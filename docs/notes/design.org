@@ -1,4 +1,4 @@
-#+TITLE Design Notes
+#+TITLE: Design Notes
 
 Let’s start with an example.
 
