@@ -1,3 +1,7 @@
 #+TITLE: README
 
 Just Another /Fine/ Pipeline Language.
+
+This is the core graph library. There’s a simple calculator demo
+in the test directory. It’s also used by
+[[https://github.com/ndw/xmlcalabash2][XML Calabash 2.x]].
