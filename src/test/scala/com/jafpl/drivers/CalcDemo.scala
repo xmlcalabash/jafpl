@@ -2,9 +2,10 @@ package com.jafpl.drivers
 
 import java.io.FileWriter
 
-import com.jafpl.calc.{AddExpr, MultExpr, NumberLiteral, UnaryExpr}
-import com.jafpl.graph.{Graph, InputNode, Node, Runtime}
+import com.jafpl.calc._
+import com.jafpl.graph.{Graph, InputNode, LoopStart, Node, Runtime}
 import com.jafpl.items.NumberItem
+import com.jafpl.runtime.ForEachIterator
 import com.jafpl.xpath.{CalcParser, XdmNodes}
 import net.sf.saxon.s9api._
 
@@ -21,6 +22,9 @@ object CalcDemo extends App {
   val _IntegerLiteral = new QName("", "IntegerLiteral")
   val _TOKEN = new QName("", "TOKEN")
   val _VarRef = new QName("", "VarRef")
+  val _QName = new QName("", "QName")
+  val _FunctionCall = new QName("", "FunctionCall")
+  val _ArgumentList = new QName("", "ArgumentList")
   val _nid = new QName("", "nid")
 
   val multOps = Array("*", "div")
@@ -177,7 +181,23 @@ object CalcDemo extends App {
             gnode = Some(graph.createInputNode(nodeId))
             varMap.put(node.getStringValue, gnode.get.asInstanceOf[InputNode])
           }
-        } else if (node.getNodeName == _TOKEN) {
+        } else if (node.getNodeName == _FunctionCall) {
+          // We only know about the sum function...
+          if (children(0).getNodeName != _QName || children(0).getStringValue != "double") {
+            halt("Only expecting the 'double' function")
+          }
+
+          val fname = name(children(0))
+          val doubler = graph.createNode(fname, new Doubler())
+          nodeMap.put(fname, doubler)
+
+          val iterate = new GenerateIntegers("for_" + nodeId, List(doubler))
+          gnode = Some(graph.createIteratorNode(iterate, List(doubler)))
+
+          graph.addEdge(gnode.get, "current", doubler, "source")
+          graph.addEdge(doubler, "result", gnode.get.asInstanceOf[LoopStart].loopEnd, "I_result")
+
+        } else if (node.getNodeName == _TOKEN || node.getNodeName == _QName || node.getNodeName == _ArgumentList) {
           // nop
         } else {
           halt("Unexpected node name: " + node.getNodeName)
@@ -185,13 +205,15 @@ object CalcDemo extends App {
 
         if (gnode.isDefined) {
           if (firstElement) {
-            graph.addEdge(gnode.get, "result", output, "source")
+            graph.addEdge(linkFrom(gnode.get), "result", output, "source")
             firstElement = false
           }
           nodeMap.put(nodeId, gnode.get)
         }
 
-        for (child <- children) { makeNodes(child) }
+        for (child <- children) {
+          makeNodes(child)
+        }
       case _ => Unit
     }
   }
@@ -217,12 +239,29 @@ object CalcDemo extends App {
             count += 1
             pos += 2
           }
+        } else if (node.getNodeName == _FunctionCall) {
+          var count = 1
+          var pos = 0
+          val arglist = XdmNodes.children(children(1))
+          while (pos < arglist.size) {
+            val operand = nodeMap(name(arglist(pos)))
+            graph.addEdge(operand, "result", gnode.get, "s" + count)
+            count += 1
+            pos += 2
+          }
         } else if (node.getNodeName == _UnaryExpr) {
           val expr = nodeMap(name(children(1)))
           graph.addEdge(expr, "result", gnode.get, "source")
         }
         for (child <- children) { makeEdges(child) }
       case _ => Unit
+    }
+  }
+
+  def linkFrom(node: Node): Node = {
+    node match {
+      case l: LoopStart => l.loopEnd
+      case _ => node
     }
   }
 
