@@ -31,11 +31,6 @@ abstract class DefaultStart(name: String, val subpipeline: List[Node]) extends D
                      outputs: List[String],
                      opts: List[QName]): Unit = {
     super.setup(ctrl, inputs, outputs, opts)
-
-    logger.debug("SUBPIPELINE: " + this)
-    for (node <- subpipeline) {
-      logger.debug("   " + node)
-    }
   }
 
   override def readyToRestart(): Unit = {

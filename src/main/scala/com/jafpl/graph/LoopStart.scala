@@ -27,9 +27,13 @@ class LoopStart(graph: Graph, name: Option[String], val loopEnd: LoopEnd, step: 
   }
 
   override private[graph] def makeActors(): Unit = {
+    val made = madeActors
+
     super.makeActors()
 
-    graph.monitor ! GSubgraph(_actor, step.subpipeline)
+    if (!made) {
+      graph.monitor ! GSubgraph(_actor, step.subpipeline)
+    }
   }
 
   override def addIterationCaches(): Unit = {

@@ -255,7 +255,7 @@ class Graph() {
   }
 
   private[graph] def makeActors(): Unit = {
-    _system = ActorSystem("XMLCalabashPipeline")
+    _system = ActorSystem("jafpl-com")
     _monitor = _system.actorOf(Props(new GraphMonitor(this)), name="monitor")
 
     for (node <- roots()) {
