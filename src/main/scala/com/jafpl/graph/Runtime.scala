@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 /**
   * Created by ndw on 10/6/16.
   */
-class XProcRuntime(val graph: Graph) {
+class Runtime(val graph: Graph) {
   private val logger = LoggerFactory.getLogger(this.getClass)
   private var started = false
 

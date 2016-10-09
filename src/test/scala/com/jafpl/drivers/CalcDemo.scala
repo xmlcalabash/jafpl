@@ -3,7 +3,7 @@ package com.jafpl.drivers
 import java.io.FileWriter
 
 import com.jafpl.calc.{AddExpr, MultExpr, NumberLiteral, UnaryExpr}
-import com.jafpl.graph.{Graph, InputNode, Node, XProcRuntime}
+import com.jafpl.graph.{Graph, InputNode, Node, Runtime}
 import com.jafpl.items.NumberItem
 import com.jafpl.xpath.{CalcParser, XdmNodes}
 import net.sf.saxon.s9api._
@@ -116,7 +116,7 @@ object CalcDemo extends App {
     }
   }
 
-  val runtime = new XProcRuntime(graph)
+  val runtime = new Runtime(graph)
   runtime.start()
 
   for (varname <- varMap.keySet) {

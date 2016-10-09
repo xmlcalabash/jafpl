@@ -3,7 +3,7 @@ package com.jafpl.drivers
 import java.io.FileWriter
 
 import com.jafpl.calc.{AddExpr, NumberLiteral}
-import com.jafpl.graph.{Graph, XProcRuntime}
+import com.jafpl.graph.{Graph, Runtime}
 import com.jafpl.items.{NumberItem, StringItem}
 import net.sf.saxon.s9api.Processor
 
