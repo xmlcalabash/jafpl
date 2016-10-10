@@ -2,7 +2,7 @@
 
 set | grep TRAVIS
 
-if [ "$TRAVIS_REPO_SLUG" == "$GIT_PUB_REPO" ]; then
+if [ "$TRAVIS_REPO_SLUG" == "$GIT_PUB_REPO" -a "$TRAVIS_BRANCH" == "master" ]; then
     echo -e "Setting up for publication...\n"
 
     cd $HOME
@@ -35,4 +35,6 @@ if [ "$TRAVIS_REPO_SLUG" == "$GIT_PUB_REPO" ]; then
     else
         echo -e "Publication cannot be performed on pull requests.\n"
     fi
+else
+    echo "Cannot publish $TRAVIS_REPO_SLUG on branch $TRAVIS_BRANCH"
 fi
