@@ -13,18 +13,18 @@ if [ "$TRAVIS_REPO_SLUG" == "$GIT_PUB_REPO" ]; then
     if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
         echo -e "Publishing docs...\n"
 
-        ROOT=/home/travis/build/$TRAVIS_REPO_SLUG
+        PAGES=/home/travis/build/$TRAVIS_REPO_SLUG/build/pages
 
         cd gh-pages
-        ls $ROOT
+        rsync -ar --delete $PAGES/ ./
 
         if [ "$GITHUB_CNAME" != "" ]; then
             echo $GITHUB_CNAME > CNAME
         fi
 
-#        git add --all .
-#        git commit -m "Successful travis build $TRAVIS_BUILD_NUMBER"
-#        git push -fq origin gh-pages
+        git add --all .
+        git commit -m "Successful travis build $TRAVIS_BUILD_NUMBER"
+        git push -fq origin gh-pages
 
         echo -e "Published jafpl to gh-pages\n"
         if [ "$GITHUB_CNAME" != "" ]; then
