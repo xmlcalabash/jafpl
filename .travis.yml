@@ -1,0 +1,7 @@
+install: true
+language: java
+script: gradle build
+sudu: false
+
+after_success:
+  - src/website/bin/travis-publish.sh
