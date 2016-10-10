@@ -1,1 +1,117 @@
-There's nothing to see here
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>JAFPL.com</title><meta charset="utf-8" /><meta name="generator" content="DocBook XSL 2.0 Stylesheets V2.0.20" /><link rel="stylesheet" type="text/css" href="https://docbook.github.io/release/2.0.20/resources/css/default.css" /><link rel="stylesheet" type="text/css" href="/css/docbook.css" /><link rel="stylesheet" type="text/css" href="/css/tabs.css" /><link rel="stylesheet" type="text/css" href="/css/website.css" /><link rel="icon" href="/graphics/icon.ico" type="image/ico" /><script type="text/javascript" src="https://docbook.github.io/release/2.0.20/resources/js/dbmodnizr.js"></script><link href="https://docbook.github.io/release/2.0.20/resources/css/prism.css" rel="stylesheet" type="text/css" /><link href="https://docbook.github.io/release/2.0.20/resources/css/db-prism.css" rel="stylesheet" type="text/css" /></head><body><div class="header">
+<h1><img src="/images/jafpl.png" alt="JAFPL" /></h1>
+</div><div class="navset" id="nav"><div class="hd"><ul><li id="home" class="on" title="selected"><a href="/"><strong><em>Home</em></strong></a></li></ul></div><div class="bd"><ul><li class="on first "><a href="/">Overview</a></li><li id="contact" class="  last"><a href="/contact">Contact us</a></li></ul></div></div><article class="article"><h1>Just another <em>fine</em> pipeline language</h1><p>This project is the core runtime for a general purpose pipeline
+language. It’s the heart of <em class="citetitle">XML Calabash V2.x</em>
+which hasn’t been released yet. This hasn’t been released in any
+official sense either. YMMV. Here there be dragons. Etc.</p><section id="what" class="section"><div class="section-titlepage"><h2>What is it?</h2></div><p>For the purpose of this discussion, a pipeline is a directed,
+acyclic graph. Each node in the graph represents some kind of
+processing. The edges between the nodes are how the data flows through
+the pipeline.</p><p>This library doesn’t care what you do in each node and it
+doesn’t care what kind of data flows between nodes. You construct a
+graph with edges. You pour data in at the top, stuff happens, data
+pours out the bottom.</p><p>Many nodes can be implemented as atomic units of work
+(henceforth “atomic steps”), but some naturally operate on subgraphs
+(henceforth “compound steps”). The current (9 Oct 2016) implementation
+supports only one compound step: iteration. Steps to choose beteween
+alternative subgraphs and to support try/catch error handling are
+planned.</p></section><section id="example" class="section"><div class="section-titlepage"><h2>An example</h2></div><p>An example may help. I plan to use this library as the core of
+my new XProc implementation, but if you aren’t familiar with XProc
+(and odds are, you’re not), that’s not going to be very intuitive.
+</p><p>To illustrate how things work, the library ships with a small
+<em class="citetitle">CalcDemo</em> application that uses the library to
+evaluate simple arithmetic expressions. Using a pipeline language for
+this purpose is a bit crazy, but I’m going to assume you all
+understand how arithmetic works.</p><p>Consider the expression “<code class="code">(1 + 2) * (3 + 4 + 5)</code>”. It’s possible to construct
+a pipeline to evaluate this expression:</p><div id="example.5" class="mediaobject"><img src="pipe1.svg" /></div><p>The steps labled <code class="literal">IntegerLiteral_<em class="replaceable"><code>*</code></em></code>”
+are atomic steps that provide the
+input numbers. The steps labeled
+“<code class="literal">AdditiveExpr_<em class="replaceable"><code>*</code></em></code>” receive a number
+on each input port. When all the numbers have arrived, the sum is computed and
+the result is output. In an analagous way, the step labeled
+“<code class="literal">MultiplicativeExpr_<em class="replaceable"><code>*</code></em></code>” performs
+multiplication. The step labled “<code class="literal">OUTPUT</code>” is a pipeline boundary.
+The caller is responsible for what happens after that. (The demo tool simply prints
+the answer, 36 in this case.)</p><p>Pipeline boundaries can occur on the input as well. Consider this
+expression: “<code class="code">(1 + 2) * $foo</code>”. Here <code class="code">$foo</code> is an option
+that has to passed in.</p><div id="example.8" class="mediaobject"><img src="pipe2.svg" /></div><p>All atomic steps work basically the same way. There’s also a provision for declaring
+a dependency edge between two nodes that aren’t connected by data flow. The semantics
+of the dependency are that the <em>dependent</em> step will not be run
+before the step it <em>depends on</em> has finished.</p><p>Concocting an example of a compound step requires a little more craziness.
+Imagine a function, “double”, that takes a series of numbers as arguments. It doubles
+each of its arguments and returns the results as a sequence.</p><p>One way to implement this is with a compound step. The compound step takes
+the arguments and generates a sequence of numbers from them. Each item in this sequence
+is passed through a subpipeline. The result of the step is the output from the subpipeline.
+If we stick a single atomic “double” step in the subpipeline, we’ll get the desired
+result:</p><div id="example.12" class="mediaobject"><img src="pipe3.svg" /></div><p>It’s worth noting that even though we conceived of the step as a
+wrapper around a subpipeline, the graph implementation is flat. Start
+and end steps, which are effectively atomic, are used to manage the iteration.</p><p>For one final example, I will use an XProc pipeline. This pipeline is
+mostly identity steps. The <code class="tag-element">p:interleave</code> step is one that I made
+up for testing: it shuffles documents from its <code class="code">left</code> and
+<code class="code">right</code> inputs together in strict alternation.</p><p>Here is the pipeline:</p><pre class="programlisting language-none"><code>&lt;p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:xi="http://www.w3.org/2001/XInclude"
+                xmlns:c="http://www.w3.org/ns/xproc-step"
+                name="main" version="1.0"&gt;
+  &lt;p:input port="source" sequence="true" primary="true"/&gt;
+  &lt;p:output port="result" step="end" sequence="true"/&gt;
+
+  &lt;p:identity name="start"/&gt;
+
+  &lt;p:identity name="outside-the-loop"/&gt;
+
+  &lt;p:for-each name="loop"&gt;
+    &lt;p:iteration-source&gt;
+      &lt;p:pipe step="start" port="result"/&gt;
+    &lt;/p:iteration-source&gt;
+    &lt;p:output port="result"&gt;
+      &lt;p:pipe step="interleave" port="result"/&gt;
+    &lt;/p:output&gt;
+
+    &lt;p:identity name="first"/&gt;
+
+    &lt;p:interleave name="interleave"&gt;
+      &lt;p:input port="left"&gt;
+        &lt;p:pipe step="first" port="result"/&gt;
+      &lt;/p:input&gt;
+      &lt;p:input port="right"&gt;
+        &lt;p:pipe step="outside-the-loop" port="result"/&gt;
+      &lt;/p:input&gt;
+    &lt;/p:interleave&gt;
+  &lt;/p:for-each&gt;
+
+  &lt;p:identity name="end"/&gt;
+
+&lt;/p:declare-step&gt;</code></pre><p>And here is the somewhat larger graph:</p><div id="example.18" class="mediaobject"><img src="pipe4.svg" /></div><p>There are two interesting features in this graph:</p><div class="orderedlist"><ol style="list-style: decimal;"><li><p>First, an explicit “fan out” step has been added. This is
+done automatically by the graph engine. In the execution graph,
+every output port will be read by at most one input port and every
+input port will consume data from exactly one output port.</p></li><li><p>The ordinary semantic for atomic steps is that they take inputs,
+perform computation, and produce output. Once. If you want to iterate,
+you have to make that iteration explicit.</p><p>But the <code class="tag-element">p:interleave</code> step reads “across” the loop boundary. If it
+simply read from the “start” identity step (or the fan out that acts as its
+proxy), there would be nothing to read on the second iteration.
+The graph engine automatically inserts caching proxies where necessary.
+</p></li></ol></div></section><section id="how" class="section"><div class="section-titlepage"><h2>How does it work?</h2></div><p>The graph is executed with the <a href="http://akka.io/">Akka</a> framework. An implementation
+for each step must be provided, then actors are created to manage each
+node. All steps “start” at the same time and execute in parallel (to the extent
+that the graph allows for parallelism, of course). When the
+last step reports that it is finished, execution finishes.</p><p>One of my goals is to conceal as much of the framework mechanics
+from step implementors (and to prevent step authors from mucking with the
+framework!).</p><p>The API, so far, is quite simple. Each (atomic) step implmentation
+must implement five methods:</p><section id="setup" class="section"><div class="section-titlepage"><h3>Setup</h3></div><pre class="programlisting language-none"><code>def setup(controller: StepController,
+          inputPorts: List[String],
+          outputPorts: List[String],
+          options: List[QName])</code></pre><p>Setup will be called once before execution begins. The graph constructor
+neither knows nor cares about the name and number of inputs and outputs on each
+node. Setup is the implementation’s opportunity to look at the configuration
+and decide if it’s ok.</p><p>The names of options are <code class="code">QName</code>s at the moment
+because that’s convenient. That’ll have to change to be less
+XML-y.</p><p>The implementation should keep a copy of the controller. The controller
+is how the step sends data “downstream” to the next step(s) in the graph.
+For atomic steps, there’s only one important method on the controller:</p><pre class="programlisting language-none"><code>def send(port: String, item: GenericItem))</code></pre><p>This method sends the item “out” of specified port.</p><p>(For compound steps, things are still in a state of flux.)</p></section><section id="receive" class="section"><div class="section-titlepage"><h3></h3></div><pre class="programlisting language-none"><code>def receive(port: String, msg: ItemMessage)</code></pre><p>Receive is how data gets delievered to the step. The actor responsible
+for managing the node will call the <code class="methodname">receive</code> method each
+time a document arrives.</p></section><section id="reset" class="section"><div class="section-titlepage"><h3>Reset</h3></div><pre class="programlisting language-none"><code>def reset()</code></pre><p>If the step is in a loop, it will be reset between each iteration.</p></section><section id="run" class="section"><div class="section-titlepage"><h3></h3></div><pre class="programlisting language-none"><code>def run()</code></pre><p>After all of the inputs have been delievered, the step will be asked to run.
+This will happen exactly once.</p><p>Note that there’s nothing that says an implementation has to wait until
+<code class="methodname">run</code> is called. The identity step, for example, can
+send the documents out as fast as they arrive and do nothing when
+<code class="methodname">run</code> is called.</p><p>But if a step needs all its inputs before it can run, that’s fine too.</p></section><section id="teardown" class="section"><div class="section-titlepage"><h3></h3></div><pre class="programlisting language-none"><code>def teardown()</code></pre><p>Teardown is called once when the pipeline execution has finished.</p></section></section><section id="whatsnext" class="section"><div class="section-titlepage"><h2>What’s next?</h2></div><p>Well. Continued development, I hope. But no promises.</p></section><footer><p>Copyright © 2016 Norman Walsh. See
+      <a href="https://github.com/ndw/jafpl/blob/master/LICENSE.md">LICENSE</a>.
+      Last updated on 09 Oct 2016 at 07:42p.m. GMT-05:00 by Norman Walsh</p></footer></article><script src="https://docbook.github.io/release/2.0.20/resources/js/prism.js"></script></body></html>

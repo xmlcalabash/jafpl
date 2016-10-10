@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns="http://docbook.org/ns/docbook"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+	 xml:id="contact"
+         version="5.0">
+<info>
+  <title>Contact us</title>
+</info>
+
+<para>The <link xlink:href="http://jafpl.com/">jafpl.com</link> site
+is maintained by <link xlink:href="http://nwalsh.com/">Norman Walsh</link>.
+If you have any questions or comments, please send email to
+<email>ndw@nwalsh.com</email>.</para>
+
+</article>
