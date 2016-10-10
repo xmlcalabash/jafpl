@@ -136,7 +136,14 @@
 <!-- complete and total f'ing hack -->
 <xsl:function name="f:mediaobject-href" as="xs:string">
   <xsl:param name="filename" as="xs:string"/>
-  <xsl:value-of select="substring-after($filename, '/pages/')"/>
+  <xsl:choose>
+    <xsl:when test="starts-with($filename, '/')">
+      <xsl:value-of select="substring-after($filename, '/pages/')"/>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:value-of select="$filename"/>
+    </xsl:otherwise>
+  </xsl:choose>
 </xsl:function>
 
 </xsl:stylesheet>
