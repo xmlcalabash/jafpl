@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorRef}
 import akka.event.Logging
 import com.jafpl.graph.GraphMonitor.{GFinish, GFinished, GStart}
 import com.jafpl.messages._
-import com.jafpl.runtime.{CompoundStart, StepController}
+import com.jafpl.runtime.StepController
 
 import scala.collection.mutable
 
@@ -28,13 +28,13 @@ private[graph] class NodeActor(node: Node) extends Actor {
   private def run() = {
     log.debug("RUN   " + node)
     node.graph.monitor ! GStart(node)
-    node.run()
+    node.synchronized {
+      node.run()
+    }
 
     node match {
       case n: LoopStart =>
-        if (n.stepFinished) {
-          node.graph.monitor ! GFinish(node)
-        }
+        Unit
       case n: LoopEnd =>
         Unit
       case _ => node.graph.monitor ! GFinish(node)
@@ -44,7 +44,9 @@ private[graph] class NodeActor(node: Node) extends Actor {
   def receive = {
     case m: ItemMessage =>
       log.debug("MSG   {}", node)
-      node.receive(m.port, m)
+      node.synchronized {
+        node.receive(m.port, m)
+      }
     case m: CloseMessage =>
       log.debug("CLOSE {}: {}", m.port, node)
       openInputs.remove(m.port)
@@ -60,12 +62,27 @@ private[graph] class NodeActor(node: Node) extends Actor {
       }
     case m: ResetMessage =>
       log.debug("RESET {}", node)
-      node.reset()
+      node.synchronized {
+        node.reset()
+      }
     case m: GFinished =>
       node match {
         case ls: LoopStart =>
-          log.debug("RTORS {}", ls)
-          ls.readyToRestart()
+          if (ls.runAgain) {
+            for (node <- ls.subpipeline) {
+              node.synchronized {
+                node.reset()
+              }
+            }
+          } else {
+            node.graph.monitor ! GFinish(ls)
+          }
+        case le: LoopEnd =>
+          // FIXME: Is this gauranteed to work? Is there any chance that le.runAgain could
+          // get false when ls.runAgain got true?
+          if (!le.runAgain) {
+            node.graph.monitor ! GFinish(le)
+          }
         case _ => log.debug("Node {} didn't expect to be notified of subgraph completion")
       }
     case m: Any => log.debug("Node {} received unexpected message: {}", node, m)

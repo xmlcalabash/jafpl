@@ -3,7 +3,7 @@ package com.jafpl.graph
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.jafpl.messages.{CloseMessage, StartMessage}
 import com.jafpl.util.TreeWriter
-import com.jafpl.runtime.{CompoundStart, Step}
+import com.jafpl.runtime.{CompoundStep, Step}
 import com.jafpl.util.UniqueId
 import net.sf.saxon.s9api.{Processor, QName, XdmNode}
 import org.slf4j.LoggerFactory
@@ -77,16 +77,16 @@ class Graph() {
     node
   }
 
-  def createIteratorNode(start: CompoundStart, subpipeline: List[Node]): LoopStart = {
+  def createIteratorNode(step: CompoundStep, subpipeline: List[Node]): LoopStart = {
     chkValid()
-    val loopEnd = new LoopEnd(this, Some("loop_end_" + UniqueId.nextId), start.compoundEnd)
-    val loopStart = new LoopStart(this, Some("loop_start_" + UniqueId.nextId), loopEnd, start)
+    val loopStart = new LoopStart(this, Some("loop_start_" + UniqueId.nextId), step, subpipeline)
+    val loopEnd   = new LoopEnd(this, Some("loop_end_" + UniqueId.nextId), step)
+
+    loopStart.loopEnd = loopEnd
+    loopEnd.loopStart = loopStart
+
     nodes.add(loopStart)
     nodes.add(loopEnd)
-
-    for (node <- subpipeline) {
-      loopStart.addNode(node)
-    }
 
     loopStart
   }

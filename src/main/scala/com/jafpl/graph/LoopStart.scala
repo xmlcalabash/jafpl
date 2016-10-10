@@ -2,7 +2,7 @@ package com.jafpl.graph
 
 import akka.actor.Props
 import com.jafpl.graph.GraphMonitor.{GSubgraph, GWatch}
-import com.jafpl.runtime.CompoundStart
+import com.jafpl.runtime.CompoundStep
 import com.jafpl.util.{TreeWriter, UniqueId}
 import net.sf.saxon.s9api.QName
 
@@ -11,20 +11,19 @@ import scala.collection.mutable
 /**
   * Created by ndw on 10/2/16.
   */
-class LoopStart(graph: Graph, name: Option[String], val loopEnd: LoopEnd, step: CompoundStart) extends Node(graph, name, Some(step)) {
-  val nodes = mutable.ListBuffer.empty[Node]
+class LoopStart(graph: Graph, name: Option[String], step: CompoundStep, nodes: List[Node]) extends Node(graph, name, Some(step)) {
+  var _loopEnd: LoopEnd = _
 
-  def addNode(node: Node): Unit = {
-    nodes += node
+  def loopEnd = _loopEnd
+  private[graph] def loopEnd_=(node: LoopEnd): Unit = {
+    _loopEnd = node
   }
 
-  def readyToRestart(): Unit = {
-    step.readyToRestart()
+  def runAgain: Boolean = {
+    step.runAgain
   }
 
-  def stepFinished: Boolean = {
-    step.finished
-  }
+  private[graph] def subpipeline = nodes
 
   override private[graph] def makeActors(): Unit = {
     val made = madeActors
@@ -32,7 +31,7 @@ class LoopStart(graph: Graph, name: Option[String], val loopEnd: LoopEnd, step: 
     super.makeActors()
 
     if (!made) {
-      graph.monitor ! GSubgraph(_actor, step.subpipeline)
+      graph.monitor ! GSubgraph(_actor, nodes)
     }
   }
 

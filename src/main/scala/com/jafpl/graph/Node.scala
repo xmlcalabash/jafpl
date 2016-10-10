@@ -147,7 +147,11 @@ class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]
 
   def receive(port: String, msg: ItemMessage): Unit = {
     if (worker.isDefined) {
-      worker.get.receive(port, msg)
+      this match {
+        case le: LoopEnd =>
+          le.receiveOutput(port, msg)
+        case _ => worker.get.receive(port, msg)
+        }
     } else {
       logger.info("No worker: {}", this)
     }
@@ -169,7 +173,12 @@ class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]
       logger.debug("Node {} sends to {} on {}", this, targetPort, targetNode)
       targetNode.actor ! msg
     } else {
-      logger.info(this + " writes to unknown output port: " + port)
+      this match {
+        case ls: LoopStart =>
+          ls.loopEnd.send(port, item)
+        case _ =>
+          logger.info(this + " writes to unknown output port: " + port)
+      }
     }
   }
 

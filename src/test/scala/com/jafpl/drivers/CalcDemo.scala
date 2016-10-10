@@ -5,7 +5,6 @@ import java.io.FileWriter
 import com.jafpl.calc._
 import com.jafpl.graph.{Graph, InputNode, LoopStart, Node, Runtime}
 import com.jafpl.items.NumberItem
-import com.jafpl.runtime.ForEachIterator
 import com.jafpl.xpath.{CalcParser, XdmNodes}
 import net.sf.saxon.s9api._
 
@@ -182,7 +181,7 @@ object CalcDemo extends App {
             varMap.put(node.getStringValue, gnode.get.asInstanceOf[InputNode])
           }
         } else if (node.getNodeName == _FunctionCall) {
-          // We only know about the sum function...
+          // We only know about the double function...
           if (children(0).getNodeName != _QName || children(0).getStringValue != "double") {
             halt("Only expecting the 'double' function")
           }
@@ -191,7 +190,7 @@ object CalcDemo extends App {
           val doubler = graph.createNode(fname, new Doubler())
           nodeMap.put(fname, doubler)
 
-          val iterate = new GenerateIntegers("for_" + nodeId, List(doubler))
+          val iterate = new IterateIntegers("for_" + nodeId)
           gnode = Some(graph.createIteratorNode(iterate, List(doubler)))
 
           graph.addEdge(gnode.get, "current", doubler, "source")
