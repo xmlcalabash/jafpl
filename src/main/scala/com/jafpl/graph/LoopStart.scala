@@ -1,9 +1,9 @@
 package com.jafpl.graph
 
 import akka.actor.Props
-import com.jafpl.graph.GraphMonitor.{GWatch, GSubgraph}
+import com.jafpl.graph.GraphMonitor.{GSubgraph, GWatch}
 import com.jafpl.runtime.CompoundStart
-import com.jafpl.util.UniqueId
+import com.jafpl.util.{TreeWriter, UniqueId}
 import net.sf.saxon.s9api.QName
 
 import scala.collection.mutable

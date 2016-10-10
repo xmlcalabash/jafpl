@@ -2,6 +2,7 @@ package com.jafpl.graph
 
 import com.jafpl.items.GenericItem
 import com.jafpl.messages.ItemMessage
+import com.jafpl.util.TreeWriter
 
 /**
   * Created by ndw on 10/2/16.
@@ -41,4 +42,9 @@ class OutputNode(graph: Graph, name: Option[String]) extends Node(graph, name, N
       }
     }
   }
+
+  override def dumpExtraAttr(tree: TreeWriter): Unit = {
+    tree.addAttribute(Serializer._boundary, "true")
+  }
+
 }

@@ -249,6 +249,10 @@ class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]
     }
   }
 
+  def dumpExtraAttr(tree: TreeWriter): Unit = {
+    // nop
+  }
+
   def dump(tree: TreeWriter): Unit = {
     tree.addStartElement(Serializer.pg_node)
     if (name.isDefined) {
@@ -258,6 +262,7 @@ class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]
       tree.addAttribute(Serializer._step, step.get.toString)
     }
     tree.addAttribute(Serializer._uid, uid.toString)
+    dumpExtraAttr(tree)
 
     if (inputs().nonEmpty) {
       tree.addStartElement(Serializer.pg_inputs)

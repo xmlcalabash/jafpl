@@ -10,6 +10,7 @@
   <xsl:text>digraph pg_graph {&#10;</xsl:text>
   <xsl:apply-templates/>
   <xsl:apply-templates select="//pg:in-edge|//pg:out-edge" mode="links"/>
+  <xsl:apply-templates select="//pg:node" mode="shapes"/>
   <xsl:text>}&#10;</xsl:text>
 </xsl:template>
 
@@ -20,6 +21,7 @@
   <xsl:text>label = "</xsl:text>
   <xsl:value-of select="@name"/>
   <xsl:text>";&#10;</xsl:text>
+  <xsl:text>shape = "invhouse";&#10;</xsl:text>
 
   <xsl:apply-templates/>
 
@@ -110,5 +112,21 @@
   <xsl:value-of select="@pg:id"/>
   <xsl:text>";&#10;</xsl:text>
 </xsl:template>
+
+<!-- ============================================================ -->
+
+<xsl:template match="pg:node[@boundary='true' and pg:inputs]" mode="shapes">
+  <xsl:text>"</xsl:text>
+  <xsl:value-of select="concat(generate-id(.), '.', pg:inputs/pg:in-edge/@input-port)"/>
+  <xsl:text>" [shape=invhouse];&#10;</xsl:text>
+</xsl:template>
+
+<xsl:template match="pg:node[@boundary='true' and pg:outputs]" mode="shapes">
+  <xsl:text>"</xsl:text>
+  <xsl:value-of select="concat(generate-id(.), '.', pg:outputs/pg:out-edge/@output-port)"/>
+  <xsl:text>" [shape=invhouse];&#10;</xsl:text>
+</xsl:template>
+
+<xsl:template match="pg:node" mode="shapes"/>
 
 </xsl:stylesheet>
