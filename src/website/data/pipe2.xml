@@ -1,0 +1,48 @@
+<pg:graph xmlns:pg="http://jafpl.com/ns/graph">
+   <pg:node name="OUTPUT" uid="9" boundary="true">
+      <pg:inputs>
+         <pg:in-edge source="10" input-port="source" output-port="result"/>
+      </pg:inputs>
+   </pg:node>
+   <pg:node name="MultiplicativeExpr_0"
+            step="com.jafpl.calc.MultExpr@6aaceffd"
+            uid="10">
+      <pg:inputs>
+         <pg:in-edge source="14" input-port="s2" output-port="result"/>
+         <pg:in-edge source="11" input-port="s1" output-port="result"/>
+      </pg:inputs>
+      <pg:outputs>
+         <pg:out-edge destination="9" input-port="source" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="AdditiveExpr_1"
+            step="com.jafpl.calc.AddExpr@c86b9e3"
+            uid="11">
+      <pg:inputs>
+         <pg:in-edge source="13" input-port="s2" output-port="result"/>
+         <pg:in-edge source="12" input-port="s1" output-port="result"/>
+      </pg:inputs>
+      <pg:outputs>
+         <pg:out-edge destination="10" input-port="s1" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="IntegerLiteral_2"
+            step="com.jafpl.calc.NumberLiteral@10aa41f2"
+            uid="12">
+      <pg:outputs>
+         <pg:out-edge destination="11" input-port="s1" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="VarRef_6" uid="14" boundary="true">
+      <pg:outputs>
+         <pg:out-edge destination="10" input-port="s2" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="IntegerLiteral_4"
+            step="com.jafpl.calc.NumberLiteral@3af9c5b7"
+            uid="13">
+      <pg:outputs>
+         <pg:out-edge destination="11" input-port="s2" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+</pg:graph>

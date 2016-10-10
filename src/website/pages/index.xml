@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<article xmlns="http://docbook.org/ns/docbook"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+	 xml:id="home"
+         version="5.0">
+<info>
+  <title>JAFPL.com</title>
+</info>
+
+<para>This project is the core runtime for a general purpose pipeline
+language. It’s the heart of <citetitle>XML Calabash V2.x</citetitle>
+which hasn’t been released yet. This hasn’t been released in any
+official sense either. YMMV. Here there be dragons. Etc.</para>
+
+<section xml:id="what">
+<title>What is it?</title>
+
+<para>For the purpose of this discussion, a pipeline is a directed,
+acyclic graph. Each node in the graph represents some kind of
+processing. The edges between the nodes are how the data flows through
+the pipeline.</para>
+
+<para>This library doesn’t care what you do in each node and it
+doesn’t care what kind of data flows between nodes. You construct a
+graph with edges. You pour data in at the top, stuff happens, data
+pours out the bottom.</para>
+
+<para>Many nodes can be implemented as atomic units of work
+(henceforth “atomic steps”), but some naturally operate on subgraphs
+(henceforth “compound steps”). The current (9 Oct 2016) implementation
+supports only one compound step: iteration. Steps to choose beteween
+alternative subgraphs and to support try/catch error handling are
+planned.</para>
+
+</section>
+<section xml:id="example">
+<title>An example</title>
+
+<para>An example may help. I plan to use this library as the core of
+my new XProc implementation, but if you aren’t familiar with XProc
+(and odds are, you’re not), that’s not going to be very intuitive.
+</para>
+
+<para>To illustrate how things work, the library ships with a small
+<citetitle>CalcDemo</citetitle> application that uses the library to
+evaluate simple arithmetic expressions. Using a pipeline language for
+this purpose is a bit crazy, but I’m going to assume you all
+understand how arithmetic works.</para>
+
+<para>Consider the expression “<code>(1 + 2) * (3 + 4 + 5)</code>”. It’s possible to construct
+a pipeline to evaluate this expression:</para>
+
+<mediaobject>
+<imageobject>
+<imagedata fileref="pipe1.svg"/>
+</imageobject>
+</mediaobject>
+
+<para>The steps labled <literal>IntegerLiteral_<replaceable>*</replaceable></literal>”
+are atomic steps that provide the
+input numbers. The steps labeled
+“<literal>AdditiveExpr_<replaceable>*</replaceable></literal>” receive a number
+on each input port. When all the numbers have arrived, the sum is computed and
+the result is output. In an analagous way, the step labeled
+“<literal>MultiplicativeExpr_<replaceable>*</replaceable></literal>” performs
+multiplication. The step labled “<literal>OUTPUT</literal>” is a pipeline boundary.
+The caller is responsible for what happens after that. (The demo tool simply prints
+the answer, 36 in this case.)</para>
+
+<para>Pipeline boundaries can occur on the input as well. Consider this
+expression: “<code>(1 + 2) * $foo</code>”. Here <code>$foo</code> is an option
+that has to passed in.</para>
+
+<mediaobject>
+<imageobject>
+<imagedata fileref="pipe2.svg"/>
+</imageobject>
+</mediaobject>
+
+<para>All atomic steps work basically the same way. There’s also a provision for declaring
+a dependency edge between two nodes that aren’t connected by data flow. The semantics
+of the dependency are that the <emphasis>dependent</emphasis> step will not be run
+before the step it <emphasis>depends on</emphasis> has finished.</para>
+
+<para>Concocting an example of a compound step requires a little more craziness.
+Imagine a function, “double”, that takes a series of numbers as arguments. It doubles
+each of its arguments and returns the results as a sequence.</para>
+
+<para>One way to implement this is with a compound step. The compound step takes
+the arguments and generates a sequence of numbers from them. Each item in this sequence
+is passed through a subpipeline. The result of the step is the output from the subpipeline.
+If we stick a single atomic “double” step in the subpipeline, we’ll get the desired
+result:</para>
+
+<mediaobject>
+<imageobject>
+<imagedata fileref="pipe3.svg"/>
+</imageobject>
+</mediaobject>
+
+<para>It’s worth noting that even though we conceived of the step as a
+wrapper around a subpipeline, the graph implementation is flat. Start
+and end steps, which are effectively atomic, are used to manage the iteration.</para>
+
+<para>For one final example, I will use an XProc pipeline. This pipeline is
+mostly identity steps. The <tag>p:interleave</tag> step is one that I made
+up for testing: it shuffles documents from its <code>left</code> and
+<code>right</code> inputs together in strict alternation.</para>
+
+<para>Here is the pipeline:</para>
+
+<programlisting><![CDATA[<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:xi="http://www.w3.org/2001/XInclude"
+                xmlns:c="http://www.w3.org/ns/xproc-step"
+                name="main" version="1.0">
+  <p:input port="source" sequence="true" primary="true"/>
+  <p:output port="result" step="end" sequence="true"/>
+
+  <p:identity name="start"/>
+
+  <p:identity name="outside-the-loop"/>
+
+  <p:for-each name="loop">
+    <p:iteration-source>
+      <p:pipe step="start" port="result"/>
+    </p:iteration-source>
+    <p:output port="result">
+      <p:pipe step="interleave" port="result"/>
+    </p:output>
+
+    <p:identity name="first"/>
+
+    <p:interleave name="interleave">
+      <p:input port="left">
+        <p:pipe step="first" port="result"/>
+      </p:input>
+      <p:input port="right">
+        <p:pipe step="outside-the-loop" port="result"/>
+      </p:input>
+    </p:interleave>
+  </p:for-each>
+
+  <p:identity name="end"/>
+
+</p:declare-step>]]></programlisting>
+
+<para>And here is the somewhat larger graph:</para>
+
+<mediaobject>
+<imageobject>
+<imagedata fileref="pipe4.svg"/>
+</imageobject>
+</mediaobject>
+
+
+<para>There are two interesting features in this graph:</para>
+
+<orderedlist>
+<listitem>
+<para>First, an explicit “fan out” step has been added. This is
+done automatically by the graph engine. In the execution graph,
+every output port will be read by at most one input port and every
+input port will consume data from exactly one output port.</para>
+</listitem>
+<listitem>
+<para>The ordinary semantic for atomic steps is that they take inputs,
+perform computation, and produce output. Once. If you want to iterate,
+you have to make that iteration explicit.</para>
+<para>But the <tag>p:interleave</tag> step reads “across” the loop boundary. If it
+simply read from the “start” identity step (or the fan out that acts as its
+proxy), there would be nothing to read on the second iteration.
+The graph engine automatically inserts caching proxies where necessary.
+</para>
+</listitem>
+</orderedlist>
+</section>
+
+<section xml:id="how">
+<title>How does it work?</title>
+
+<para>The graph is executed with the <link
+xlink:href="http://akka.io/">Akka</link> framework. An implementation
+for each step must be provided, then actors are created to manage each
+node. All steps “start” at the same time and execute in parallel (to the extent
+that the graph allows for parallelism, of course). When the
+last step reports that it is finished, execution finishes.</para>
+
+<para>One of my goals is to conceal as much of the framework mechanics
+from step implementors (and to prevent step authors from mucking with the
+framework!).</para>
+
+<para>The API, so far, is quite simple. Each (atomic) step implmentation
+must implement five methods:</para>
+
+<section xml:id="setup">
+<title>Setup</title>
+<programlisting><![CDATA[def setup(controller: StepController,
+          inputPorts: List[String],
+          outputPorts: List[String],
+          options: List[QName])]]></programlisting>
+
+<para>Setup will be called once before execution begins. The graph constructor
+neither knows nor cares about the name and number of inputs and outputs on each
+node. Setup is the implementation’s opportunity to look at the configuration
+and decide if it’s ok.</para>
+
+<para>The names of options are <code>QName</code>s at the moment
+because that’s convenient. That’ll have to change to be less
+XML-y.</para>
+
+<para>The implementation should keep a copy of the controller. The controller
+is how the step sends data “downstream” to the next step(s) in the graph.
+For atomic steps, there’s only one important method on the controller:</para>
+
+<programlisting><![CDATA[def send(port: String, item: GenericItem))]]></programlisting>
+
+<para>This method sends the item “out” of specified port.</para>
+
+<para>(For compound steps, things are still in a state of flux.)</para>
+</section>
+
+<section xml:id="receive">
+<title></title>
+<programlisting><![CDATA[def receive(port: String, msg: ItemMessage)]]></programlisting>
+
+<para>Receive is how data gets delievered to the step. The actor responsible
+for managing the node will call the <methodname>receive</methodname> method each
+time a document arrives.</para>
+
+</section>
+
+
+<section xml:id="reset">
+<title>Reset</title>
+<programlisting><![CDATA[def reset()]]></programlisting>
+
+<para>If the step is in a loop, it will be reset between each iteration.</para>
+
+</section>
+
+<section xml:id="run">
+<title></title>
+<programlisting><![CDATA[def run()]]></programlisting>
+
+<para>After all of the inputs have been delievered, the step will be asked to run.
+This will happen exactly once.</para>
+
+<para>Note that there’s nothing that says an implementation has to wait until
+<methodname>run</methodname> is called. The identity step, for example, can
+send the documents out as fast as they arrive and do nothing when
+<methodname>run</methodname> is called.</para>
+
+<para>But if a step needs all its inputs before it can run, that’s fine too.</para>
+</section>
+
+<section xml:id="teardown">
+<title></title>
+<programlisting><![CDATA[def teardown()]]></programlisting>
+
+<para>Teardown is called once when the pipeline execution has finished.</para>
+
+</section>
+</section>
+
+<section xml:id="whatsnext">
+<title>What’s next?</title>
+
+<para>Well. Continued development, I hope. But no promises.</para>
+</section>
+
+</article>
