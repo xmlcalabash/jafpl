@@ -16,7 +16,7 @@ if [ "$TRAVIS_REPO_SLUG" == "$GIT_PUB_REPO" -a "$TRAVIS_BRANCH" == "master" ]; t
         PAGES=/home/travis/build/$TRAVIS_REPO_SLUG/build/pages
 
         cd gh-pages
-        rsync -ar --delete $PAGES/ ./
+        rsync -ar --exclude .git --delete $PAGES/ ./
 
         if [ "$GITHUB_CNAME" != "" ]; then
             echo $GITHUB_CNAME > CNAME
