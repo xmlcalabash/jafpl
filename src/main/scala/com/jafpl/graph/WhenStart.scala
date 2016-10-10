@@ -1,27 +1,23 @@
 package com.jafpl.graph
 
-import akka.actor.Props
-import com.jafpl.graph.GraphMonitor.{GSubgraph, GWatch}
+import com.jafpl.graph.GraphMonitor.GSubgraph
 import com.jafpl.runtime.CompoundStep
-import com.jafpl.util.{TreeWriter, UniqueId}
+import com.jafpl.util.TreeWriter
 import net.sf.saxon.s9api.QName
-
-import scala.collection.mutable
 
 /**
   * Created by ndw on 10/2/16.
   */
-class LoopStart(graph: Graph, name: Option[String], step: Option[CompoundStep], nodes: List[Node]) extends Node(graph, name, step) with CompoundStart {
-  var _loopEnd: LoopEnd = _
+class WhenStart(graph: Graph, name: Option[String], step: Option[CompoundStep], nodes: List[Node]) extends Node(graph, name, step) with CompoundStart {
+  var _whenEnd: WhenEnd = _
+  var cachePort = 1
 
-  def endNode = _loopEnd
-  private[graph] def endNode_=(node: LoopEnd): Unit = {
-    _loopEnd = node
+  def endNode = _whenEnd
+  private[graph] def endNode_=(node: WhenEnd): Unit = {
+    _whenEnd = node
   }
 
-  def runAgain: Boolean = {
-    step.get.runAgain
-  }
+  final def runAgain = false
 
   private[graph] def subpipeline = nodes
 
@@ -35,10 +31,12 @@ class LoopStart(graph: Graph, name: Option[String], step: Option[CompoundStep], 
     }
   }
 
-  override def addIterationCaches(): Unit = {
+  override private[graph] def addWhenCaches(when: Option[WhenStart]): Unit = {
+    /*
     for (child <- nodes) {
-      child.addIterationCaches()
+      child.addWhenCaches(Some(this))
     }
+    */
 
     for (child <- nodes) {
       for (input <- child.inputs()) {
@@ -50,18 +48,19 @@ class LoopStart(graph: Graph, name: Option[String], step: Option[CompoundStep], 
         }
         if (!found) {
           // Cache me Amadeus
-          logger.debug("Add cache  : " + edge)
-          val cache = graph.createIterationCacheNode()
+          logger.debug("Add when cache: " + edge)
+          val portName = "cache_" + cachePort
           graph.removeEdge(edge)
-          graph.addEdge(edge.source, edge.outputPort, cache, "source")
-          graph.addEdge(cache, "result", edge.destination, edge.inputPort)
+          graph.addEdge(edge.source, edge.outputPort, this, "I_" + portName)
+          graph.addEdge(this, "O_" + portName, edge.destination, edge.inputPort)
+          cachePort += 1
         }
       }
     }
   }
 
   override def dumpExtraAttr(tree: TreeWriter): Unit = {
-    tree.addAttribute(Serializer._compound_end, _loopEnd.uid.toString)
+    tree.addAttribute(Serializer._compound_end, _whenEnd.uid.toString)
     var nodeList = ""
     for (node <- nodes) {
       nodeList += node.uid.toString + " "

@@ -77,13 +77,21 @@ class Graph() {
     node
   }
 
+  def createIteratorNode(subpipeline: List[Node]): LoopStart = {
+    createIteratorNode(None, subpipeline)
+  }
+
   def createIteratorNode(step: CompoundStep, subpipeline: List[Node]): LoopStart = {
+    createIteratorNode(Some(step), subpipeline)
+  }
+
+  private def createIteratorNode(step: Option[CompoundStep], subpipeline: List[Node]): LoopStart = {
     chkValid()
     val loopStart = new LoopStart(this, Some("loop_start_" + UniqueId.nextId), step, subpipeline)
     val loopEnd   = new LoopEnd(this, Some("loop_end_" + UniqueId.nextId), step)
 
-    loopStart.loopEnd = loopEnd
-    loopEnd.loopStart = loopStart
+    loopStart.endNode = loopEnd
+    loopEnd.startNode = loopStart
 
     nodes.add(loopStart)
     nodes.add(loopEnd)
@@ -95,6 +103,50 @@ class Graph() {
     val node = new IterationCache(this, Some("i_cache_" + UniqueId.nextId))
     nodes.add(node)
     node
+  }
+
+  def createChooseNode(subpipeline: List[Node]): ChooseStart = {
+    createChooseNode(None, subpipeline)
+  }
+
+  def createChooseNode(step: CompoundStep, subpipeline: List[Node]): ChooseStart = {
+    createChooseNode(Some(step), subpipeline)
+  }
+
+  private def createChooseNode(step: Option[CompoundStep], subpipeline: List[Node]): ChooseStart = {
+    chkValid()
+    val chooseStart = new ChooseStart(this, Some("choose_start_" + UniqueId.nextId), step, subpipeline)
+    val chooseEnd   = new ChooseEnd(this, Some("choose_end_" + UniqueId.nextId), step)
+
+    chooseStart.endNode = chooseEnd
+    chooseEnd.startNode = chooseStart
+
+    nodes.add(chooseStart)
+    nodes.add(chooseEnd)
+
+    chooseStart
+  }
+
+  def createWhenNode(subpipeline: List[Node]): WhenStart = {
+    createWhenNode(None, subpipeline)
+  }
+
+  def createWhenNode(step: CompoundStep, subpipeline: List[Node]): WhenStart = {
+    createWhenNode(Some(step), subpipeline)
+  }
+
+  private def createWhenNode(step: Option[CompoundStep], subpipeline: List[Node]): WhenStart = {
+    chkValid()
+    val whenStart = new WhenStart(this, Some("when_start_" + UniqueId.nextId), step, subpipeline)
+    val whenEnd   = new WhenEnd(this, Some("when_end_" + UniqueId.nextId), step)
+
+    whenStart.endNode = whenEnd
+    whenEnd.startNode = whenStart
+
+    nodes.add(whenStart)
+    nodes.add(whenEnd)
+
+    whenStart
   }
 
   def addEdge(from: Port, to: Port): Unit = {
@@ -204,6 +256,7 @@ class Graph() {
     if (_valid) {
       for (node <- nodes) {
         node.addIterationCaches()
+        node.addWhenCaches(None)
       }
     }
 

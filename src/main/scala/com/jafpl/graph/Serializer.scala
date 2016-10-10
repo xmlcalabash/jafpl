@@ -16,7 +16,9 @@ object Serializer {
   val _input_port = new QName("", "input-port")
   val _output_port = new QName("", "output-port")
   val _boundary = new QName("", "boundary")
-  val _loop_start = new QName("", "loop-start")
+  val _compound_start = new QName("", "compound-start")
+  val _compound_end = new QName("", "compound-end")
+  val _compound_children = new QName("", "compound-children")
 
   val pg_graph = new QName("pg", NS_JAFPL_PG, "graph")
   val pg_in_edge = new QName("pg", NS_JAFPL_PG, "in-edge")

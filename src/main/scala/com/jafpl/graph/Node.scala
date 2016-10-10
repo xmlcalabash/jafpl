@@ -16,7 +16,6 @@ import scala.collection.{Set, immutable, mutable}
   * Created by ndw on 10/2/16.
   */
 class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]) extends StepController {
-  protected val uid = UniqueId.nextId
   protected val logger = LoggerFactory.getLogger(this.getClass)
   private val inputPort = mutable.HashMap.empty[String, Option[Edge]]
   private val outputPort = mutable.HashMap.empty[String, Option[Edge]]
@@ -31,6 +30,8 @@ class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]
 
   private[graph] val dependsOn = mutable.HashSet.empty[Node]
   private[graph] def actor = _actor
+
+  val uid = UniqueId.nextId
 
   logger.debug("Create node: " + this)
 
@@ -133,7 +134,11 @@ class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]
     valid
   }
 
-  def addIterationCaches(): Unit = {
+  private[graph] def addIterationCaches(): Unit = {
+    // nop
+  }
+
+  private[graph] def addWhenCaches(when: Option[WhenStart]): Unit = {
     // nop
   }
 
@@ -174,8 +179,8 @@ class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]
       targetNode.actor ! msg
     } else {
       this match {
-        case ls: LoopStart =>
-          ls.loopEnd.send(port, item)
+        case ls: CompoundStart =>
+          ls.endNode.send(port, item)
         case _ =>
           logger.info(this + " writes to unknown output port: " + port)
       }

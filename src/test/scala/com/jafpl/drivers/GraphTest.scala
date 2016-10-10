@@ -2,7 +2,7 @@ package com.jafpl.drivers
 
 import java.io.FileWriter
 
-import com.jafpl.calc.{AddExpr, NumberLiteral}
+import com.jafpl.calc.{AddExpr, IterateIntegers, NumberLiteral}
 import com.jafpl.graph.{Graph, Runtime}
 import com.jafpl.items.{NumberItem, StringItem}
 import net.sf.saxon.s9api.Processor
@@ -12,7 +12,7 @@ object GraphTest extends App {
 
   val graph = new Graph()
 
-  nodes010(graph)
+  nodes012(graph)
 
   val valid = graph.valid()
   println(valid)
@@ -119,4 +119,61 @@ object GraphTest extends App {
     graph.addEdge(a, "output", b, "source")
     graph.addEdge(b, "current", c, "input")
   }
+
+  def nodes011(graph: Graph): Unit = {
+    val a = graph.createNode("a")
+    val s1 = graph.createNode("s1")
+    val s2 = graph.createNode("s2")
+    val foreach = graph.createIteratorNode(List(s1,s2))
+    val c = graph.createNode("c")
+
+    val outside = graph.createNode("outer")
+
+    graph.addEdge(a, "output", foreach, "source")
+    graph.addEdge(s1, "result", s2, "source")
+    graph.addEdge(outside, "result", s1, "secondary")
+    graph.addEdge(foreach, "current", s1, "source")
+    graph.addEdge(s2, "result", foreach.endNode, "I_result")
+    graph.addEdge(foreach.endNode, "result", c, "source")
+  }
+
+  def nodes012(graph: Graph): Unit = {
+    val a = graph.createNode("a")
+    val alt1 = graph.createNode("alt1")
+    //val alt2 = graph.createNode("alt2")
+    val alt3 = graph.createNode("alt3")
+    val when1 = graph.createWhenNode(List(alt1))
+    //val when2 = graph.createWhenNode(List(alt2))
+    val other = graph.createWhenNode(List(alt3))
+    val choose = graph.createChooseNode(List(when1,other)) //when2
+    val c = graph.createNode("c")
+
+    graph.addEdge(a, "result", choose, "source")
+    graph.addEdge(choose.endNode, "result", c, "source")
+    graph.addEdge(alt1, "result", when1.endNode, "I_result")
+    //graph.addEdge(alt2, "result", when2.endNode, "I_result")
+    graph.addEdge(alt3, "result", other.endNode, "I_result")
+
+    graph.addEdge(choose, "when1_condition", when1, "condition")
+    //graph.addEdge(choose, "when2_condition", when2, "condition")
+    graph.addEdge(choose, "true_condition", other, "condition")
+
+    graph.addEdge(when1.endNode, "result", choose.endNode, "I_result")
+    //graph.addEdge(when2.endNode, "result", choose.endNode, "I_result")
+    graph.addEdge(other.endNode, "result", choose.endNode, "I_result")
+
+    val outside = graph.createNode("outer")
+    graph.addEdge(outside, "result", alt3, "source")
+
+    /*
+    graph.addEdge(a, "output", foreach, "source")
+    graph.addEdge(s1, "result", s2, "source")
+    graph.addEdge(outside, "result", s1, "secondary")
+    graph.addEdge(foreach, "current", s1, "source")
+    graph.addEdge(s2, "result", foreach.endNode, "I_result")
+    graph.addEdge(foreach.endNode, "result", c, "source")
+    */
+  }
+
+
 }
