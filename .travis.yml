@@ -2,6 +2,8 @@ install: true
 language: java
 script: gradle build
 sudu: false
+jdk:
+  - oraclejdk8
 
 after_success:
   - src/website/bin/travis-publish.sh
