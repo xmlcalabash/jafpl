@@ -52,7 +52,11 @@
   <link rel="stylesheet" type="text/css" href="/css/docbook.css"/>
   <link rel="stylesheet" type="text/css" href="/css/tabs.css" />
   <link rel="stylesheet" type="text/css" href="/css/website.css" />
+  <link href='http://fonts.googleapis.com/css?family=Rambla'
+        rel='stylesheet' type='text/css' />
+<!--
   <link rel="icon" href="/graphics/icon.ico" type="image/ico"/>
+-->
 </xsl:template>
 
 <!-- ============================================================ -->
