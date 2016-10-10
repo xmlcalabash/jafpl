@@ -6,27 +6,70 @@
 
 <xsl:output method="text" encoding="utf-8"/>
 
+<xsl:key name="uid" match="pg:node" use="@uid"/>
+<xsl:key name="child" match="pg:node" use="tokenize(@compound-children, ' ')"/>
+
 <xsl:template match="pg:graph">
   <xsl:text>digraph pg_graph {&#10;</xsl:text>
-  <xsl:apply-templates/>
+
+  <!-- find the roots -->
+  <xsl:variable name="roots" as="xs:string*">
+    <xsl:for-each select="pg:node[not(@compound-start)]">
+      <xsl:if test="empty(key('child', @uid))">
+        <xsl:value-of select="@uid"/>
+      </xsl:if>
+    </xsl:for-each>
+  </xsl:variable>
+
+  <xsl:apply-templates select="pg:node[@uid = $roots]"/>
+
   <xsl:apply-templates select="//pg:in-edge|//pg:out-edge" mode="links"/>
-  <xsl:apply-templates select="//pg:node" mode="shapes"/>
+
   <xsl:text>}&#10;</xsl:text>
 </xsl:template>
 
-<xsl:template match="pg:node">
+<!-- ============================================================ -->
+
+<xsl:template match="pg:node" priority="1">
+  <xsl:apply-templates select="." mode="donode"/>
+</xsl:template>
+
+<xsl:template match="pg:node[@compound-children]" priority="10">
+  <xsl:text>subgraph "cluster_subpipeline_</xsl:text>
+  <xsl:value-of select="generate-id()"/>
+  <xsl:text>" {&#10;</xsl:text>
+  <xsl:text>label = "</xsl:text>
+  <xsl:value-of select="concat('subpipeline: ', @name)"/>
+  <xsl:text>";&#10;</xsl:text>
+  <xsl:text>color = "#cacaca";&#10;</xsl:text>
+
+  <xsl:variable name="root" select="/"/>
+
+  <xsl:for-each select="(@uid, @compound-end)">
+    <xsl:apply-templates select="key('uid', ., $root)" mode="donode"/>
+  </xsl:for-each>
+
+  <xsl:for-each select="tokenize(@compound-children, ' ')">
+    <xsl:apply-templates select="key('uid', ., $root)"/>
+  </xsl:for-each>
+
+  <xsl:text>}&#10;</xsl:text>
+</xsl:template>
+
+<xsl:template match="pg:node" mode="donode">
   <xsl:text>subgraph "cluster</xsl:text>
   <xsl:value-of select="generate-id()"/>
   <xsl:text>" {&#10;</xsl:text>
   <xsl:text>label = "</xsl:text>
   <xsl:value-of select="@name"/>
   <xsl:text>";&#10;</xsl:text>
-  <xsl:text>shape = "invhouse";&#10;</xsl:text>
 
   <xsl:apply-templates/>
 
   <xsl:text>}&#10;</xsl:text>
 </xsl:template>
+
+<!-- ============================================================ -->
 
 <xsl:template match="pg:inputs">
   <xsl:text>subgraph "cluster</xsl:text>
@@ -112,21 +155,5 @@
   <xsl:value-of select="@pg:id"/>
   <xsl:text>";&#10;</xsl:text>
 </xsl:template>
-
-<!-- ============================================================ -->
-
-<xsl:template match="pg:node[@boundary='true' and pg:inputs]" mode="shapes">
-  <xsl:text>"</xsl:text>
-  <xsl:value-of select="concat(generate-id(.), '.', pg:inputs/pg:in-edge/@input-port)"/>
-  <xsl:text>" [shape=invhouse];&#10;</xsl:text>
-</xsl:template>
-
-<xsl:template match="pg:node[@boundary='true' and pg:outputs]" mode="shapes">
-  <xsl:text>"</xsl:text>
-  <xsl:value-of select="concat(generate-id(.), '.', pg:outputs/pg:out-edge/@output-port)"/>
-  <xsl:text>" [shape=invhouse];&#10;</xsl:text>
-</xsl:template>
-
-<xsl:template match="pg:node" mode="shapes"/>
 
 </xsl:stylesheet>
