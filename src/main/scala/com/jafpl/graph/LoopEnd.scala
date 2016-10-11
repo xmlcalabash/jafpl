@@ -18,8 +18,17 @@ class LoopEnd(graph: Graph, name: Option[String], step: Option[CompoundStep]) ex
     _loopStart = node
   }
 
-  def receiveOutput(port: String, msg: ItemMessage): Unit = {
+  override def receive(port: String, msg: ItemMessage): Unit = {
+    val outputPort = if (port.startsWith("I_")) {
+      port.substring(2)
+    } else {
+      port
+    }
     step.get.receiveOutput(port, msg)
+  }
+
+  override def receiveOutput(port: String, msg: ItemMessage): Unit = {
+    logger.warn("receiveOutput called on LoopEnd")
   }
 
   def runAgain: Boolean = {

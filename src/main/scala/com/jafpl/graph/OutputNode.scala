@@ -29,6 +29,7 @@ class OutputNode(graph: Graph, name: Option[String]) extends Node(graph, name, N
 
   override def run(): Unit = {
     done = true
+    stop()
   }
 
   def closed = done

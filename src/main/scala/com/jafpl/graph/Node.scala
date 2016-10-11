@@ -26,14 +26,12 @@ class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]
   protected var _actor: ActorRef = _
   protected var madeActors = false
   protected var _finished = false
-  protected val worker = step
+  val worker = step
 
   private[graph] val dependsOn = mutable.HashSet.empty[Node]
   private[graph] def actor = _actor
 
   val uid = UniqueId.nextId
-
-  logger.debug("Create node: " + this)
 
   def inputs(): Set[String] = {
     inputPort.keySet
@@ -142,6 +140,10 @@ class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]
     // nop
   }
 
+  private[graph] def addChooseCaches(choose: Option[ChooseStart]): Unit = {
+    // nop
+  }
+
   override def toString: String = {
     if (name.isDefined) {
       "[Node: " + name.get + " " + uid.toString + "]"
@@ -175,7 +177,6 @@ class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]
       sequenceNos.put(port, seqNo)
 
       val msg = new ItemMessage(targetPort, uid, seqNo, item)
-      logger.debug("Node {} sends to {} on {}", this, targetPort, targetNode)
       targetNode.actor ! msg
     } else {
       this match {
@@ -191,8 +192,7 @@ class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]
     val edge = outputPort(port).get
     val targetPort = edge.inputPort
     val targetNode = edge.destination
-    val msg = new CloseMessage(port)
-    logger.debug("Node {} closes {} on {}", this, targetPort, targetNode)
+    val msg = new CloseMessage(targetPort)
     targetNode.actor ! msg
   }
 
@@ -212,7 +212,6 @@ class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]
       val targetPort = edge.inputPort
       val targetNode = edge.destination
       val msg = new CloseMessage(targetPort)
-      logger.debug("Node {} closes {} on {}", this, targetPort, targetNode)
       targetNode.actor ! msg
     }
 
@@ -222,9 +221,23 @@ class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]
       }
     }
 
-    logger.debug("Node {} finishes", this)
     _finished = true
     graph.monitor ! GFinish(this)
+  }
+
+  def finish(): Unit = {
+    _finished = true
+    graph.monitor ! GFinish(this)
+  }
+
+  def finish(node: Node): Unit = {
+    node.finish()
+    node match {
+      case s: CompoundStart =>
+        for (node <- s.subpipeline) {
+          node.finish()
+        }
+    }
   }
 
   private[graph] def run(): Unit = {
@@ -233,9 +246,14 @@ class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]
       return
     }
 
-    logger.info("CALLED NODE RUN: " + this)
     worker.get.run()
-    stop()
+
+    this match {
+      case cs: CompoundStart => Unit
+      case ce: CompoundEnd => Unit
+      case _ =>
+        stop()
+    }
   }
 
   private[graph] def makeActors(): Unit = {
@@ -259,7 +277,11 @@ class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]
       }
 
       _actor = graph.system.actorOf(Props(new NodeActor(this)), actorName.get)
-      graph.monitor ! GWatch(this)
+
+      this match {
+        case _: CompoundEnd => Unit
+        case _ => graph.monitor ! GWatch(this)
+      }
     }
   }
 

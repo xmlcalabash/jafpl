@@ -20,52 +20,47 @@ private[graph] class NodeActor(node: Node) extends Actor {
     if (openInputs.isEmpty && dependsOn.isEmpty) {
       run()
     } else {
-      log.debug("Node {} not ready to run (inputs ready: {}, dependencies ready: {})", node,
-        openInputs.isEmpty, dependsOn.isEmpty)
+      var str = "";
+      for (port <- openInputs) {
+        str += port + " "
+      }
+      log.debug("NOT READY " + node + ": " + str)
     }
   }
 
   private def run() = {
-    log.debug("RUN   " + node)
     node.graph.monitor ! GStart(node)
     node.synchronized {
       node.run()
-    }
-
-    node match {
-      case n: LoopStart =>
-        Unit
-      case n: LoopEnd =>
-        Unit
-      case _ => node.graph.monitor ! GFinish(node)
     }
   }
 
   def receive = {
     case m: ItemMessage =>
-      log.debug("MSG   {}", node)
+      log.debug("A IMSSG {} {} from {}", m.port, node, sender)
       node.synchronized {
         node.receive(m.port, m)
       }
     case m: CloseMessage =>
-      log.debug("CLOSE {}: {}", m.port, node)
+      log.debug("A CLOSE  {}: {}", m.port, node)
       openInputs.remove(m.port)
       checkRun()
     case m: StartMessage =>
-      log.debug("SMSG  {}", node)
+      log.debug("A START  {}", node)
       checkRun()
     case m: RanMessage =>
-      log.debug("RAN  {}", node)
+      log.debug("A RAN    {}", node)
       if (dependsOn.contains(m.node)) {
         dependsOn.remove(m.node)
         checkRun()
       }
     case m: ResetMessage =>
-      log.debug("RESET {}", node)
+      log.debug("A RESET {}", node)
       node.synchronized {
         node.reset()
       }
     case m: GFinished =>
+      log.debug("A FINIT {}", node)
       node match {
         case ls: LoopStart =>
           if (ls.runAgain) {
@@ -76,6 +71,7 @@ private[graph] class NodeActor(node: Node) extends Actor {
             }
           } else {
             node.graph.monitor ! GFinish(ls)
+            ls.endNode.stop()
           }
         case le: LoopEnd =>
           // FIXME: Is this gauranteed to work? Is there any chance that le.runAgain could
@@ -83,6 +79,16 @@ private[graph] class NodeActor(node: Node) extends Actor {
           if (!le.runAgain) {
             node.graph.monitor ! GFinish(le)
           }
+        case s: WhenStart =>
+          node.graph.monitor ! GFinish(s)
+          s.endNode.stop()
+        case s: WhenEnd =>
+          node.graph.monitor ! GFinish(s)
+        case s: ChooseStart =>
+          node.graph.monitor ! GFinish(s)
+          s.endNode.stop()
+        case s: ChooseEnd =>
+          node.graph.monitor ! GFinish(s)
         case _ => log.debug("Node {} didn't expect to be notified of subgraph completion")
       }
     case m: Any => log.debug("Node {} received unexpected message: {}", node, m)

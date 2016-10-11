@@ -3,7 +3,7 @@ package com.jafpl.graph
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.jafpl.messages.{CloseMessage, StartMessage}
 import com.jafpl.util.TreeWriter
-import com.jafpl.runtime.{CompoundStep, Step}
+import com.jafpl.runtime._
 import com.jafpl.util.UniqueId
 import net.sf.saxon.s9api.{Processor, QName, XdmNode}
 import org.slf4j.LoggerFactory
@@ -106,11 +106,7 @@ class Graph() {
   }
 
   def createChooseNode(subpipeline: List[Node]): ChooseStart = {
-    createChooseNode(None, subpipeline)
-  }
-
-  def createChooseNode(step: CompoundStep, subpipeline: List[Node]): ChooseStart = {
-    createChooseNode(Some(step), subpipeline)
+    createChooseNode(Some(new Chooser("chooser")), subpipeline)
   }
 
   private def createChooseNode(step: Option[CompoundStep], subpipeline: List[Node]): ChooseStart = {
@@ -128,17 +124,24 @@ class Graph() {
   }
 
   def createWhenNode(subpipeline: List[Node]): WhenStart = {
-    createWhenNode(None, subpipeline)
+    createWhenNode(Some(new WhenTrue()), subpipeline)
   }
 
-  def createWhenNode(step: CompoundStep, subpipeline: List[Node]): WhenStart = {
+  def createWhenNode(step: WhenStep, subpipeline: List[Node]): WhenStart = {
     createWhenNode(Some(step), subpipeline)
   }
 
-  private def createWhenNode(step: Option[CompoundStep], subpipeline: List[Node]): WhenStart = {
+  private def createWhenNode(step: Option[WhenStep], subpipeline: List[Node]): WhenStart = {
     chkValid()
-    val whenStart = new WhenStart(this, Some("when_start_" + UniqueId.nextId), step, subpipeline)
-    val whenEnd   = new WhenEnd(this, Some("when_end_" + UniqueId.nextId), step)
+
+    val whenStep = if (step.isDefined) {
+      Some(new Whener(step.get))
+    } else {
+      step
+    }
+
+    val whenStart = new WhenStart(this, Some("when_start_" + UniqueId.nextId), whenStep, subpipeline)
+    val whenEnd   = new WhenEnd(this, Some("when_end_" + UniqueId.nextId), whenStep)
 
     whenStart.endNode = whenEnd
     whenEnd.startNode = whenStart
@@ -257,6 +260,7 @@ class Graph() {
       for (node <- nodes) {
         node.addIterationCaches()
         node.addWhenCaches(None)
+        node.addChooseCaches(None)
       }
     }
 

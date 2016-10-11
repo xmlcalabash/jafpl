@@ -15,8 +15,17 @@ class ChooseEnd(graph: Graph, name: Option[String], step: Option[CompoundStep]) 
     _chooseStart = node
   }
 
-  def receiveOutput(port: String, msg: ItemMessage): Unit = {
+  override def receive(port: String, msg: ItemMessage): Unit = {
+    val outputPort = if (port.startsWith("I_")) {
+      port.substring(2)
+    } else {
+      port
+    }
     step.get.receiveOutput(port, msg)
+  }
+
+  override def receiveOutput(port: String, msg: ItemMessage): Unit = {
+    logger.warn("receiveOutput called on ChooseEnd")
   }
 
   final def runAgain = false

@@ -23,7 +23,7 @@ class LoopStart(graph: Graph, name: Option[String], step: Option[CompoundStep], 
     step.get.runAgain
   }
 
-  private[graph] def subpipeline = nodes
+  def subpipeline = nodes
 
   override private[graph] def makeActors(): Unit = {
     val made = madeActors
@@ -50,7 +50,6 @@ class LoopStart(graph: Graph, name: Option[String], step: Option[CompoundStep], 
         }
         if (!found) {
           // Cache me Amadeus
-          logger.debug("Add cache  : " + edge)
           val cache = graph.createIterationCacheNode()
           graph.removeEdge(edge)
           graph.addEdge(edge.source, edge.outputPort, cache, "source")

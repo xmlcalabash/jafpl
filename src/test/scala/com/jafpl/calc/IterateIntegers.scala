@@ -15,7 +15,6 @@ class IterateIntegers(name: String) extends DefaultCompoundStep(name) {
   var index = 1
 
   override def run(): Unit = {
-    logger.info("RUN   IterateIntegers {}", Array(name, integers.size.toString))
     if (integers.contains(index)) {
       controller.send("current", new NumberItem(integers(index) * 2))
       controller.close("current")
@@ -24,7 +23,6 @@ class IterateIntegers(name: String) extends DefaultCompoundStep(name) {
   }
 
   override def runAgain: Boolean = {
-    logger.info("AGAIN IterateIntegers {}", integers.contains(index+1))
     integers.contains(index+1)
   }
 
@@ -33,7 +31,6 @@ class IterateIntegers(name: String) extends DefaultCompoundStep(name) {
 
     msg.item match {
       case num: NumberItem =>
-        logger.info("RECVD IterateIntegers " + index)
         integers.put(index, num.get)
       case _ => throw new CalcException("Message was not a number")
     }

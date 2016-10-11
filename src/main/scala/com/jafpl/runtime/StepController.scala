@@ -11,4 +11,6 @@ trait StepController {
   def close(port: String)
   def tell(node: Node, msg: Any)
   def stop()
+  def finish()
+  def finish(node: Node)
 }

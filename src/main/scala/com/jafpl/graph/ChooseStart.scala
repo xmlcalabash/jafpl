@@ -1,7 +1,7 @@
 package com.jafpl.graph
 
 import com.jafpl.graph.GraphMonitor.GSubgraph
-import com.jafpl.runtime.CompoundStep
+import com.jafpl.runtime.{Chooser, CompoundStep}
 import com.jafpl.util.TreeWriter
 
 /**
@@ -9,6 +9,7 @@ import com.jafpl.util.TreeWriter
   */
 class ChooseStart(graph: Graph, name: Option[String], step: Option[CompoundStep], nodes: List[Node]) extends Node(graph, name, step) with CompoundStart {
   var _chooseEnd: ChooseEnd = _
+  var cachePort = 1
 
   def endNode = _chooseEnd
   private[graph] def endNode_=(node: ChooseEnd): Unit = {
@@ -17,7 +18,11 @@ class ChooseStart(graph: Graph, name: Option[String], step: Option[CompoundStep]
 
   final def runAgain = false
 
-  private[graph] def subpipeline = nodes
+  def subpipeline = nodes
+
+  override private[graph] def run(): Unit = {
+    step.get.asInstanceOf[Chooser].pickOne(nodes)
+  }
 
   override private[graph] def makeActors(): Unit = {
     val made = madeActors
@@ -26,6 +31,31 @@ class ChooseStart(graph: Graph, name: Option[String], step: Option[CompoundStep]
 
     if (!made) {
       graph.monitor ! GSubgraph(_actor, nodes)
+    }
+  }
+
+  override private[graph] def addWhenCaches(when: Option[WhenStart]): Unit = {
+    /*
+    for (child <- nodes) {
+      child.addChooseCaches(Some(this))
+    }
+    */
+
+    for (child <- nodes) {
+      child match {
+        case when: WhenStart =>
+          for (input <- child.inputs()) {
+            val edge = child.input(input).get
+            if (edge.inputPort == "condition") {
+              val portName = "choose_" + cachePort
+              graph.removeEdge(edge)
+              graph.addEdge(edge.source, edge.outputPort, this, "I_" + portName)
+              graph.addEdge(this, "O_" + portName, edge.destination, edge.inputPort)
+              cachePort += 1
+            }
+          }
+        case _ => Unit
+      }
     }
   }
 

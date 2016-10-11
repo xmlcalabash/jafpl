@@ -8,4 +8,5 @@ import com.jafpl.runtime.StepController
 trait CompoundStart extends StepController {
   def endNode: CompoundEnd
   def runAgain: Boolean
+  def subpipeline: List[Node]
 }

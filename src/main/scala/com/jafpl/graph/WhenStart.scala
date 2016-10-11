@@ -1,6 +1,8 @@
 package com.jafpl.graph
 
 import com.jafpl.graph.GraphMonitor.GSubgraph
+import com.jafpl.items.GenericItem
+import com.jafpl.messages.ItemMessage
 import com.jafpl.runtime.CompoundStep
 import com.jafpl.util.TreeWriter
 import net.sf.saxon.s9api.QName
@@ -19,7 +21,7 @@ class WhenStart(graph: Graph, name: Option[String], step: Option[CompoundStep], 
 
   final def runAgain = false
 
-  private[graph] def subpipeline = nodes
+  def subpipeline = nodes
 
   override private[graph] def makeActors(): Unit = {
     val made = madeActors
@@ -48,8 +50,7 @@ class WhenStart(graph: Graph, name: Option[String], step: Option[CompoundStep], 
         }
         if (!found) {
           // Cache me Amadeus
-          logger.debug("Add when cache: " + edge)
-          val portName = "cache_" + cachePort
+          val portName = "when_" + cachePort
           graph.removeEdge(edge)
           graph.addEdge(edge.source, edge.outputPort, this, "I_" + portName)
           graph.addEdge(this, "O_" + portName, edge.destination, edge.inputPort)

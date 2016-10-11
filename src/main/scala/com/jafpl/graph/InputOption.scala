@@ -38,7 +38,6 @@ private[graph] class InputOption(graph: Graph, val optName: QName) extends Node(
       val msg = new ItemMessage(targetPort, uid, seqNo, item)
       seqNo += 1
 
-      logger.debug("Input edge {} sends to {} on {}", this, targetPort, targetNode)
       targetNode.actor ! msg
     }
 
@@ -54,7 +53,6 @@ private[graph] class InputOption(graph: Graph, val optName: QName) extends Node(
 
       val msg = new CloseMessage(targetPort)
 
-      logger.debug("Input edge {} closes {} on {}", this, targetPort, targetNode)
       targetNode.actor ! msg
     }
     actor ! new CloseMessage("result")

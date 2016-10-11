@@ -29,7 +29,6 @@ class MultExpr(val ops: List[String]) extends Step {
     var pos = 2
     for (op <- ops) {
       val operand = operands("s" + pos)
-      logger.info("{}: {} {} {}", this, acc.toString, op, operand.toString)
       op match {
         case "*" =>
           acc = acc * operand
