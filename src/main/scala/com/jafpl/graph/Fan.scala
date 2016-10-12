@@ -6,7 +6,9 @@ import com.jafpl.runtime.{DefaultStep, Step, StepController}
 /**
   * Created by ndw on 10/3/16.
   */
-private[graph] class Fan(name: String) extends DefaultStep(name) {
+private[graph] class Fan(defLabel: String) extends DefaultStep {
+  label = defLabel
+
   override def receive(port: String, msg: ItemMessage): Unit = {
     super.receive(port, msg)
     for (port <- outputPorts) {

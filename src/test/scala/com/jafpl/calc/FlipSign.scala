@@ -7,8 +7,9 @@ import com.jafpl.runtime.DefaultStep
 /**
   * Created by ndw on 10/7/16.
   */
-class FlipSign() extends DefaultStep("flipsign") {
+class FlipSign() extends DefaultStep {
   var inputNumber = 0
+  label = "flipsign"
 
   override def run(): Unit = {
     controller.send("result", new NumberItem(- inputNumber))

@@ -41,7 +41,7 @@ class Runtime(val graph: Graph) {
 
   def read(port: String): Option[GenericItem] = {
     for (node <- outputs()) {
-      if (node.name.isDefined && node.name.get == port) {
+      if (node.port == port) {
         return node.read()
       }
     }
@@ -50,28 +50,13 @@ class Runtime(val graph: Graph) {
     None
   }
 
-  def set(optName: QName, item: GenericItem): Unit = {
-    if (!started) {
-      throw new GraphException("You must start the pipeline first!")
-    }
-
-    for (opt <- options()) {
-      if (opt.optName == optName) {
-        opt.set(item)
-        return
-      }
-    }
-
-    logger.info("Pipeline has no option named: " + optName)
-  }
-
   def write(port: String, item: GenericItem): Unit = {
     if (!started) {
       throw new GraphException("You must start the pipeline first!")
     }
 
     for (node <- inputs()) {
-      if (node.name.isDefined && node.name.get == port) {
+      if (node.port == port) {
         node.write(item)
         return
       }
@@ -86,7 +71,7 @@ class Runtime(val graph: Graph) {
     }
 
     for (node <- inputs()) {
-      if (node.name.isDefined && node.name.get == port) {
+      if (node.port == port) {
         node.close()
         return
       }

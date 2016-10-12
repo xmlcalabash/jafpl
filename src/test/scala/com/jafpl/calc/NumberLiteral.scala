@@ -8,7 +8,9 @@ import net.sf.saxon.s9api.QName
 /**
   * Created by ndw on 10/7/16.
   */
-class NumberLiteral(val number: Int) extends DefaultStep("number-literal") {
+class NumberLiteral(val number: Int) extends DefaultStep {
+  label = "num_lit"
+
   override def run(): Unit = {
     val item = new NumberItem(number)
     controller.send("result", item)

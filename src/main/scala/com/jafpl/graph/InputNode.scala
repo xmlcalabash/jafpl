@@ -11,9 +11,10 @@ import scala.util.Random
 /**
   * Created by ndw on 10/2/16.
   */
-class InputNode(graph: Graph, name: Option[String]) extends Node(graph, name, None) {
+class InputNode(graph: Graph, val port: String) extends Node(graph, None) {
   private var constructionOk = true
   private var seqNo: Long = 1
+  label = Some("_input_" + port)
 
   private[graph] override def addInput(port: String, edge: Option[Edge]): Unit = {
     constructionOk = false
@@ -25,7 +26,7 @@ class InputNode(graph: Graph, name: Option[String]) extends Node(graph, name, No
   }
 
   override private[graph] def run(): Unit = {
-    // do nothing
+    stop()
   }
 
   def write(item: GenericItem): Unit = {
@@ -42,17 +43,7 @@ class InputNode(graph: Graph, name: Option[String]) extends Node(graph, name, No
   }
 
   def close(): Unit = {
-    for (port <- outputs()) {
-      val edge = output(port)
-      val targetPort = edge.get.inputPort
-      val targetNode = edge.get.destination
-
-      val msg = new CloseMessage(targetPort)
-
-      targetNode.actor ! msg
-    }
-    actor ! new CloseMessage("result")
-    actor ! new RanMessage(this)
+    stop()
   }
 
   override def dumpExtraAttr(tree: TreeWriter): Unit = {

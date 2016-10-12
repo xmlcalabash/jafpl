@@ -7,10 +7,11 @@ import net.sf.saxon.s9api.QName
 /**
   * Created by ndw on 10/2/16.
   */
-private[graph] class InputOption(graph: Graph, val optName: QName) extends Node(graph, None, None) {
+private[graph] class InputOption(graph: Graph) extends Node(graph, None) {
   private var constructionOk = true
   private var seqNo: Long = 1
   private var initialized = false
+  label = Some("_input_option")
 
   private[graph] override def addInput(port: String, edge: Option[Edge]): Unit = {
     constructionOk = false

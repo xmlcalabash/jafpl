@@ -7,8 +7,9 @@ import com.jafpl.util.TreeWriter
 /**
   * Created by ndw on 10/2/16.
   */
-class ChooseEnd(graph: Graph, name: Option[String], step: Option[CompoundStep]) extends Node(graph, name, step) with CompoundEnd {
+class ChooseEnd(graph: Graph, step: Option[CompoundStep]) extends Node(graph, step) with CompoundEnd {
   var _chooseStart: ChooseStart = _
+  label = Some("_choose_end")
 
   def startNode = _chooseStart
   private[graph] def startNode_=(node: ChooseStart): Unit = {

@@ -16,11 +16,21 @@ private[graph] class NodeActor(node: Node) extends Actor {
   val openInputs = mutable.HashSet() ++ node.inputs()
   val dependsOn = mutable.HashSet() ++ node.dependsOn
 
+  log.debug("INIT " + node + ": " + openList)
+
+  private def openList: String = {
+    var str = ""
+    for (input <- openInputs) {
+      str += input + " "
+    }
+    str
+  }
+
   def checkRun(): Unit = {
     if (openInputs.isEmpty && dependsOn.isEmpty) {
       run()
     } else {
-      var str = "";
+      var str = ""
       for (port <- openInputs) {
         str += port + " "
       }
@@ -37,19 +47,23 @@ private[graph] class NodeActor(node: Node) extends Actor {
 
   def receive = {
     case m: ItemMessage =>
-      log.debug("A IMSSG {} {} from {}", m.port, node, sender)
+      log.debug("A IMSSG {} {}", m.port, node)
       node.synchronized {
         node.receive(m.port, m)
       }
     case m: CloseMessage =>
-      log.debug("A CLOSE  {}: {}", m.port, node)
-      openInputs.remove(m.port)
+      if (openInputs.contains(m.port)) {
+        openInputs.remove(m.port)
+        log.debug("A CLOSE OPEN {}: {}: {}", m.port, node, openList)
+      } else {
+        log.debug("A CLOSE FAIL {}: {}: {}", m.port, node, openList)
+      }
       checkRun()
     case m: StartMessage =>
-      log.debug("A START  {}", node)
+      log.debug("A START  {} CHECK", node)
       checkRun()
     case m: RanMessage =>
-      log.debug("A RAN    {}", node)
+      log.debug("A RAN    {} CHECK", node)
       if (dependsOn.contains(m.node)) {
         dependsOn.remove(m.node)
         checkRun()

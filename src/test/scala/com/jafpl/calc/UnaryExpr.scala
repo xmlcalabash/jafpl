@@ -12,8 +12,14 @@ import org.slf4j.LoggerFactory
 class UnaryExpr(val op: String) extends Step {
   var controller: StepController = _
   val logger = LoggerFactory.getLogger(this.getClass)
+  var _label = "unknown"
 
-  override def setup(controller: StepController, inputPorts: List[String], outputPorts: List[String], options: List[QName]): Unit = {
+  override def label = _label
+  override def label_=(label: String): Unit = {
+    _label = label
+  }
+
+  override def setup(controller: StepController, inputPorts: List[String], outputPorts: List[String]): Unit = {
     this.controller = controller
   }
 

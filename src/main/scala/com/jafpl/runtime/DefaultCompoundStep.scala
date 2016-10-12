@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 /**
   * Created by ndw on 10/7/16.
   */
-abstract class DefaultCompoundStep(name: String) extends DefaultStep(name) with CompoundStep {
+abstract class DefaultCompoundStep extends DefaultStep with CompoundStep {
   def receiveOutput(port: String, msg: ItemMessage): Unit = {
     val outputPort = if (port.startsWith("I_")) {
       port.substring(2)

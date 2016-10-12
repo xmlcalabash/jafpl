@@ -7,10 +7,11 @@ import com.jafpl.util.TreeWriter
 /**
   * Created by ndw on 10/2/16.
   */
-class OutputNode(graph: Graph, name: Option[String]) extends Node(graph, name, None) {
+class OutputNode(graph: Graph, val port: String) extends Node(graph, None) {
   private val items = collection.mutable.ListBuffer.empty[GenericItem]
   private var done = false
   private var constructionOk = true
+  label = Some("_output_" + port)
 
   override def addOutput(port: String, edge: Option[Edge]): Unit = {
     constructionOk = false

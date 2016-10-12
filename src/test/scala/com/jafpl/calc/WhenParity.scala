@@ -7,7 +7,13 @@ import com.jafpl.runtime.{CompoundStep, DefaultCompoundStep, WhenStep}
 /**
   * Created by ndw on 10/10/16.
   */
-class WhenParity(name: String, private val chooseOdd: Boolean) extends DefaultCompoundStep(name) with WhenStep {
+class WhenParity(private val chooseOdd: Boolean) extends DefaultCompoundStep with WhenStep {
+  label = if (chooseOdd) {
+    "when_odd"
+  } else {
+    "when_even"
+  }
+
   override def test(item: GenericItem): Boolean = {
     val accept = item match {
       case num: NumberItem =>

@@ -11,8 +11,9 @@ import scala.collection.mutable
 /**
   * Created by ndw on 10/2/16.
   */
-class LoopStart(graph: Graph, name: Option[String], step: Option[CompoundStep], nodes: List[Node]) extends Node(graph, name, step) with CompoundStart {
+class LoopStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) extends Node(graph, step) with CompoundStart {
   var _loopEnd: LoopEnd = _
+  label = Some("_loop_start")
 
   def endNode = _loopEnd
   private[graph] def endNode_=(node: LoopEnd): Unit = {

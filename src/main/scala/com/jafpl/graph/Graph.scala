@@ -35,44 +35,46 @@ class Graph() {
     }
   }
 
+  def createNode(): Node = {
+    createNode(None)
+  }
+
   def createNode(name: String): Node = {
+    createNode(Some(name))
+  }
+
+  private def createNode(name: Option[String]): Node = {
     chkValid()
-    val node = new Node(this, Some(name), None)
+    val node = new Node(this, None)
+    node.label = name
     nodes.add(node)
     node
   }
 
-  def createNode(name: String, step: Step): Node = {
+  def createNode(step: Step): Node = {
     chkValid()
-    val node = new Node(this, Some(name), Some(step))
-    nodes.add(node)
-    node
-  }
-
-  def createInputOption(name: QName): InputOption = {
-    chkValid()
-    val node = new InputOption(this, name)
+    val node = new Node(this, Some(step))
     nodes.add(node)
     node
   }
 
   def createInputNode(name: String): InputNode = {
     chkValid()
-    val node = new InputNode(this, Some(name))
+    val node = new InputNode(this, name)
     nodes.add(node)
     node
   }
 
   def createOutputNode(name: String): OutputNode = {
     chkValid()
-    val node = new OutputNode(this, Some(name))
+    val node = new OutputNode(this, name)
     nodes.add(node)
     node
   }
 
-  def createVariableNode(name: QName, step: Step): Node = {
+  def createVariableNode(step: Step): Node = {
     chkValid()
-    val node = new Node(this, Some("var_" + UniqueId.nextId), Some(step))
+    val node = new Node(this, Some(step))
     nodes.add(node)
     node
   }
@@ -87,8 +89,8 @@ class Graph() {
 
   private def createIteratorNode(step: Option[CompoundStep], subpipeline: List[Node]): LoopStart = {
     chkValid()
-    val loopStart = new LoopStart(this, Some("loop_start_" + UniqueId.nextId), step, subpipeline)
-    val loopEnd   = new LoopEnd(this, Some("loop_end_" + UniqueId.nextId), step)
+    val loopStart = new LoopStart(this, step, subpipeline)
+    val loopEnd   = new LoopEnd(this, step)
 
     loopStart.endNode = loopEnd
     loopEnd.startNode = loopStart
@@ -100,19 +102,19 @@ class Graph() {
   }
 
   private[graph] def createIterationCacheNode(): IterationCache = {
-    val node = new IterationCache(this, Some("i_cache_" + UniqueId.nextId))
+    val node = new IterationCache(this)
     nodes.add(node)
     node
   }
 
   def createChooseNode(subpipeline: List[Node]): ChooseStart = {
-    createChooseNode(Some(new Chooser("chooser")), subpipeline)
+    createChooseNode(Some(new Chooser()), subpipeline)
   }
 
   private def createChooseNode(step: Option[CompoundStep], subpipeline: List[Node]): ChooseStart = {
     chkValid()
-    val chooseStart = new ChooseStart(this, Some("choose_start_" + UniqueId.nextId), step, subpipeline)
-    val chooseEnd   = new ChooseEnd(this, Some("choose_end_" + UniqueId.nextId), step)
+    val chooseStart = new ChooseStart(this, step, subpipeline)
+    val chooseEnd   = new ChooseEnd(this, step)
 
     chooseStart.endNode = chooseEnd
     chooseEnd.startNode = chooseStart
@@ -140,8 +142,8 @@ class Graph() {
       step
     }
 
-    val whenStart = new WhenStart(this, Some("when_start_" + UniqueId.nextId), whenStep, subpipeline)
-    val whenEnd   = new WhenEnd(this, Some("when_end_" + UniqueId.nextId), whenStep)
+    val whenStart = new WhenStart(this, whenStep, subpipeline)
+    val whenEnd   = new WhenEnd(this, whenStep)
 
     whenStart.endNode = whenEnd
     whenEnd.startNode = whenStart

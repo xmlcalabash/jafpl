@@ -14,9 +14,15 @@ class Whener(when: WhenStep) extends Step with CompoundStep with WhenStep {
   protected val logger = LoggerFactory.getLogger(this.getClass)
   protected val cache = mutable.HashMap.empty[String,ListBuffer[ItemMessage]]
   private var ctrl: StepController = _
+  private var _label = "_whener"
 
-  override def setup(controller: StepController, inputPorts: List[String], outputPorts: List[String], options: List[QName]): Unit = {
-    when.setup(controller, inputPorts, outputPorts, options)
+  override def label = _label
+  override def label_=(label: String): Unit = {
+    _label = label
+  }
+
+  override def setup(controller: StepController, inputPorts: List[String], outputPorts: List[String]): Unit = {
+    when.setup(controller, inputPorts, outputPorts)
     ctrl = controller
   }
 

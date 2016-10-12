@@ -8,8 +8,9 @@ import net.sf.saxon.s9api.QName
 /**
   * Created by ndw on 10/2/16.
   */
-class WhenEnd(graph: Graph, name: Option[String], step: Option[CompoundStep]) extends Node(graph, name, step) with CompoundEnd {
+class WhenEnd(graph: Graph, step: Option[CompoundStep]) extends Node(graph, step) with CompoundEnd {
   var _whenStart: WhenStart = _
+  label = Some("_when_end")
 
   def startNode = _whenStart
   private[graph] def startNode_=(node: WhenStart): Unit = {

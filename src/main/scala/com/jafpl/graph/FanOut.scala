@@ -6,11 +6,11 @@ import com.jafpl.util.UniqueId
 /**
   * Created by ndw on 10/3/16.
   */
-private[graph] class FanOut(graph: Graph, name: Option[String], step: Step) extends Node(graph, name, Some(step)) {
+private[graph] class FanOut(graph: Graph, step: Step) extends Node(graph, Some(step)) {
   var portCount = 0
 
   def this(graph: Graph) {
-    this(graph, Some("!fanout_" + UniqueId.nextId.toString), new Fan("fanout"))
+    this(graph, new Fan("_fan_out"))
   }
 
   def nextPort: Port = {

@@ -10,9 +10,10 @@ import net.sf.saxon.s9api.QName
 /**
   * Created by ndw on 10/2/16.
   */
-class WhenStart(graph: Graph, name: Option[String], step: Option[CompoundStep], nodes: List[Node]) extends Node(graph, name, step) with CompoundStart {
+class WhenStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) extends Node(graph, step) with CompoundStart {
   var _whenEnd: WhenEnd = _
   var cachePort = 1
+  label = Some("_when_start")
 
   def endNode = _whenEnd
   private[graph] def endNode_=(node: WhenEnd): Unit = {

@@ -18,15 +18,15 @@ object ChooseDemo extends App {
 
   val dumpGraph = Some("pg.xml")
 
-  val input = graph.createNode("InputNumber", new NumberLiteral(0))
+  val input = graph.createNode(new NumberLiteral(0))
   val output = graph.createOutputNode("OUTPUT")
 
-  val double = graph.createNode("Double", new Doubler())
-  val flip = graph.createNode("FlipSign", new FlipSign())
-  val zero = graph.createNode("Zero", new StringLiteral("zero"))
+  val double = graph.createNode(new Doubler())
+  val flip = graph.createNode(new FlipSign())
+  val zero = graph.createNode(new StringLiteral("zero"))
 
-  val when1 = graph.createWhenNode(new WhenSigned("plus", choosePos = false), List(double))
-  val when2 = graph.createWhenNode(new WhenSigned("minus", choosePos = true), List(flip))
+  val when1 = graph.createWhenNode(new WhenSigned(choosePos = false), List(double))
+  val when2 = graph.createWhenNode(new WhenSigned(choosePos = true), List(flip))
   val other = graph.createWhenNode(List(zero))
   val choose = graph.createChooseNode(List(when1, when2, other))
 

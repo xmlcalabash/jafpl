@@ -7,22 +7,25 @@ import org.slf4j.LoggerFactory
 /**
   * Created by ndw on 10/7/16.
   */
-abstract class DefaultStep(name: String) extends Step  {
+abstract class DefaultStep extends Step  {
   protected val logger = LoggerFactory.getLogger(this.getClass)
   protected var controller: StepController = _
   protected var inputPorts = List.empty[String]
   protected var outputPorts = List.empty[String]
-  protected var options = List.empty[QName]
+  private var _label: String = "unknown"
+
+  override def label = _label
+  override def label_=(label: String): Unit = {
+    _label = label
+  }
 
   override def setup(ctrl: StepController,
                      inputs: List[String],
-                     outputs: List[String],
-                     opts: List[QName]): Unit = {
+                     outputs: List[String]): Unit = {
     //logger.debug("{} setup", name)
     controller = ctrl
     inputPorts = inputs
     outputPorts = outputs
-    options = opts
   }
 
   override def reset(): Unit = {

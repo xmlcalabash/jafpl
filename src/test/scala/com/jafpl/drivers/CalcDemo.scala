@@ -160,7 +160,7 @@ object CalcDemo extends App {
             ops += chkTok(children(pos), multOps)
             pos += 2
           }
-          gnode = Some(graph.createNode(nodeId, new MultExpr(ops.toList)))
+          gnode = Some(graph.createNode(new MultExpr(ops.toList)))
         } else if (node.getNodeName == _AdditiveExpr) {
           val ops = ListBuffer.empty[String]
           ops += chkTok(children(1), addOps)
@@ -169,12 +169,12 @@ object CalcDemo extends App {
             ops += chkTok(children(pos), addOps)
             pos += 2
           }
-          gnode = Some(graph.createNode(nodeId, new AddExpr(ops.toList)))
+          gnode = Some(graph.createNode(new AddExpr(ops.toList)))
         } else if (node.getNodeName == _UnaryExpr) {
           val op = chkTok(children(0), addOps)
-          gnode = Some(graph.createNode(nodeId, new UnaryExpr(op)))
+          gnode = Some(graph.createNode(new UnaryExpr(op)))
         } else if (node.getNodeName == _IntegerLiteral) {
-          gnode = Some(graph.createNode(nodeId, new NumberLiteral(node.getStringValue.toInt)))
+          gnode = Some(graph.createNode(new NumberLiteral(node.getStringValue.toInt)))
         } else if (node.getNodeName == _VarRef) {
           if (!varMap.contains(nodeId)) {
             gnode = Some(graph.createInputNode(nodeId))
@@ -187,10 +187,10 @@ object CalcDemo extends App {
           }
 
           val fname = name(children(0))
-          val doubler = graph.createNode(fname, new Doubler())
+          val doubler = graph.createNode(new Doubler())
           nodeMap.put(fname, doubler)
 
-          val iterate = new IterateIntegers("for_" + nodeId)
+          val iterate = new IterateIntegers()
           gnode = Some(graph.createIteratorNode(iterate, List(doubler)))
 
           graph.addEdge(gnode.get, "current", doubler, "source")

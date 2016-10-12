@@ -15,8 +15,14 @@ class MultExpr(val ops: List[String]) extends Step {
   var controller: StepController = _
   val logger = LoggerFactory.getLogger(this.getClass)
   val operands = mutable.HashMap.empty[String, Int]
+  var _label = "unknown"
 
-  override def setup(controller: StepController, inputPorts: List[String], outputPorts: List[String], options: List[QName]): Unit = {
+  override def label = _label
+  override def label_=(label: String): Unit = {
+    _label = label
+  }
+
+  override def setup(controller: StepController, inputPorts: List[String], outputPorts: List[String]): Unit = {
     this.controller = controller
   }
 

@@ -10,9 +10,10 @@ import scala.collection.mutable
 /**
   * Created by ndw on 10/9/16.
   */
-class IterateIntegers(name: String) extends DefaultCompoundStep(name) {
+class IterateIntegers extends DefaultCompoundStep {
   val integers = mutable.HashMap.empty[Int, Int]
   var index = 1
+  label = "iter_int"
 
   override def run(): Unit = {
     if (integers.contains(index)) {

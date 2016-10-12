@@ -15,7 +15,7 @@ import scala.collection.{Set, immutable, mutable}
 /**
   * Created by ndw on 10/2/16.
   */
-class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]) extends StepController {
+class Node(val graph: Graph, step: Option[Step]) extends StepController {
   protected val logger = LoggerFactory.getLogger(this.getClass)
   private val inputPort = mutable.HashMap.empty[String, Option[Edge]]
   private val outputPort = mutable.HashMap.empty[String, Option[Edge]]
@@ -27,6 +27,11 @@ class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]
   protected var madeActors = false
   protected var _finished = false
   val worker = step
+  private[graph] var label: Option[String] = if (step.isDefined) {
+    Some(step.get.label)
+  } else {
+    None
+  }
 
   private[graph] val dependsOn = mutable.HashSet.empty[Node]
   private[graph] def actor = _actor
@@ -145,8 +150,8 @@ class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]
   }
 
   override def toString: String = {
-    if (name.isDefined) {
-      "[Node: " + name.get + " " + uid.toString + "]"
+    if (label.isDefined) {
+      "[Node: " + label.get + " " + uid.toString + "]"
     } else {
       "[Node: " + uid.toString + "]"
     }
@@ -268,15 +273,16 @@ class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]
       madeActors = true
 
       if (worker.isDefined) {
-        worker.get.setup(this, inputs().toList, outputs().toList, List.empty[QName])
+        worker.get.setup(this, inputs().toList, outputs().toList)
       }
 
-      var actorName = name
-      if (actorName.isEmpty) {
-        actorName = Some("anon" + UniqueId.nextId)
+      val actorName = if (label.isDefined) {
+        label.get + "_" + UniqueId.nextId
+      } else {
+        "unknown" + "_" + UniqueId.nextId
       }
 
-      _actor = graph.system.actorOf(Props(new NodeActor(this)), actorName.get)
+      _actor = graph.system.actorOf(Props(new NodeActor(this)), actorName)
 
       this match {
         case _: CompoundEnd => Unit
@@ -291,8 +297,8 @@ class Node(val graph: Graph, val name: Option[String] = None, step: Option[Step]
 
   def dump(tree: TreeWriter): Unit = {
     tree.addStartElement(Serializer.pg_node)
-    if (name.isDefined) {
-      tree.addAttribute(Serializer._name, name.get)
+    if (label.isDefined) {
+      tree.addAttribute(Serializer._name, label.get)
     }
     if (step.isDefined) {
       tree.addAttribute(Serializer._step, step.get.toString)

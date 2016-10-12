@@ -11,9 +11,11 @@ import scala.collection.mutable
 /**
   * Created by ndw on 10/10/16.
   */
-class Chooser(name: String) extends DefaultCompoundStep(name) {
+class Chooser extends DefaultCompoundStep {
   val cDoc = mutable.HashMap.empty[String, GenericItem]
   var whenCount = 0
+
+  label = "_chooser"
 
   def pickOne(nodes: List[Node]): Unit = {
     var when: Option[Node] = None

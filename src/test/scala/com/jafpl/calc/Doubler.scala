@@ -11,8 +11,9 @@ import scala.collection.mutable
 /**
   * Created by ndw on 10/7/16.
   */
-class Doubler() extends DefaultStep("doubler") {
+class Doubler() extends DefaultStep {
   var inputNumber = 0
+  label = "Doubler"
 
   override def run(): Unit = {
     controller.send("result", new NumberItem(inputNumber * 2))
