@@ -111,10 +111,10 @@ object CalcDemo extends App {
 
   if (dumpGraph.isDefined) {
     if (dumpGraph.get == "") {
-      println(graph.dump(processor).toString)
+      println(graph.dump())
     } else {
       val pw = new FileWriter(dumpGraph.get)
-      pw.write(graph.dump(processor).toString)
+      pw.write(graph.dump())
       pw.close()
     }
   }

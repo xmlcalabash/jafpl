@@ -2,7 +2,7 @@ package com.jafpl.graph
 
 import com.jafpl.items.GenericItem
 import com.jafpl.messages.ItemMessage
-import com.jafpl.util.TreeWriter
+import com.jafpl.util.XmlWriter
 
 /**
   * Created by ndw on 10/2/16.
@@ -45,7 +45,7 @@ class OutputNode(graph: Graph, val port: String) extends Node(graph, None) {
     }
   }
 
-  override def dumpExtraAttr(tree: TreeWriter): Unit = {
+  override def dumpExtraAttr(tree: XmlWriter): Unit = {
     tree.addAttribute(Serializer._boundary, "true")
   }
 

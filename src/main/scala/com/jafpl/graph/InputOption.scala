@@ -2,7 +2,6 @@ package com.jafpl.graph
 
 import com.jafpl.items.GenericItem
 import com.jafpl.messages.{CloseMessage, ItemMessage, RanMessage}
-import net.sf.saxon.s9api.QName
 
 /**
   * Created by ndw on 10/2/16.

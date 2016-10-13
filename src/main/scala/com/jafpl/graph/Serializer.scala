@@ -1,29 +1,27 @@
 package com.jafpl.graph
 
-import net.sf.saxon.s9api.QName
-
 /**
   * Created by ndw on 10/9/16.
   */
 object Serializer {
   val NS_JAFPL_PG = "http://jafpl.com/ns/graph"
 
-  val _name = new QName("", "name")
-  val _step = new QName("", "step")
-  val _uid = new QName("", "uid")
-  val _source = new QName("", "source")
-  val _destination = new QName("", "destination")
-  val _input_port = new QName("", "input-port")
-  val _output_port = new QName("", "output-port")
-  val _boundary = new QName("", "boundary")
-  val _compound_start = new QName("", "compound-start")
-  val _compound_end = new QName("", "compound-end")
-  val _compound_children = new QName("", "compound-children")
+  val _name = "name"
+  val _step = "step"
+  val _uid = "uid"
+  val _source = "source"
+  val _destination = "destination"
+  val _input_port = "input-port"
+  val _output_port = "output-port"
+  val _boundary = "boundary"
+  val _compound_start = "compound-start"
+  val _compound_end = "compound-end"
+  val _compound_children = "compound-children"
 
-  val pg_graph = new QName("pg", NS_JAFPL_PG, "graph")
-  val pg_in_edge = new QName("pg", NS_JAFPL_PG, "in-edge")
-  val pg_inputs = new QName("pg", NS_JAFPL_PG, "inputs")
-  val pg_node = new QName("pg", NS_JAFPL_PG, "node")
-  val pg_out_edge = new QName("pg", NS_JAFPL_PG, "out-edge")
-  val pg_outputs = new QName("pg", NS_JAFPL_PG, "outputs")
+  val pg_graph = "pg:graph"
+  val pg_in_edge = "pg:in-edge"
+  val pg_inputs = "pg:inputs"
+  val pg_node = "pg:node"
+  val pg_out_edge = "pg:out-edge"
+  val pg_outputs = "pg:outputs"
 }

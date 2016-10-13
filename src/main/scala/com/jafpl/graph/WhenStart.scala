@@ -1,11 +1,8 @@
 package com.jafpl.graph
 
 import com.jafpl.graph.GraphMonitor.GSubgraph
-import com.jafpl.items.GenericItem
-import com.jafpl.messages.ItemMessage
 import com.jafpl.runtime.CompoundStep
-import com.jafpl.util.TreeWriter
-import net.sf.saxon.s9api.QName
+import com.jafpl.util.XmlWriter
 
 /**
   * Created by ndw on 10/2/16.
@@ -61,7 +58,7 @@ class WhenStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) ext
     }
   }
 
-  override def dumpExtraAttr(tree: TreeWriter): Unit = {
+  override def dumpExtraAttr(tree: XmlWriter): Unit = {
     tree.addAttribute(Serializer._compound_end, _whenEnd.uid.toString)
     var nodeList = ""
     for (node <- nodes) {

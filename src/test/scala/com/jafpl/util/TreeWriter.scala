@@ -1,15 +1,15 @@
 package com.jafpl.util
 
-import net.sf.saxon.Controller
-import net.sf.saxon.expr.instruct.Executable
-import net.sf.saxon.s9api._
-import net.sf.saxon.event.{NamespaceReducer, PipelineConfiguration, Receiver}
-import net.sf.saxon.tree.util.NamespaceIterator
 import java.net.URI
 
+import net.sf.saxon.Controller
 import net.sf.saxon.`type`.{BuiltInType, SchemaType, SimpleType}
+import net.sf.saxon.event.{NamespaceReducer, PipelineConfiguration, Receiver}
+import net.sf.saxon.expr.instruct.Executable
 import net.sf.saxon.expr.parser.Location
 import net.sf.saxon.om._
+import net.sf.saxon.s9api._
+import net.sf.saxon.tree.util.NamespaceIterator
 
 class TreeWriter private {
   protected var processor: Processor = _

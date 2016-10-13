@@ -1,7 +1,6 @@
 package com.jafpl.graph
 
 import com.jafpl.items.GenericItem
-import net.sf.saxon.s9api.QName
 import org.slf4j.LoggerFactory
 
 /**

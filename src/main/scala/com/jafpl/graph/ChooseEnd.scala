@@ -2,7 +2,7 @@ package com.jafpl.graph
 
 import com.jafpl.messages.ItemMessage
 import com.jafpl.runtime.CompoundStep
-import com.jafpl.util.TreeWriter
+import com.jafpl.util.XmlWriter
 
 /**
   * Created by ndw on 10/2/16.
@@ -31,7 +31,7 @@ class ChooseEnd(graph: Graph, step: Option[CompoundStep]) extends Node(graph, st
 
   final def runAgain = false
 
-  override def dumpExtraAttr(tree: TreeWriter): Unit = {
+  override def dumpExtraAttr(tree: XmlWriter): Unit = {
     tree.addAttribute(Serializer._compound_start, _chooseStart.uid.toString)
   }
 }

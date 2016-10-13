@@ -2,10 +2,8 @@ package com.jafpl.graph
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.jafpl.messages.{CloseMessage, StartMessage}
-import com.jafpl.util.TreeWriter
+import com.jafpl.util.XmlWriter
 import com.jafpl.runtime._
-import com.jafpl.util.UniqueId
-import net.sf.saxon.s9api.{Processor, QName, XdmNode}
 import org.slf4j.LoggerFactory
 
 import scala.collection.mutable
@@ -332,9 +330,9 @@ class Graph() {
     }
   }
 
-  def dump(processor: Processor): XdmNode = {
-    val tree = new TreeWriter(processor)
-    tree.startDocument(null)
+  def dump(): String = {
+    val tree = new XmlWriter()
+    tree.startDocument()
     tree.addStartElement(Serializer.pg_graph)
     for (node <- nodes) {
       node.dump(tree)

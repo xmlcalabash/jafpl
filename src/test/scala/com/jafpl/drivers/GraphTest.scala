@@ -19,7 +19,7 @@ object GraphTest extends App {
 
   if (valid) {
     val pgw = new FileWriter("pg.xml")
-    val gdump = graph.dump(processor)
+    val gdump = graph.dump()
     pgw.write(gdump.toString)
     pgw.close()
     println(gdump)

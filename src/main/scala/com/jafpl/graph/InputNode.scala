@@ -3,7 +3,7 @@ package com.jafpl.graph
 import akka.event.Logging
 import com.jafpl.items.GenericItem
 import com.jafpl.messages.{CloseMessage, ItemMessage, RanMessage}
-import com.jafpl.util.TreeWriter
+import com.jafpl.util.XmlWriter
 import org.slf4j.LoggerFactory
 
 import scala.util.Random
@@ -46,7 +46,7 @@ class InputNode(graph: Graph, val port: String) extends Node(graph, None) {
     stop()
   }
 
-  override def dumpExtraAttr(tree: TreeWriter): Unit = {
+  override def dumpExtraAttr(tree: XmlWriter): Unit = {
     tree.addAttribute(Serializer._boundary, "true")
   }
 }

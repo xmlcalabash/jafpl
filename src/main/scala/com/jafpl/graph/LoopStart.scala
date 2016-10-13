@@ -1,10 +1,8 @@
 package com.jafpl.graph
 
-import akka.actor.Props
 import com.jafpl.graph.GraphMonitor.{GSubgraph, GWatch}
 import com.jafpl.runtime.CompoundStep
-import com.jafpl.util.{TreeWriter, UniqueId}
-import net.sf.saxon.s9api.QName
+import com.jafpl.util.XmlWriter
 
 import scala.collection.mutable
 
@@ -60,7 +58,7 @@ class LoopStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) ext
     }
   }
 
-  override def dumpExtraAttr(tree: TreeWriter): Unit = {
+  override def dumpExtraAttr(tree: XmlWriter): Unit = {
     tree.addAttribute(Serializer._compound_end, _loopEnd.uid.toString)
     var nodeList = ""
     for (node <- nodes) {

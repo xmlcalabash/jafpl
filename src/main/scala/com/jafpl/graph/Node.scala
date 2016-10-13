@@ -5,9 +5,8 @@ import com.jafpl.messages.{CloseMessage, ItemMessage, RanMessage}
 import com.jafpl.runtime.{Step, StepController}
 import com.jafpl.graph.GraphMonitor.{GFinish, GWatch}
 import com.jafpl.items.GenericItem
-import com.jafpl.util.TreeWriter
+import com.jafpl.util.XmlWriter
 import com.jafpl.util.UniqueId
-import net.sf.saxon.s9api.QName
 import org.slf4j.LoggerFactory
 
 import scala.collection.{Set, immutable, mutable}
@@ -291,11 +290,11 @@ class Node(val graph: Graph, step: Option[Step]) extends StepController {
     }
   }
 
-  def dumpExtraAttr(tree: TreeWriter): Unit = {
+  def dumpExtraAttr(tree: XmlWriter): Unit = {
     // nop
   }
 
-  def dump(tree: TreeWriter): Unit = {
+  def dump(tree: XmlWriter): Unit = {
     tree.addStartElement(Serializer.pg_node)
     if (label.isDefined) {
       tree.addAttribute(Serializer._name, label.get)

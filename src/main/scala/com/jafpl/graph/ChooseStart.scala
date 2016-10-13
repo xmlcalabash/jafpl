@@ -2,7 +2,7 @@ package com.jafpl.graph
 
 import com.jafpl.graph.GraphMonitor.GSubgraph
 import com.jafpl.runtime.{Chooser, CompoundStep}
-import com.jafpl.util.TreeWriter
+import com.jafpl.util.XmlWriter
 
 /**
   * Created by ndw on 10/2/16.
@@ -60,7 +60,7 @@ class ChooseStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) e
     }
   }
 
-  override def dumpExtraAttr(tree: TreeWriter): Unit = {
+  override def dumpExtraAttr(tree: XmlWriter): Unit = {
     tree.addAttribute(Serializer._compound_end, _chooseEnd.uid.toString)
     var nodeList = ""
     for (node <- nodes) {

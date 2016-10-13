@@ -1,7 +1,6 @@
 package com.jafpl.runtime
 
 import com.jafpl.messages.ItemMessage
-import net.sf.saxon.s9api.QName
 import org.slf4j.LoggerFactory
 
 /**
