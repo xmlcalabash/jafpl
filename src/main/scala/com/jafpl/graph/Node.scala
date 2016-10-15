@@ -1,12 +1,11 @@
 package com.jafpl.graph
 
 import akka.actor.{ActorRef, Props}
-import com.jafpl.messages.{CloseMessage, ItemMessage, RanMessage}
-import com.jafpl.runtime.{Step, StepController}
 import com.jafpl.graph.GraphMonitor.{GFinish, GWatch}
 import com.jafpl.items.GenericItem
-import com.jafpl.util.XmlWriter
-import com.jafpl.util.UniqueId
+import com.jafpl.messages.{CloseMessage, ItemMessage, RanMessage}
+import com.jafpl.runtime.{Step, StepController}
+import com.jafpl.util.{UniqueId, XmlWriter}
 import org.slf4j.LoggerFactory
 
 import scala.collection.{Set, immutable, mutable}

@@ -1,10 +1,8 @@
 package com.jafpl.runtime
 
-import com.jafpl.graph.GraphMonitor.GFinish
-import com.jafpl.graph.{GraphException, Node, WhenStart}
+import com.jafpl.graph.{GraphException, Node}
 import com.jafpl.items.GenericItem
 import com.jafpl.messages.{CloseMessage, ItemMessage}
-import com.jafpl.util.UniqueId
 
 import scala.collection.mutable
 

@@ -1,7 +1,7 @@
 package com.jafpl.graph
 
 import com.jafpl.messages.ItemMessage
-import com.jafpl.runtime.{DefaultStep, Step, StepController}
+import com.jafpl.runtime.DefaultStep
 
 /**
   * Created by ndw on 10/3/16.

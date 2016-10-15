@@ -1,7 +1,6 @@
 package com.jafpl.graph
 
 import com.jafpl.runtime.Step
-import com.jafpl.util.UniqueId
 
 /**
   * Created by ndw on 10/3/16.

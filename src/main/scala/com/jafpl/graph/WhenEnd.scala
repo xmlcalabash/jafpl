@@ -1,7 +1,7 @@
 package com.jafpl.graph
 
 import com.jafpl.messages.ItemMessage
-import com.jafpl.runtime.{CompoundStep, Whener}
+import com.jafpl.runtime.CompoundStep
 import com.jafpl.util.XmlWriter
 
 /**

@@ -1,10 +1,9 @@
 package com.jafpl.graph
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.Actor
 import akka.event.Logging
 import com.jafpl.graph.GraphMonitor.{GFinish, GFinished, GStart}
 import com.jafpl.messages._
-import com.jafpl.runtime.StepController
 
 import scala.collection.mutable
 

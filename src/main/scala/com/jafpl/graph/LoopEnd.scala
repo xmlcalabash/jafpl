@@ -1,13 +1,8 @@
 package com.jafpl.graph
 
-import akka.actor.Props
-import com.jafpl.graph.GraphMonitor.{GSubgraph, GWatch}
-import com.jafpl.items.GenericItem
-import com.jafpl.messages.{CloseMessage, ItemMessage, RanMessage}
+import com.jafpl.messages.ItemMessage
 import com.jafpl.runtime.CompoundStep
-import com.jafpl.util.{UniqueId, XmlWriter}
-
-import scala.collection.mutable
+import com.jafpl.util.XmlWriter
 
 /**
   * Created by ndw on 10/2/16.

@@ -1,13 +1,12 @@
 package com.jafpl.graph
 
 import akka.actor.{ActorRef, ActorSystem, Props}
-import com.jafpl.messages.{CloseMessage, StartMessage}
-import com.jafpl.util.XmlWriter
+import com.jafpl.messages.StartMessage
 import com.jafpl.runtime._
+import com.jafpl.util.XmlWriter
 import org.slf4j.LoggerFactory
 
-import scala.collection.mutable
-import scala.collection.immutable
+import scala.collection.{immutable, mutable}
 
 /**
   * Created by ndw on 10/2/16.

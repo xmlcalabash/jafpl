@@ -1,12 +1,8 @@
 package com.jafpl.graph
 
-import akka.event.Logging
 import com.jafpl.items.GenericItem
-import com.jafpl.messages.{CloseMessage, ItemMessage, RanMessage}
+import com.jafpl.messages.ItemMessage
 import com.jafpl.util.XmlWriter
-import org.slf4j.LoggerFactory
-
-import scala.util.Random
 
 /**
   * Created by ndw on 10/2/16.

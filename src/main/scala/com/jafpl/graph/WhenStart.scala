@@ -1,7 +1,7 @@
 package com.jafpl.graph
 
 import com.jafpl.graph.GraphMonitor.GSubgraph
-import com.jafpl.runtime.{CompoundStep, Whener}
+import com.jafpl.runtime.CompoundStep
 import com.jafpl.util.XmlWriter
 
 /**

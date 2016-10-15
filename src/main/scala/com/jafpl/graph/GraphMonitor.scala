@@ -1,11 +1,8 @@
 package com.jafpl.graph
 
 import akka.actor.{Actor, ActorRef}
-import akka.actor.Actor.Receive
 import akka.event.Logging
 import com.jafpl.graph.GraphMonitor._
-import com.jafpl.messages._
-import com.jafpl.util.UniqueId
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
