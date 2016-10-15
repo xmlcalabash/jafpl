@@ -139,11 +139,11 @@ class Node(val graph: Graph, step: Option[Step]) extends StepController {
     // nop
   }
 
-  private[graph] def addWhenCaches(when: Option[WhenStart]): Unit = {
+  private[graph] def addWhenCaches(): Unit = {
     // nop
   }
 
-  private[graph] def addChooseCaches(choose: Option[ChooseStart]): Unit = {
+  private[graph] def addChooseCaches(): Unit = {
     // nop
   }
 

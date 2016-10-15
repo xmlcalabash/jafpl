@@ -160,6 +160,8 @@ class Graph() {
   def addEdge(source: Node, outputPort: String, destination: Node, inputPort: String): Unit = {
     chkValid()
 
+    //logger.info("addEdge: " + source + "." + outputPort + " -> " + destination + "." + inputPort)
+
     val from =
       if (source.output(outputPort).isDefined) {
         val edge = source.output(outputPort).get
@@ -207,10 +209,14 @@ class Graph() {
 
     val edge = new Edge(this, from, to)
 
+    //logger.info("         " + from + " -> " + to)
+
     edges.add(edge)
   }
 
   private[graph] def removeEdge(edge: Edge): Unit = {
+    //logger.info("rmvEdge: " + edge.source + "." + edge.outputPort + " -> " + edge.destination + "." + edge.inputPort)
+
     edge.source.removeOutput(edge.outputPort)
     edge.destination.removeInput(edge.inputPort)
     edges.remove(edge)
@@ -259,8 +265,8 @@ class Graph() {
     if (_valid) {
       for (node <- nodes) {
         node.addIterationCaches()
-        node.addWhenCaches(None)
-        node.addChooseCaches(None)
+        node.addWhenCaches()
+        node.addChooseCaches()
       }
     }
 

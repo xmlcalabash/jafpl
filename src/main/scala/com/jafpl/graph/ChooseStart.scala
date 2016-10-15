@@ -30,19 +30,14 @@ class ChooseStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) e
     graph.monitor ! GSubgraph(_actor, nodes)
   }
 
-  override private[graph] def addWhenCaches(when: Option[WhenStart]): Unit = {
-    /*
-    for (child <- nodes) {
-      child.addChooseCaches(Some(this))
-    }
-    */
-
+  override private[graph] def addChooseCaches(): Unit = {
     for (child <- nodes) {
       child match {
         case when: WhenStart =>
           for (input <- child.inputs()) {
             val edge = child.input(input).get
             if (edge.inputPort == "condition") {
+              logger.info("Choose caches: " + edge)
               val portName = "choose_" + cachePort
               graph.removeEdge(edge)
               graph.addEdge(edge.source, edge.outputPort, this, "I_" + portName)
@@ -52,6 +47,10 @@ class ChooseStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) e
           }
         case _ => Unit
       }
+    }
+
+    for (child <- nodes) {
+      child.addChooseCaches()
     }
   }
 

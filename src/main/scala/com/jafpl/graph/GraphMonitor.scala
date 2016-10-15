@@ -91,7 +91,7 @@ class GraphMonitor(private val graph: Graph) extends Actor {
 
   final def receive = {
     case GWatch(node) =>
-      log.debug("M WATCH  {}", node)
+      //log.debug("M WATCH  {}", node)
       watch(node)
     case GStart(node) =>
       log.debug("M START  {}", node)
@@ -100,11 +100,13 @@ class GraphMonitor(private val graph: Graph) extends Actor {
       log.debug("M FINISH {}", node)
       finish(node)
     case GSubgraph(ref, subpipline) =>
+      /*
       var str = ""
       for (node <- subpipline) {
         str += node + " "
       }
       log.debug("M SUBGRF {}: {}", ref, str)
+      */
       subgraph(ref, subpipline)
     case m: Any => log.debug("Unexpected message: {}", m)
   }

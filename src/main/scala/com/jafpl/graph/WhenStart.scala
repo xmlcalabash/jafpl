@@ -1,7 +1,7 @@
 package com.jafpl.graph
 
 import com.jafpl.graph.GraphMonitor.GSubgraph
-import com.jafpl.runtime.CompoundStep
+import com.jafpl.runtime.{CompoundStep, Whener}
 import com.jafpl.util.XmlWriter
 
 /**
@@ -26,13 +26,7 @@ class WhenStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) ext
     graph.monitor ! GSubgraph(_actor, nodes)
   }
 
-  override private[graph] def addWhenCaches(when: Option[WhenStart]): Unit = {
-    /*
-    for (child <- nodes) {
-      child.addWhenCaches(Some(this))
-    }
-    */
-
+  override private[graph] def addWhenCaches(): Unit = {
     for (child <- nodes) {
       for (input <- child.inputs()) {
         val edge = child.input(input).get
@@ -42,7 +36,7 @@ class WhenStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) ext
           found = found || node == cnode
         }
         if (!found) {
-          // Cache me Amadeus
+          logger.info("When caches: " + edge)
           val portName = "when_" + cachePort
           graph.removeEdge(edge)
           graph.addEdge(edge.source, edge.outputPort, this, "I_" + portName)
@@ -50,6 +44,10 @@ class WhenStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) ext
           cachePort += 1
         }
       }
+    }
+
+    for (child <- nodes) {
+      child.addWhenCaches()
     }
   }
 
