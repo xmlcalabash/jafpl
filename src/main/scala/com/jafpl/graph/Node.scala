@@ -23,7 +23,6 @@ class Node(val graph: Graph, step: Option[Step]) extends StepController {
   private var constructionOk = true
   private val actors = mutable.HashMap.empty[String, ActorRef]
   protected var _actor: ActorRef = _
-  protected var madeActors = false
   protected var _finished = false
   val worker = step
   private[graph] var label: Option[String] = if (step.isDefined) {
@@ -261,32 +260,23 @@ class Node(val graph: Graph, step: Option[Step]) extends StepController {
   }
 
   private[graph] def makeActors(): Unit = {
-    for (port <- outputPort.keySet) {
-      val edge = outputPort.getOrElse(port, None)
-      if (edge.isDefined) {
-        edge.get.destination.makeActors()
-      }
+    val actorName = if (label.isDefined) {
+      label.get + "_" + UniqueId.nextId
+    } else {
+      "unknown" + "_" + UniqueId.nextId
     }
 
-    if (!madeActors) {
-      madeActors = true
+    _actor = graph.system.actorOf(Props(new NodeActor(this)), actorName)
 
-      if (worker.isDefined) {
-        worker.get.setup(this, inputs().toList, outputs().toList)
-      }
-
-      val actorName = if (label.isDefined) {
-        label.get + "_" + UniqueId.nextId
-      } else {
-        "unknown" + "_" + UniqueId.nextId
-      }
-
-      _actor = graph.system.actorOf(Props(new NodeActor(this)), actorName)
-
-      this match {
-        case _: CompoundEnd => Unit
-        case _ => graph.monitor ! GWatch(this)
-      }
+    // The steps that represent the end of a compound step are special.
+    // The worker associated with them is irrelevant and they aren't watched.
+    this match {
+      case _: CompoundEnd => Unit
+      case _ =>
+        if (worker.isDefined) {
+          worker.get.setup(this, inputs().toList, outputs().toList)
+        }
+        graph.monitor ! GWatch(this)
     }
   }
 

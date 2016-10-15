@@ -25,13 +25,8 @@ class LoopStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) ext
   def subpipeline = nodes
 
   override private[graph] def makeActors(): Unit = {
-    val made = madeActors
-
     super.makeActors()
-
-    if (!made) {
-      graph.monitor ! GSubgraph(_actor, nodes)
-    }
+    graph.monitor ! GSubgraph(_actor, nodes)
   }
 
   override def addIterationCaches(): Unit = {

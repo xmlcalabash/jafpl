@@ -26,13 +26,8 @@ class ChooseStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) e
   }
 
   override private[graph] def makeActors(): Unit = {
-    val made = madeActors
-
     super.makeActors()
-
-    if (!made) {
-      graph.monitor ! GSubgraph(_actor, nodes)
-    }
+    graph.monitor ! GSubgraph(_actor, nodes)
   }
 
   override private[graph] def addWhenCaches(when: Option[WhenStart]): Unit = {

@@ -315,7 +315,7 @@ class Graph() {
     _system = ActorSystem("jafpl-com")
     _monitor = _system.actorOf(Props(new GraphMonitor(this)), name="monitor")
 
-    for (node <- roots()) {
+    for (node <- nodes) {
       node.makeActors()
     }
 

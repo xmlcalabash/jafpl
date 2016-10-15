@@ -91,7 +91,7 @@ class GraphMonitor(private val graph: Graph) extends Actor {
 
   final def receive = {
     case GWatch(node) =>
-      //log.debug("M WATCH  {}", node)
+      log.debug("M WATCH  {}", node)
       watch(node)
     case GStart(node) =>
       log.debug("M START  {}", node)
