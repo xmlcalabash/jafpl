@@ -17,7 +17,7 @@ class IterateIntegers extends DefaultCompoundStep {
 
   override def run(): Unit = {
     if (integers.contains(index)) {
-      controller.send("current", new NumberItem(integers(index) * 2))
+      controller.send("current", new NumberItem(integers(index)))
       controller.close("current")
       index += 1
     }
