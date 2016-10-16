@@ -75,34 +75,22 @@ private[graph] class NodeActor(node: Node) extends Actor {
     case m: GFinished =>
       log.debug("A FINIT {}", node)
       node match {
-        case ls: LoopStart =>
-          if (ls.runAgain) {
-            for (node <- ls.subpipeline) {
+        case compoundStart: CompoundStart =>
+          if (compoundStart.runAgain) {
+            for (node <- compoundStart.subpipeline) {
               node.synchronized {
                 node.reset()
               }
             }
           } else {
-            node.graph.monitor ! GFinish(ls)
-            ls.endNode.stop()
+            node.graph.monitor ! GFinish(compoundStart)
+            compoundStart.compoundEnd.stop()
           }
-        case le: LoopEnd =>
-          // FIXME: Is this gauranteed to work? Is there any chance that le.runAgain could
-          // get false when ls.runAgain got true?
-          if (!le.runAgain) {
-            node.graph.monitor ! GFinish(le)
+        case compoundEnd: CompoundEnd =>
+          if (!compoundEnd.compoundStart.asInstanceOf[CompoundStart].runAgain) {
+            node.graph.monitor ! GFinish(compoundEnd)
           }
-        case s: WhenStart =>
-          node.graph.monitor ! GFinish(s)
-          s.endNode.stop()
-        case s: WhenEnd =>
-          node.graph.monitor ! GFinish(s)
-        case s: ChooseStart =>
-          node.graph.monitor ! GFinish(s)
-          s.endNode.stop()
-        case s: ChooseEnd =>
-          node.graph.monitor ! GFinish(s)
-        case _ => log.debug("Node {} didn't expect to be notified of subgraph completion")
+        case _ => log.debug("Node {} didn't expect to be notified of subgraph completion", node)
       }
     case m: Any => log.debug("Node {} received unexpected message: {}", node, m)
   }

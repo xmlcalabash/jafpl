@@ -183,7 +183,7 @@ class Node(val graph: Graph, step: Option[Step]) extends StepController {
     } else {
       this match {
         case ls: CompoundStart =>
-          ls.endNode.send(port, item)
+          ls.compoundEnd.send(port, item)
         case _ =>
           logger.info(this + " writes to unknown output port: " + port)
       }
@@ -258,7 +258,7 @@ class Node(val graph: Graph, step: Option[Step]) extends StepController {
     }
   }
 
-  private[graph] def makeActors(): Unit = {
+  private[jafpl] def makeActors(): Unit = {
     var actorName = if (label.isDefined) {
       label.get + "_" + UniqueId.nextId
     } else {

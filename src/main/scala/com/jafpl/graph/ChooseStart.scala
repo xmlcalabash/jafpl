@@ -1,33 +1,16 @@
 package com.jafpl.graph
 
-import com.jafpl.graph.GraphMonitor.GSubgraph
-import com.jafpl.runtime.{Chooser, CompoundStep}
-import com.jafpl.util.XmlWriter
+import com.jafpl.runtime.{Chooser, CompoundStep, DefaultCompoundStart}
 
 /**
   * Created by ndw on 10/2/16.
   */
-class ChooseStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) extends Node(graph, step) with CompoundStart {
-  var _chooseEnd: ChooseEnd = _
-  var cachePort = 1
+class ChooseStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) extends DefaultCompoundStart(graph, step, nodes) {
+  private var cachePort = 1
   label = Some("_choose_start")
-
-  def endNode = _chooseEnd
-  private[graph] def endNode_=(node: ChooseEnd): Unit = {
-    _chooseEnd = node
-  }
-
-  final def runAgain = false
-
-  def subpipeline = nodes
 
   override private[graph] def run(): Unit = {
     step.get.asInstanceOf[Chooser].pickOne(nodes)
-  }
-
-  override private[graph] def makeActors(): Unit = {
-    super.makeActors()
-    graph.monitor ! GSubgraph(_actor, nodes)
   }
 
   override private[graph] def addChooseCaches(): Unit = {
@@ -52,14 +35,5 @@ class ChooseStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) e
     for (child <- nodes) {
       child.addChooseCaches()
     }
-  }
-
-  override def dumpExtraAttr(tree: XmlWriter): Unit = {
-    tree.addAttribute(Serializer._compound_end, _chooseEnd.uid.toString)
-    var nodeList = ""
-    for (node <- nodes) {
-      nodeList += node.uid.toString + " "
-    }
-    tree.addAttribute(Serializer._compound_children, nodeList)
   }
 }

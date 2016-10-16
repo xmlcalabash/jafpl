@@ -1,31 +1,12 @@
 package com.jafpl.graph
 
-import com.jafpl.graph.GraphMonitor.GSubgraph
-import com.jafpl.runtime.CompoundStep
-import com.jafpl.util.XmlWriter
+import com.jafpl.runtime.{CompoundStep, DefaultCompoundStart}
 
 /**
   * Created by ndw on 10/2/16.
   */
-class LoopStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) extends Node(graph, step) with CompoundStart {
-  var _loopEnd: LoopEnd = _
+class LoopStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) extends DefaultCompoundStart(graph, step, nodes) {
   label = Some("_loop_start")
-
-  def endNode = _loopEnd
-  private[graph] def endNode_=(node: LoopEnd): Unit = {
-    _loopEnd = node
-  }
-
-  def runAgain: Boolean = {
-    step.get.runAgain
-  }
-
-  def subpipeline = nodes
-
-  override private[graph] def makeActors(): Unit = {
-    super.makeActors()
-    graph.monitor ! GSubgraph(_actor, nodes)
-  }
 
   override def addIterationCaches(): Unit = {
     for (child <- nodes) {
@@ -49,14 +30,5 @@ class LoopStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) ext
         }
       }
     }
-  }
-
-  override def dumpExtraAttr(tree: XmlWriter): Unit = {
-    tree.addAttribute(Serializer._compound_end, _loopEnd.uid.toString)
-    var nodeList = ""
-    for (node <- nodes) {
-      nodeList += node.uid.toString + " "
-    }
-    tree.addAttribute(Serializer._compound_children, nodeList)
   }
 }

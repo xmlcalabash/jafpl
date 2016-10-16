@@ -7,7 +7,6 @@ import com.jafpl.runtime.StepController
   * Created by ndw on 10/10/16.
   */
 trait CompoundEnd extends StepController {
-  def startNode: CompoundStart
+  def compoundStart: Node
   def receiveOutput(port: String, msg: ItemMessage)
-  def runAgain: Boolean
 }

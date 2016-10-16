@@ -24,7 +24,7 @@ class Graph() {
 
   private[graph] def finished = _finished
   private[graph] def system = _system
-  private[graph] def monitor = _monitor
+  private[jafpl] def monitor = _monitor
 
   def chkValid() = {
     if (_validated) {
@@ -89,8 +89,8 @@ class Graph() {
     val loopStart = new LoopStart(this, step, subpipeline)
     val loopEnd   = new LoopEnd(this, step)
 
-    loopStart.endNode = loopEnd
-    loopEnd.startNode = loopStart
+    loopStart.compoundEnd = loopEnd
+    loopEnd.compoundStart = loopStart
 
     nodes.add(loopStart)
     nodes.add(loopEnd)
@@ -113,8 +113,8 @@ class Graph() {
     val chooseStart = new ChooseStart(this, step, subpipeline)
     val chooseEnd   = new ChooseEnd(this, step)
 
-    chooseStart.endNode = chooseEnd
-    chooseEnd.startNode = chooseStart
+    chooseStart.compoundEnd = chooseEnd
+    chooseEnd.compoundStart = chooseStart
 
     nodes.add(chooseStart)
     nodes.add(chooseEnd)
@@ -142,13 +142,34 @@ class Graph() {
     val whenStart = new WhenStart(this, whenStep, subpipeline)
     val whenEnd   = new WhenEnd(this, whenStep)
 
-    whenStart.endNode = whenEnd
-    whenEnd.startNode = whenStart
+    whenStart.compoundEnd = whenEnd
+    whenEnd.compoundStart = whenStart
 
     nodes.add(whenStart)
     nodes.add(whenEnd)
 
     whenStart
+  }
+
+  def createGroupNode(subpipeline: List[Node]): GroupStart = {
+    chkValid()
+    val step       = Option(new Grouper())
+    val groupStart = new GroupStart(this, step, subpipeline)
+    val groupEnd   = new GroupEnd(this, step)
+
+    groupStart.compoundEnd = groupEnd
+    groupEnd.compoundStart = groupStart
+
+    nodes.add(groupStart)
+    nodes.add(groupEnd)
+
+    var count = 0
+    for (node <- subpipeline) {
+      count += 1
+      addEdge(groupStart, "!latch_" + count, node, "!latch")
+    }
+
+    groupStart
   }
 
   def addEdge(from: Port, to: Port): Unit = {

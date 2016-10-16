@@ -38,15 +38,15 @@ object ChooseDemo extends App {
   graph.addEdge(input, "result", flip, "source")
   graph.addEdge(input, "result", zero, "source")
 
-  graph.addEdge(when1.endNode, "result", choose.endNode, "I_result")
-  graph.addEdge(when2.endNode, "result", choose.endNode, "I_result")
-  graph.addEdge(other.endNode, "result", choose.endNode, "I_result")
+  graph.addEdge(when1.compoundEnd, "result", choose.compoundEnd, "I_result")
+  graph.addEdge(when2.compoundEnd, "result", choose.compoundEnd, "I_result")
+  graph.addEdge(other.compoundEnd, "result", choose.compoundEnd, "I_result")
 
-  graph.addEdge(double, "result", when1.endNode, "I_result")
-  graph.addEdge(flip, "result", when2.endNode, "I_result")
-  graph.addEdge(zero, "result", other.endNode, "I_result")
+  graph.addEdge(double, "result", when1.compoundEnd, "I_result")
+  graph.addEdge(flip, "result", when2.compoundEnd, "I_result")
+  graph.addEdge(zero, "result", other.compoundEnd, "I_result")
 
-  graph.addEdge(choose.endNode, "result", output, "source")
+  graph.addEdge(choose.compoundEnd, "result", output, "source")
 
   val valid = graph.valid()
   if (!valid) {
@@ -79,7 +79,7 @@ object ChooseDemo extends App {
 
   def linkFrom(node: Node): Node = {
     node match {
-      case l: LoopStart => l.endNode
+      case l: LoopStart => l.compoundEnd
       case _ => node
     }
   }

@@ -194,7 +194,7 @@ object CalcDemo extends App {
           gnode = Some(graph.createIteratorNode(iterate, List(doubler)))
 
           graph.addEdge(gnode.get, "current", doubler, "source")
-          graph.addEdge(doubler, "result", gnode.get.asInstanceOf[LoopStart].endNode, "I_result")
+          graph.addEdge(doubler, "result", gnode.get.asInstanceOf[LoopStart].compoundEnd, "I_result")
 
         } else if (node.getNodeName == _TOKEN || node.getNodeName == _QName || node.getNodeName == _ArgumentList) {
           // nop
@@ -259,7 +259,7 @@ object CalcDemo extends App {
 
   def linkFrom(node: Node): Node = {
     node match {
-      case l: LoopStart => l.endNode
+      case l: LoopStart => l.compoundEnd
       case _ => node
     }
   }

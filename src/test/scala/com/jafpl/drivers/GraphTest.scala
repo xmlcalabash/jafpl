@@ -2,9 +2,7 @@ package com.jafpl.drivers
 
 import java.io.FileWriter
 
-import com.jafpl.calc.{AddExpr, IterateIntegers, NumberLiteral}
-import com.jafpl.graph.{Graph, Runtime}
-import com.jafpl.items.{NumberItem, StringItem}
+import com.jafpl.graph.Graph
 import net.sf.saxon.s9api.Processor
 
 object GraphTest extends App {
@@ -133,8 +131,8 @@ object GraphTest extends App {
     graph.addEdge(s1, "result", s2, "source")
     graph.addEdge(outside, "result", s1, "secondary")
     graph.addEdge(foreach, "current", s1, "source")
-    graph.addEdge(s2, "result", foreach.endNode, "I_result")
-    graph.addEdge(foreach.endNode, "result", c, "source")
+    graph.addEdge(s2, "result", foreach.compoundEnd, "I_result")
+    graph.addEdge(foreach.compoundEnd, "result", c, "source")
   }
 
   def nodes012(graph: Graph): Unit = {
@@ -149,18 +147,18 @@ object GraphTest extends App {
     val c = graph.createNode("c")
 
     graph.addEdge(a, "result", choose, "source")
-    graph.addEdge(choose.endNode, "result", c, "source")
-    graph.addEdge(alt1, "result", when1.endNode, "I_result")
+    graph.addEdge(choose.compoundEnd, "result", c, "source")
+    graph.addEdge(alt1, "result", when1.compoundEnd, "I_result")
     //graph.addEdge(alt2, "result", when2.endNode, "I_result")
-    graph.addEdge(alt3, "result", other.endNode, "I_result")
+    graph.addEdge(alt3, "result", other.compoundEnd, "I_result")
 
     graph.addEdge(choose, "when1_condition", when1, "condition")
     //graph.addEdge(choose, "when2_condition", when2, "condition")
     graph.addEdge(choose, "true_condition", other, "condition")
 
-    graph.addEdge(when1.endNode, "result", choose.endNode, "I_result")
+    graph.addEdge(when1.compoundEnd, "result", choose.compoundEnd, "I_result")
     //graph.addEdge(when2.endNode, "result", choose.endNode, "I_result")
-    graph.addEdge(other.endNode, "result", choose.endNode, "I_result")
+    graph.addEdge(other.compoundEnd, "result", choose.compoundEnd, "I_result")
 
     val outside = graph.createNode("outer")
     graph.addEdge(outside, "result", alt3, "source")
