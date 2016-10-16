@@ -2,12 +2,14 @@ buildscript {
   repositories {
     mavenCentral()
     maven { url "http://maven.restlet.org" }
+    maven { url "https://plugins.gradle.org/m2/" }
   }
 
   dependencies {
     classpath group: 'org.docbook', name: 'docbook-xslt2', version: '2.0.19'
     classpath group: 'com.xmlcalabash', name: 'xmlcalabash1-print', version: '1.1.4'
     classpath group: 'com.xmlcalabash', name: 'xmlcalabash1-gradle', version: '1.1.2'
+    classpath group: 'gradle.plugin.com.github.maiflai', name: 'gradle-scalatest', version: '0.14'
   }
 }
 
@@ -15,6 +17,7 @@ plugins {
   id "scala"
   id "maven"
   id "de.undercouch.download" version "2.0.0"
+  id "com.github.maiflai.scalatest" version "0.14"
 }
 
 configurations {
@@ -41,7 +44,11 @@ dependencies {
     [group: 'org.xmlresolver', name: 'xmlresolver', version: '0.12.3']
   )
   testCompile (
-    [group: 'net.sf.saxon', name: 'Saxon-HE', version: saxonVersion ]
+    [group: 'net.sf.saxon', name: 'Saxon-HE', version: saxonVersion ],
+    [group: 'org.scalatest', name: 'scalatest_2.11', version: '3.0.0']
+  )
+  testRuntime (
+    [group: 'org.pegdown', name: 'pegdown', version: '1.6.0']
   )
 }
 
