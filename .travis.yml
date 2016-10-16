@@ -1,3 +1,6 @@
+env:
+  TERM=dumb
+
 install: true
 language: java
 script: gradle build
