@@ -259,11 +259,15 @@ class Node(val graph: Graph, step: Option[Step]) extends StepController {
   }
 
   private[graph] def makeActors(): Unit = {
-    val actorName = if (label.isDefined) {
+    var actorName = if (label.isDefined) {
       label.get + "_" + UniqueId.nextId
     } else {
       "unknown" + "_" + UniqueId.nextId
     }
+
+    actorName = actorName.replace("{", "+OC")
+    actorName = actorName.replace("}", "+CC")
+    actorName = actorName.replace("$", "+DS")
 
     _actor = graph.system.actorOf(Props(new NodeActor(this)), actorName)
 
