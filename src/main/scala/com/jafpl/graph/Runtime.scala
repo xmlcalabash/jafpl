@@ -22,14 +22,6 @@ class Runtime(val graph: Graph) {
     graph.inputs()
   }
 
-  def options(): List[InputOption] = {
-    if (!started) {
-      throw new GraphException("You must start the pipeline first!")
-    }
-
-    graph.options()
-  }
-
   def outputs(): List[OutputNode] = {
     if (!started) {
       throw new GraphException("You must start the pipeline first!")
@@ -68,6 +60,8 @@ class Runtime(val graph: Graph) {
     if (!started) {
       throw new GraphException("You must start the pipeline first!")
     }
+
+    println("close: " + port)
 
     for (node <- inputs()) {
       if (node.port == port) {

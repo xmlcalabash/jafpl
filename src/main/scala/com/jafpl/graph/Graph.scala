@@ -294,17 +294,6 @@ class Graph() {
     inodes.toList
   }
 
-  private [graph] def options(): List[InputOption] = {
-    val onodes = mutable.ListBuffer.empty[InputOption]
-    for (node <- nodes) {
-      node match {
-        case n: InputOption => onodes += n
-        case _ => Unit
-      }
-    }
-    onodes.toList
-  }
-
   private[graph] def outputs(): List[OutputNode] = {
     val onodes = mutable.ListBuffer.empty[OutputNode]
     for (node <- nodes) {
