@@ -52,6 +52,8 @@ design.</para>
 <section xml:id="where">
 <title>Where is it?</title>
 
+<para><inlinemediaobject><imageobject><imagedata fileref="https://travis-ci.org/ndw/jafpl.svg?branch=master"/></imageobject></inlinemediaobject></para>
+
 <para>It’s <link xlink:href="https://github.com/ndw/jafpl">on GitHub</link>.
 </para>
 </section>
