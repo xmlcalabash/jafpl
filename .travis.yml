@@ -3,7 +3,7 @@ env:
 
 install: true
 language: java
-script: gradle --console plain build
+script: gradle --no-color build
 sudu: false
 jdk:
   - oraclejdk8
