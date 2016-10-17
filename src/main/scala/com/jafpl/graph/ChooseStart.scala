@@ -20,7 +20,7 @@ class ChooseStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) e
           for (input <- child.inputs()) {
             val edge = child.input(input).get
             if (edge.inputPort == "condition") {
-              logger.info("Choose caches: " + edge)
+              logger.debug("Choose caches: " + edge)
               val portName = "choose_" + cachePort
               graph.removeEdge(edge)
               graph.addEdge(edge.source, edge.outputPort, this, "I_" + portName)

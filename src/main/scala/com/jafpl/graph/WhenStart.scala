@@ -19,7 +19,7 @@ class WhenStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) ext
           found = found || node == cnode
         }
         if (!found) {
-          logger.info("When caches: " + edge)
+          logger.debug("When caches: " + edge)
           val portName = "when_" + cachePort
           graph.removeEdge(edge)
           graph.addEdge(edge.source, edge.outputPort, this, "I_" + portName)
