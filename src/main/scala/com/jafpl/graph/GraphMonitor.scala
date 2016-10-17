@@ -16,13 +16,21 @@ object GraphMonitor {
   case class GStart(node: Node)
   case class GFinish(node: Node)
   case class GSubgraph(ref: ActorRef, subpipeline: List[Node])
+  case class GWaitingFor(node: Node, ports: List[String], dependsOn: List[Node])
   case class GFinished()
+  case class GDump()
+  case class GTrace(enable: Boolean)
+}
+
+class GraphStatus(val ports: List[String], val dependsOn: List[Node]) {
 }
 
 class GraphMonitor(private val graph: Graph) extends Actor {
   val log = Logging(context.system, this)
   val watching = mutable.HashSet.empty[Node]
+  val _status = mutable.HashMap.empty[Node, GraphStatus]
   val subgraphs = mutable.HashMap.empty[ActorRef, List[Node]]
+  var trace = false
 
   def watch(node: Node): Unit = {
     watching += node
@@ -74,9 +82,28 @@ class GraphMonitor(private val graph: Graph) extends Actor {
   }
 
   def dumpState(): Unit = {
-    log.info("====================================================================")
+    log.info("===============================================================Graph Monitor==")
     for (node <- watching) {
-      log.info("WATCHING: " + node)
+      var msg = "WATCHING: " + node
+      if (_status.contains(node)) {
+        if (_status(node).ports.nonEmpty) {
+          msg += " (waiting for:"
+          for (port <- _status(node).ports) {
+            msg += " " + port
+          }
+          msg += ")"
+        }
+
+        if (_status(node).dependsOn.nonEmpty) {
+          msg += " (depends on:"
+          for (dep <- _status(node).dependsOn) {
+            msg += " " + dep
+          }
+          msg += ")"
+        }
+      }
+
+      log.info(msg)
     }
     for (ref <- subgraphs.keySet) {
       log.info("SUBGRAPH: " + ref)
@@ -84,27 +111,57 @@ class GraphMonitor(private val graph: Graph) extends Actor {
         log.info("            " + node)
       }
     }
+    log.info("===============================================================/Graph Monitor=")
+  }
+
+  def status(): Unit = {
+    dumpState()
   }
 
   final def receive = {
     case GWatch(node) =>
-      //log.debug("M WATCH  {}", node)
+      if (trace) {
+        log.info("M WATCH   {}", node)
+      }
       watch(node)
     case GStart(node) =>
-      log.debug("M START  {}", node)
+      if (trace) {
+        log.info("M START   {}", node)
+      }
       start(node)
     case GFinish(node) =>
-      log.debug("M FINISH {}", node)
+      if (trace) {
+        log.info("M FINISH  {}", node)
+      }
       finish(node)
     case GSubgraph(ref, subpipline) =>
-      /*
-      var str = ""
-      for (node <- subpipline) {
-        str += node + " "
+      if (trace) {
+        var str = ""
+        for (node <- subpipline) {
+          str += node + " "
+        }
+        log.info("M SUBGRAF {}: {}", ref, str)
       }
-      log.debug("M SUBGRF {}: {}", ref, str)
-      */
       subgraph(ref, subpipline)
+    case GWaitingFor(node, ports, depends) =>
+      if (trace) {
+        var str = ""
+        for (port <- ports) {
+          str += port + " "
+        }
+        for (node <- depends) {
+          str += node + " "
+        }
+        log.info("M WAITFOR {}: {}", node, str)
+      }
+      _status.put(node, new GraphStatus(ports, depends))
+    case GTrace(enable) =>
+      if (trace) {
+        log.info("M TRACE   {}", enable)
+      }
+      trace = enable
+    case GDump() =>
+      dumpState()
     case m: Any => log.debug("Unexpected message: {}", m)
   }
 }

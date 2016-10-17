@@ -2,7 +2,7 @@ package com.jafpl.graph
 
 import akka.actor.Actor
 import akka.event.Logging
-import com.jafpl.graph.GraphMonitor.{GFinish, GFinished, GStart}
+import com.jafpl.graph.GraphMonitor.{GFinish, GFinished, GStart, GWaitingFor}
 import com.jafpl.messages._
 
 import scala.collection.mutable
@@ -16,6 +16,7 @@ private[graph] class NodeActor(node: Node) extends Actor {
   val dependsOn = mutable.HashSet() ++ node.dependsOn
 
   log.debug("INIT " + node + ": " + openList)
+  node.graph.monitor ! GWaitingFor(node, openInputs.toList, dependsOn.toList)
 
   private def openList: String = {
     var str = ""
@@ -54,6 +55,7 @@ private[graph] class NodeActor(node: Node) extends Actor {
       if (openInputs.contains(m.port)) {
         openInputs.remove(m.port)
         log.debug("A CLOSE OPEN {}: {}: {}", m.port, node, openList)
+        node.graph.monitor ! GWaitingFor(node, openInputs.toList, dependsOn.toList)
       } else {
         log.debug("A CLOSE FAIL {}: {}: {}", m.port, node, openList)
       }
@@ -65,6 +67,7 @@ private[graph] class NodeActor(node: Node) extends Actor {
       log.debug("A RAN    {} CHECK", node)
       if (dependsOn.contains(m.node)) {
         dependsOn.remove(m.node)
+        node.graph.monitor ! GWaitingFor(node, openInputs.toList, dependsOn.toList)
         checkRun()
       }
     case m: ResetMessage =>

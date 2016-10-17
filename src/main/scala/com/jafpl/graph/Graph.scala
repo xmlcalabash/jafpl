@@ -1,6 +1,7 @@
 package com.jafpl.graph
 
 import akka.actor.{ActorRef, ActorSystem, Props}
+import com.jafpl.graph.GraphMonitor.{GDump, GTrace}
 import com.jafpl.messages.StartMessage
 import com.jafpl.runtime._
 import com.jafpl.util.XmlWriter
@@ -330,6 +331,9 @@ class Graph() {
     _system = ActorSystem("jafpl-com")
     _monitor = _system.actorOf(Props(new GraphMonitor(this)), name="monitor")
 
+    val trace = Option(System.getProperty("org.xmlcalabash.trace"))
+    _monitor ! GTrace(trace.isDefined && List("true", "yes", "1").contains(trace.get))
+
     for (node <- nodes) {
       node.makeActors()
     }
@@ -343,6 +347,14 @@ class Graph() {
           node.actor ! new StartMessage(node.actor)
       }
     }
+  }
+
+  def trace(enable: Boolean): Unit = {
+    _monitor ! GTrace(enable)
+  }
+
+  def status(): Unit = {
+    _monitor ! GDump()
   }
 
   def dump(): String = {
