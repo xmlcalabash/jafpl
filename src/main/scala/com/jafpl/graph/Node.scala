@@ -268,6 +268,9 @@ class Node(val graph: Graph, step: Option[Step]) extends StepController {
     actorName = actorName.replace("{", "+OC")
     actorName = actorName.replace("}", "+CC")
     actorName = actorName.replace("$", "+DS")
+    actorName = actorName.replace("/", "+SL")
+
+    logger.debug("Creating actor for " + this + ": " + actorName)
 
     _actor = graph.system.actorOf(Props(new NodeActor(this)), actorName)
 
