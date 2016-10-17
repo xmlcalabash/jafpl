@@ -61,8 +61,6 @@ class Runtime(val graph: Graph) {
       throw new GraphException("You must start the pipeline first!")
     }
 
-    println("close: " + port)
-
     for (node <- inputs()) {
       if (node.port == port) {
         node.close()
