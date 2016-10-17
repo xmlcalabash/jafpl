@@ -4,8 +4,11 @@ import com.jafpl.calc.{Doubler, NumberLiteral}
 import com.jafpl.graph.{Graph, Runtime}
 import com.jafpl.items.NumberItem
 import net.sf.saxon.s9api.Processor
+import org.junit.runner.RunWith
 import org.scalatest._
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class GroupSpec extends FlatSpec {
   val processor = new Processor(false)
 
@@ -34,7 +37,9 @@ class GroupSpec extends FlatSpec {
     val runtime = new Runtime(graph)
     runtime.start()
 
+    Thread.sleep(500) // Give the pipeline a chance to finish
     while (runtime.running) {
+      graph.status()
       Thread.sleep(100)
     }
 

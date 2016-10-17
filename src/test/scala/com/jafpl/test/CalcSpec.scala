@@ -5,11 +5,14 @@ import com.jafpl.graph.{Graph, InputNode, LoopStart, Node, OutputNode, Runtime}
 import com.jafpl.items.NumberItem
 import com.jafpl.xpath.{CalcParser, XdmNodes}
 import net.sf.saxon.s9api.{Processor, QName, XdmNode, XdmNodeKind}
+import org.junit.runner.RunWith
 import org.scalatest._
+import org.scalatest.junit.JUnitRunner
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
+@RunWith(classOf[JUnitRunner])
 class CalcSpec extends FlatSpec {
   val _MultiplicativeExpr = new QName("", "MultiplicativeExpr")
   val _UnaryExpr = new QName("", "UnaryExpr")
@@ -124,7 +127,9 @@ class CalcSpec extends FlatSpec {
       }
     }
 
+    Thread.sleep(500) // Give the pipeline a chance to finish
     while (runtime.running) {
+      graph.status()
       Thread.sleep(100)
     }
 
