@@ -12,7 +12,7 @@ class AardvarkSpec extends FlatSpec {
   val processor = new Processor(false)
 
   "ScalaTest " should "be able to add two small numbers" in {
-    assert(1 + 2 === 4)
+    assert(1 + 2 === 3)
   }
 
 }
