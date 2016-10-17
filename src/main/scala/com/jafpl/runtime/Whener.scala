@@ -1,6 +1,7 @@
 package com.jafpl.runtime
 import com.jafpl.items.GenericItem
 import com.jafpl.messages.ItemMessage
+import com.jafpl.util.SourceLocation
 import org.slf4j.LoggerFactory
 
 import scala.collection.mutable
@@ -14,10 +15,16 @@ class Whener(when: WhenStep) extends Step with CompoundStep with WhenStep {
   protected val cache = mutable.HashMap.empty[String,ListBuffer[ItemMessage]]
   private var ctrl: StepController = _
   private var _label = "_whener"
+  private var _location: Option[SourceLocation] = None
 
   override def label = _label
-  override def label_=(label: String): Unit = {
+  def label_=(label: String): Unit = {
     _label = label
+  }
+
+  override def location = _location
+  def location_=(sourceLocation: SourceLocation): Unit = {
+    _location = Some(sourceLocation)
   }
 
   override def setup(controller: StepController, inputPorts: List[String], outputPorts: List[String]): Unit = {

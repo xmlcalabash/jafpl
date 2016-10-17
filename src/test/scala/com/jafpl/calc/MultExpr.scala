@@ -3,7 +3,7 @@ package com.jafpl.calc
 import com.jafpl.items.NumberItem
 import com.jafpl.messages.ItemMessage
 import com.jafpl.runtime.{Step, StepController}
-import net.sf.saxon.s9api.QName
+import com.jafpl.util.SourceLocation
 import org.slf4j.LoggerFactory
 
 import scala.collection.mutable
@@ -16,10 +16,16 @@ class MultExpr(val ops: List[String]) extends Step {
   val logger = LoggerFactory.getLogger(this.getClass)
   val operands = mutable.HashMap.empty[String, Int]
   var _label = "unknown"
+  var _location: Option[SourceLocation] = None
 
   override def label = _label
-  override def label_=(label: String): Unit = {
+  def label_=(label: String): Unit = {
     _label = label
+  }
+
+  override def location = _location
+  def location_=(sourceLocation: SourceLocation): Unit = {
+    _location = Some(sourceLocation)
   }
 
   override def setup(controller: StepController, inputPorts: List[String], outputPorts: List[String]): Unit = {

@@ -1,6 +1,7 @@
 package com.jafpl.runtime
 
 import com.jafpl.messages.ItemMessage
+import com.jafpl.util.SourceLocation
 import org.slf4j.LoggerFactory
 
 /**
@@ -12,10 +13,16 @@ abstract class DefaultStep extends Step  {
   protected var inputPorts = List.empty[String]
   protected var outputPorts = List.empty[String]
   private var _label: String = "unknown"
+  private var _location: Option[SourceLocation] = None
 
   override def label = _label
-  override def label_=(label: String): Unit = {
+  def label_=(label: String): Unit = {
     _label = label
+  }
+
+  override def location = _location
+  def location_=(sourceLocation: SourceLocation): Unit = {
+    _location = Some(sourceLocation)
   }
 
   override def setup(ctrl: StepController,
