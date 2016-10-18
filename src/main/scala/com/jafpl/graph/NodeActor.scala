@@ -96,7 +96,9 @@ private[graph] class NodeActor(node: Node) extends Actor {
         case _ => log.debug("Node {} didn't expect to be notified of subgraph completion", node)
       }
     case m: GException =>
-      node.graph.monitor ! GException(node, m.srcNode, m.throwable)
+      if (!node.caught(m.throwable)) {
+        node.graph.monitor ! GException(node, m.srcNode, m.throwable)
+      }
     case m: Any => log.info("Node {} received unexpected message: {}", node, m)
   }
 }

@@ -71,4 +71,6 @@ class Whener(when: WhenStep) extends Step with CompoundStep with WhenStep {
   override def test(msg: GenericItem): Boolean = {
     when.test(msg)
   }
+
+  override def caught(exception: Throwable) = false
 }

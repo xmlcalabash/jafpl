@@ -248,6 +248,19 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
     }
   }
 
+  def caught(exception: Throwable): Boolean = {
+    if (worker.isDefined) {
+      worker.get match {
+        case cs: CompoundStart =>
+          cs.caught(exception)
+        case _ =>
+          false
+      }
+    } else {
+      false
+    }
+  }
+
   private[graph] def run(): Unit = {
     var bang: Option[GException] = None
 

@@ -9,4 +9,5 @@ trait CompoundStart extends StepController {
   def compoundEnd: Node
   def runAgain: Boolean
   def subpipeline: List[Node]
+  def caught(exception: Throwable): Boolean
 }
