@@ -1,4 +1,4 @@
-package com.jafpl.calc
+package com.jafpl.steps
 
 import com.jafpl.items.{GenericItem, NumberItem}
 import com.jafpl.runtime.{DefaultCompoundStep, WhenStep}
@@ -6,17 +6,17 @@ import com.jafpl.runtime.{DefaultCompoundStep, WhenStep}
 /**
   * Created by ndw on 10/10/16.
   */
-class WhenSigned(private val choosePos: Boolean) extends DefaultCompoundStep with WhenStep {
-  label = if (choosePos) {
-    "when_pos"
+class WhenParity(private val chooseOdd: Boolean) extends DefaultCompoundStep with WhenStep {
+  label = if (chooseOdd) {
+    "when_odd"
   } else {
-    "when_neg"
+    "when_even"
   }
 
   override def test(item: GenericItem): Boolean = {
     val accept = item match {
       case num: NumberItem =>
-        ((num.get > 0) && choosePos) || ((num.get < 0) && !choosePos)
+        (num.get % 2 == 1 && chooseOdd) || (num.get %2 == 0 && !chooseOdd)
       case _ =>
         false
     }

@@ -1,8 +1,8 @@
 package com.jafpl.test
 
-import com.jafpl.calc.{Doubler, FlipSign, NumberLiteral, StringLiteral, WhenSigned}
-import com.jafpl.graph.{Graph, OutputNode, Runtime}
+import com.jafpl.graph.{Graph, OutputNode}
 import com.jafpl.items.{NumberItem, StringItem}
+import com.jafpl.steps.{Doubler, FlipSign, GenerateLiteral, WhenSigned}
 import net.sf.saxon.s9api.Processor
 import org.junit.runner.RunWith
 import org.scalatest._
@@ -10,6 +10,7 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class ChooseSpec extends FlatSpec {
+
   val processor = new Processor(false)
 
   "A Choose with 0 " should "select the zero when" in {
@@ -69,12 +70,12 @@ class ChooseSpec extends FlatSpec {
   def runGraph(inputNumber: Int): OutputNode = {
     val graph = new Graph()
 
-    val input = graph.createNode(new NumberLiteral(inputNumber))
+    val input = graph.createNode(new GenerateLiteral(inputNumber))
     val output = graph.createOutputNode("OUTPUT")
 
     val double = graph.createNode(new Doubler())
     val flip = graph.createNode(new FlipSign())
-    val zero = graph.createNode(new StringLiteral("zero"))
+    val zero = graph.createNode(new GenerateLiteral("zero"))
 
     val when1 = graph.createWhenNode(new WhenSigned(choosePos = false), List(double))
     val when2 = graph.createWhenNode(new WhenSigned(choosePos = true), List(flip))
@@ -104,17 +105,10 @@ class ChooseSpec extends FlatSpec {
       throw new IllegalStateException("The graph isn't valid")
     }
 
-    val runtime = new Runtime(graph)
-    runtime.start()
-    graph.status()
-
-    Thread.sleep(500) // Give the pipeline a chance to finish
-    while (runtime.running) {
-      graph.status()
-      Thread.sleep(100)
-    }
+    val runtime = graph.runtime
+    runtime.run()
+    runtime.waitForPipeline()
 
     output
   }
-
 }

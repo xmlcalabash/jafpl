@@ -4,7 +4,7 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import com.jafpl.graph.GraphMonitor.{GDump, GTrace}
 import com.jafpl.messages.StartMessage
 import com.jafpl.runtime._
-import com.jafpl.util.XmlWriter
+import com.jafpl.util.{UniqueId, XmlWriter}
 import org.slf4j.LoggerFactory
 
 import scala.collection.{immutable, mutable}
@@ -17,6 +17,8 @@ class Graph() {
   private val nodes = mutable.HashSet.empty[Node]
   private val fans = mutable.HashMap.empty[Node, Node]
   private val edges = mutable.HashSet.empty[Edge]
+  private var except: Option[Throwable] = None
+  private var exceptNode: Option[Node] = None
   private var _validated = false
   private var _valid = true
   private var _finished = false
@@ -26,6 +28,9 @@ class Graph() {
   private[graph] def finished = _finished
   private[graph] def system = _system
   private[jafpl] def monitor = _monitor
+
+  def exception = except
+  def exceptionNode = exceptNode
 
   def chkValid() = {
     if (_validated) {
@@ -39,6 +44,13 @@ class Graph() {
 
   def createNode(name: String): Node = {
     createNode(Some(name))
+  }
+
+  def runtime: GraphRuntime = {
+    if (!valid()) {
+      throw new GraphException("Attempt to get runtime for invalid graph")
+    }
+    new Runtime(this)
   }
 
   private def createNode(name: Option[String]): Node = {
@@ -252,6 +264,12 @@ class Graph() {
     _finished = true
   }
 
+  private[graph] def abort(srcNode: Option[Node], exception: Throwable): Unit = {
+    _finished = true
+    except = Some(exception)
+    exceptNode = srcNode
+  }
+
   def valid(): Boolean = {
     if (_validated) {
       return _valid
@@ -328,8 +346,8 @@ class Graph() {
   }
 
   private[graph] def makeActors(): Unit = {
-    _system = ActorSystem("jafpl-com")
-    _monitor = _system.actorOf(Props(new GraphMonitor(this)), name="monitor")
+    _system = ActorSystem("jafpl-com-" + UniqueId.nextId)
+    _monitor = _system.actorOf(Props(new GraphMonitor(this)), name = "monitor")
 
     val trace = Option(System.getProperty("org.xmlcalabash.trace"))
     _monitor ! GTrace(trace.isDefined && List("true", "yes", "1").contains(trace.get))
@@ -337,7 +355,9 @@ class Graph() {
     for (node <- nodes) {
       node.makeActors()
     }
+  }
 
+  private[graph] def runActors() {
     // Run all the roots that aren't InputNodes or OutputNodes
     for (root <- roots()) {
       root match {
@@ -347,6 +367,24 @@ class Graph() {
           node.actor ! new StartMessage(node.actor)
       }
     }
+  }
+
+  private [graph] def reset(): Unit = {
+    for (node <- nodes) {
+      node.reset()
+    }
+    _finished = false
+    except = None
+    exceptNode = None
+  }
+
+  private [graph] def teardown(): Unit = {
+    for (node <- nodes) {
+      node.teardown()
+    }
+    _finished = true
+    except = None
+    exceptNode = None
   }
 
   def trace(enable: Boolean): Unit = {

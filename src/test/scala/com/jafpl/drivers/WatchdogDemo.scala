@@ -3,26 +3,21 @@ package com.jafpl.drivers
 import java.io.FileWriter
 
 import com.jafpl.graph.{Graph, LoopStart, Node}
-import com.jafpl.steps.{Doubler, GenerateLiteral}
-import net.sf.saxon.s9api._
+import com.jafpl.steps.Doubler
+import net.sf.saxon.s9api.Processor
 
-object GroupDemo extends App {
+object WatchdogDemo extends App {
   val processor = new Processor(false)
   val graph = new Graph()
 
   val dumpGraph = Some("pg.xml")
 
-  val input = graph.createNode(new GenerateLiteral(4))
+  val input = graph.createInputNode("source")
+  val double = graph.createNode(new Doubler())
   val output = graph.createOutputNode("OUTPUT")
 
-  val double = graph.createNode(new Doubler())
-
-  val group = graph.createGroupNode(List(double))
-
   graph.addEdge(input, "result", double, "source")
-
-  graph.addEdge(double, "result", group.compoundEnd, "I_result")
-  graph.addEdge(group.compoundEnd, "result", output, "source")
+  graph.addEdge(double, "result", output, "source")
 
   val valid = graph.valid()
   if (!valid) {
@@ -41,6 +36,12 @@ object GroupDemo extends App {
 
   val runtime = graph.runtime
   runtime.run()
+
+  /*
+  runtime.write("source", new NumberItem(12))
+  runtime.close("source")
+  */
+
   runtime.waitForPipeline()
 
   var item = output.read()

@@ -3,10 +3,10 @@ package com.jafpl.drivers
 import java.io.FileWriter
 
 import com.jafpl.graph.{Graph, LoopStart, Node}
-import com.jafpl.steps.{Doubler, GenerateLiteral}
+import com.jafpl.steps.{Bang, GenerateLiteral}
 import net.sf.saxon.s9api._
 
-object GroupDemo extends App {
+object BangDemo extends App {
   val processor = new Processor(false)
   val graph = new Graph()
 
@@ -15,14 +15,17 @@ object GroupDemo extends App {
   val input = graph.createNode(new GenerateLiteral(4))
   val output = graph.createOutputNode("OUTPUT")
 
-  val double = graph.createNode(new Doubler())
+  val bang = graph.createNode(new Bang())
 
-  val group = graph.createGroupNode(List(double))
+  val group = graph.createGroupNode(List(bang))
 
-  graph.addEdge(input, "result", double, "source")
+  val outerGroup = graph.createGroupNode(List(group))
 
-  graph.addEdge(double, "result", group.compoundEnd, "I_result")
-  graph.addEdge(group.compoundEnd, "result", output, "source")
+  graph.addEdge(input, "result", bang, "source")
+
+  graph.addEdge(bang, "result", group.compoundEnd, "I_result")
+  graph.addEdge(group.compoundEnd, "result", outerGroup.compoundEnd, "I_result")
+  graph.addEdge(outerGroup.compoundEnd, "result", output, "source")
 
   val valid = graph.valid()
   if (!valid) {
@@ -43,11 +46,18 @@ object GroupDemo extends App {
   runtime.run()
   runtime.waitForPipeline()
 
+  if (graph.exception.isDefined) {
+    println("Execution failed: " + graph.exception.get)
+    println("At step: " + graph.exceptionNode.get)
+  }
+
   var item = output.read()
   while (item.isDefined) {
     println(item.get)
     item = output.read()
   }
+
+  runtime.teardown()
 
   def linkFrom(node: Node): Node = {
     node match {

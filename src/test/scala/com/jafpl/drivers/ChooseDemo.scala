@@ -2,15 +2,9 @@ package com.jafpl.drivers
 
 import java.io.FileWriter
 
-import com.jafpl.calc._
-import com.jafpl.graph.{Graph, InputNode, LoopStart, Node, Runtime}
-import com.jafpl.items.NumberItem
-import com.jafpl.runtime.Chooser
-import com.jafpl.xpath.{CalcParser, XdmNodes}
+import com.jafpl.graph.{Graph, LoopStart, Node}
+import com.jafpl.steps.{Doubler, FlipSign, GenerateLiteral, WhenSigned}
 import net.sf.saxon.s9api._
-
-import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
 object ChooseDemo extends App {
   val processor = new Processor(false)
@@ -18,12 +12,12 @@ object ChooseDemo extends App {
 
   val dumpGraph = Some("pg.xml")
 
-  val input = graph.createNode(new NumberLiteral(0))
+  val input = graph.createNode(new GenerateLiteral(0))
   val output = graph.createOutputNode("OUTPUT")
 
   val double = graph.createNode(new Doubler())
   val flip = graph.createNode(new FlipSign())
-  val zero = graph.createNode(new StringLiteral("zero"))
+  val zero = graph.createNode(new GenerateLiteral("zero"))
 
   val when1 = graph.createWhenNode(new WhenSigned(choosePos = false), List(double))
   val when2 = graph.createWhenNode(new WhenSigned(choosePos = true), List(flip))
@@ -63,13 +57,9 @@ object ChooseDemo extends App {
     }
   }
 
-  val runtime = new Runtime(graph)
-  runtime.start()
-
-
-  while (runtime.running) {
-    Thread.sleep(100)
-  }
+  val runtime = graph.runtime
+  runtime.run()
+  runtime.waitForPipeline()
 
   var item = output.read()
   while (item.isDefined) {

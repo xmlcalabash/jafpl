@@ -1,8 +1,8 @@
 package com.jafpl.test
 
-import com.jafpl.calc.{Doubler, NumberLiteral}
-import com.jafpl.graph.{Graph, Runtime}
+import com.jafpl.graph.Graph
 import com.jafpl.items.NumberItem
+import com.jafpl.steps.{Doubler, GenerateLiteral}
 import net.sf.saxon.s9api.Processor
 import org.junit.runner.RunWith
 import org.scalatest._
@@ -17,7 +17,7 @@ class GroupSpec extends FlatSpec {
 
     val inputNumber = 4
 
-    val input = graph.createNode(new NumberLiteral(inputNumber))
+    val input = graph.createNode(new GenerateLiteral(inputNumber))
     val output = graph.createOutputNode("OUTPUT")
 
     val double = graph.createNode(new Doubler())
@@ -34,14 +34,9 @@ class GroupSpec extends FlatSpec {
       throw new IllegalStateException("The graph isn't valid")
     }
 
-    val runtime = new Runtime(graph)
-    runtime.start()
-
-    Thread.sleep(500) // Give the pipeline a chance to finish
-    while (runtime.running) {
-      graph.status()
-      Thread.sleep(100)
-    }
+    val runtime = graph.runtime
+    runtime.run()
+    runtime.waitForPipeline()
 
     var count = 1
     var item = output.read()

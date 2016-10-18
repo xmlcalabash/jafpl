@@ -2,7 +2,7 @@ package com.jafpl.graph
 
 import akka.actor.Actor
 import akka.event.Logging
-import com.jafpl.graph.GraphMonitor.{GFinish, GFinished, GStart, GWaitingFor}
+import com.jafpl.graph.GraphMonitor.{GException, GFinish, GFinished, GStart, GWaitingFor}
 import com.jafpl.messages._
 
 import scala.collection.mutable
@@ -95,6 +95,8 @@ private[graph] class NodeActor(node: Node) extends Actor {
           }
         case _ => log.debug("Node {} didn't expect to be notified of subgraph completion", node)
       }
-    case m: Any => log.debug("Node {} received unexpected message: {}", node, m)
+    case m: GException =>
+      node.graph.monitor ! GException(node, m.srcNode, m.throwable)
+    case m: Any => log.info("Node {} received unexpected message: {}", node, m)
   }
 }

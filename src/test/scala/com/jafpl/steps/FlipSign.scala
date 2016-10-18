@@ -1,22 +1,19 @@
-package com.jafpl.calc
+package com.jafpl.steps
 
+import com.jafpl.calc.CalcException
 import com.jafpl.items.NumberItem
 import com.jafpl.messages.ItemMessage
-import com.jafpl.runtime.{DefaultStep, Step, StepController}
-import net.sf.saxon.s9api.QName
-import org.slf4j.LoggerFactory
-
-import scala.collection.mutable
+import com.jafpl.runtime.DefaultStep
 
 /**
   * Created by ndw on 10/7/16.
   */
-class Doubler() extends DefaultStep {
+class FlipSign() extends DefaultStep {
   var inputNumber = 0
-  label = "Doubler"
+  label = "flipsign"
 
   override def run(): Unit = {
-    controller.send("result", new NumberItem(inputNumber * 2))
+    controller.send("result", new NumberItem(- inputNumber))
   }
 
   override def receive(port: String, msg: ItemMessage): Unit = {

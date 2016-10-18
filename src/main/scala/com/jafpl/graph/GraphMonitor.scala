@@ -1,5 +1,7 @@
 package com.jafpl.graph
 
+import java.time.{Duration, Instant}
+
 import akka.actor.{Actor, ActorRef}
 import akka.event.Logging
 import com.jafpl.graph.GraphMonitor._
@@ -20,6 +22,8 @@ object GraphMonitor {
   case class GFinished()
   case class GDump()
   case class GTrace(enable: Boolean)
+  case class GException(node: Node, srcNode: Node, throwable: Throwable)
+  case class GWatchdog(millis: Int)
 }
 
 class GraphStatus(val ports: List[String], val dependsOn: List[Node]) {
@@ -31,6 +35,7 @@ class GraphMonitor(private val graph: Graph) extends Actor {
   val _status = mutable.HashMap.empty[Node, GraphStatus]
   val subgraphs = mutable.HashMap.empty[ActorRef, List[Node]]
   var trace = false
+  var lastMessage = Instant.now()
 
   def watch(node: Node): Unit = {
     watching += node
@@ -81,6 +86,30 @@ class GraphMonitor(private val graph: Graph) extends Actor {
     }
   }
 
+  def bang(node: Node, srcNode: Node, except: Throwable): Unit = {
+    var found = false
+
+    for (actor <- subgraphs.keySet) {
+      if (subgraphs(actor).contains(node)) {
+        log.debug("M CAUGHT  {}: {} (forwards to {})", node, except, actor)
+        actor ! GException(node, srcNode, except)
+        found = true
+      }
+    }
+
+    if (!found) {
+      log.debug("M EXCEPT  {}: {}", node, except)
+      graph.abort(Some(srcNode), except)
+      context.system.terminate()
+    }
+  }
+
+  def watchdog(millis: Int): Unit = {
+    log.debug("M WTCHDOG {}", millis)
+    graph.abort(None, new RuntimeException("Pipeline watchdog timer exceeded " + millis + "ms"))
+    context.system.terminate()
+  }
+
   def dumpState(): Unit = {
     log.info("===============================================================Graph Monitor==")
     for (node <- watching) {
@@ -120,21 +149,25 @@ class GraphMonitor(private val graph: Graph) extends Actor {
 
   final def receive = {
     case GWatch(node) =>
+      lastMessage = Instant.now()
       if (trace) {
         log.info("M WATCH   {}", node)
       }
       watch(node)
     case GStart(node) =>
+      lastMessage = Instant.now()
       if (trace) {
         log.info("M START   {}", node)
       }
       start(node)
     case GFinish(node) =>
+      lastMessage = Instant.now()
       if (trace) {
         log.info("M FINISH  {}", node)
       }
       finish(node)
     case GSubgraph(ref, subpipline) =>
+      lastMessage = Instant.now()
       if (trace) {
         var str = ""
         for (node <- subpipline) {
@@ -144,6 +177,7 @@ class GraphMonitor(private val graph: Graph) extends Actor {
       }
       subgraph(ref, subpipline)
     case GWaitingFor(node, ports, depends) =>
+      lastMessage = Instant.now()
       if (trace) {
         var str = ""
         for (port <- ports) {
@@ -155,13 +189,23 @@ class GraphMonitor(private val graph: Graph) extends Actor {
         log.info("M WAITFOR {}: {}", node, str)
       }
       _status.put(node, new GraphStatus(ports, depends))
+    case GException(node, srcNode, except) =>
+      lastMessage = Instant.now()
+      bang(node, srcNode, except)
     case GTrace(enable) =>
+      lastMessage = Instant.now()
       if (trace) {
         log.info("M TRACE   {}", enable)
       }
       trace = enable
     case GDump() =>
+      lastMessage = Instant.now()
       dumpState()
+    case GWatchdog(millis) =>
+      val ns = Duration.between(lastMessage, Instant.now()).toMillis
+      if (ns > millis) {
+        watchdog(millis)
+      }
     case m: Any => log.debug("Unexpected message: {}", m)
   }
 }

@@ -1,32 +1,44 @@
 package com.jafpl.graph
 
+import com.jafpl.graph.GraphMonitor.GWatchdog
 import com.jafpl.items.GenericItem
+import com.jafpl.runtime.{GraphRuntime, Step}
 import org.slf4j.LoggerFactory
 
 /**
   * Created by ndw on 10/6/16.
   */
-class Runtime(val graph: Graph) {
+private[graph] class Runtime(val graph: Graph) extends GraphRuntime {
   private val logger = LoggerFactory.getLogger(this.getClass)
-  private var started = false
+  private var _started = false
+  private val watchdog = 10
+  private val sleepInterval = 100
 
-  if (!graph.valid) {
-    throw new GraphException("Invalid graph")
+  graph.makeActors()
+
+  override def run(): Unit = {
+    if (!_started) {
+      graph.runActors()
+      _started = true
+    }
+  }
+
+  override def running: Boolean = {
+    if (_started) {
+      if (graph.finished) {
+        _started = false
+      }
+      !graph.finished
+    } else {
+      false
+    }
   }
 
   def inputs(): List[InputNode] = {
-    if (!started) {
-      throw new GraphException("You must start the pipeline first!")
-    }
-
     graph.inputs()
   }
 
   def outputs(): List[OutputNode] = {
-    if (!started) {
-      throw new GraphException("You must start the pipeline first!")
-    }
-
     graph.outputs()
   }
 
@@ -36,14 +48,13 @@ class Runtime(val graph: Graph) {
         return node.read()
       }
     }
-
-    logger.info("Pipeline has no output port: " + port)
+    logger.debug("Pipeline has no output port: " + port)
     None
   }
 
   def write(port: String, item: GenericItem): Unit = {
-    if (!started) {
-      throw new GraphException("You must start the pipeline first!")
+    if (!_started) {
+      throw new GraphException("Cannot write to pipeline before it is started")
     }
 
     for (node <- inputs()) {
@@ -53,35 +64,53 @@ class Runtime(val graph: Graph) {
       }
     }
 
-    logger.info("Pipeline has no input port: " + port)
+    logger.debug("Pipeline has no input port: " + port)
   }
 
   def close(port: String): Unit = {
-    if (!started) {
-      throw new GraphException("You must start the pipeline first!")
-    }
-
-    for (node <- inputs()) {
-      if (node.port == port) {
-        node.close()
-        return
+    if (_started) {
+      for (node <- inputs()) {
+        if (node.port == port) {
+          node.close()
+          return
+        }
       }
+
+      logger.info("Pipeline has no input port: " + port)
     }
-
-    logger.info("Pipeline has no input port: " + port)
   }
 
-  def start(): Unit = {
-    graph.makeActors()
-    started = true
+  override def reset(): Unit = {
+    graph.reset()
   }
 
-  def running: Boolean = !graph.finished
-
-  def kill(): Unit = {
-    graph.system.terminate()
+  override def waitForPipeline: Option[Throwable] = {
+    var ticker = watchdog * 1000
+    while (!graph.finished) {
+      if (ticker <= 0) {
+        ticker = watchdog * 1000
+        graph.monitor ! GWatchdog(ticker)
+      }
+      Thread.sleep(sleepInterval)
+      ticker -= sleepInterval
+    }
+    if (graph.exception.isDefined) {
+      throw graph.exception.get
+    }
+    graph.exception
   }
 
+  override def teardown(): Unit = {
+    graph.teardown()
+  }
 
+  override def exception: Option[Throwable] = graph.exception
 
+  override def exceptionStep: Option[Step] = {
+    if (graph.exceptionNode.isDefined) {
+      graph.exceptionNode.get.step
+    } else {
+      None
+    }
+  }
 }

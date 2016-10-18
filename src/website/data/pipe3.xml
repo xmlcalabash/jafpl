@@ -11,7 +11,7 @@
          <pg:out-edge destination="25" input-port="s1" output-port="result"/>
       </pg:outputs>
    </pg:node>
-   <pg:node name="QName_1" step="com.jafpl.calc.Doubler@58ea606c" uid="17">
+   <pg:node name="QName_1" step="com.jafpl.steps.Doubler@58ea606c" uid="17">
       <pg:inputs>
          <pg:in-edge source="21" input-port="source" output-port="current"/>
       </pg:inputs>

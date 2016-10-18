@@ -1,7 +1,7 @@
 package com.jafpl.graph
 
 import akka.actor.{ActorRef, Props}
-import com.jafpl.graph.GraphMonitor.{GFinish, GWatch}
+import com.jafpl.graph.GraphMonitor.{GException, GFinish, GWatch}
 import com.jafpl.items.GenericItem
 import com.jafpl.messages.{CloseMessage, ItemMessage, RanMessage}
 import com.jafpl.runtime.{Step, StepController}
@@ -13,7 +13,7 @@ import scala.collection.{Set, immutable, mutable}
 /**
   * Created by ndw on 10/2/16.
   */
-class Node(val graph: Graph, step: Option[Step]) extends StepController {
+class Node(val graph: Graph, val step: Option[Step]) extends StepController {
   protected val logger = LoggerFactory.getLogger(this.getClass)
   private val inputPort = mutable.HashMap.empty[String, Option[Edge]]
   private val outputPort = mutable.HashMap.empty[String, Option[Edge]]
@@ -208,6 +208,12 @@ class Node(val graph: Graph, step: Option[Step]) extends StepController {
     }
   }
 
+  private[graph] def teardown() = {
+    if (worker.isDefined) {
+      worker.get.teardown()
+    }
+  }
+
   def stop(): Unit = {
     for (port <- outputPort.keySet) {
       val edge = outputPort(port).get
@@ -243,12 +249,23 @@ class Node(val graph: Graph, step: Option[Step]) extends StepController {
   }
 
   private[graph] def run(): Unit = {
-    if (worker.isEmpty) {
+    var bang: Option[GException] = None
+
+    if (worker.isDefined) {
+      try {
+        worker.get.run()
+      } catch {
+        case any: Throwable =>
+          logger.debug(this + " crashed: " + any)
+          bang = Some(new GException(this, this, any))
+      }
+    } else {
       logger.info("No worker: {}", this)
-      return
     }
 
-    worker.get.run()
+    if (bang.isDefined) {
+      graph.monitor ! bang.get
+    }
 
     this match {
       case cs: CompoundStart => Unit
