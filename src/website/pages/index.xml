@@ -8,7 +8,7 @@
 </info>
 
 <para>This project is the core runtime for a general purpose pipeline
-language. It’s the heart of <citetitle>XML Calabash V2.x</citetitle>
+processor. It’s the heart of <citetitle>XML Calabash V2.x</citetitle>
 which hasn’t been released yet. This hasn’t been released in any
 official sense either. YMMV. Here there be dragons. Etc.</para>
 
@@ -23,7 +23,13 @@ acyclic graph. Each node in the graph represents some kind of
 processing. The edges between the nodes are how the data flows through
 the pipeline.</para>
 
-<para>This library doesn’t care what you do in each node and it
+<mediaobject>
+<imageobject>
+<imagedata fileref="byhand-1.svg"/>
+</imageobject>
+</mediaobject>
+
+<para>This library doesn’t care what each node does and it
 doesn’t care what kind of data flows between nodes. You construct a
 graph with edges. You pour data in at the top, stuff happens, data
 pours out the bottom.</para>
@@ -33,20 +39,21 @@ pours out the bottom.</para>
 (henceforth “compound steps”). Several compound steps are planned:</para>
 
 <orderedlist>
-<listitem><para>Iterate over a sequence.</para>
-<para>There is an implementation of sequence iteration in the current
-release, but I don’t think it’s an especially clear or even stable
-design.</para>
+<listitem><simpara>Iteration. (Iterate over a sequence, iterate until done,
+iterate until stable.)</simpara>
 </listitem>
-<listitem><para>Choose one of several alternatives.</para>
+<listitem><simpara>Choose one of several alternatives.</simpara>
 </listitem>
-<listitem><para>Try/catch style error handling.</para>
-</listitem>
-<listitem><para>Iterate until done.</para>
-</listitem>
-<listitem><para>Iterate until stable.</para>
+<listitem><simpara>Try/catch style error handling.</simpara>
 </listitem>
 </orderedlist>
+
+<para>It would be nice to generalize the abstraction of “compound step” to the
+point where a small number of primitives in the core library could be used to
+build arbitrary compound steps. So far, that goal seems elusive. Each of the
+types that I’ve implemented have had quite different expressions at the graph
+level.</para>
+
 </section>
 
 <section xml:id="where">
@@ -61,12 +68,124 @@ design.</para>
 <section xml:id="how">
 <title>How does it work?</title>
 
+<para>At the level of this library, you must construct a graph using the
+underlying APIs. There’s no “pipeline language” support at this level.
+Broadly speaking, there are four kinds of nodes:</para>
+
+<itemizedlist>
+<listitem><para><classname>Node</classname>s are the general case, they
+are atomic steps in the pipeline.</para>
+</listitem>
+<listitem><para><classname>InputNode</classname>s represent an “input boundary”
+between the graph and the outside world. This is where you pour documents
+into the pipeline.
+</para>
+</listitem>
+<listitem><para><classname>OutputNode</classname>s represent an “output boundary”.
+This is where you pull the results out of the pipeline.
+</para>
+</listitem>
+<listitem><para>Compound steps are actually represented as two atomic
+nodes, a “start node” and an “end node”. I’m not entirely pleased with
+the current API for compound steps so let’s just set those aside for
+the moment.
+</para>
+</listitem>
+</itemizedlist>
+
+<para>You can construct any graph that you like with these nodes and
+edges between them. An edge is a connection between an “output port”
+on a “source” node and an “input port” on a “destination” node. The edges
+are arbitrary; asserting that an edge exists between two ports creates
+the ports if necessary.</para>
+
+<para>There are only a few inviolable constraints on the graph:</para>
+
+<orderedlist>
+<listitem><para>No loops. It’s a
+<link xlink:href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">DAG</link>.
+</para>
+</listitem>
+<listitem><para>You can’t use an <classname>InputNode</classname> as the destination
+of any edge.</para>
+</listitem>
+<listitem><para>You can’t use an <classname>OutputNode</classname> as the source
+of any edge.</para>
+</listitem>
+</orderedlist>
+
+<para>One of the design flaws in
+<link xlink:href="http://github.com/ndw/xmlcalabash1/">XML Calabash 1.x</link>
+is that the edges between steps have to buffer what they produce and the sequence
+has to be replayable. This happens because multiple steps may read the same output
+port and the reads may be interleaved. This problem cannot occur in JAFPL.
+Every port is read by exactly one step and exactly one step writes to every
+input port. If the graph described by your edges multiplexes access to
+any port, a “fan in” or “fan out” step will be inserted as appropriate.</para>
+
+<para>In other words, this graph never happens:</para>
+
+<mediaobject>
+<imageobject>
+<imagedata fileref="byhand-2.svg"/>
+</imageobject>
+</mediaobject>
+
+<para>If you attempt to construct that graph, the library will automatically
+restructure it so that this graph is produced:</para>
+
+<mediaobject>
+<imageobject>
+<imagedata fileref="byhand-3.svg"/>
+</imageobject>
+</mediaobject>
+
+<para>You must provide an
+<link linkend="api">implementation class</link> for every node that you
+construct. That’s the class that will be called upon to perform the
+work of the step.</para>
+
 <para>The graph is executed with the <link
-xlink:href="http://akka.io/">Akka</link> framework. An implementation
-for each step must be provided, then actors are created to manage each
-node. All steps “start” at the same time and execute in parallel (to the extent
-that the graph allows for parallelism, of course). When the
-last step reports that it is finished, execution finishes.</para>
+xlink:href="http://akka.io/">Akka</link> framework. Actors are created
+to manage each node. All steps “start” at the same time and execute in
+parallel (to the extent that the graph allows for parallelism, of
+course). When the last step reports that it is finished, execution
+finishes.</para>
+
+<para>The actors know the topology of the graph. Any step that has no
+inputs can run immediately. Steps that have inputs, can’t run until
+all of their inputs have been provided. Inputs pass between the steps
+as messages. Consider the simple, linear pipeline at the beginning of
+this document.</para>
+
+<para>When execution begins, “Do Something” can’t run because
+it’s waiting for input from the “outside”. “Do Something Else” can’t
+run because it’s waiting for input from “Do Something.” The process
+that is running the pipeline pours an arbitrary number of documents
+into the input port. Each document is received immediately by “Do
+Something”, which is solely responsible for buffering it or doing
+whatever is necessary. Eventually, the process running the pipeline
+closes the input port.</para>
+
+<para>At this point, the actor framework tells “Do Something” to run.
+It does whatever it does, dropping documents into its output port.
+The framework turns those documents into messages that are sent
+immediately to “Do Something Else.”</para>
+
+<para>When “Do Something” finishes, the framework closes each of its
+output ports and consequently the input port that is reading it. When
+the last input port on “Do Something Else” is closed, the framework
+tells it to run. And thus it continues until every step has run. When
+every step has run, the pipeline is finished. The process running the
+pipeline can collect its results from the output port.</para>
+
+<para>In practice, there are a number of subtlties here. Loops have
+to buffer inputs so that they’re available to each iteration. A choose
+must make sure that <emphasis>none</emphasis> of the steps in any of its
+branches run before a specific branch is selected. Etc.</para>
+
+<para>This library will amend the graph and introduce additional steps as
+necessary to hide all of this complexity from the user.</para>
 
 <section xml:id="example">
 <title>An example</title>
@@ -82,7 +201,7 @@ evaluate simple arithmetic expressions. Using a pipeline language for
 this purpose is a bit crazy, but I’m going to assume you all
 understand how arithmetic works.</para>
 
-<para>Consider the expression “<code>(1 + 2) * (3 + 4 + 5)</code>”. It’s possible to construct
+<para>Consider the expression “<code>(1+2)*(3+4+5)</code>”. It’s possible to construct
 a pipeline to evaluate this expression:</para>
 
 <mediaobject>
@@ -91,20 +210,26 @@ a pipeline to evaluate this expression:</para>
 </imageobject>
 </mediaobject>
 
-<para>The steps labled <literal>IntegerLiteral_<replaceable>*</replaceable></literal>”
-are atomic steps that provide the
-input numbers. The steps labeled
-“<literal>AdditiveExpr_<replaceable>*</replaceable></literal>” receive a number
-on each input port. When all the numbers have arrived, the sum is computed and
-the result is output. In an analagous way, the step labeled
-“<literal>MultiplicativeExpr_<replaceable>*</replaceable></literal>” performs
-multiplication. The step labled “<literal>OUTPUT</literal>” is a pipeline boundary.
-The caller is responsible for what happens after that. (The demo tool simply prints
-the answer, 36 in this case.)</para>
+<para>The steps labled
+<literal>IntegerLiteral_<replaceable>number</replaceable></literal>”
+are atomic steps that provide the input numbers. (It’s a shame they aren’t
+labeled 1, 2, 3, 4, 5, corresponding to the input digits, but the numbers
+are actually a function of the way the expression is parsed. However,
+that’s not important, they’re just labels.)
+The steps labeled
+“<literal>AdditiveExpr_<replaceable>number</replaceable></literal>” and
+“<literal>MultiplicativeExpr_<replaceable>number</replaceable></literal>”
+perform the obvious mathematical operations on their inputs.</para>
 
-<para>Pipeline boundaries can occur on the input as well. Consider this
-expression: “<code>(1 + 2) * $foo</code>”. Here <code>$foo</code> is an option
-that has to passed in.</para>
+<para>There are no external inputs. When this pipeline starts, the
+integer literal steps all execute in parallel, producing one output each.
+The additions can also proceed in parallel. Then the multiplication computes
+the final sum, “36”, which is printed by the demo.</para>
+
+<para>To see what happens when inputs are required, consider this
+expression: “<code>(1+2)*$foo</code>”. Here <code>$foo</code> is an
+additional input to the expression. Steps have inputs and outputs and
+(almost) nothing else.</para>
 
 <mediaobject>
 <imageobject>
