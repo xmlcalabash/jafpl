@@ -38,7 +38,7 @@ class Chooser extends DefaultCompoundStep {
     for (node <- nodes) {
       if (when.get == node) {
         // This will cause the when to run as its last input will have been closed
-        controller.tell(node, new CloseMessage("condition"))
+        controller.tell(node, new CloseMessage(null, "condition"))
       } else {
         controller.finish(node)
       }

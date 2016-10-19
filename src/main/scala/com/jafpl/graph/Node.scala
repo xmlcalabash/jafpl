@@ -167,6 +167,7 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
   }
 
   def send(port: String, item: GenericItem): Unit = {
+    println("send " + item + " to " + port + ": " + this)
     if (outputPort.get(port).isDefined) {
       val edge = output(port).get
       val targetPort = edge.inputPort
@@ -194,7 +195,7 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
     val edge = outputPort(port).get
     val targetPort = edge.inputPort
     val targetNode = edge.destination
-    val msg = new CloseMessage(targetPort)
+    val msg = new CloseMessage(this, targetPort)
     targetNode.actor ! msg
   }
 
@@ -210,7 +211,10 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
 
   private[graph] def teardown() = {
     if (worker.isDefined) {
+      println("teardown: " + this + ": " + worker.get)
       worker.get.teardown()
+    } else {
+      println("teardown: " + this)
     }
   }
 
@@ -219,7 +223,7 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
       val edge = outputPort(port).get
       val targetPort = edge.inputPort
       val targetNode = edge.destination
-      val msg = new CloseMessage(targetPort)
+      val msg = new CloseMessage(this, targetPort)
       targetNode.actor ! msg
     }
 
@@ -262,6 +266,7 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
   }
 
   private[graph] def run(): Unit = {
+    println("NRUN " + this + ": " + worker)
     var bang: Option[GException] = None
 
     if (worker.isDefined) {

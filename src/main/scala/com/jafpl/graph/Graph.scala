@@ -380,7 +380,10 @@ class Graph() {
 
   private [graph] def teardown(): Unit = {
     for (node <- nodes) {
-      node.teardown()
+      node match {
+        case end: CompoundEnd => Unit
+        case other: Node => other.teardown()
+      }
     }
     _finished = true
     except = None

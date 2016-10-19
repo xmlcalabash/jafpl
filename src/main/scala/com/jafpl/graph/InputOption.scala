@@ -51,11 +51,11 @@ private[graph] class InputOption(graph: Graph) extends Node(graph, None) {
       val targetPort = edge.get.inputPort
       val targetNode = edge.get.destination
 
-      val msg = new CloseMessage(targetPort)
+      val msg = new CloseMessage(this, targetPort)
 
       targetNode.actor ! msg
     }
-    actor ! new CloseMessage("result")
+    actor ! new CloseMessage(this, "result")
     actor ! new RanMessage(this)
   }
 }

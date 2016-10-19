@@ -33,7 +33,7 @@ class AddExpr(val ops: List[String]) extends Step {
   }
 
   override def reset(): Unit = {
-    // nop
+    operands.clear()
   }
 
   override def run(): Unit = {
@@ -41,6 +41,7 @@ class AddExpr(val ops: List[String]) extends Step {
     var pos = 2
     for (op <- ops) {
       val operand = operands("s" + pos)
+      //logger.info(s"AddExpr: $acc $op $operand")
       op match {
         case "+" => acc = acc + operand
         case "-" => acc = acc - operand

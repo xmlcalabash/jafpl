@@ -26,10 +26,15 @@ private[graph] class NodeActor(node: Node) extends Actor {
     str
   }
 
-  def checkRun(): Unit = {
+  def checkRun(reason: String): Unit = {
     if (openInputs.isEmpty && dependsOn.isEmpty) {
+      println("ARUN " + reason + ": " + this + ":" + node)
+      openInputs ++ node.inputs()
+      dependsOn ++ node.dependsOn
+      node.graph.monitor ! GWaitingFor(node, openInputs.toList, dependsOn.toList)
       run()
     } else {
+      println("AXXX " + reason + ": " + this + ":" + node)
       var str = ""
       for (port <- openInputs) {
         str += port + " "
@@ -39,9 +44,13 @@ private[graph] class NodeActor(node: Node) extends Actor {
   }
 
   private def run() = {
-    node.graph.monitor ! GStart(node)
-    node.synchronized {
-      node.run()
+    node match {
+      case end: CompoundEnd => Unit
+      case _ =>
+        node.graph.monitor ! GStart(node)
+        node.synchronized {
+          node.run()
+        }
     }
   }
 
@@ -59,16 +68,16 @@ private[graph] class NodeActor(node: Node) extends Actor {
       } else {
         log.debug("A CLOSE FAIL {}: {}: {}", m.port, node, openList)
       }
-      checkRun()
+      checkRun("CLOSE " + m.node)
     case m: StartMessage =>
       log.debug("A START  {} CHECK", node)
-      checkRun()
+      checkRun("START")
     case m: RanMessage =>
       log.debug("A RAN    {} CHECK", node)
       if (dependsOn.contains(m.node)) {
         dependsOn.remove(m.node)
         node.graph.monitor ! GWaitingFor(node, openInputs.toList, dependsOn.toList)
-        checkRun()
+        checkRun("RAN")
       }
     case m: ResetMessage =>
       log.debug("A RESET {}", node)
@@ -82,9 +91,13 @@ private[graph] class NodeActor(node: Node) extends Actor {
           if (compoundStart.runAgain) {
             for (node <- compoundStart.subpipeline) {
               node.synchronized {
+                println("RESET NODE: " + node)
                 node.reset()
               }
             }
+            println("RESET START: " + compoundStart)
+            compoundStart.reset()
+            checkRun("LOOP")
           } else {
             node.graph.monitor ! GFinish(compoundStart)
             compoundStart.compoundEnd.stop()

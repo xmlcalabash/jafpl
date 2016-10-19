@@ -7,8 +7,9 @@ import com.jafpl.util.XmlWriter
 /**
   * Created by ndw on 10/16/16.
   */
-class DefaultCompoundEnd(graph: Graph, step: Option[CompoundStep]) extends Node(graph, step) with CompoundEnd {
+class DefaultCompoundEnd(graph: Graph, step: Option[CompoundStep]) extends Node(graph, None) with CompoundEnd {
   private var _start: Node = _
+  private val _step = step
 
   def compoundStart = _start
   private[jafpl] def compoundStart_=(node: Node): Unit = {
@@ -16,12 +17,13 @@ class DefaultCompoundEnd(graph: Graph, step: Option[CompoundStep]) extends Node(
   }
 
   override def receive(port: String, msg: ItemMessage): Unit = {
+    println("LOOP END RECEIVES " + msg)
     val outputPort = if (port.startsWith("I_")) {
       port.substring(2)
     } else {
       port
     }
-    step.get.receiveOutput(port, msg)
+    _step.get.receiveOutput(port, msg)
   }
 
   override def receiveOutput(port: String, msg: ItemMessage): Unit = {
