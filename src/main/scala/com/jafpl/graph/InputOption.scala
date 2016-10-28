@@ -1,7 +1,8 @@
 package com.jafpl.graph
 
+import com.jafpl.graph.GraphMonitor.{GClose, GSend}
 import com.jafpl.items.GenericItem
-import com.jafpl.messages.{CloseMessage, ItemMessage, RanMessage}
+import com.jafpl.messages.ItemMessage
 
 /**
   * Created by ndw on 10/2/16.
@@ -30,7 +31,7 @@ private[graph] class InputOption(graph: Graph) extends Node(graph, None) {
       throw new GraphException("You cannot reinitialize an option")
     }
 
-    for (port <- outputs()) {
+    for (port <- outputs) {
       val edge = output(port)
       val targetPort = edge.get.inputPort
       val targetNode = edge.get.destination
@@ -38,7 +39,7 @@ private[graph] class InputOption(graph: Graph) extends Node(graph, None) {
       val msg = new ItemMessage(targetPort, uid, seqNo, item)
       seqNo += 1
 
-      targetNode.actor ! msg
+      graph.monitor ! GSend(targetNode, msg)
     }
 
     initialized = true
@@ -46,16 +47,11 @@ private[graph] class InputOption(graph: Graph) extends Node(graph, None) {
   }
 
   private def close(): Unit = {
-    for (port <- outputs()) {
+    for (port <- outputs) {
       val edge = output(port)
       val targetPort = edge.get.inputPort
       val targetNode = edge.get.destination
-
-      val msg = new CloseMessage(this, targetPort)
-
-      targetNode.actor ! msg
+      graph.monitor ! GClose(targetNode, targetPort)
     }
-    actor ! new CloseMessage(this, "result")
-    actor ! new RanMessage(this)
   }
 }

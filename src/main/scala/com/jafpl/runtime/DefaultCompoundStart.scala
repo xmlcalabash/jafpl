@@ -27,7 +27,7 @@ abstract class DefaultCompoundStart(graph: Graph, step: Option[CompoundStep], no
 
   override private[jafpl] def makeActors(): Unit = {
     super.makeActors()
-    graph.monitor ! GSubgraph(_actor, nodes)
+    graph.monitor ! GSubgraph(this, nodes)
   }
 
   override def dumpExtraAttr(tree: XmlWriter): Unit = {

@@ -1,5 +1,6 @@
 package com.jafpl.graph
 
+import com.jafpl.graph.GraphMonitor.GSelectWhen
 import com.jafpl.runtime.{Chooser, CompoundStep, DefaultCompoundStart}
 
 /**
@@ -10,14 +11,14 @@ class ChooseStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) e
   label = Some("_choose_start")
 
   override private[graph] def run(): Unit = {
-    step.get.asInstanceOf[Chooser].pickOne(nodes)
+    graph.monitor ! GSelectWhen(this, step.get.asInstanceOf[Chooser].pickOne(nodes))
   }
 
   override private[graph] def addChooseCaches(): Unit = {
     for (child <- nodes) {
       child match {
         case when: WhenStart =>
-          for (input <- child.inputs()) {
+          for (input <- child.inputs) {
             val edge = child.input(input).get
             if (edge.inputPort == "condition") {
               logger.debug("Choose caches: " + edge)

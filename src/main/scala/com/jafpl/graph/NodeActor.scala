@@ -2,8 +2,8 @@ package com.jafpl.graph
 
 import akka.actor.Actor
 import akka.event.Logging
-import com.jafpl.graph.GraphMonitor.{GException, GFinish, GFinished, GStart, GWaitingFor}
-import com.jafpl.messages._
+import com.jafpl.graph.GraphMonitor.{GException, GFinished, GRun}
+import com.jafpl.messages.ItemMessage
 
 import scala.collection.mutable
 
@@ -12,11 +12,10 @@ import scala.collection.mutable
   */
 private[graph] class NodeActor(node: Node) extends Actor {
   val log = Logging(context.system, this)
-  val openInputs = mutable.HashSet() ++ node.inputs()
+  val openInputs = mutable.HashSet() ++ node.inputs
   val dependsOn = mutable.HashSet() ++ node.dependsOn
 
   log.debug("INIT " + node + ": " + openList)
-  node.graph.monitor ! GWaitingFor(node, openInputs.toList, dependsOn.toList)
 
   private def openList: String = {
     var str = ""
@@ -26,28 +25,10 @@ private[graph] class NodeActor(node: Node) extends Actor {
     str
   }
 
-  def checkRun(reason: String): Unit = {
-    if (openInputs.isEmpty && dependsOn.isEmpty) {
-      println("ARUN " + reason + ": " + this + ":" + node)
-      openInputs ++ node.inputs()
-      dependsOn ++ node.dependsOn
-      node.graph.monitor ! GWaitingFor(node, openInputs.toList, dependsOn.toList)
-      run()
-    } else {
-      println("AXXX " + reason + ": " + this + ":" + node)
-      var str = ""
-      for (port <- openInputs) {
-        str += port + " "
-      }
-      log.debug("NOT READY " + node + ": " + str)
-    }
-  }
-
   private def run() = {
     node match {
       case end: CompoundEnd => Unit
       case _ =>
-        node.graph.monitor ! GStart(node)
         node.synchronized {
           node.run()
         }
@@ -55,11 +36,34 @@ private[graph] class NodeActor(node: Node) extends Actor {
   }
 
   def receive = {
+    case m: GRun =>
+      run()
+    case m: GException =>
+      if (!node.caught(m.throwable)) {
+        node.graph.monitor ! GException(node, m.srcNode, m.throwable)
+      }
+    case m: ItemMessage =>
+      node.receive(m.port, m)
+    case m: GFinished =>
+      node match {
+        case start: CompoundStart =>
+          node.stop()
+          start.compoundEnd.stop()
+        case _: Any =>
+          println("Gfinished? " + node)
+      }
+    case m: Any => log.info("Node {} received unexpected message: {}", node, m)
+  }
+
+  /*
+  def xreceive = {
     case m: ItemMessage =>
       log.debug("A IMSSG {} {}", m.port, node)
       node.synchronized {
         node.receive(m.port, m)
       }
+    case m: GRun =>
+      checkRun("GRUN")
     case m: CloseMessage =>
       if (openInputs.contains(m.port)) {
         openInputs.remove(m.port)
@@ -114,4 +118,5 @@ private[graph] class NodeActor(node: Node) extends Actor {
       }
     case m: Any => log.info("Node {} received unexpected message: {}", node, m)
   }
+  */
 }

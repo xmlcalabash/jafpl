@@ -1,8 +1,7 @@
 package com.jafpl.graph
 
 import akka.actor.{ActorRef, ActorSystem, Props}
-import com.jafpl.graph.GraphMonitor.{GDump, GTrace}
-import com.jafpl.messages.StartMessage
+import com.jafpl.graph.GraphMonitor.{GDump, GRun, GTrace}
 import com.jafpl.runtime._
 import com.jafpl.util.{UniqueId, XmlWriter}
 import org.slf4j.LoggerFactory
@@ -15,7 +14,7 @@ import scala.collection.{immutable, mutable}
   */
 class Graph() {
   protected val logger = LoggerFactory.getLogger(this.getClass)
-  private val nodes = mutable.HashSet.empty[Node]
+  private val _nodes = mutable.HashSet.empty[Node]
   private val fans = mutable.HashMap.empty[Node, Node]
   private val edges = mutable.HashSet.empty[Edge]
   private var except: Option[Throwable] = None
@@ -29,6 +28,7 @@ class Graph() {
   private[graph] def finished = _finished
   private[graph] def system = _system
   private[jafpl] def monitor = _monitor
+  private[graph] def nodes = _nodes.toSet
 
   def exception = except
   def exceptionNode = exceptNode
@@ -58,35 +58,35 @@ class Graph() {
     chkValid()
     val node = new Node(this, None)
     node.label = name
-    nodes.add(node)
+    _nodes.add(node)
     node
   }
 
   def createNode(step: Step): Node = {
     chkValid()
     val node = new Node(this, Some(step))
-    nodes.add(node)
+    _nodes.add(node)
     node
   }
 
   def createInputNode(name: String): InputNode = {
     chkValid()
     val node = new InputNode(this, name)
-    nodes.add(node)
+    _nodes.add(node)
     node
   }
 
   def createOutputNode(name: String): OutputNode = {
     chkValid()
     val node = new OutputNode(this, name)
-    nodes.add(node)
+    _nodes.add(node)
     node
   }
 
   def createVariableNode(step: Step): Node = {
     chkValid()
     val node = new Node(this, Some(step))
-    nodes.add(node)
+    _nodes.add(node)
     node
   }
 
@@ -106,15 +106,15 @@ class Graph() {
     loopStart.compoundEnd = loopEnd
     loopEnd.compoundStart = loopStart
 
-    nodes.add(loopStart)
-    nodes.add(loopEnd)
+    _nodes.add(loopStart)
+    _nodes.add(loopEnd)
 
     loopStart
   }
 
   private[graph] def createIterationCacheNode(): IterationCache = {
     val node = new IterationCache(this)
-    nodes.add(node)
+    _nodes.add(node)
     node
   }
 
@@ -130,8 +130,8 @@ class Graph() {
     chooseStart.compoundEnd = chooseEnd
     chooseEnd.compoundStart = chooseStart
 
-    nodes.add(chooseStart)
-    nodes.add(chooseEnd)
+    _nodes.add(chooseStart)
+    _nodes.add(chooseEnd)
 
     chooseStart
   }
@@ -159,8 +159,8 @@ class Graph() {
     whenStart.compoundEnd = whenEnd
     whenEnd.compoundStart = whenStart
 
-    nodes.add(whenStart)
-    nodes.add(whenEnd)
+    _nodes.add(whenStart)
+    _nodes.add(whenEnd)
 
     whenStart
   }
@@ -174,8 +174,8 @@ class Graph() {
     groupStart.compoundEnd = groupEnd
     groupEnd.compoundStart = groupStart
 
-    nodes.add(groupStart)
-    nodes.add(groupEnd)
+    _nodes.add(groupStart)
+    _nodes.add(groupEnd)
 
     var count = 0
     for (node <- subpipeline) {
@@ -205,7 +205,7 @@ class Graph() {
           fanOut.nextPort
         } else {
           val fanOut = new FanOut(this)
-          nodes.add(fanOut)
+          _nodes.add(fanOut)
           fans.put(edge.source, fanOut)
 
           removeEdge(edge)
@@ -227,7 +227,7 @@ class Graph() {
           fanIn.nextPort
         } else {
           val fanIn = new FanIn(this)
-          nodes.add(fanIn)
+          _nodes.add(fanIn)
           fans.put(edge.destination, fanIn)
           edge.source.removeOutput(edge.outputPort)
           edge.destination.removeInput(edge.inputPort)
@@ -296,14 +296,14 @@ class Graph() {
       }
     }
 
-    for (node <- nodes) {
+    for (node <- _nodes) {
       _valid = _valid && node.valid
       _valid = _valid && node.noCycles(immutable.HashSet.empty[Node])
       _valid = _valid && node.connected()
     }
 
     if (_valid) {
-      for (node <- nodes) {
+      for (node <- _nodes) {
         node.addIterationCaches()
         node.addWhenCaches()
         node.addChooseCaches()
@@ -316,8 +316,8 @@ class Graph() {
 
   private def roots(): Set[Node] = {
     val roots = mutable.HashSet.empty[Node]
-    for (node <- nodes) {
-      if (node.inputs().isEmpty) {
+    for (node <- _nodes) {
+      if (node.inputs.isEmpty) {
         roots.add(node)
       }
     }
@@ -326,7 +326,7 @@ class Graph() {
 
   private[graph] def inputs(): List[InputNode] = {
     val inodes = mutable.ListBuffer.empty[InputNode]
-    for (node <- nodes) {
+    for (node <- _nodes) {
       node match {
         case n: InputNode => inodes += n
         case _ => Unit
@@ -337,7 +337,7 @@ class Graph() {
 
   private[graph] def outputs(): List[OutputNode] = {
     val onodes = mutable.ListBuffer.empty[OutputNode]
-    for (node <- nodes) {
+    for (node <- _nodes) {
       node match {
         case n: OutputNode => onodes += n
         case _ => Unit
@@ -350,28 +350,20 @@ class Graph() {
     _system = ActorSystem("jafpl-com-" + UniqueId.nextId)
     _monitor = _system.actorOf(Props(new GraphMonitor(this)), name = "monitor")
 
-    val trace = Option(System.getProperty("org.xmlcalabash.trace"))
+    val trace = Option(System.getProperty("com.xmlcalabash.trace"))
     _monitor ! GTrace(trace.isDefined && List("true", "yes", "1").contains(trace.get))
 
-    for (node <- nodes) {
+    for (node <- _nodes) {
       node.makeActors()
     }
   }
 
-  private[graph] def runActors() {
-    // Run all the roots that aren't InputNodes or OutputNodes
-    for (root <- roots()) {
-      root match {
-        case node: InputNode => Unit
-        case node: OutputNode => Unit
-        case node: Node =>
-          node.actor ! new StartMessage(node.actor)
-      }
-    }
+  private[graph] def run() {
+    monitor ! GRun()
   }
 
   private [graph] def reset(): Unit = {
-    for (node <- nodes) {
+    for (node <- _nodes) {
       node.reset()
     }
     _finished = false
@@ -380,7 +372,7 @@ class Graph() {
   }
 
   private [graph] def teardown(): Unit = {
-    for (node <- nodes) {
+    for (node <- _nodes) {
       node match {
         case end: CompoundEnd => Unit
         case other: Node => other.teardown()
@@ -454,7 +446,7 @@ class Graph() {
     val tree = new XmlWriter()
     tree.startDocument()
     tree.addStartElement(Serializer.pg_graph)
-    for (node <- nodes) {
+    for (node <- _nodes) {
       node.dump(tree)
     }
     tree.addEndElement()

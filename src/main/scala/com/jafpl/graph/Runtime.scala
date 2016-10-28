@@ -11,14 +11,14 @@ import org.slf4j.LoggerFactory
 private[graph] class Runtime(val graph: Graph) extends GraphRuntime {
   private val logger = LoggerFactory.getLogger(this.getClass)
   private var _started = false
-  private val watchdog = 10
+  private val watchdog = 1
   private val sleepInterval = 100
 
   graph.makeActors()
 
   override def run(): Unit = {
     if (!_started) {
-      graph.runActors()
+      graph.run()
       _started = true
     }
   }

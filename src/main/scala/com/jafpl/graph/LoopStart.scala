@@ -24,7 +24,7 @@ class LoopStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) ext
     }
 
     for (child <- nodes) {
-      for (input <- child.inputs()) {
+      for (input <- child.inputs) {
         val edge = child.input(input).get
         val node = edge.source
         var found = (node == this)

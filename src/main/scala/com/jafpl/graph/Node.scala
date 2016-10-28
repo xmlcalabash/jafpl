@@ -1,9 +1,9 @@
 package com.jafpl.graph
 
-import akka.actor.{ActorRef, Props}
-import com.jafpl.graph.GraphMonitor.{GException, GFinish, GWatch}
+import akka.actor.Props
+import com.jafpl.graph.GraphMonitor.{GClose, GException, GFinish, GInitialize, GSend}
 import com.jafpl.items.GenericItem
-import com.jafpl.messages.{CloseMessage, ItemMessage, RanMessage}
+import com.jafpl.messages.ItemMessage
 import com.jafpl.runtime.{Step, StepController}
 import com.jafpl.util.{UniqueId, XmlWriter}
 import org.slf4j.LoggerFactory
@@ -20,8 +20,6 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
   private val sequenceNos = mutable.HashMap.empty[String, Long]
   private val dependents = mutable.HashSet.empty[Node]
   private var constructionOk = true
-  private val actors = mutable.HashMap.empty[String, ActorRef]
-  protected var _actor: ActorRef = _
   protected var _finished = false
   val worker = step
   private[graph] var label: Option[String] = if (step.isDefined) {
@@ -31,21 +29,16 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
   }
 
   private[graph] val dependsOn = mutable.HashSet.empty[Node]
-  private[graph] def actor = _actor
 
   val uid = UniqueId.nextId
 
-  def inputs(): Set[String] = {
-    inputPort.keySet
-  }
+  def inputs: Set[String] = inputPort.keySet
 
   def input(port: String): Option[Edge] = {
     inputPort.getOrElse(port, None)
   }
 
-  def outputs(): Set[String] = {
-    outputPort.keySet
-  }
+  def outputs: Set[String] = outputPort.keySet
 
   def output(port: String): Option[Edge] = {
     outputPort.getOrElse(port, None)
@@ -167,7 +160,6 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
   }
 
   def send(port: String, item: GenericItem): Unit = {
-    println("send " + item + " to " + port + ": " + this)
     if (outputPort.get(port).isDefined) {
       val edge = output(port).get
       val targetPort = edge.inputPort
@@ -180,7 +172,7 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
       sequenceNos.put(port, seqNo)
 
       val msg = new ItemMessage(targetPort, uid, seqNo, item)
-      targetNode.actor ! msg
+      graph.monitor ! GSend(targetNode, msg)
     } else {
       this match {
         case ls: CompoundStart =>
@@ -195,12 +187,7 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
     val edge = outputPort(port).get
     val targetPort = edge.inputPort
     val targetNode = edge.destination
-    val msg = new CloseMessage(this, targetPort)
-    targetNode.actor ! msg
-  }
-
-  def tell(node: Node, msg: Any): Unit = {
-    node.actor ! msg
+    graph.monitor ! GClose(targetNode, targetPort)
   }
 
   private[graph] def reset() = {
@@ -218,40 +205,6 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
     }
   }
 
-  def stop(): Unit = {
-    for (port <- outputPort.keySet) {
-      val edge = outputPort(port).get
-      val targetPort = edge.inputPort
-      val targetNode = edge.destination
-      val msg = new CloseMessage(this, targetPort)
-      targetNode.actor ! msg
-    }
-
-    for (rest <- dependents) {
-      if (!rest.finished) {
-        rest.actor ! new RanMessage(this)
-      }
-    }
-
-    _finished = true
-    graph.monitor ! GFinish(this)
-  }
-
-  def finish(): Unit = {
-    _finished = true
-    graph.monitor ! GFinish(this)
-  }
-
-  def finish(node: Node): Unit = {
-    node.finish()
-    node match {
-      case s: CompoundStart =>
-        for (node <- s.subpipeline) {
-          node.finish()
-        }
-    }
-  }
-
   def caught(exception: Throwable): Boolean = {
     if (worker.isDefined) {
       worker.get match {
@@ -266,7 +219,6 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
   }
 
   private[graph] def run(): Unit = {
-    println("NRUN " + this + ": " + worker)
     var bang: Option[GException] = None
 
     if (worker.isDefined) {
@@ -275,7 +227,7 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
       } catch {
         case any: Throwable =>
           logger.debug(this + " crashed: " + any)
-          bang = Some(new GException(this, this, any))
+          bang = Some(GException(this, this, any))
       }
     } else {
       logger.info("No worker: {}", this)
@@ -293,6 +245,18 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
     }
   }
 
+  def stop(): Unit = {
+    for (port <- outputPort.keySet) {
+      close(port)
+    }
+    finish()
+  }
+
+  def finish(): Unit = {
+    _finished = true
+    graph.monitor ! GFinish(this)
+  }
+
   private[jafpl] def makeActors(): Unit = {
     var actorName = if (label.isDefined) {
       label.get + "_" + UniqueId.nextId
@@ -307,19 +271,31 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
 
     logger.debug("Creating actor for " + this + ": " + actorName)
 
-    _actor = graph.system.actorOf(Props(new NodeActor(this)), actorName)
+    val actor = graph.system.actorOf(Props(new NodeActor(this)), actorName)
 
     // The steps that represent the end of a compound step are special.
     // The worker associated with them is irrelevant and they aren't watched.
     this match {
-      case _: CompoundEnd => Unit
+      case _: CompoundEnd =>
+        graph.monitor ! GInitialize(this, actor)
       case _ =>
         if (worker.isDefined) {
-          worker.get.setup(this, inputs().toList, outputs().toList)
+          worker.get.setup(this, inputs.toList, outputs.toList)
         }
-        graph.monitor ! GWatch(this)
+        graph.monitor ! GInitialize(this, actor)
     }
   }
+
+  /*
+    val log = Logging(context.system, this)
+  val openInputs = mutable.HashSet() ++ node.inputs()
+  val dependsOn = mutable.HashSet() ++ node.dependsOn
+
+  log.debug("INIT " + node + ": " + openList)
+  node.graph.monitor ! GWaitingFor(node, openInputs.toList, dependsOn.toList)
+
+   */
+
 
   def dumpExtraAttr(tree: XmlWriter): Unit = {
     // nop
@@ -336,9 +312,9 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
     tree.addAttribute(Serializer._uid, uid.toString)
     dumpExtraAttr(tree)
 
-    if (inputs().nonEmpty) {
+    if (inputs.nonEmpty) {
       tree.addStartElement(Serializer.pg_inputs)
-      for (portName <- inputs()) {
+      for (portName <- inputs) {
         val port = inputPort(portName)
         if (port.isDefined) {
           tree.addStartElement(Serializer.pg_in_edge)
@@ -351,9 +327,9 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
       tree.addEndElement()
     }
 
-    if (outputs().nonEmpty) {
+    if (outputs.nonEmpty) {
       tree.addStartElement(Serializer.pg_outputs)
-      for (portName <- outputs()) {
+      for (portName <- outputs) {
         val port = outputPort(portName)
         if (port.isDefined) {
           tree.addStartElement(Serializer.pg_out_edge)

@@ -1,5 +1,6 @@
 package com.jafpl.graph
 
+import com.jafpl.graph.GraphMonitor.GSend
 import com.jafpl.items.GenericItem
 import com.jafpl.messages.ItemMessage
 import com.jafpl.util.XmlWriter
@@ -22,11 +23,11 @@ class InputNode(graph: Graph, val port: String) extends Node(graph, None) {
   }
 
   override private[graph] def run(): Unit = {
-    stop()
+    close()
   }
 
   def write(item: GenericItem): Unit = {
-    for (port <- outputs()) {
+    for (port <- outputs) {
       val edge = output(port)
       val targetPort = edge.get.inputPort
       val targetNode = edge.get.destination
@@ -34,7 +35,7 @@ class InputNode(graph: Graph, val port: String) extends Node(graph, None) {
       val msg = new ItemMessage(targetPort, uid, seqNo, item)
       seqNo += 1
 
-      targetNode.actor ! msg
+      graph.monitor ! GSend(targetNode, msg)
     }
   }
 

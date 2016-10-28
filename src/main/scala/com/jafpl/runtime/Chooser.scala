@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import com.jafpl.graph.{GraphException, Node}
 import com.jafpl.items.GenericItem
-import com.jafpl.messages.{CloseMessage, ItemMessage}
+import com.jafpl.messages.ItemMessage
 
 import scala.collection.mutable
 
@@ -15,7 +15,7 @@ class Chooser extends DefaultCompoundStep {
 
   label = "_chooser"
 
-  def pickOne(nodes: List[Node]): Unit = {
+  def pickOne(nodes: List[Node]): Node = {
     var when: Option[Node] = None
     while (when.isEmpty && whenCount < nodes.size) {
       whenCount += 1
@@ -35,14 +35,7 @@ class Chooser extends DefaultCompoundStep {
       throw new GraphException("Choose didn't find any takers")
     }
 
-    for (node <- nodes) {
-      if (when.get == node) {
-        // This will cause the when to run as its last input will have been closed
-        controller.tell(node, new CloseMessage(null, "condition"))
-      } else {
-        controller.finish(node)
-      }
-    }
+    when.get
   }
 
   override def runAgain: Boolean = false

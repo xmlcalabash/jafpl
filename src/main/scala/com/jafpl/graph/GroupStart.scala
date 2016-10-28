@@ -9,7 +9,7 @@ class GroupStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) ex
   label = Some("_group_start")
 
   override private[graph] def run(): Unit = {
-    for (output <- outputs()) {
+    for (output <- outputs) {
       close(output)
     }
   }
