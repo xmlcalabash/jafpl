@@ -7,6 +7,7 @@ import com.jafpl.runtime._
 import com.jafpl.util.{UniqueId, XmlWriter}
 import org.slf4j.LoggerFactory
 
+import scala.collection.mutable.ListBuffer
 import scala.collection.{immutable, mutable}
 
 /**
@@ -397,6 +398,57 @@ class Graph() {
   def status(): Unit = {
     _monitor ! GDump()
   }
+
+  def topology(): List[String] = {
+    val nodeIds = mutable.HashMap.empty[Node, String]
+    val lines = ListBuffer.empty[String]
+    var count = 0
+
+    for (node <- nodes.toList.sortWith(_.uid < _.uid)) {
+      val id = base26ish(count)
+      nodeIds.put(node, id)
+      count += 1
+      lines += id
+    }
+
+    for (edge <- edges.toList.sortWith(sortEdge)) {
+      val source = nodeIds(edge.source) + "." + edge.outputPort
+      val target = nodeIds(edge.destination) + "." + edge.inputPort
+      lines += source + " -> " + target
+    }
+
+    lines.toList
+  }
+
+  private def sortEdge(e1: Edge, e2:Edge) = {
+    val e1suid = e1.source.uid
+    val e2suid = e2.source.uid
+    val e1duid = e1.destination.uid
+    val e2duid = e2.destination.uid
+    val e1ip = e1.inputPort
+    val e1op = e1.outputPort
+    val e2ip = e2.inputPort
+    val e2op = e2.outputPort
+
+    val s1 = f"$e1suid%6d$e1duid%6d|$e1op|$e1ip"
+    val s2 = f"$e2suid%6d$e2duid%6d|$e2op|$e2ip"
+
+    s1 < s2
+  }
+
+  private def base26ish(integer: Int): String = {
+    val letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    var result = ""
+    var value = integer
+    while (value >= 0) {
+      val ch = value % 26
+      result = letters(ch) + result
+      value /= 26
+      value -= 1
+    }
+    result
+  }
+
 
   def dump(): String = {
     val tree = new XmlWriter()
