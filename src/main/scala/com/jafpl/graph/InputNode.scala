@@ -23,7 +23,7 @@ class InputNode(graph: Graph, val port: String) extends Node(graph, None) {
   }
 
   override private[graph] def run(): Unit = {
-    close()
+    // nop
   }
 
   def write(item: GenericItem): Unit = {
@@ -37,10 +37,6 @@ class InputNode(graph: Graph, val port: String) extends Node(graph, None) {
 
       graph.monitor ! GSend(targetNode, msg)
     }
-  }
-
-  def close(): Unit = {
-    stop()
   }
 
   override def dumpExtraAttr(tree: XmlWriter): Unit = {

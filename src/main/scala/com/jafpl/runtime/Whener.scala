@@ -42,7 +42,7 @@ class Whener(when: WhenStep) extends Step with CompoundStep with WhenStep {
       for (msg <- cache(port)) {
         ctrl.send(oport, msg.item)
       }
-      ctrl.close(oport)
+      //ctrl.close(oport)
     }
     cache.clear()
     when.run()

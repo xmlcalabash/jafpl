@@ -24,13 +24,13 @@ class OutputNode(graph: Graph, val port: String) extends Node(graph, None) {
 
   override def receive(port: String, msg: ItemMessage): Unit = {
     items.synchronized {
+      logger.debug("Recv: {}", msg.sequenceNo)
       items.append(msg.item)
     }
   }
 
   override def run(): Unit = {
     done = true
-    stop()
   }
 
   def closed = done

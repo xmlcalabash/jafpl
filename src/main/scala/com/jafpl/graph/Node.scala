@@ -1,7 +1,7 @@
 package com.jafpl.graph
 
 import akka.actor.Props
-import com.jafpl.graph.GraphMonitor.{GClose, GException, GFinish, GInitialize, GSend}
+import com.jafpl.graph.GraphMonitor.{GException, GInitialize, GSend}
 import com.jafpl.items.GenericItem
 import com.jafpl.messages.ItemMessage
 import com.jafpl.runtime.{Step, StepController}
@@ -183,13 +183,6 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
     }
   }
 
-  def close(port: String): Unit = {
-    val edge = outputPort(port).get
-    val targetPort = edge.inputPort
-    val targetNode = edge.destination
-    graph.monitor ! GClose(targetNode, targetPort)
-  }
-
   private[graph] def reset() = {
     if (worker.isDefined) {
       worker.get.reset()
@@ -198,10 +191,7 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
 
   private[graph] def teardown() = {
     if (worker.isDefined) {
-      println("teardown: " + this + ": " + worker.get)
       worker.get.teardown()
-    } else {
-      println("teardown: " + this)
     }
   }
 
@@ -236,25 +226,6 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
     if (bang.isDefined) {
       graph.monitor ! bang.get
     }
-
-    this match {
-      case cs: CompoundStart => Unit
-      case ce: CompoundEnd => Unit
-      case _ =>
-        stop()
-    }
-  }
-
-  def stop(): Unit = {
-    for (port <- outputPort.keySet) {
-      close(port)
-    }
-    finish()
-  }
-
-  def finish(): Unit = {
-    _finished = true
-    graph.monitor ! GFinish(this)
   }
 
   private[jafpl] def makeActors(): Unit = {

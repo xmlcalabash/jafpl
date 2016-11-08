@@ -186,6 +186,15 @@ class Graph() {
     groupStart
   }
 
+  def getSourceEdge(source: Node, outputPort: String): Option[Edge] = {
+    for (edge <- edges) {
+      if (edge.source == source && edge.outputPort == outputPort) {
+        return Some(edge)
+      }
+    }
+    None
+  }
+
   def addEdge(from: Port, to: Port): Unit = {
     chkValid()
     addEdge(from.node, from.name, to.node, to.name)

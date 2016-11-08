@@ -17,7 +17,6 @@ class DefaultCompoundEnd(graph: Graph, step: Option[CompoundStep]) extends Node(
   }
 
   override def receive(port: String, msg: ItemMessage): Unit = {
-    println("LOOP END RECEIVES " + msg)
     val outputPort = if (port.startsWith("I_")) {
       port.substring(2)
     } else {

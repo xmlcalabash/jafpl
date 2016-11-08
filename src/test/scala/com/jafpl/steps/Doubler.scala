@@ -13,6 +13,7 @@ class Doubler() extends DefaultStep {
   label = "Doubler"
 
   override def run(): Unit = {
+    //logger.info("Double={}", inputNumber*2)
     controller.send("result", new NumberItem(inputNumber * 2))
   }
 

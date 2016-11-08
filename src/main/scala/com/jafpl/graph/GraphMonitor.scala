@@ -5,6 +5,7 @@ import java.time.{Duration, Instant}
 import akka.actor.{Actor, ActorRef}
 import akka.event.Logging
 import com.jafpl.graph.GraphMonitor._
+import com.jafpl.graph.NodeActor.{NException, NFinished, NReset, NRun}
 import com.jafpl.graph.StepState.StepState
 import com.jafpl.messages.ItemMessage
 
@@ -18,11 +19,9 @@ import scala.collection.mutable.ListBuffer
 object GraphMonitor {
   case class GInitialize(node: Node, actor: ActorRef)
   case class GRun()
-  case class GWatch(node: Node)
   case class GStart(node: Node)
   case class GFinish(node: Node)
   case class GSubgraph(node: Node, subpipeline: List[Node])
-  case class GFinished()
   case class GDump()
   case class GTrace(enable: Boolean)
   case class GException(node: Node, srcNode: Node, throwable: Throwable)
@@ -39,15 +38,14 @@ object GraphState extends Enumeration {
 
 object StepState extends Enumeration {
   type StepState = Value
-  val NOTREADY, READY, RUNNING, FINISHED = Value
+  val NOTREADY, READY, RUNNING, LOOPING, WAITING, NEEDSRESET, WAITTOFINISH, FINISHED = Value
 }
 
 class GraphMonitor(private val graph: Graph) extends Actor {
   val log = Logging(context.system, this)
   val nodes = mutable.HashMap.empty[Node, ActorRef]
-  val watching = mutable.HashSet.empty[Node]
   val subgraphs = mutable.HashMap.empty[ActorRef, List[Node]]
-  val containers = mutable.HashMap.empty[Node, ListBuffer[Node]]
+  val parents = mutable.HashMap.empty[Node, Node]
   val stepState = mutable.HashMap.empty[Node, StepState]
   var graphState = GraphState.NOTREADY
 
@@ -90,24 +88,44 @@ class GraphMonitor(private val graph: Graph) extends Actor {
   }
 
   def run(): Unit = {
-    dumpState("RUN")
+    //dumpState("RUN")
     for (node <- graph.nodes) {
       if (nodeReadyToRun(node)) {
         stepState.put(node, StepState.READY)
       }
 
-      if (stepState(node) == StepState.READY) {
+      val state = stepState(node)
+      if (state == StepState.READY || state == StepState.WAITING || state == StepState.LOOPING) {
+        val dInput = dependsOnInputs.get(node)
+        val dNodes = dependsOnNodes.get(node)
+        val canRun = dInput.isDefined && dInput.get.isEmpty && dNodes.isDefined && dNodes.get.isEmpty
+        var run = false
+
         node match {
-          case end: CompoundEnd => Unit
-          case _: Any =>
-            if (dependsOnInputs(node).isEmpty && dependsOnNodes(node).isEmpty) {
-              stepState.put(node, StepState.RUNNING)
-              nodes(node) ! GRun()
+          case start: CompoundStart =>
+            run = canRun || (state == StepState.LOOPING)
+
+            val end = start.compoundEnd.asInstanceOf[Node]
+            run = run && (stepState(end) == StepState.READY)
+
+            if (run) {
+              stepState.put(end, StepState.WAITING)
             }
+          case end: CompoundEnd =>
+            run = canRun
+          case _: Any =>
+            run = canRun && (stepState(node) == StepState.READY)
+        }
+        if (run) {
+          if (trace) {
+            log.info("M RUN     {}", node)
+          }
+          stepState.put(node, StepState.RUNNING)
+          nodes(node) ! NRun()
         }
       }
     }
-    dumpState("/RUN")
+    //dumpState("/RUN")
   }
 
   def nodeReadyToRun(node: Node): Boolean = {
@@ -132,83 +150,195 @@ class GraphMonitor(private val graph: Graph) extends Actor {
 
   def parentIsReady(node: Node): Boolean = {
     var ready = true
-    if (containers.contains(node)) {
-      for (pnode <- containers(node)) {
-        ready = ready && (stepState(pnode) == StepState.RUNNING)
-      }
+    if (parents.contains(node)) {
+      val pnode = parents(node)
+      ready = ready && (stepState(pnode) == StepState.RUNNING)
     }
     ready
   }
 
-  def watch(node: Node, actor: ActorRef): Unit = {
-    if (nodes.contains(node)) {
-      if (nodes(node) != actor) {
-        throw new IllegalStateException("Only one actor is allowed for any given node")
-      }
-    } else {
-      nodes.put(node, actor)
-    }
-    watch(node)
-  }
-
-  def watch(node: Node): Unit = {
-    watching += node
+  def parent(node: Node): Option[Node] = {
+    parents.get(node)
   }
 
   def subgraph(node: Node, subpipeline: List[Node]): Unit = {
     val ref = nodes(node)
     subgraphs.put(ref, subpipeline)
     for (subnode <- subpipeline) {
-      if (!containers.contains(subnode)) {
-        containers.put(subnode, ListBuffer.empty[Node])
+      if (parents.get(subnode).isDefined) {
+        throw new GraphException("Node already has a parent!?")
       }
-      containers(subnode) += node
+      parents.put(subnode, node)
     }
   }
 
   def start(node: Node): Unit = {
-    watching += node
+    // nop
   }
 
   def finish(node: Node): Unit = {
-    val whoCares = ListBuffer.empty[ActorRef]
-    for (ref <- subgraphs.keySet) {
-      if (subgraphs(ref).contains(node)) {
-        whoCares += ref
+    node match {
+      case ce: CompoundEnd => finishCompoundEnd(ce)
+      case ic: IterationCache =>
+        // Iteration caches never finish on their own
+        stepState.put(node, StepState.NEEDSRESET)
+      case _ => finishStep(node)
+    }
+    //dumpState("FINISH")
+  }
+
+  def finishCompoundEnd(node: CompoundEnd): Unit = {
+    val start = node.compoundStart
+    val startActor = nodes(start)
+    val subgraph = subgraphs(startActor)
+
+    for (child <- subgraph) {
+      if (stepState(child) == StepState.RUNNING) {
+        stepState.put(node.asInstanceOf[Node], StepState.WAITTOFINISH)
+        return
       }
     }
 
-    watching -= node
+    if (start.asInstanceOf[CompoundStart].runAgain) {
+      resetNode(start)
+      start match {
+        case loop: LoopStart =>
+          for (cache <- loop.caches) {
+            if (trace) {
+              log.info("  RESET   {}", cache)
+            }
+            stepState.put(cache, StepState.READY)
+          }
+        case _ => Unit
+      }
 
-    for (ref <- whoCares) {
-      var count = 0
-      for (node <- subgraphs(ref)) {
-        if (watching.contains(node)) {
-          count += 1
+      for (child <- subgraph) {
+        resetNode(child)
+      }
+
+      resetNode(node.asInstanceOf[Node])
+
+      run()
+    } else {
+      for (child <- subgraph) {
+        nodes(child) ! NFinished()
+        stepState.put(child, StepState.FINISHED)
+      }
+      startActor ! NFinished()
+      stepState.put(node.asInstanceOf[Node], StepState.FINISHED)
+
+      start match {
+        case loop: LoopStart =>
+          for (cache <- loop.caches) {
+            stepState.put(cache, StepState.FINISHED)
+          }
+        case _ => Unit
+      }
+
+      for (port <- node.asInstanceOf[Node].outputs) {
+        graph.monitor ! GClose(node.asInstanceOf[Node], port)
+      }
+    }
+  }
+
+  private def resetNode(node: Node): Unit = {
+    if (trace) {
+      log.info("  RESET   {}", node)
+    }
+    nodes(node) ! NReset()
+    dependsOnInputs.put(node, mutable.HashSet() ++ node.inputs)
+    dependsOnNodes.put(node, mutable.HashSet() ++ node.dependsOn)
+
+    node match {
+      case cs: CompoundStart =>
+        stepState.put(node, StepState.LOOPING)
+      case _ =>
+        stepState.put(node, StepState.READY)
+    }
+  }
+
+  def finishStep(node: Node): Unit = {
+    var inloop = false
+    var pnode = parent(node)
+    while (pnode.isDefined) {
+      pnode.get match {
+        case ls: LoopStart => inloop || ls.runAgain
+        case _ => Unit
+      }
+      pnode = parent(pnode.get)
+    }
+
+    var runAgain = false
+    var endNode: Option[Node] = None
+    node match {
+      case ls: LoopStart =>
+        runAgain = ls.runAgain
+        if (trace) {
+          log.info("  AGAIN   {}: {}", node, runAgain)
+        }
+        inloop = inloop && runAgain
+        endNode = Some(ls.compoundEnd)
+      case cs: CompoundStart =>
+        endNode = Some(cs.compoundEnd)
+      case _ => Unit
+    }
+
+    if (inloop || runAgain) {
+      if (trace) {
+        log.info("  LOOP    {}", node)
+      }
+      stepState.put(node, StepState.WAITING)
+    } else {
+      val whoCares = ListBuffer.empty[ActorRef]
+      for (ref <- subgraphs.keySet) {
+        if (subgraphs(ref).contains(node)) {
+          whoCares += ref
         }
       }
 
-      if (count == 0) {
-        if (trace) {
-          log.info("> TELL " + ref)
+      for (ref <- whoCares) {
+        var count = 0
+        for (node <- subgraphs(ref)) {
+          if (stepState(node) != StepState.FINISHED) {
+            count += 1
+          }
         }
-        ref ! GFinished()
-      } else {
-        if (trace) {
-          log.info("> " + count + " " + ref)
+
+        if (count == 0) {
+          if (trace) {
+            log.info("> TELL " + ref)
+          }
+          ref ! NFinished()
+        } else {
+          if (trace) {
+            log.info("> " + count + " " + ref)
+          }
         }
+      }
+
+      if (endNode.isDefined) {
+        nodes(endNode.get) ! NRun()
+      }
+
+      stepState.put(node, StepState.FINISHED)
+    }
+
+    pnode = parent(node)
+    if (pnode.isDefined) {
+      val ls = pnode.get.asInstanceOf[CompoundStart]
+      var le = ls.compoundEnd
+      if (stepState(le) == StepState.WAITTOFINISH) {
+        finishCompoundEnd(le.asInstanceOf[CompoundEnd])
       }
     }
 
-    stepState.put(node, StepState.FINISHED)
-
-    // dumpState()
     var finished = true
-    for (node <- nodes) {
+    for (node <- nodes.keySet) {
       finished = finished && (stepState(node) == StepState.FINISHED)
     }
     if (finished) {
       log.debug("Pipeline execution complete")
+      //dumpState("Finished")
       graph.finish()
       context.system.terminate()
     }
@@ -219,14 +349,14 @@ class GraphMonitor(private val graph: Graph) extends Actor {
 
     for (actor <- subgraphs.keySet) {
       if (subgraphs(actor).contains(node)) {
-        log.debug("M CAUGHT  {}: {} (forwards to {})", node, except, actor)
-        actor ! GException(node, srcNode, except)
+        log.info("M CAUGHT  {}: {} (forwards to {})", node, except, actor)
+        actor ! NException(node, srcNode, except)
         found = true
       }
     }
 
     if (!found) {
-      log.debug("M EXCEPT  {}: {}", node, except)
+      log.info("M EXCEPT  {}: {}", node, except)
       graph.abort(Some(srcNode), except)
       context.system.terminate()
     }
@@ -279,10 +409,6 @@ class GraphMonitor(private val graph: Graph) extends Actor {
     log.info("===============================================================/Graph Monitor=")
   }
 
-  def status(): Unit = {
-    dumpState()
-  }
-
   final def receive = {
     case GSend(node, msg) =>
       lastMessage = Instant.now()
@@ -292,17 +418,20 @@ class GraphMonitor(private val graph: Graph) extends Actor {
       nodes(node) ! msg
     case GClose(node, port) =>
       lastMessage = Instant.now()
+      val edge = graph.getSourceEdge(node, port)
+
       if (trace) {
-        log.info("M CLOSE   {}: {}", node, port)
+        if (edge.isDefined) {
+          log.info("M CLOSE   {}: {}", edge.get.destination, edge.get.inputPort)
+        } else {
+          log.info("M CLOSE   NO EDGE FOR {}: {}", node, port)
+        }
       }
-      dependsOnInputs(node).remove(port)
+
+      if (edge.isDefined) {
+        dependsOnInputs(edge.get.destination).remove(edge.get.inputPort)
+      }
       run()
-    case GWatch(node) =>
-      lastMessage = Instant.now()
-      if (trace) {
-        log.info("M WATCH   {}", node)
-      }
-      watch(node)
     case GStart(node) =>
       lastMessage = Instant.now()
       if (trace) {
@@ -328,7 +457,7 @@ class GraphMonitor(private val graph: Graph) extends Actor {
     case GException(node, srcNode, except) =>
       lastMessage = Instant.now()
       if (trace) {
-        log.info("M EXCEPT  {}", node)
+        log.info("M EXCEPT  {}: {}", node, except)
       }
       bang(node, srcNode, except)
     case GTrace(enable) =>
@@ -351,7 +480,6 @@ class GraphMonitor(private val graph: Graph) extends Actor {
         log.info("M INIT    {}", node)
       }
       initialize(node, actor)
-      runIfReady()
     case GRun() =>
       lastMessage = Instant.now()
       if (trace) {
@@ -361,85 +489,4 @@ class GraphMonitor(private val graph: Graph) extends Actor {
     case m: Any => log.info("Unexpected message: {}", m)
   }
 
-  /*
-    final def receive = {
-    case GSend(node, msg) =>
-      if (trace) {
-        log.info("M SEND    {}: {}", node, msg)
-        nodes(node) ! msg
-      }
-    case GClose(node, port) =>
-      if (trace) {
-        log.info("M CLOSE   {}: {}", node, port)
-      }
-      dependsOnInput(node).remove(port)
-      run()
-    case GWatch(node) =>
-      lastMessage = Instant.now()
-      if (trace) {
-        log.info("M WATCH   {}", node)
-      }
-      watch(node)
-    case GStart(node) =>
-      lastMessage = Instant.now()
-      if (trace) {
-        log.info("M START   {}", node)
-      }
-      start(node)
-    case GFinish(node) =>
-      lastMessage = Instant.now()
-      if (trace) {
-        log.info("M FINISH  {}", node)
-      }
-      finish(node)
-    case GSubgraph(node, subpipline) =>
-      lastMessage = Instant.now()
-      if (trace) {
-        var str = ""
-        for (node <- subpipline) {
-          str += node + " "
-        }
-        log.info("M SUBGRAF {}: {}", node, str)
-      }
-      subgraph(node, subpipline)
-    case GWaitingFor(node, ports, depends) =>
-      lastMessage = Instant.now()
-      if (trace) {
-        var str = ""
-        for (port <- ports) {
-          str += port + " "
-        }
-        for (node <- depends) {
-          str += node + " "
-        }
-        log.info("M WAITFOR {}: {}", node, str)
-      }
-      _status.put(node, new GraphStatus(ports, depends))
-    case GException(node, srcNode, except) =>
-      lastMessage = Instant.now()
-      bang(node, srcNode, except)
-    case GTrace(enable) =>
-      lastMessage = Instant.now()
-      if (trace) {
-        log.info("M TRACE   {}", enable)
-      }
-      trace = enable
-    case GDump() =>
-      lastMessage = Instant.now()
-      dumpState()
-    case GWatchdog(millis) =>
-      val ns = Duration.between(lastMessage, Instant.now()).toMillis
-      if (ns > millis) {
-        watchdog(millis)
-      }
-    case GInitialize(node, actor) =>
-      lastMessage = Instant.now()
-      initialize(node, actor)
-      runIfReady()
-    case GRun() =>
-      runIfReady()
-    case m: Any => log.info("Unexpected message: {}", m)
-  }
-
-   */
 }

@@ -10,12 +10,23 @@ import scala.collection.mutable.ListBuffer
   */
 class Cacher extends DefaultStep {
   val cache = ListBuffer.empty[GenericItem]
+  var ready = true
 
   override def run(): Unit = {
-    println("Cacher runs")
-    for (item <- cache) {
-      controller.send("result", item)
+    if (true || ready) {
+      logger.debug("Sending {} items from cache: {}", cache.size, this)
+      for (item <- cache) {
+        controller.send("result", item)
+      }
+      ready = false
+    } else {
+      logger.debug("Attempt to run cache without reset: {}", this)
     }
+  }
+
+  override def reset(): Unit = {
+    logger.debug("Reset {}: {}", ready, this)
+    ready = true
   }
 
   override def receive(port: String, msg: ItemMessage): Unit = {

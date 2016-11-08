@@ -1,6 +1,6 @@
 package com.jafpl.graph
 
-import com.jafpl.graph.GraphMonitor.{GClose, GSend}
+import com.jafpl.graph.GraphMonitor.GSend
 import com.jafpl.items.GenericItem
 import com.jafpl.messages.ItemMessage
 
@@ -43,15 +43,5 @@ private[graph] class InputOption(graph: Graph) extends Node(graph, None) {
     }
 
     initialized = true
-    close()
-  }
-
-  private def close(): Unit = {
-    for (port <- outputs) {
-      val edge = output(port)
-      val targetPort = edge.get.inputPort
-      val targetNode = edge.get.destination
-      graph.monitor ! GClose(targetNode, targetPort)
-    }
   }
 }

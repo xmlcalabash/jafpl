@@ -7,8 +7,4 @@ import com.jafpl.items.GenericItem
   */
 trait StepController {
   def send(port: String, item: GenericItem)
-  def close(port: String)
-  //def tell(node: Node, msg: Any)
-  def stop()
-  def finish()
 }

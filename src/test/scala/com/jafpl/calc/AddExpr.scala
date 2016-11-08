@@ -15,7 +15,7 @@ class AddExpr(val ops: List[String]) extends Step {
   var controller: StepController = _
   val logger = LoggerFactory.getLogger(this.getClass)
   val operands = mutable.HashMap.empty[String, Int]
-  var _label = "unknown"
+  var _label = "add"
   var _location: Option[SourceLocation] = None
 
   override def label = _label
@@ -33,10 +33,12 @@ class AddExpr(val ops: List[String]) extends Step {
   }
 
   override def reset(): Unit = {
+    //logger.info("AddExpr run")
     operands.clear()
   }
 
   override def run(): Unit = {
+    //logger.info("AddExpr run")
     var acc = operands("s1")
     var pos = 2
     for (op <- ops) {
@@ -63,6 +65,8 @@ class AddExpr(val ops: List[String]) extends Step {
       case num: NumberItem => value = num.get
       case _ => throw new CalcException("Message was not a number")
     }
+
+    //logger.info("AddExpr received {}: {}", port, value)
 
     operands.put(port, value)
   }

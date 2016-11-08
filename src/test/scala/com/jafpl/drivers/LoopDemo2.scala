@@ -13,7 +13,7 @@ object LoopDemo2 extends App {
 
   val dumpGraph = Some("pg.xml")
 
-  val input = graph.createNode(new GenerateLiteral(4))
+  val input = graph.createNode(new GenerateLiteral(100))
   val output = graph.createOutputNode("OUTPUT")
 
   val increment = graph.createNode(new GenerateLiteral(1))

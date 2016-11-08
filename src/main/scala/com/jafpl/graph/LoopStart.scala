@@ -12,9 +12,8 @@ class LoopStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) ext
   label = Some("_loop_start")
 
   override def reset(): Unit = {
-    println("RESET CACHES")
     for (cache <- caches) {
-      cache.close("result")
+      cache.reset()
     }
   }
 

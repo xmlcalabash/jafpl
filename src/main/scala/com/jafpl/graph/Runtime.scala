@@ -71,7 +71,7 @@ private[graph] class Runtime(val graph: Graph) extends GraphRuntime {
     if (_started) {
       for (node <- inputs()) {
         if (node.port == port) {
-          node.close()
+          //node.close()
           return
         }
       }

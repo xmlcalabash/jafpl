@@ -58,7 +58,7 @@ class Calculator(expr: String, bindings: Map[String, Int]) {
       val node = varMap(varname)
       if (bindings.contains(varname)) {
         node.write(new NumberItem(bindings(varname)))
-        node.close()
+        //node.close()
       } else {
         throw new CalcException("Expression contains unbound variable: " + varname)
       }

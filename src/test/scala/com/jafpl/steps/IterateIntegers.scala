@@ -4,34 +4,23 @@ import com.jafpl.items.{NumberItem, StringItem}
 import com.jafpl.messages.ItemMessage
 import com.jafpl.runtime.DefaultCompoundStep
 
-import scala.collection.mutable.ListBuffer
-
 /**
   * Created by ndw on 10/9/16.
   */
 class IterateIntegers() extends DefaultCompoundStep {
-  val list = ListBuffer.empty[Int]
-  var current = 0
+  var current = 1
   var max = 0
   label = "iter_int"
 
   override def run(): Unit = {
-    current += 1
-    list += current
-    //logger.info(s"Iterate: $current")
+    logger.debug("Send {}: {}", current, this)
     controller.send("current", new NumberItem(current))
-    controller.close("current")
-  }
-
-  override def teardown(): Unit = {
-    for (item <- list) {
-      println("Generated " + item)
-    }
+    current += 1
   }
 
   override def runAgain: Boolean = {
-    val again = (current < max) && (max > 0)
-    again
+    logger.debug("Again? {} <= {}", current, max)
+    (current <= max) && (max > 0)
   }
 
   override def receive(port: String, msg: ItemMessage): Unit = {
