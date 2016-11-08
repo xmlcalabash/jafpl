@@ -22,7 +22,6 @@ object GraphMonitor {
   case class GStart(node: Node)
   case class GFinish(node: Node)
   case class GSubgraph(node: Node, subpipeline: List[Node])
-  case class GDump()
   case class GTrace(enable: Boolean)
   case class GException(node: Node, srcNode: Node, throwable: Throwable)
   case class GWatchdog(millis: Int)
@@ -64,6 +63,7 @@ class GraphMonitor(private val graph: Graph) extends Actor {
     dependsOnInputs.put(node, mutable.HashSet() ++ node.inputs)
     dependsOnNodes.put(node, mutable.HashSet() ++ node.dependsOn)
 
+    // A graph is ready if and only if all of its nodes are initialized
     var ready = true
     for (node <- graph.nodes) {
       node match {
@@ -78,16 +78,13 @@ class GraphMonitor(private val graph: Graph) extends Actor {
     }
   }
 
-  def runIfReady(): Unit = {
-    graphState synchronized  {
-      if (graphState == GraphState.READY) {
-        graphState = GraphState.RUNNING
-        run()
-      }
-    }
-  }
-
   def run(): Unit = {
+    if (graphState != GraphState.READY && graphState != GraphState.RUNNING) {
+      graph.abort(None, new GraphException("Attempt to run graph in an unready state: " + graphState))
+      context.system.terminate()
+      return
+    }
+
     //dumpState("RUN")
     for (node <- graph.nodes) {
       if (nodeReadyToRun(node)) {
@@ -466,9 +463,6 @@ class GraphMonitor(private val graph: Graph) extends Actor {
         log.info("M TRACE   {}", enable)
       }
       trace = enable
-    case GDump() =>
-      lastMessage = Instant.now()
-      dumpState()
     case GWatchdog(millis) =>
       val ns = Duration.between(lastMessage, Instant.now()).toMillis
       if (ns > millis) {
@@ -485,7 +479,7 @@ class GraphMonitor(private val graph: Graph) extends Actor {
       if (trace) {
         log.info("M RUN GRAPH")
       }
-      runIfReady()
+      run()
     case m: Any => log.info("Unexpected message: {}", m)
   }
 

@@ -1,7 +1,7 @@
 package com.jafpl.graph
 
 import akka.actor.{ActorRef, ActorSystem, Props}
-import com.jafpl.graph.GraphMonitor.{GDump, GRun, GTrace}
+import com.jafpl.graph.GraphMonitor.{GRun, GTrace}
 import com.jafpl.runtime._
 import com.jafpl.util.{UniqueId, XmlWriter}
 import org.slf4j.LoggerFactory
@@ -394,10 +394,6 @@ class Graph() {
 
   def trace(enable: Boolean): Unit = {
     _monitor ! GTrace(enable)
-  }
-
-  def status(): Unit = {
-    _monitor ! GDump()
   }
 
   def topology(): List[String] = {
