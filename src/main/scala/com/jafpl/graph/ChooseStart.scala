@@ -8,10 +8,14 @@ import com.jafpl.runtime.{Chooser, CompoundStep, DefaultCompoundStart}
   */
 class ChooseStart(graph: Graph, step: Option[CompoundStep], nodes: List[Node]) extends DefaultCompoundStart(graph, step, nodes) {
   private var cachePort = 1
+  private var _chosenWhen: Option[Node] = None
   label = Some("_choose_start")
 
+  def chosenWhen = _chosenWhen
+
   override private[graph] def run(): Unit = {
-    graph.monitor ! GSelectWhen(this, step.get.asInstanceOf[Chooser].pickOne(nodes))
+    _chosenWhen = Some(step.get.asInstanceOf[Chooser].pickOne(nodes))
+    graph.monitor ! GSelectWhen(this, _chosenWhen.get)
   }
 
   override private[graph] def addChooseCaches(): Unit = {

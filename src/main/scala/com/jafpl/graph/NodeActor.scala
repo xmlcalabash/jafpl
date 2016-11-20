@@ -28,12 +28,21 @@ private[graph] class NodeActor(node: Node) extends Actor {
       case _ => node.run()
     }
 
-    if (node.isInstanceOf[CompoundEnd]) {
-      // nop
-    } else {
-      for (port <- node.outputs) {
-        node.graph.monitor ! GClose(node, port)
-      }
+    node match {
+      case end: CompoundEnd => Unit
+      case choose: ChooseStart => Unit
+        // This is kind of grotty
+        for (port <- node.outputs) {
+          val edge = node.output(port)
+          if (choose.chosenWhen.isDefined && edge.isDefined
+              && edge.get.destination == choose.chosenWhen.get) {
+            node.graph.monitor ! GClose(node, port)
+          }
+        }
+      case _ =>
+        for (port <- node.outputs) {
+          node.graph.monitor ! GClose(node, port)
+        }
     }
 
     node.graph.monitor ! GFinish(node)

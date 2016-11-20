@@ -341,6 +341,39 @@ class GraphMonitor(private val graph: Graph) extends Actor {
     }
   }
 
+  def selectWhen(when: Node): Unit = {
+    // Mark all the other branches as finished
+    val choose = parent(when).get
+    val chooseActor = nodes(choose)
+    for (node <- subgraphs(chooseActor)) {
+      if (node != when) {
+        setFinished(node)
+      }
+    }
+  }
+
+  def setFinished(node: Node): Unit = {
+    stepState.put(node, StepState.FINISHED)
+
+    // Close the outputs for all the unselected branches
+    node match {
+      case wstart: WhenStart =>
+        val end = wstart.compoundEnd
+        for (port <- end.outputs) {
+          node.graph.monitor ! GClose(end, port)
+        }
+        stepState.put(end, StepState.FINISHED)
+      case _ => Unit
+    }
+
+    val actor = nodes(node)
+    if (subgraphs.contains(actor)) {
+      for (node <- subgraphs(actor)) {
+        setFinished(node)
+      }
+    }
+  }
+
   def bang(node: Node, srcNode: Node, except: Throwable): Unit = {
     var found = false
 
@@ -480,6 +513,12 @@ class GraphMonitor(private val graph: Graph) extends Actor {
         log.info("M RUN GRAPH")
       }
       run()
+    case GSelectWhen(choose, when) =>
+      lastMessage = Instant.now()
+      if (trace) {
+        log.info("M SELECT  {}", when)
+      }
+      selectWhen(when)
     case m: Any => log.info("Unexpected message: {}", m)
   }
 
