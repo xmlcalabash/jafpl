@@ -1,44 +1,105 @@
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>JAFPL.com</title><meta charset="utf-8" /><meta name="generator" content="DocBook XSL 2.0 Stylesheets V2.0.20" /><link rel="stylesheet" type="text/css" href="https://docbook.github.io/release/2.0.20/resources/css/default.css" /><link rel="stylesheet" type="text/css" href="/css/docbook.css" /><link rel="stylesheet" type="text/css" href="/css/tabs.css" /><link rel="stylesheet" type="text/css" href="/css/website.css" /><link href="http://fonts.googleapis.com/css?family=Rambla" rel="stylesheet" type="text/css" /><script type="text/javascript" src="https://docbook.github.io/release/2.0.20/resources/js/dbmodnizr.js"></script><link href="https://docbook.github.io/release/2.0.20/resources/css/prism.css" rel="stylesheet" type="text/css" /><link href="https://docbook.github.io/release/2.0.20/resources/css/db-prism.css" rel="stylesheet" type="text/css" /></head><body><div class="header">
 <h1>JA<em>F</em>  PL</h1>
 </div><div class="navset" id="nav"><div class="hd"><ul><li id="home" class="on" title="selected"><a href="/"><strong><em>Home</em></strong></a></li></ul></div><div class="bd"><ul><li class="on first "><a href="/">Overview</a></li><li id="contact" class="  last"><a href="/contact">Contact us</a></li></ul></div></div><article class="article"><h1>Just another <em>fine</em> pipeline language<a href="https://github.com/ndw/jafpl" class="github-corner"><svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a></h1><p>This project is the core runtime for a general purpose pipeline
-language. It’s the heart of <em class="citetitle">XML Calabash V2.x</em>
+processor. It’s the heart of <em class="citetitle">XML Calabash V2.x</em>
 which hasn’t been released yet. This hasn’t been released in any
 official sense either. YMMV. Here there be dragons. Etc.</p><section id="what" class="section"><div class="section-titlepage"><h2>What is it?</h2></div><p>This is a JVM library for evaluating pipelines composed of
 arbitrary steps.</p><p>For the purpose of this discussion, a pipeline is a directed,
 acyclic graph. Each node in the graph represents some kind of
 processing. The edges between the nodes are how the data flows through
-the pipeline.</p><p>This library doesn’t care what you do in each node and it
+the pipeline.</p><div id="what.4" class="mediaobject"><img src="byhand-1.svg" /></div><p>This library doesn’t care what each node does and it
 doesn’t care what kind of data flows between nodes. You construct a
 graph with edges. You pour data in at the top, stuff happens, data
 pours out the bottom.</p><p>Many nodes can be implemented as atomic units of work
 (henceforth “atomic steps”), but some naturally operate on subgraphs
-(henceforth “compound steps”). Several compound steps are planned:</p><div class="orderedlist"><ol style="list-style: decimal;"><li><p>Iterate over a sequence.</p><p>There is an implementation of sequence iteration in the current
-release, but I don’t think it’s an especially clear or even stable
-design.</p></li><li><p>Choose one of several alternatives.</p></li><li><p>Try/catch style error handling.</p></li><li><p>Iterate until done.</p></li><li><p>Iterate until stable.</p></li></ol></div></section><section id="where" class="section"><div class="section-titlepage"><h2>Where is it?</h2></div><p><span class="inlinemediaobject"><img src="https://travis-ci.org/ndw/jafpl.svg?branch=master" /></span></p><p>It’s <a href="https://github.com/ndw/jafpl">on GitHub</a>.
-</p></section><section id="how" class="section"><div class="section-titlepage"><h2>How does it work?</h2></div><p>The graph is executed with the <a href="http://akka.io/">Akka</a> framework. An implementation
-for each step must be provided, then actors are created to manage each
-node. All steps “start” at the same time and execute in parallel (to the extent
-that the graph allows for parallelism, of course). When the
-last step reports that it is finished, execution finishes.</p><section id="example" class="section"><div class="section-titlepage"><h3>An example</h3></div><p>An example may help. I plan to use this library as the core of
+(henceforth “compound steps”). Several compound steps are planned:</p><div class="orderedlist"><ol style="list-style: decimal;"><li><p>Iteration. (Iterate over a sequence, iterate until done,
+iterate until stable.)</p></li><li><p>Choose one of several alternatives.</p></li><li><p>Try/catch style error handling.</p></li></ol></div><p>It would be nice to generalize the abstraction of “compound step” to the
+point where a small number of primitives in the core library could be used to
+build arbitrary compound steps. So far, that goal seems elusive. Each of the
+types that I’ve implemented have had quite different expressions at the graph
+level.</p></section><section id="where" class="section"><div class="section-titlepage"><h2>Where is it?</h2></div><p><span class="inlinemediaobject"><img src="https://travis-ci.org/ndw/jafpl.svg?branch=master" /></span></p><p>It’s <a href="https://github.com/ndw/jafpl">on GitHub</a>.
+</p></section><section id="how" class="section"><div class="section-titlepage"><h2>How does it work?</h2></div><p>At the level of this library, you must construct a graph using the
+underlying APIs. There’s no “pipeline language” support at this level.
+Broadly speaking, there are four kinds of nodes:</p><div class="itemizedlist"><ul><li><p><code class="classname">Node</code>s are the general case, they
+are atomic steps in the pipeline.</p></li><li><p><code class="classname">InputNode</code>s represent an “input boundary”
+between the graph and the outside world. This is where you pour documents
+into the pipeline.
+</p></li><li><p><code class="classname">OutputNode</code>s represent an “output boundary”.
+This is where you pull the results out of the pipeline.
+</p></li><li><p>Compound steps are actually represented as two atomic
+nodes, a “start node” and an “end node”. I’m not entirely pleased with
+the current API for compound steps so let’s just set those aside for
+the moment.
+</p></li></ul></div><p>You can construct any graph that you like with these nodes and
+edges between them. An edge is a connection between an “output port”
+on a “source” node and an “input port” on a “destination” node. The edges
+are arbitrary; asserting that an edge exists between two ports creates
+the ports if necessary.</p><p>There are only a few inviolable constraints on the graph:</p><div class="orderedlist"><ol style="list-style: decimal;"><li><p>No loops. It’s a
+<a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">DAG</a>.
+</p></li><li><p>You can’t use an <code class="classname">InputNode</code> as the destination
+of any edge.</p></li><li><p>You can’t use an <code class="classname">OutputNode</code> as the source
+of any edge.</p></li></ol></div><p>One of the design flaws in
+<a href="http://github.com/ndw/xmlcalabash1/">XML Calabash 1.x</a>
+is that the edges between steps have to buffer what they produce and the sequence
+has to be replayable. This happens because multiple steps may read the same output
+port and the reads may be interleaved. This problem cannot occur in JAFPL.
+Every port is read by exactly one step and exactly one step writes to every
+input port. If the graph described by your edges multiplexes access to
+any port, a “fan in” or “fan out” step will be inserted as appropriate.</p><p>In other words, this graph never happens:</p><div id="how.9" class="mediaobject"><img src="byhand-2.svg" /></div><p>If you attempt to construct that graph, the library will automatically
+restructure it so that this graph is produced:</p><div id="how.11" class="mediaobject"><img src="byhand-3.svg" /></div><p>You must provide an
+<a href="#api">implementation class</a> for every node that you
+construct. That’s the class that will be called upon to perform the
+work of the step.</p><p>The graph is executed with the <a href="http://akka.io/">Akka</a> framework. Actors are created
+to manage each node. All steps “start” at the same time and execute in
+parallel (to the extent that the graph allows for parallelism, of
+course). When the last step reports that it is finished, execution
+finishes.</p><p>The actors know the topology of the graph. Any step that has no
+inputs can run immediately. Steps that have inputs, can’t run until
+all of their inputs have been provided. Inputs pass between the steps
+as messages. Consider the simple, linear pipeline at the beginning of
+this document.</p><p>When execution begins, “Do Something” can’t run because
+it’s waiting for input from the “outside”. “Do Something Else” can’t
+run because it’s waiting for input from “Do Something.” The process
+that is running the pipeline pours an arbitrary number of documents
+into the input port. Each document is received immediately by “Do
+Something”, which is solely responsible for buffering it or doing
+whatever is necessary. Eventually, the process running the pipeline
+closes the input port.</p><p>At this point, the actor framework tells “Do Something” to run.
+It does whatever it does, dropping documents into its output port.
+The framework turns those documents into messages that are sent
+immediately to “Do Something Else.”</p><p>When “Do Something” finishes, the framework closes each of its
+output ports and consequently the input port that is reading it. When
+the last input port on “Do Something Else” is closed, the framework
+tells it to run. And thus it continues until every step has run. When
+every step has run, the pipeline is finished. The process running the
+pipeline can collect its results from the output port.</p><p>In practice, there are a number of subtlties here. Loops have
+to buffer inputs so that they’re available to each iteration. A choose
+must make sure that <em>none</em> of the steps in any of its
+branches run before a specific branch is selected. Etc.</p><p>This library will amend the graph and introduce additional steps as
+necessary to hide all of this complexity from the user.</p><section id="example" class="section"><div class="section-titlepage"><h3>An example</h3></div><p>An example may help. I plan to use this library as the core of
 my new XProc implementation, but if you aren’t familiar with XProc
 (and odds are, you’re not), that’s not going to be very intuitive.
 </p><p>To illustrate how things work, the library ships with a small
 <em class="citetitle">CalcDemo</em> application that uses the library to
 evaluate simple arithmetic expressions. Using a pipeline language for
 this purpose is a bit crazy, but I’m going to assume you all
-understand how arithmetic works.</p><p>Consider the expression “<code class="code">(1 + 2) * (3 + 4 + 5)</code>”. It’s possible to construct
-a pipeline to evaluate this expression:</p><div id="example.5" class="mediaobject"><img src="pipe1.svg" /></div><p>The steps labled <code class="literal">IntegerLiteral_<em class="replaceable"><code>*</code></em></code>”
-are atomic steps that provide the
-input numbers. The steps labeled
-“<code class="literal">AdditiveExpr_<em class="replaceable"><code>*</code></em></code>” receive a number
-on each input port. When all the numbers have arrived, the sum is computed and
-the result is output. In an analagous way, the step labeled
-“<code class="literal">MultiplicativeExpr_<em class="replaceable"><code>*</code></em></code>” performs
-multiplication. The step labled “<code class="literal">OUTPUT</code>” is a pipeline boundary.
-The caller is responsible for what happens after that. (The demo tool simply prints
-the answer, 36 in this case.)</p><p>Pipeline boundaries can occur on the input as well. Consider this
-expression: “<code class="code">(1 + 2) * $foo</code>”. Here <code class="code">$foo</code> is an option
-that has to passed in.</p><div id="example.8" class="mediaobject"><img src="pipe2.svg" /></div><p>All atomic steps work basically the same way. There’s also a provision for declaring
+understand how arithmetic works.</p><p>Consider the expression “<code class="code">(1+2)*(3+4+5)</code>”. It’s possible to construct
+a pipeline to evaluate this expression:</p><div id="example.5" class="mediaobject"><img src="pipe1.svg" /></div><p>The steps labled
+<code class="literal">IntegerLiteral_<em class="replaceable"><code>number</code></em></code>”
+are atomic steps that provide the input numbers. (It’s a shame they aren’t
+labeled 1, 2, 3, 4, 5, corresponding to the input digits, but the numbers
+are actually a function of the way the expression is parsed. However,
+that’s not important, they’re just labels.)
+The steps labeled
+“<code class="literal">AdditiveExpr_<em class="replaceable"><code>number</code></em></code>” and
+“<code class="literal">MultiplicativeExpr_<em class="replaceable"><code>number</code></em></code>”
+perform the obvious mathematical operations on their inputs.</p><p>There are no external inputs. When this pipeline starts, the
+integer literal steps all execute in parallel, producing one output each.
+The additions can also proceed in parallel. Then the multiplication computes
+the final sum, “36”, which is printed by the demo.</p><p>To see what happens when inputs are required, consider this
+expression: “<code class="code">(1+2)*$foo</code>”. Here <code class="code">$foo</code> is an
+additional input to the expression. Steps have inputs and outputs and
+(almost) nothing else.</p><div id="example.9" class="mediaobject"><img src="pipe2.svg" /></div><p>All atomic steps work basically the same way. There’s also a provision for declaring
 a dependency edge between two nodes that aren’t connected by data flow. The semantics
 of the dependency are that the <em>dependent</em> step will not be run
 before the step it <em>depends on</em> has finished.</p><p>Concocting an example of a compound step requires a little more craziness.
@@ -47,7 +108,7 @@ each of its arguments and returns the results as a sequence.</p><p>One way to im
 the arguments and generates a sequence of numbers from them. Each item in this sequence
 is passed through a subpipeline. The result of the step is the output from the subpipeline.
 If we stick a single atomic “double” step in the subpipeline, we’ll get the desired
-result:</p><div id="example.12" class="mediaobject"><img src="pipe3.svg" /></div><p>It’s worth noting that even though we conceived of the step as a
+result:</p><div id="example.13" class="mediaobject"><img src="pipe3.svg" /></div><p>It’s worth noting that even though we conceived of the step as a
 wrapper around a subpipeline, the graph implementation is flat. Start
 and end steps, which are effectively atomic, are used to manage the iteration.</p><p>For one final example, I will use an XProc pipeline. This pipeline is
 mostly identity steps. The <code class="tag-element">p:interleave</code> step is one that I made
@@ -85,7 +146,7 @@ up for testing: it shuffles documents from its <code class="code">left</code> an
 
   &lt;p:identity name="end"/&gt;
 
-&lt;/p:declare-step&gt;</code></pre><p>And here is the somewhat larger graph:</p><div id="example.18" class="mediaobject"><img src="pipe4.svg" /></div><p>There are two interesting features in this graph:</p><div class="orderedlist"><ol style="list-style: decimal;"><li><p>First, an explicit “fan out” step has been added. This is
+&lt;/p:declare-step&gt;</code></pre><p>And here is the somewhat larger graph:</p><div id="example.19" class="mediaobject"><img src="pipe4.svg" /></div><p>There are two interesting features in this graph:</p><div class="orderedlist"><ol style="list-style: decimal;"><li><p>First, an explicit “fan out” step has been added. This is
 done automatically by the graph engine. In the execution graph,
 every output port will be read by at most one input port and every
 input port will consume data from exactly one output port.</p></li><li><p>The ordinary semantic for atomic steps is that they take inputs,
@@ -135,4 +196,4 @@ it can tell if it will run before it is reset again. If any inputs arrive,
 what’s going to work best.</p></section></section><section id="whatsnext" class="section"><div class="section-titlepage"><h2>What’s next?</h2></div><p>Well. Continued development, I hope. But no promises.</p></section><section id="whatif" class="section"><div class="section-titlepage"><h2>What if I want a …?</h2></div><p>Just <a href="https://github.com/ndw/jafpl/issues">file an issue</a>,
 man, that’s all I got.</p></section><footer><p>Copyright © 2016 Norman Walsh. See
       <a href="https://github.com/ndw/jafpl/blob/master/LICENSE.md">LICENSE</a>.
-      Last updated on 17 Oct 2016 at 09:37a.m. GMT-05:00 by Norman Walsh</p></footer></article><script src="https://docbook.github.io/release/2.0.20/resources/js/prism.js"></script></body></html>
+      Last updated on 19 Oct 2016 at 07:39a.m. GMT-05:00 by Norman Walsh</p></footer></article><script src="https://docbook.github.io/release/2.0.20/resources/js/prism.js"></script></body></html>
