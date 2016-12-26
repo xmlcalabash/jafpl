@@ -52,7 +52,6 @@ class CompoundNodes extends FlatSpec {
     val correct = Array("A", "B", "C", "D", "E",
       "A.result -> B.source",
       "B.result -> E.I_result",
-      "D.!latch_1 -> B.!latch",
       "E.result -> C.source")
     val lines = graph.topology()
 
