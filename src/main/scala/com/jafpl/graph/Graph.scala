@@ -165,6 +165,39 @@ class Graph() {
     whenStart
   }
 
+  def createTryNode(group: Node, subpipeline: List[Node]): TryStart = {
+    val catcher = Some(new Catcher())
+
+    chkValid()
+    val tryStart = new TryStart(this, catcher, group, subpipeline)
+    val tryEnd   = new TryEnd(this, catcher)
+
+    tryStart.compoundEnd = tryEnd
+    tryEnd.compoundStart = tryStart
+
+    _nodes.add(tryStart)
+    _nodes.add(tryEnd)
+
+    tryStart
+  }
+
+  def createCatchNode(subpipeline: List[Node]): CatchStart = {
+    val catcher = Some(new Catcher())
+
+    chkValid()
+
+    val catchStart = new CatchStart(this, catcher, subpipeline)
+    val catchEnd   = new CatchEnd(this, catcher)
+
+    catchStart.compoundEnd = catchEnd
+    catchEnd.compoundStart = catchStart
+
+    _nodes.add(catchStart)
+    _nodes.add(catchEnd)
+
+    catchStart
+  }
+
   def createGroupNode(subpipeline: List[Node]): GroupStart = {
     chkValid()
     val step       = Option(new Grouper())
@@ -176,12 +209,6 @@ class Graph() {
 
     _nodes.add(groupStart)
     _nodes.add(groupEnd)
-
-    var count = 0
-    for (node <- subpipeline) {
-      count += 1
-      addEdge(groupStart, "!latch_" + count, node, "!latch")
-    }
 
     groupStart
   }
@@ -364,6 +391,7 @@ class Graph() {
 
     for (node <- _nodes) {
       node.makeActors()
+      node.identifySubgraphs()
     }
   }
 

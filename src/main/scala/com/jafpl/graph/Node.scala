@@ -257,19 +257,12 @@ class Node(val graph: Graph, val step: Option[Step]) extends StepController {
     }
   }
 
-  /*
-    val log = Logging(context.system, this)
-  val openInputs = mutable.HashSet() ++ node.inputs()
-  val dependsOn = mutable.HashSet() ++ node.dependsOn
-
-  log.debug("INIT " + node + ": " + openList)
-  node.graph.monitor ! GWaitingFor(node, openInputs.toList, dependsOn.toList)
-
-   */
-
+  private[jafpl] def identifySubgraphs(): Unit = {
+    Unit
+  }
 
   def dumpExtraAttr(tree: XmlWriter): Unit = {
-    // nop
+    Unit
   }
 
   def dump(tree: XmlWriter): Unit = {

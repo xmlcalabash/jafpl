@@ -105,6 +105,13 @@ class GraphMonitor(private val graph: Graph) extends Actor {
             val end = start.compoundEnd.asInstanceOf[Node]
             run = run && (stepState(end) == StepState.READY)
 
+            start match {
+              case cstart: CatchStart =>
+                run = run && cstart.caughtException
+              case _ =>
+                Unit
+            }
+
             if (run) {
               stepState.put(end, StepState.WAITING)
             }
@@ -149,7 +156,7 @@ class GraphMonitor(private val graph: Graph) extends Actor {
     var ready = true
     if (parents.contains(node)) {
       val pnode = parents(node)
-      ready = ready && (stepState(pnode) == StepState.RUNNING)
+      ready = ready && (stepState(pnode) == StepState.RUNNING || stepState(pnode) == StepState.FINISHED)
     }
     ready
   }

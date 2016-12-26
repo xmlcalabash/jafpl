@@ -27,6 +27,10 @@ abstract class DefaultCompoundStart(graph: Graph, step: Option[CompoundStep], no
 
   override private[jafpl] def makeActors(): Unit = {
     super.makeActors()
+  }
+
+  override private[jafpl] def identifySubgraphs(): Unit = {
+    super.identifySubgraphs()
     graph.monitor ! GSubgraph(this, nodes)
   }
 
