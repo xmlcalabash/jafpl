@@ -2,8 +2,5 @@
 
 Just Another /Fine/ Pipeline Language.
 
-[[https://api.travis-ci.org/ndw/jafpl.svg?branch=master]]
+This is the core graph library.
 
-This is the core graph library. There’s a simple calculator demo
-in the test directory. It’s also used by
-[[https://github.com/ndw/xmlcalabash2][XML Calabash 2.x]].
