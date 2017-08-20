@@ -1,0 +1,77 @@
+default namespace = "http://jafpl.com/ns/graph"
+
+# FIXME: Add Schematron rules
+
+start = graph
+
+graph =
+    element graph {
+        (container|node)*
+    }
+
+nodeAttributes =
+      attribute id { text }
+    & attribute label { text }
+    & attribute className { text }
+    & attribute name { text }
+
+containerAttributes =
+      nodeAttributes
+    & attribute end { text }
+
+containerEndAttributes =
+      nodeAttributes
+    & attribute start { text }
+
+container =
+    element container {
+        containerAttributes,
+        inputs?,
+        outputs?,
+        children
+    }
+
+container-end =
+    element container-end {
+        containerEndAttributes,
+        inputs?,
+        outputs?
+    }
+
+node =
+    element node {
+        nodeAttributes,
+        inputs?,
+        outputs?
+    }
+
+inputs =
+    element inputs {
+        in-edge+
+    }
+
+outputs =
+    element outputs {
+        out-edge+
+    }
+
+children =
+    element children {
+        ((container|node)+, container-end)
+    }
+
+in-edge =
+    element in-edge {
+        attribute input-port { text }
+      & attribute output-port { text }
+      & attribute source { text }
+      & empty
+    }
+
+out-edge =
+    element out-edge {
+        attribute input-port { text }
+      & attribute output-port { text }
+      & attribute destination { text }
+      & empty
+    }
