@@ -22,6 +22,4 @@ libraryDependencies ++= Seq(
 )
 
 target in Compile in doc := baseDirectory.value / "apidocs"
-scalacOptions in doc <++= baseDirectory map { d =>
-  Seq("-doc-root-content", d / "docs/apidocs/root.md" getPath)
-}
+scalacOptions in doc ++= Seq("-doc-root-content", "docs/apidocs/root.md")
