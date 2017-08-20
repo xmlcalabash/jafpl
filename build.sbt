@@ -1,4 +1,4 @@
-name := "jafpl2"
+name := "jafpl"
 
 version := "0.1"
 
@@ -22,4 +22,6 @@ libraryDependencies ++= Seq(
 )
 
 target in Compile in doc := baseDirectory.value / "apidocs"
-scalacOptions in Compile ++= Seq("-doc-root-content", "docs/apidocs/root.md")
+scalacOptions in doc <++= baseDirectory map { d =>
+  Seq("-doc-root-content", d / "docs/apidocs/root.md" getPath)
+}

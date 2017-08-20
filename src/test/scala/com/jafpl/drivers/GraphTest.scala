@@ -9,7 +9,7 @@ import com.jafpl.steps.{Identity, LogBinding, Producer, RaiseError, Sink}
 object GraphTest extends App {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
-  runTwo()
+  runThree()
 
   def runTwo(): Unit = {
     val graph = new Graph()
