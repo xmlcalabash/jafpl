@@ -2,7 +2,7 @@
 
 Just Another /Fine/ Pipeline Language.
 
-This is a dead branch. You want the `master` branch.
+This is a dead branch. You want the ~master~ branch.
 
 I misunderstood some of the consequences of the way asynchrony would
 play out in an actor framework when I undertook this work.
