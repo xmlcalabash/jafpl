@@ -1,0 +1,100 @@
+<pg:graph xmlns:pg="http://jafpl.com/ns/graph">
+   <pg:node name="atomic-step_30_outside-the-loop"
+            step="com.xmlcalabash.runtime.Identity@2fd1433e"
+            uid="3">
+      <pg:inputs>
+         <pg:in-edge source="12" input-port="source" output-port="result_1"/>
+      </pg:inputs>
+      <pg:outputs>
+         <pg:out-edge destination="14" input-port="source" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="source" uid="0" boundary="true">
+      <pg:outputs>
+         <pg:out-edge destination="2" input-port="source" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="!fanout_11" step="com.jafpl.graph.Fan@29d89d5d" uid="12">
+      <pg:inputs>
+         <pg:in-edge source="2" input-port="source" output-port="result"/>
+      </pg:inputs>
+      <pg:outputs>
+         <pg:out-edge destination="9" input-port="source" output-port="result_2"/>
+         <pg:out-edge destination="3" input-port="source" output-port="result_1"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="atomic-step_75_interleave"
+            step="com.xmlcalabash.runtime.Identity@3514a4c0"
+            uid="5">
+      <pg:inputs>
+         <pg:in-edge source="4" input-port="left" output-port="result"/>
+         <pg:in-edge source="14" input-port="right" output-port="result"/>
+      </pg:inputs>
+      <pg:outputs>
+         <pg:out-edge destination="7" input-port="I_result" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="atomic-step_68_first"
+            step="com.xmlcalabash.runtime.Identity@212b5695"
+            uid="4">
+      <pg:inputs>
+         <pg:in-edge source="9" input-port="source" output-port="current"/>
+      </pg:inputs>
+      <pg:outputs>
+         <pg:out-edge destination="5" input-port="left" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="result" uid="1" boundary="true">
+      <pg:inputs>
+         <pg:in-edge source="10" input-port="source" output-port="result"/>
+      </pg:inputs>
+   </pg:node>
+   <pg:node name="i_cache_13" uid="14">
+      <pg:inputs>
+         <pg:in-edge source="3" input-port="source" output-port="result"/>
+      </pg:inputs>
+      <pg:outputs>
+         <pg:out-edge destination="5" input-port="right" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="atomic-step_109_end"
+            step="com.xmlcalabash.runtime.Identity@446293d"
+            uid="10">
+      <pg:inputs>
+         <pg:in-edge source="7" input-port="source" output-port="result"/>
+      </pg:inputs>
+      <pg:outputs>
+         <pg:out-edge destination="1" input-port="source" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="atomic-step_23_start"
+            step="com.xmlcalabash.runtime.Identity@69997e9d"
+            uid="2">
+      <pg:inputs>
+         <pg:in-edge source="0" input-port="source" output-port="result"/>
+      </pg:inputs>
+      <pg:outputs>
+         <pg:out-edge destination="12" input-port="source" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="loop_end_6"
+            step="com.jafpl.runtime.DefaultEnd@793be5ca"
+            uid="7">
+      <pg:inputs>
+         <pg:in-edge source="5" input-port="I_result" output-port="result"/>
+      </pg:inputs>
+      <pg:outputs>
+         <pg:out-edge destination="10" input-port="source" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="loop_start_8"
+            step="com.jafpl.runtime.ForEachIterator@625732"
+            uid="9">
+      <pg:inputs>
+         <pg:in-edge source="12" input-port="source" output-port="result_2"/>
+      </pg:inputs>
+      <pg:outputs>
+         <pg:out-edge destination="4" input-port="source" output-port="current"/>
+      </pg:outputs>
+   </pg:node>
+</pg:graph>

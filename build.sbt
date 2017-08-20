@@ -21,5 +21,7 @@ libraryDependencies ++= Seq(
   "org.scala-lang.modules" %% "scala-swing" % "2.0.0-M2"
 )
 
-target in Compile in doc := baseDirectory.value / "apidocs"
+// Yes, this is an odd place for local use, but it's where the website
+// needs them. I should figure out how to parameterize the location...
+target in Compile in doc := baseDirectory.value / "build/pages/apidocs"
 scalacOptions in doc ++= Seq("-doc-root-content", "docs/apidocs/root.md")

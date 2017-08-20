@@ -1,0 +1,144 @@
+/* Website CSS */
+
+body {
+    background-color: white;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-top: 5px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+}
+
+h1 {
+    font-family: "Rambla", Arial, helvetica, sans-serif;
+    font-size: 36pt;
+    margin-bottom: 0.5em;
+    margin-top: 0.25em;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+h2 {
+    font-family: "Rambla", Arial, helvetica, sans-serif;
+    font-size: 24pt;
+}
+
+h3 {
+    font-family: "Rambla", Arial, helvetica, sans-serif;
+    font-size: 20pt;
+}
+
+h4 {
+    font-family: "Rambla", Arial, helvetica, sans-serif;
+    font-size: 16pt;
+}
+
+.header {
+    background-color: white;
+    font-family: "Rambla", Arial, helvetica, sans-serif;
+    margin-top: 0;
+    padding-left: 5px;
+    padding-top: 10px;
+}
+
+.header h1 {
+    font-size: 44pt;
+    margin-bottom: 0;
+    margin-top: 0;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+.header .tagline { 
+    color: #F2F3F5;
+    font-family: serif;
+    font-style: italic;
+    margin-right: 30px;
+    position: absolute;
+    right: 10px;
+    text-align: right;
+    top: 35px;
+}
+
+article {
+    border-bottom: 1px solid #999;
+    border-left: 1px solid #999;
+    border-right: 1px solid #999;
+    border-top: 1px solid #999;
+    padding-left: 10px;
+    padding-right: 140px;
+}
+
+.subscribe {
+    font-size: 10px;
+}
+
+footer {
+    border-top: solid #AAAAAA 1pt;
+    color: #555555;
+    font-size: 9pt;
+    margin-bottom: 0.5in;
+    padding-top: 4px;
+    position: absolute;
+    text-align: center;
+    visibility: visible;
+}
+
+.admonition {
+    border: solid 1px #AAAAAA;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.admonition .admon-title {
+    font-weight: bold;
+}
+
+sup {
+    font-size: 60%;
+}
+
+.programlisting {
+    background-color: #EEEEEE;
+    border: solid 1px #AAAAAA;
+    padding-left: 1em;
+}
+
+.mediaobject img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 75%;
+}
+
+.badge a img {
+    height: 1em;
+}
+
+.github-corner:hover .octo-arm {
+    animation:octocat-wave 560ms ease-in-out
+}
+
+@keyframes octocat-wave {
+    0%,100% {
+        transform:rotate(0)
+    }
+    20%,60% {
+        transform:rotate(-25deg)
+    }
+    40%,80% {
+        transform:rotate(10deg)
+    }
+}
+
+@media (max-width:500px) {
+    .github-corner:hover .octo-arm {
+        animation:none
+    }
+    .github-corner .octo-arm {
+        animation:octocat-wave 560ms ease-in-out
+    }
+}

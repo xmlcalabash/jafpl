@@ -1,0 +1,76 @@
+<pg:graph xmlns:pg="http://jafpl.com/ns/graph">
+   <pg:node name="IntegerLiteral_11"
+            step="com.jafpl.calc.NumberLiteral@4c309d4d"
+            uid="20">
+      <pg:outputs>
+         <pg:out-edge destination="17" input-port="s3" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="OUTPUT" uid="12" boundary="true">
+      <pg:inputs>
+         <pg:in-edge source="13" input-port="source" output-port="result"/>
+      </pg:inputs>
+   </pg:node>
+   <pg:node name="IntegerLiteral_7"
+            step="com.jafpl.calc.NumberLiteral@38102d01"
+            uid="18">
+      <pg:outputs>
+         <pg:out-edge destination="17" input-port="s1" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="MultiplicativeExpr_0"
+            step="com.jafpl.calc.MultExpr@37883b97"
+            uid="13">
+      <pg:inputs>
+         <pg:in-edge source="17" input-port="s2" output-port="result"/>
+         <pg:in-edge source="14" input-port="s1" output-port="result"/>
+      </pg:inputs>
+      <pg:outputs>
+         <pg:out-edge destination="12" input-port="source" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="AdditiveExpr_1"
+            step="com.jafpl.calc.AddExpr@6ab778a"
+            uid="14">
+      <pg:inputs>
+         <pg:in-edge source="16" input-port="s2" output-port="result"/>
+         <pg:in-edge source="15" input-port="s1" output-port="result"/>
+      </pg:inputs>
+      <pg:outputs>
+         <pg:out-edge destination="13" input-port="s1" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="IntegerLiteral_2"
+            step="com.jafpl.calc.NumberLiteral@4e3958e7"
+            uid="15">
+      <pg:outputs>
+         <pg:out-edge destination="14" input-port="s1" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="AdditiveExpr_6"
+            step="com.jafpl.calc.AddExpr@77f80c04"
+            uid="17">
+      <pg:inputs>
+         <pg:in-edge source="19" input-port="s2" output-port="result"/>
+         <pg:in-edge source="18" input-port="s1" output-port="result"/>
+         <pg:in-edge source="20" input-port="s3" output-port="result"/>
+      </pg:inputs>
+      <pg:outputs>
+         <pg:out-edge destination="13" input-port="s2" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="IntegerLiteral_4"
+            step="com.jafpl.calc.NumberLiteral@1dac5ef"
+            uid="16">
+      <pg:outputs>
+         <pg:out-edge destination="14" input-port="s2" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+   <pg:node name="IntegerLiteral_9"
+            step="com.jafpl.calc.NumberLiteral@5c90e579"
+            uid="19">
+      <pg:outputs>
+         <pg:out-edge destination="17" input-port="s2" output-port="result"/>
+      </pg:outputs>
+   </pg:node>
+</pg:graph>

@@ -1,0 +1,49 @@
+digraph pg_graph {
+
+"input" [label="input"; shape=invhouse]
+
+subgraph "cluster_3" {
+  label = "Do Something"
+  subgraph "clustersub_3i" {
+    label = "inputs"
+    fontcolor = "gray"
+    style = "rounded"
+    color = "gray"
+    "source_3" [label="source"]
+  }
+  subgraph "clustersub_3o" {
+    label = "outputs"
+    fontcolor = "gray"
+    style = "rounded"
+    color = "gray"
+    "result_3" [label="result"]
+  }
+}
+
+subgraph "cluster_4" {
+  label = "Do Something Else"
+  subgraph "clustersub_4i" {
+    label = "inputs"
+    fontcolor = "gray"
+    style = "rounded"
+    color = "gray"
+    "source_4" [label="source"]
+  }
+  subgraph "clustersub_4o" {
+    label = "outputs"
+    fontcolor = "gray"
+    style = "rounded"
+    color = "gray"
+    "result_4" [label="result"]
+  }
+}
+
+"output" [label="output"; shape=invhouse]
+
+"input" -> "source_3"
+"input" -> "source_4"
+
+"result_3" -> "output"
+"result_4" -> "output"
+
+}
