@@ -51,15 +51,17 @@ object GraphTest extends App {
     val bc = new BufferConsumer()
 
     val pipeline = graph.addPipeline()
-    val p1       = pipeline.addAtomic(new Producer(List("P1", "P2")), "producer")
+    val p1       = graph.addAtomic(new Producer(List("P1", "P2")), "producer")
     val ident    = pipeline.addAtomic(new Identity(false), "identity")
     val consumer = graph.addAtomic(bc, "consumer")
 
-    graph.addEdge(p1, "result", ident, "source")
+    graph.addEdge(p1, "result", pipeline, "source")
+    graph.addEdge(pipeline, "source", ident, "source")
     graph.addEdge(ident, "result", pipeline.end, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     graph.close()
+    println(graph.asXML)
   }
 
   def runThree(): Unit = {

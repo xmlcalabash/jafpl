@@ -9,7 +9,7 @@
 <!-- Yes, there's some irony in constructing a multi-stage pipeline directly
      in XSLT to support generation of diagrams for a pipeline language. -->
 
-<xsl:output method="text" encoding="utf-8"/>
+<xsl:output method="text" encoding="utf-8" indent="yes"/>
 <xsl:strip-space elements="*"/>
 
 <!-- ============================================================ -->
@@ -58,6 +58,10 @@
   </subgraph>
 </xsl:template>
 
+<xsl:template match="g:node[parent::g:graph]" priority="100">
+  <xsl:apply-templates select="g:inputs/*|g:outputs/*" mode="boundary"/>
+</xsl:template>
+
 <xsl:template match="g:container-end">
   <subgraph name="cluster-{g:id(.)}" label="{@name}\n{@label}"
             color="black">
@@ -95,6 +99,18 @@
 
 <xsl:template match="attribute()|text()|comment()|processing-instruction()">
   <!-- nop -->
+</xsl:template>
+
+<!-- ============================================================ -->
+
+<xsl:template match="g:in-edge" mode="boundary">
+  <port id="{g:id(.)}" label="{../../@name}\n{../../@label}\n{@input-port}"
+        shape="house"/>
+</xsl:template>
+
+<xsl:template match="g:out-edge" mode="boundary">
+  <port id="{g:id(.)}" label="{../../@name}\n{../../@label}\n{@input-port}"
+        shape="invhouse"/>
 </xsl:template>
 
 <!-- ============================================================ -->
@@ -227,9 +243,16 @@
 <xsl:template match="dot:port" mode="gv2dot">
   <xsl:text>"</xsl:text>
   <xsl:value-of select="@id"/>
-  <xsl:text>" [label="</xsl:text>
-  <xsl:value-of select="@label"/>
-  <xsl:text>"];&#10;</xsl:text>
+  <xsl:text>" [&#10;</xsl:text>
+
+  <xsl:for-each select="@* except @id">
+    <xsl:value-of select="local-name(.)"/>
+    <xsl:text> = "</xsl:text>
+    <xsl:value-of select="."/>
+    <xsl:text>";&#10;</xsl:text>
+  </xsl:for-each>
+
+  <xsl:text>];&#10;</xsl:text>
 </xsl:template>
 
 <xsl:template match="dot:edge" mode="gv2dot">
