@@ -1,9 +1,11 @@
 package com.jafpl.test
 
+import com.jafpl.drivers.GraphTest.runtimeConfig
 import com.jafpl.graph.Graph
+import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{Identity, Producer, Sink}
+import com.jafpl.steps.{Identity, Producer, Sink, Sleep}
 import org.scalatest.FlatSpec
 
 class SimplestPipelineSpec extends FlatSpec {
@@ -37,5 +39,28 @@ class SimplestPipelineSpec extends FlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.run()
+  }
+
+  "A dependency " should " determine step order" in {
+    val graph = new Graph()
+    val bc = new BufferConsumer()
+
+    val pipeline = graph.addPipeline()
+    val p1       = pipeline.addAtomic(new Producer(List("P1")), "P1")
+    val p2       = pipeline.addAtomic(new Producer(List("P2")), "P2")
+    val sleep    = pipeline.addAtomic(new Sleep(500), "sleep")
+    val consumer = graph.addAtomic(bc, "consumer")
+
+    graph.addEdge(p1, "result", pipeline.end, "result")
+    graph.addEdge(p2, "result", pipeline.end, "result")
+    graph.addEdge(pipeline, "result", consumer, "source")
+    p2.dependsOn(sleep)
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.run()
+
+    assert(bc.items.size == 2)
+    assert(bc.items(0) == "P1")
+    assert(bc.items(1) == "P2")
   }
 }

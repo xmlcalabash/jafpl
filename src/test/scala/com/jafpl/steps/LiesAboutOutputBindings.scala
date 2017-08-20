@@ -1,16 +1,11 @@
 package com.jafpl.steps
 
-class Count extends DefaultStep {
-  var count: Long = 0
-
+class LiesAboutOutputBindings extends DefaultStep {
   override def inputSpec = PortBindingSpecification.SOURCESEQ
   override def outputSpec = PortBindingSpecification.RESULT
 
-  override def receive(port: String, item: Any): Unit = {
-    count += 1
-  }
-
   override def run(): Unit = {
-    consumer.get.send("result", count.toString)
+    consumer.get.send("result", "one")
+    consumer.get.send("result", "two") // but we asserted we'd send only one result!
   }
 }

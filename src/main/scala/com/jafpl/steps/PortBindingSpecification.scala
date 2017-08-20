@@ -76,6 +76,16 @@ class PortBindingSpecification(spec: immutable.Map[String,String]) {
     plist.toSet
   }
 
+  def cardinality(port: String): Option[String] = {
+    if (spec.contains(port)) {
+      Some(spec(port))
+    } else if (spec.contains("*")) {
+      Some(spec("*"))
+    } else {
+      None
+    }
+  }
+
   /** Check the actual cardinality against the specification.
     *
     * This method throws a [[com.jafpl.exceptions.PipelineException]] if the `count` of documents
@@ -91,12 +101,14 @@ class PortBindingSpecification(spec: immutable.Map[String,String]) {
 
     var pass = false
     if (spec.contains(port)) {
-      if (count == 0) {
-        pass = (spec(port) == "?") || (spec(port) == "*")
-      } else if (count == 1) {
-        pass = (spec(port) == "?") || (spec(port) == "1")
-      }  else {
-        pass = (spec(port) == "+") || (spec(port) == "*")
+      if (spec(port) == "*") {
+        pass = true
+      } else {
+        pass = count match {
+          case 0 => spec(port) == "?"
+          case 1 => (spec(port) == "?") || (spec(port) == "1")
+          case _ => spec(port) == "+"
+        }
       }
 
       if (!pass) {

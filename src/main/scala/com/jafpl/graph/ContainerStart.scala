@@ -4,14 +4,28 @@ import com.jafpl.steps.{Step, ViewportComposer}
 
 import scala.collection.mutable.ListBuffer
 
-private[jafpl] class ContainerStart(override val graph: Graph,
+/** A node that contains other nodes.
+  *
+  * Conceptually, some nodes contain others. A loop, for example, contains the steps that form the
+  * body of the loop.
+  *
+  * In practice, containers are represented by a start and an end.
+  *
+  * @constructor A container in the pipeline graph.
+  * @param graph The graph into which this node is to be inserted.
+  * @param end The end of this container.
+  * @param userLabel An optional user-defined label.
+  */
+
+class ContainerStart(override val graph: Graph,
                                     val end: ContainerEnd,
                                     override val userLabel: Option[String]) extends Node(graph, None, userLabel) {
   private val _children = ListBuffer.empty[Node]
 
+  /** The children of this container. */
   def children: List[Node] = _children.toList
 
-  override def inputsOk(): Boolean = {
+  private[graph] override def inputsOk(): Boolean = {
     if (inputs.nonEmpty) {
       var valid = true
       for (port <- inputs) {
@@ -26,73 +40,168 @@ private[jafpl] class ContainerStart(override val graph: Graph,
     }
   }
 
-  override def outputsOk() = true
+  private[graph] override def outputsOk() = true
 
   protected[graph] def addChild(node: Node): Unit = {
     node.parent = this
     _children += node
   }
 
+  /** Add a new atomic step to this container.
+    *
+    * @param step The step implementation.
+    * @return The node added.
+    */
   def addAtomic(step: Step): Node = addAtomic(step, None)
 
+  /** Add a new atomic step to this container.
+    *
+    * @param step The step implementation.
+    * @param label A user-defined label.
+    * @return The node added.
+    */
   def addAtomic(step: Step, label: String): Node = addAtomic(step, Some(label))
 
+  /** Add a new atomic step to this container.
+    *
+    * @param step The step implementation.
+    * @param label An optional, user-defined label.
+    * @return The node added.
+    */
   def addAtomic(step: Step, label: Option[String]): Node = {
     val node = graph.addAtomic(step, label)
     addChild(node)
     node
   }
 
+  /** Add a new group container to this container.
+    *
+    * @return The node added.
+    */
   def addGroup(): ContainerStart = addGroup(None)
 
+  /** Add a new group container to this container.
+    *
+    * @param label A user-defined label.
+    * @return The node added.
+    */
   def addGroup(label: String): ContainerStart = addGroup(Some(label))
 
+  /** Add a new group container to this container.
+    *
+    * @param label An optional, user-defined label.
+    * @return The node added.
+    */
   def addGroup(label: Option[String]): ContainerStart = {
     val node = graph.addGroup(label)
     addChild(node)
     node
   }
 
+  /** Add a new choose/when container to this container.
+    *
+    * @return The node added.
+    */
   def addChoose(): ChooseStart = addChoose(None)
 
+  /** Add a new choose/when container to this container.
+    *
+    * @param label A user-defined label.
+    * @return The node added.
+    */
   def addChoose(label: String): ChooseStart = addChoose(Some(label))
 
+  /** Add a new choose/when container to this container.
+    *
+    * @param label An optional, user-defined label.
+    * @return The node added.
+    */
   def addChoose(label: Option[String]): ChooseStart = {
     val node = graph.addChoose(label)
     addChild(node)
     node
   }
 
+  /** Add a new for-each container to this container.
+    *
+    * @return The node added.
+    */
   def addForEach(): ForEachStart = addForEach(None)
 
+  /** Add a new for-each container to this container.
+    *
+    * @param label A user-defined label.
+    * @return The node added.
+    */
   def addForEach(label: String): ForEachStart = addForEach(Some(label))
 
+  /** Add a new for-each container to this container.
+    *
+    * @param label An optional, user-defined label.
+    * @return The node added.
+    */
   def addForEach(label: Option[String]): ForEachStart = {
     val node = graph.addForEach(label)
     addChild(node)
     node
   }
 
+  /** Add a new viewport container to this container.
+    *
+    * @return The node added.
+    */
   def addViewport(composer: ViewportComposer): ViewportStart = addViewport(composer, None)
 
+  /** Add a new viewport container to this container.
+    *
+    * @param label A user-defined label.
+    * @return The node added.
+    */
   def addViewport(composer: ViewportComposer, label: String): ViewportStart = addViewport(composer, Some(label))
 
+  /** Add a new viewport container to this container.
+    *
+    * @param label An optional, user-defined label.
+    * @return The node added.
+    */
   def addViewport(composer: ViewportComposer, label: Option[String]): ViewportStart = {
     val node = graph.addViewport(composer, label)
     addChild(node)
     node
   }
 
+  /** Add a new try/catch container to this container.
+    *
+    * @return The node added.
+    */
   def addTryCatch(): TryCatchStart = addTryCatch(None)
 
+  /** Add a new try/catch container to this container.
+    *
+    * @param label A user-defined label.
+    * @return The node added.
+    */
   def addTryCatch(label: String): TryCatchStart = addTryCatch(Some(label))
 
+  /** Add a new try/catch container to this container.
+    *
+    * @param label An optional, user-defined label.
+    * @return The node added.
+    */
   def addTryCatch(label: Option[String]): TryCatchStart = {
     val node = graph.addTryCatch(label)
     addChild(node)
     node
   }
 
+  /** Add a new variable to this container.
+    *
+    * This method inserts a variable binding into the container. This binding is
+    * effectively the source of a variable's value. Other steps may connect to this
+    * binding in order to read it's computed value at runtime.
+    *
+    * @return The node added.
+    */
   def addBinding(name: String, expression: String): Binding = {
     val binding = graph.addBinding(name, expression)
     addChild(binding)

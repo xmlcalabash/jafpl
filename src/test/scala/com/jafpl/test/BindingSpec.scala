@@ -27,8 +27,6 @@ class BindingSpec extends FlatSpec {
     graph.addEdge(pipeline, "result", output, "source")
 
     graph.close()
-    println(graph.asXML)
-
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.run()
 

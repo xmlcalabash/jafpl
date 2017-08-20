@@ -7,6 +7,7 @@ import com.jafpl.graph.{ContainerEnd, Node}
 import com.jafpl.messages.BindingMessage
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GStopped}
 import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NGuardResult, NInitialize, NInput, NReset, NStart, NStop, NTraceDisable, NTraceEnable, NViewportFinished}
+import com.jafpl.steps.{Consumer, PortBindingSpecification}
 
 import scala.collection.mutable
 
@@ -37,6 +38,13 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   protected val openBindings = mutable.HashSet.empty[String]
   protected var readyToRun = false
   protected val traces = mutable.HashSet.empty[String]
+  protected val cardinalities = mutable.HashMap.empty[String, Long]
+  protected var proxy = Option.empty[ConsumingProxy]
+
+  def this(monitor: ActorRef, runtime: GraphRuntime, node: Node, proxy: Option[ConsumingProxy]) {
+    this(monitor, runtime, node)
+    this.proxy = proxy
+  }
 
   protected def traceEnabled(event: String): Boolean = {
     traces.contains(event) || runtime.dynamicContext.traceEnabled(event)
@@ -62,6 +70,22 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     }
     for (input <- node.bindings) {
       openBindings.add(input)
+    }
+  }
+
+  protected def reset(): Unit = {
+    readyToRun = false
+    openInputs.clear()
+    for (input <- node.inputs) {
+      openInputs.add(input)
+    }
+    openBindings.clear()
+    for (input <- node.bindings) {
+      openBindings.add(input)
+    }
+    cardinalities.clear()
+    if (proxy.isDefined) {
+      proxy.get.reset()
     }
   }
 
@@ -125,9 +149,17 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       trace(s"RSTEP $node", "StepExec")
       try {
         node.step.get.run()
+        if (proxy.isDefined) {
+          for (output <- node.outputs) {
+            if (!output.startsWith("#")) {
+              node.step.get.outputSpec.checkCardinality(output,proxy.get.cardinality(output))
+            }
+          }
+        }
       } catch {
         case cause: Throwable =>
           threwException = true
+          println("BANG: "+ node)
           monitor ! GException(Some(node), cause)
       }
     } else {
@@ -142,15 +174,18 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     }
   }
 
-  protected def reset(): Unit = {
-    readyToRun = false
-    openInputs.clear()
-    for (input <- node.inputs) {
-      openInputs.add(input)
-    }
-  }
-
   protected def close(port: String): Unit = {
+    if (node.step.isDefined && node.step.get.inputSpec != PortBindingSpecification.ANY
+        && !port.startsWith("#")) {
+      try {
+        node.step.get.inputSpec.checkCardinality(port, cardinalities.getOrElse(port, 0L))
+      } catch {
+        case cause: Throwable =>
+          println("BANG in " + node)
+          monitor ! GException(Some(node), cause)
+        case _: Throwable => Unit
+      }
+    }
     openInputs -= port
     runIfReady()
   }
@@ -167,6 +202,8 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         case _ => throw new GraphException("Unexpected item on #bindings port")
       }
     } else {
+      val card = cardinalities.getOrElse(port, 0L) + 1L
+      cardinalities.put(port, card)
       if (node.step.isDefined) {
         node.step.get.receive(port, item)
       }

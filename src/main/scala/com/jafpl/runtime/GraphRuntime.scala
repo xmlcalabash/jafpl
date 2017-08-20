@@ -2,8 +2,9 @@ package com.jafpl.runtime
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.jafpl.exceptions.{GraphException, PipelineException}
-import com.jafpl.graph.{Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, ForEachStart, Graph, GroupStart, Joiner, PipelineStart, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
+import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, ForEachStart, Graph, GroupStart, Joiner, PipelineStart, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
 import com.jafpl.runtime.GraphMonitor.{GNode, GRun, GWatchdog}
+import com.jafpl.steps.Consumer
 import com.jafpl.util.UniqueId
 import org.slf4j.LoggerFactory
 
@@ -124,6 +125,11 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
 
     for (node <- graph.nodes) {
       var actorName = "_" * (7 - node.id.length) + node.id
+      val proxy: Option[ConsumingProxy] = if (node.step.isDefined) {
+        Some(new ConsumingProxy(_monitor, this, node))
+      } else {
+        None
+      }
 
       val actor = node match {
         case binding: Binding =>
@@ -171,12 +177,13 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
             case _ =>
               _system.actorOf(Props(new EndActor(_monitor, this, end)), actorName)
           }
+        case atomic: AtomicNode =>
+          if (proxy.isDefined) {
+            node.step.get.setConsumer(proxy.get)
+          }
+          _system.actorOf(Props(new NodeActor(_monitor, this, node, proxy)), actorName)
         case _ =>
-          _system.actorOf(Props(new NodeActor(_monitor, this, node)), actorName)
-      }
-
-      if (node.step.isDefined) {
-        node.step.get.setConsumer(new ConsumingProxy(_monitor, this, node))
+          throw new PipelineException("unexpected", "Unexpected step type: " + node)
       }
 
       _monitor ! GNode(node, actor)

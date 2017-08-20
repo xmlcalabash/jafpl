@@ -638,6 +638,54 @@ class Graph {
     }
 
     for (edge <- _edges) {
+      if (edge.from.step.isDefined && edge.to.step.isDefined) {
+        val fromCard = edge.from.step.get.outputSpec.cardinality(edge.fromPort)
+        val toCard = edge.to.step.get.inputSpec.cardinality(edge.toPort)
+        if (fromCard.isEmpty) {
+          logger.warn(s"Step ${edge.from.step.get} has no output port named ${edge.fromPort}")
+        } else if (toCard.isEmpty) {
+          logger.warn(s"Step ${edge.to.step.get} has no input port named ${edge.toPort}")
+        } else {
+          if ((fromCard.get == "1") || (toCard.get == "*") || (fromCard.get == toCard.get)) {
+            // nop; this is bound to be fine.
+          } else {
+            fromCard.get match {
+              case "*" =>
+                toCard.get match {
+                  case "+" =>
+                    logger.warn(s"${edge.from}.${edge.fromPort} may produce no output but ${edge.to}.${edge.toPort} requires at least one input")
+                  case "1" =>
+                    logger.warn(s"${edge.from}.${edge.fromPort} may produce a sequence but ${edge.to}.${edge.toPort} requires exactly one input")
+                  case "?" =>
+                    logger.warn(s"${edge.from}.${edge.fromPort} may produce a sequence but ${edge.to}.${edge.toPort} requires at most one input")
+                  case _ =>
+                    throw new GraphException(s"Unexpected cardinality on ${edge.to}.${edge.toPort}: ${toCard.get}")
+                }
+              case "+" =>
+                toCard.get match {
+                  case "1" =>
+                    logger.warn(s"${edge.from}.${edge.fromPort} may produce a sequence but ${edge.to}.${edge.toPort} requires exactly one input")
+                  case "?" =>
+                    logger.warn(s"${edge.from}.${edge.fromPort} may produce a sequence but ${edge.to}.${edge.toPort} requires at most one input")
+                  case _ =>
+                    throw new GraphException(s"Unexpected cardinality on ${edge.to}.${edge.toPort}: ${toCard.get}")
+                }
+              case "?" =>
+                toCard.get match {
+                  case "+" =>
+                    logger.warn(s"${edge.from}.${edge.fromPort} may produce no output but ${edge.to}.${edge.toPort} requires at least one input")
+                  case "1" =>
+                    logger.warn(s"${edge.from}.${edge.fromPort} may produce no output but ${edge.to}.${edge.toPort} requires exactly one input")
+                  case _ =>
+                    throw new GraphException(s"Unexpected cardinality on ${edge.to}.${edge.toPort}: ${toCard.get}")
+                }
+              case _ =>
+                throw new GraphException(s"Unexpected cardinality on ${edge.from}.${edge.fromPort}: ${fromCard.get}")
+            }
+          }
+        }
+      }
+
       val ancestor = commonAncestor(edge.from, edge.to)
       if (ancestor.isDefined) {
         val d1 = depth(ancestor.get, edge.from)

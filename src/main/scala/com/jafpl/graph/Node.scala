@@ -4,11 +4,20 @@ import com.jafpl.exceptions.GraphException
 import com.jafpl.steps.Step
 import com.jafpl.util.UniqueId
 
-import scala.collection.Set
 import scala.collection.mutable.ListBuffer
 import scala.xml.UnprefixedAttribute
 
-abstract private[jafpl] class Node(val graph: Graph, val step: Option[Step], val userLabel: Option[String]) {
+/** A node in the pipeline graph.
+  *
+  * You can't instantiate nodes directly, see the methods on [[com.jafpl.graph.Graph]] and
+  * on nodes.
+  *
+  * @constructor A node in the pipeline graph.
+  * @param graph The graph into which this node is to be inserted.
+  * @param step An optional implementation step.
+  * @param userLabel An optional user-defined label.
+  */
+abstract class Node(val graph: Graph, val step: Option[Step], val userLabel: Option[String]) {
   private var _start: Option[ContainerStart] = None
   val id: String = UniqueId.nextId.toString
 
@@ -27,18 +36,47 @@ abstract private[jafpl] class Node(val graph: Graph, val step: Option[Step], val
   }
   private val _label = s"${_name}-$id"
 
+  /** The node lebel. */
   def label: String = _label
 
+  /** To string. */
   override def toString: String = {
     s"{$label}"
   }
 
+  /** Add a dependency edge.
+    *
+    * This method asserts that the current node depends on another node. Ordinarily,
+    * data flow establishes dependencies automatically. If step A consumes the output of step B,
+    * the pipeline will assure that step B runs before step A.
+    *
+    * In cases where there is no data flow dependency, but it's still necessary to force an
+    * order, you can impose one by saying that `A.dependsOn(B)`.
+    *
+    * @param node
+    */
   def dependsOn(node: Node): Unit = {
     graph.addDependsEdge(node, this)
   }
 
+  /** The names of this step's input ports.
+    *
+    * @return The input port names.
+    */
   def inputs: Set[String] = graph.inboundPorts(this)
+
+  /** The names of this step's output ports.
+    *
+    * @return The output port names.
+    */
   def outputs: Set[String] = graph.outboundPorts(this)
+
+  /** The names of this step's variable bindings.
+    *
+    * This method returns the names of the variables for which this step will receive bindings at runtime.
+    *
+    * @return The variable names.
+    */
   def bindings: Set[String] = graph.bindings(this)
 
   protected[jafpl] def inputEdge(port: String): Edge = {
@@ -49,8 +87,12 @@ abstract private[jafpl] class Node(val graph: Graph, val step: Option[Step], val
     graph.edgesFrom(this, port).head
   }
 
+  /** This node's parent.
+    *
+    * @return This node's parent.
+    */
   def parent: Option[ContainerStart] = _start
-  def parent_=(node: ContainerStart): Unit = {
+  private[graph] def parent_=(node: ContainerStart): Unit = {
     if (_start.isEmpty) {
       _start = Some(node)
     } else {
@@ -163,6 +205,6 @@ abstract private[jafpl] class Node(val graph: Graph, val step: Option[Step], val
     new xml.Elem(null, nodeName, attrs, xml.TopScope, false, nodes:_*)
   }
 
-  def inputsOk(): Boolean
-  def outputsOk(): Boolean
+  private[graph] def inputsOk(): Boolean
+  private[graph] def outputsOk(): Boolean
 }

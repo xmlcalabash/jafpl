@@ -1,37 +1,65 @@
 package com.jafpl.drivers
 
 import com.jafpl.graph.Graph
-import com.jafpl.io.{BufferConsumer, DevNullConsumer}
+import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{Identity, LogBinding, Producer, RaiseError, Sink}
+import com.jafpl.steps.{Identity, LogBinding, Producer, RaiseError, Sink, Sleep}
 
 object GraphTest extends App {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
-  runThree()
+  runTwo()
+
+  def runSeven(): Unit = {
+    val graph = new Graph()
+
+    val pipeline = graph.addPipeline(None)
+    val producer = graph.addAtomic(new Producer(List("SomeDocument")), "producer")
+    val choose = pipeline.addChoose("choose")
+    val when1 = choose.addWhen("true", "when1")
+    val when2 = choose.addWhen("false", "when2")
+
+    val p1 = when1.addAtomic(new Producer(List("WHEN1")), "p1")
+    val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")
+
+    val bc = new BufferConsumer()
+    val consumer = graph.addAtomic(bc, "finalconsumer")
+
+    graph.addEdge(producer, "result", when1, "condition")
+    graph.addEdge(producer, "result", when2, "condition")
+
+    graph.addEdge(p1, "result", when1.end, "result")
+    graph.addEdge(p2, "result", when2.end, "result")
+
+    graph.addEdge(when1, "result", choose.end, "result")
+    graph.addEdge(when2, "result", choose.end, "result")
+
+    graph.addEdge(choose, "result", pipeline.end, "result")
+    graph.addEdge(pipeline, "result", consumer, "source")
+
+    graph.close()
+    //println(graph.asXML)
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.run()
+
+  }
 
   def runTwo(): Unit = {
     val graph = new Graph()
+    val bc = new BufferConsumer()
 
     val pipeline = graph.addPipeline()
-    val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
-    val group    = pipeline.addGroup("group")
-    val inner    = group.addAtomic(new Identity(), "inner")
-    val outer    = pipeline.addAtomic(new Identity(), "outer")
-    val consumer = graph.addAtomic(new DevNullConsumer(), "consumer")
+    val p1       = pipeline.addAtomic(new Producer(List("P1", "P2")), "producer")
+    val ident    = pipeline.addAtomic(new Identity(false), "identity")
+    val consumer = graph.addAtomic(bc, "consumer")
 
-    graph.addEdge(producer, "result", inner, "source")
-    graph.addEdge(inner, "result", group.end, "result")
-    graph.addEdge(group, "result", pipeline.end, "result")
-    graph.addEdge(inner, "result", outer, "source")
-    graph.addEdge(outer, "result", pipeline.end, "result")
+    graph.addEdge(p1, "result", ident, "source")
+    graph.addEdge(ident, "result", pipeline.end, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
-    println(graph.asXML)
     graph.close()
-    assert(!graph.valid)
-
   }
 
   def runThree(): Unit = {
