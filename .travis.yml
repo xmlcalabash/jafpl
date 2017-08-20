@@ -5,7 +5,8 @@ env:
 install: true
 language: scala
 scala:
-  - 2.11.8
+  - 2.12.3
+script: sbt ++$TRAVIS_SCALA_VERSION test doc
 sudu: false
 jdk:
   - oraclejdk8
