@@ -1,6 +1,0 @@
-/build/
-/.gradle/
-/.idea/
-
-# Stupid Gradle bug
-/src/website/etc/git-log-summary.xml

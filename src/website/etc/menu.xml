@@ -1,9 +1,0 @@
-<ul xmlns="http://www.w3.org/1999/xhtml">
-  <li id="home">
-    <a href="/">Home</a>
-    <ul>
-      <li><a href="/">Overview</a></li>
-      <li id="contact"><a href="/contact">Contact us</a></li>
-    </ul>
-  </li>
-</ul>
