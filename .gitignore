@@ -1,2 +1,3 @@
 build/
 .gradle/
+/src/website/etc/git-log-summary.xml
