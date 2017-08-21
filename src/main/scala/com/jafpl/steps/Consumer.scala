@@ -15,5 +15,5 @@ trait Consumer {
     * @param port The output port.
     * @param item The item.
     */
-  def send(port: String, item: Any)
+  def send(port: String, item: Any): Unit
 }

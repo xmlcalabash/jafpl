@@ -2,11 +2,13 @@ package com.jafpl.runtime
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.jafpl.exceptions.{GraphException, PipelineException}
-import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, ForEachStart, Graph, GroupStart, Joiner, PipelineStart, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
+import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, ForEachStart, Graph, GroupStart, InputRequirement, Joiner, OutputRequirement, PipelineStart, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
 import com.jafpl.runtime.GraphMonitor.{GNode, GRun, GWatchdog}
-import com.jafpl.steps.Consumer
+import com.jafpl.steps.{DataConsumer, DataProvider}
 import com.jafpl.util.UniqueId
 import org.slf4j.LoggerFactory
+
+import scala.collection.mutable
 
 /** Execute a pipeline.
   *
@@ -26,6 +28,8 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
   private var _started = false
   private var _finished = false
   private var _exception = Option.empty[Throwable]
+  private var _inputRequirements = mutable.ListBuffer.empty[DataProvider]
+  private var _outputRequirements = mutable.ListBuffer.empty[DataConsumer]
 
   graph.close()
 
@@ -49,6 +53,10 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
     * exception is available from here after the pipeline finishes.
     */
   def exception: Option[Throwable] = _exception
+
+  def inputRequirements: List[DataProvider] = _inputRequirements.toList
+  def outputRequirements: List[DataConsumer] = _outputRequirements.toList
+
 
   protected[runtime] def finish(): Unit = {
     _finished = true
@@ -125,11 +133,6 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
 
     for (node <- graph.nodes) {
       var actorName = "_" * (7 - node.id.length) + node.id
-      val proxy: Option[ConsumingProxy] = if (node.step.isDefined) {
-        Some(new ConsumingProxy(_monitor, this, node))
-      } else {
-        None
-      }
 
       val actor = node match {
         case binding: Binding =>
@@ -177,11 +180,23 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
             case _ =>
               _system.actorOf(Props(new EndActor(_monitor, this, end)), actorName)
           }
+        case req: InputRequirement =>
+          val ip = new InputProxy(_monitor, this, node)
+          _inputRequirements += ip
+          _system.actorOf(Props(new InputRequirementActor(_monitor, this, node, ip)), actorName)
+        case req: OutputRequirement =>
+          val op = new OutputProxy(_monitor, this, node)
+          _outputRequirements += op
+          _system.actorOf(Props(new OutputRequirementActor(_monitor, this, node, op)), actorName)
         case atomic: AtomicNode =>
-          if (proxy.isDefined) {
-            node.step.get.setConsumer(proxy.get)
+          if (node.step.isDefined) {
+            val cp = new ConsumingProxy(_monitor, this, node)
+            node.step.get.setConsumer(cp)
+            _system.actorOf(Props(new NodeActor(_monitor, this, node, cp)), actorName)
+          } else {
+            _system.actorOf(Props(new NodeActor(_monitor, this, node)), actorName)
           }
-          _system.actorOf(Props(new NodeActor(_monitor, this, node, proxy)), actorName)
+
         case _ =>
           throw new PipelineException("unexpected", "Unexpected step type: " + node)
       }

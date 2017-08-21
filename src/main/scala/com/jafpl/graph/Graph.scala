@@ -72,6 +72,32 @@ class Graph {
     start
   }
 
+  /**Adds an input requirement.
+    *
+    * @param node The node that needs the input.
+    * @param port The port that needs the input.
+    */
+  def addInputRequirement(node: Node, port: String): Unit = {
+    checkOpen()
+
+    val reqdInput = new InputRequirement(this, port)
+    _nodes += reqdInput
+    addEdge(reqdInput, "result", node, port)
+  }
+
+  /**Adds an output requirement.
+    *
+    * @param node The node that will produce output.
+    * @param port The port port on which it will produce.
+    */
+  def addOutputRequirement(node: Node, port: String): Unit = {
+    checkOpen()
+
+    val reqdOutput = new OutputRequirement(this, port)
+    _nodes += reqdOutput
+    addEdge(node, port, reqdOutput, "source")
+  }
+
   /** Adds an atomic step to the graph.
     *
     * @param step The step implementation.

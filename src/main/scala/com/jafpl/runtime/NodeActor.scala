@@ -39,11 +39,11 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   protected var readyToRun = false
   protected val traces = mutable.HashSet.empty[String]
   protected val cardinalities = mutable.HashMap.empty[String, Long]
-  protected var proxy = Option.empty[ConsumingProxy]
+  protected var proxy = Option.empty[Consumer]
 
-  def this(monitor: ActorRef, runtime: GraphRuntime, node: Node, proxy: Option[ConsumingProxy]) {
+  def this(monitor: ActorRef, runtime: GraphRuntime, node: Node, consumer: Consumer) {
     this(monitor, runtime, node)
-    this.proxy = proxy
+    proxy = Some(consumer)
   }
 
   protected def traceEnabled(event: String): Boolean = {
@@ -85,7 +85,11 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     }
     cardinalities.clear()
     if (proxy.isDefined) {
-      proxy.get.reset()
+      proxy.get match {
+        case cp: ConsumingProxy =>
+          cp.reset()
+        case _ => Unit
+      }
     }
   }
 
@@ -152,7 +156,10 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         if (proxy.isDefined) {
           for (output <- node.outputs) {
             if (!output.startsWith("#")) {
-              node.step.get.outputSpec.checkCardinality(output,proxy.get.cardinality(output))
+              proxy.get match {
+                case cp: ConsumingProxy => node.step.get.outputSpec.checkCardinality(output,cp.cardinality(output))
+                case _ => Unit
+              }
             }
           }
         }
