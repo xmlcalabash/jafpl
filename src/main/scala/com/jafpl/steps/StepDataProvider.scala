@@ -7,7 +7,7 @@ package com.jafpl.steps
   * Steps call the `send` method on this object to deliver output.
   *
   */
-trait Consumer {
+trait StepDataProvider extends Provider {
   /** Send output from a step.
     *
     * Calling this method sends the specified `item` as an output on the specified `port`.

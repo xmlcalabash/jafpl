@@ -1,17 +1,16 @@
 package com.jafpl.test
 
 import com.jafpl.graph.Graph
-import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{Identity, Producer, RaiseError}
+import com.jafpl.steps.{BufferSink, Identity, Producer, RaiseError}
 import org.scalatest.FlatSpec
 
 class TryCatchSpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "A try-catch where the try works " should " succeed" in {
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
 
     val graph = new Graph()
     val pipeline = graph.addPipeline()
@@ -51,7 +50,7 @@ class TryCatchSpec extends FlatSpec {
   }
 
   "A try-catch " should " match on the code" in {
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
 
     val graph = new Graph()
     val pipeline = graph.addPipeline()
@@ -91,7 +90,7 @@ class TryCatchSpec extends FlatSpec {
   }
 
   "A try-catch " should " use the generic catch if no codes match" in {
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
 
     val graph = new Graph()
     val pipeline = graph.addPipeline()
@@ -131,7 +130,7 @@ class TryCatchSpec extends FlatSpec {
   }
 
   "A try-catch " should " fail if no catches match" in {
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
 
     val graph = new Graph()
     val pipeline = graph.addPipeline()

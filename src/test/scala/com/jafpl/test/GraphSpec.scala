@@ -2,9 +2,8 @@ package com.jafpl.test
 
 import com.jafpl.exceptions.GraphException
 import com.jafpl.graph.Graph
-import com.jafpl.io.DevNullConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
-import com.jafpl.steps.{Identity, Producer}
+import com.jafpl.steps.{Identity, Producer, Sink}
 import org.scalatest.FlatSpec
 
 class GraphSpec extends FlatSpec {
@@ -17,7 +16,7 @@ class GraphSpec extends FlatSpec {
     val producer = graph.addAtomic(new Producer(List("DOCUMENT")), "producer")
     val ident1 = pipeline.addAtomic(new Identity(), "ident1")
     val ident2 = pipeline.addAtomic(new Identity(), "ident2")
-    val consumer = graph.addAtomic(new DevNullConsumer(), "consumer")
+    val consumer = graph.addAtomic(new Sink(), "consumer")
 
     graph.addEdge(producer, "result", pipeline, "source")
     graph.addEdge(pipeline, "source", ident1, "source")
@@ -36,7 +35,7 @@ class GraphSpec extends FlatSpec {
     val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
     val group    = pipeline.addGroup("group")
     val inner    = group.addAtomic(new Identity(), "ident")
-    val consumer = graph.addAtomic(new DevNullConsumer(), "consumer")
+    val consumer = graph.addAtomic(new Sink(), "consumer")
 
     graph.addEdge(producer, "result", inner, "source")
     graph.addEdge(inner, "result", group.end, "result")
@@ -55,7 +54,7 @@ class GraphSpec extends FlatSpec {
     val group    = pipeline.addGroup("group")
     val inner    = group.addAtomic(new Identity(), "inner")
     val outer    = pipeline.addAtomic(new Identity(), "outer")
-    val consumer = graph.addAtomic(new DevNullConsumer(), "consumer")
+    val consumer = graph.addAtomic(new Sink(), "consumer")
 
     graph.addEdge(producer, "result", inner, "source")
     graph.addEdge(inner, "result", group.end, "result")
@@ -101,7 +100,7 @@ class GraphSpec extends FlatSpec {
     val producer = graph.addAtomic(new Producer(List("DOCUMENT")), "producer")
     val ident1 = pipeline.addAtomic(new Identity(), "ident1")
     val ident2 = pipeline.addAtomic(new Identity(), "ident2")
-    val consumer = graph.addAtomic(new DevNullConsumer(), "consumer")
+    val consumer = graph.addAtomic(new Sink(), "consumer")
 
     graph.addEdge(producer, "result", pipeline, "source")
     graph.addEdge(pipeline, "source", ident1, "source")
@@ -128,7 +127,7 @@ class GraphSpec extends FlatSpec {
     val producer = graph.addAtomic(new Producer(List("DOCUMENT")), "producer")
     val ident1 = pipeline.addAtomic(new Identity(), "ident1")
     val ident2 = pipeline.addAtomic(new Identity(), "ident2")
-    val consumer = graph.addAtomic(new DevNullConsumer(), "consumer")
+    val consumer = graph.addAtomic(new Sink(), "consumer")
 
     graph.addEdge(producer, "result", pipeline, "source")
     graph.addEdge(pipeline, "source", ident1, "source")

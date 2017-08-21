@@ -8,8 +8,4 @@ class PrintingConsumer extends DataProvider {
   }
 
   override def close(): Unit = Unit
-
-  override def send(port: String, item: Any): Unit = {
-    println(port + ": " + item)
-  }
 }

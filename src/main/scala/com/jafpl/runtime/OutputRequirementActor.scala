@@ -2,7 +2,6 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.graph.Node
-import com.jafpl.runtime.GraphMonitor.GFinished
 
 private[runtime] class OutputRequirementActor(private val monitor: ActorRef,
                                               private val runtime: GraphRuntime,

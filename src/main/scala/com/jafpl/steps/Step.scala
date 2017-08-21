@@ -47,7 +47,7 @@ trait Step {
     *
     * @param consumer The consumer.
     */
-  def setConsumer(consumer: Consumer)
+  def setConsumer(consumer: StepDataProvider)
 
   /** Receive a binding.
     *

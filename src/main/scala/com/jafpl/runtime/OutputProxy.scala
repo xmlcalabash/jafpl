@@ -24,10 +24,4 @@ class OutputProxy(private val monitor: ActorRef,
       _provider.get.send(port, item)
     }
   }
-
-  def close(port: String): Unit = {
-    if (_provider.isDefined) {
-      _provider.get.close()
-    }
-  }
 }

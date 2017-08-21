@@ -1,17 +1,16 @@
 package com.jafpl.test
 
 import com.jafpl.graph.Graph
-import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.ProduceBinding
+import com.jafpl.steps.{BufferSink, ProduceBinding}
 import org.scalatest.FlatSpec
 
 class BindingSpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "A binding " should " be available" in {
-    var bc = new BufferConsumer()
+    var bc = new BufferSink()
 
     val graph = new Graph()
     val pipeline = graph.addPipeline()

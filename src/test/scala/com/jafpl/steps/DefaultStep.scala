@@ -9,9 +9,9 @@ class DefaultStep  extends Step {
     // nop
   }
 
-  protected var consumer: Option[Consumer] = None
+  protected var consumer: Option[StepDataProvider] = None
 
-  override def setConsumer(consumer: Consumer): Unit = {
+  override def setConsumer(consumer: StepDataProvider): Unit = {
     this.consumer = Some(consumer)
   }
 

@@ -1,10 +1,9 @@
 package com.jafpl.test
 
 import com.jafpl.graph.Graph
-import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{Count, Identity, Producer, Sink}
+import com.jafpl.steps.{BufferSink, Count, Identity, Producer, Sink}
 import org.scalatest.FlatSpec
 
 class ForEachSpec extends FlatSpec {
@@ -18,7 +17,7 @@ class ForEachSpec extends FlatSpec {
     val forEach  = pipeline.addForEach("for-each")
     val ident    = forEach.addAtomic(new Identity(), "ident")
 
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
     val consumer = graph.addAtomic(bc, "consumer")
 
     graph.addEdge(producer, "result", forEach, "source")
@@ -48,7 +47,7 @@ class ForEachSpec extends FlatSpec {
 
     val count    = pipeline.addAtomic(new Count(), "count")
 
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
     val consumer = graph.addAtomic(bc, "consumer")
 
     graph.addEdge(producer, "result", forEach, "source")
@@ -76,7 +75,7 @@ class ForEachSpec extends FlatSpec {
     val sink     = forEach.addAtomic(new Sink(), "sink")
     val ident    = forEach.addAtomic(new Identity(), "ident")
 
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
     val consumer = graph.addAtomic(bc, "consumer")
 
     graph.addEdge(cprod, "result", count, "source")

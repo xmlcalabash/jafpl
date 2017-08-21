@@ -3,7 +3,7 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.graph.Node
 import com.jafpl.runtime.GraphMonitor.{GClose, GOutput}
-import com.jafpl.steps.{Consumer, DataProvider}
+import com.jafpl.steps.{StepDataProvider, DataProvider}
 
 class InputProxy(private val monitor: ActorRef,
                  private val runtime: GraphRuntime,
@@ -13,14 +13,10 @@ class InputProxy(private val monitor: ActorRef,
   def closed: Boolean = _closed
 
   def send(item: Any): Unit = {
-    send("result", item)
+    monitor ! GOutput(node, "result", item)
   }
 
   def close(): Unit = {
     _closed = true
-  }
-
-  override def send(port: String, item: Any): Unit = {
-    monitor ! GOutput(node, port, item)
   }
 }

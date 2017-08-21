@@ -1,10 +1,9 @@
 package com.jafpl.test
 
 import com.jafpl.graph.Graph
-import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{Producer, StringComposer, Uppercase}
+import com.jafpl.steps.{BufferSink, Producer, StringComposer, Uppercase}
 import org.scalatest.FlatSpec
 
 class ViewportSpec extends FlatSpec {
@@ -12,7 +11,7 @@ class ViewportSpec extends FlatSpec {
 
   "A viewport " should " do what a viewport does" in {
     val graph = new Graph()
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
 
     val pipeline = graph.addPipeline()
 

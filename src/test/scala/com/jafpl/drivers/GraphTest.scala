@@ -6,7 +6,7 @@ import com.jafpl.graph.Graph
 import com.jafpl.io.{BufferConsumer, PrintingConsumer}
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{Identity, LogBinding, Producer, RaiseError, Sink, Sleep}
+import com.jafpl.steps.{BufferSink, Identity, LogBinding, Producer, RaiseError, Sink, Sleep}
 
 object GraphTest extends App {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
@@ -14,7 +14,6 @@ object GraphTest extends App {
   runSeven()
 
   def runSeven(): Unit = {
-    val bc = new BufferConsumer()
     val graph = new Graph()
 
     val pipeline = graph.addPipeline(None)
@@ -27,29 +26,28 @@ object GraphTest extends App {
     graph.addOutputRequirement(pipeline, "result")
 
     graph.close()
-    val pw = new PrintWriter(new File("/projects/github/xproc/jafpl/pg.xml"))
-    pw.write(graph.asXML.toString)
-    pw.close()
+    //val pw = new PrintWriter(new File("/projects/github/xproc/jafpl/pg.xml"))
+    //pw.write(graph.asXML.toString)
+    //pw.close()
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
 
-    for (consumer <- runtime.inputRequirements) {
-      consumer.send("Hello")
-      consumer.close()
-    }
+    // There's only one input requirement.
+    runtime.inputRequirements.head.send("Input document")
 
-    for (provider <- runtime.outputRequirements) {
-      val c = new PrintingConsumer()
-      provider.setProvider(c)
-    }
+    // There's only one output requirement.
+    val bc = new BufferConsumer()
+    runtime.outputRequirements.head.setProvider(bc)
 
     runtime.run()
+
+    println(bc.items.head)
 
   }
 
   def runTwo(): Unit = {
     val graph = new Graph()
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
 
     val pipeline = graph.addPipeline()
     val p1       = graph.addAtomic(new Producer(List("P1", "P2")), "producer")
@@ -77,7 +75,7 @@ object GraphTest extends App {
     val p1 = when1.addAtomic(new Producer(List("WHEN1")), "p1")
     val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")
 
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
     val consumer = graph.addAtomic(bc, "finalconsumer")
 
     graph.addEdge(producer, "result", when1, "condition")
@@ -104,7 +102,7 @@ object GraphTest extends App {
   }
 
   def runFour(): Unit = {
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
 
     val graph = new Graph()
     val pipeline = graph.addPipeline()
@@ -130,7 +128,7 @@ object GraphTest extends App {
   }
 
   def runSix(): Unit = {
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
 
     val graph = new Graph()
     val pipeline = graph.addPipeline()

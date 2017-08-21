@@ -1,20 +1,17 @@
 package com.jafpl.io
 
+import com.jafpl.steps.DataProvider
+
 import scala.collection.mutable.ListBuffer
 
-class BufferConsumer() extends DevNullConsumer {
+class BufferConsumer extends DataProvider {
   val _items: ListBuffer[Any] = ListBuffer.empty[Any]
 
   def items: List[Any] = _items.toList
 
-  override def receive(port: String, item: Any): Unit = {
-    super.receive(port, item)
+  override def send(item: Any): Unit = {
     _items += item
   }
 
-  def dumpBuffers(): Unit = {
-    for (item <- items) {
-      println("Buf: " + item)
-    }
-  }
+  override def close(): Unit = Unit
 }

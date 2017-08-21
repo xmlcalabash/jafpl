@@ -1,10 +1,9 @@
 package com.jafpl.test
 
 import com.jafpl.graph.Graph
-import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{Identity, Producer}
+import com.jafpl.steps.{BufferSink, Identity, Producer}
 import org.scalatest.FlatSpec
 
 class IOPipelineSpec extends FlatSpec {
@@ -15,7 +14,7 @@ class IOPipelineSpec extends FlatSpec {
     val pipeline = graph.addPipeline()
     val producer = graph.addAtomic(new Producer(List("DOCUMENT")), "producer")
     val ident = pipeline.addAtomic(new Identity(), "ident1")
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
     val consumer = graph.addAtomic(bc, "consumer")
 
     graph.addEdge(producer, "result", pipeline, "source")

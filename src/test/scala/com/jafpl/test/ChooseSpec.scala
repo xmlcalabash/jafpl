@@ -2,10 +2,9 @@ package com.jafpl.test
 
 import com.jafpl.exceptions.GraphException
 import com.jafpl.graph.Graph
-import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{Identity, Producer}
+import com.jafpl.steps.{BufferSink, Identity, Producer}
 import org.scalatest.FlatSpec
 
 class ChooseSpec extends FlatSpec {
@@ -53,7 +52,7 @@ class ChooseSpec extends FlatSpec {
     val p1 = when1.addAtomic(new Producer(List("WHEN1")), "p1")
     val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")
 
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
     val consumer = graph.addAtomic(bc, "finalconsumer")
 
     graph.addEdge(producer, "result", when1, "condition")
@@ -87,7 +86,7 @@ class ChooseSpec extends FlatSpec {
     val p1 = when1.addAtomic(new Producer(List("WHEN1")), "p1")
     val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")
 
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
     val consumer = graph.addAtomic(bc, "finalconsumer")
 
     graph.addEdge(producer, "result", when1, "condition")
@@ -121,7 +120,7 @@ class ChooseSpec extends FlatSpec {
     val p1 = when1.addAtomic(new Producer(List("WHEN1")), "p1")
     val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")
 
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
     val consumer = graph.addAtomic(bc, "finalconsumer")
 
     graph.addEdge(producer, "result", when1, "condition")
@@ -155,7 +154,7 @@ class ChooseSpec extends FlatSpec {
     val p1 = when1.addAtomic(new Producer(List("WHEN1")), "p1")
     val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")
 
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
     val consumer = graph.addAtomic(bc, "finalconsumer")
 
     graph.addEdge(producer, "result", when1, "condition")

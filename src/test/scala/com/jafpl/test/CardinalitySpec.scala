@@ -1,10 +1,9 @@
 package com.jafpl.test
 
 import com.jafpl.graph.Graph
-import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{Identity, LiesAboutOutputBindings, Producer, Sink, Sleep}
+import com.jafpl.steps.{BufferSink, Identity, LiesAboutOutputBindings, Producer, Sink, Sleep}
 import org.scalatest.FlatSpec
 
 class CardinalitySpec extends FlatSpec {
@@ -12,7 +11,7 @@ class CardinalitySpec extends FlatSpec {
 
   "Incorrect input cardinalities " should " cause the pipeline to fail" in {
     val graph = new Graph()
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
 
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List("P1", "P2")), "producer")
@@ -36,7 +35,7 @@ class CardinalitySpec extends FlatSpec {
 
   "Incorrect output cardinalities " should " cause the pipeline to fail" in {
     val graph = new Graph()
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
 
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List("P1", "P2")), "producer")

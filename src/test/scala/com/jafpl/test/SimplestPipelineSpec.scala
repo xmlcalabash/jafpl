@@ -2,10 +2,9 @@ package com.jafpl.test
 
 import com.jafpl.drivers.GraphTest.runtimeConfig
 import com.jafpl.graph.Graph
-import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{Identity, Producer, Sink, Sleep}
+import com.jafpl.steps.{BufferSink, Identity, Producer, Sink, Sleep}
 import org.scalatest.FlatSpec
 
 class SimplestPipelineSpec extends FlatSpec {
@@ -43,7 +42,7 @@ class SimplestPipelineSpec extends FlatSpec {
 
   "A dependency " should " determine step order" in {
     val graph = new Graph()
-    val bc = new BufferConsumer()
+    val bc = new BufferSink()
 
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List("P1")), "P1")

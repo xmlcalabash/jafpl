@@ -87,6 +87,9 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
     * To determine if execution has completed, check the `finished` value.
     */
   def runInBackground(): Unit = {
+    for (provider <- inputRequirements) {
+      provider.close()
+    }
     _monitor ! GRun()
     _started = true
   }
