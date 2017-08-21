@@ -8,7 +8,7 @@ scala:
   - 2.12.3
 script:
   - sbt ++$TRAVIS_SCALA_VERSION test doc
-  - gradle website
+  - gradle --build-file website.gradle website
 sudu: false
 jdk:
   - oraclejdk8
