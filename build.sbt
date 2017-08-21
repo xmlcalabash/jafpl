@@ -27,3 +27,6 @@ target in Compile in doc := baseDirectory.value / "build/pages/apidocs"
 scalacOptions in (Compile, doc) ++= Seq(
   "-doc-root-content", baseDirectory.value+"/docs/apidocs/root.md"
 )
+
+publishTo := Some(Resolver.file("file",
+  new File(Path.userHome.absolutePath+"/.m2/repository")))
