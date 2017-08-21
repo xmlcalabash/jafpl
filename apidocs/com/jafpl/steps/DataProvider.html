@@ -127,20 +127,14 @@
       <p class="shortcomment cmt">This is the Scaladoc for the steps package.</p><div class="fullcomment"><div class="comment cmt"><p>This is the Scaladoc for the steps package.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.jafpl">jafpl</a></dd></dl></div>
     </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="Consumer.html" title="Interface for sending outputs from atomic steps."></a>
-                        <a href="Consumer.html" title="Interface for sending outputs from atomic steps.">
-                          Consumer
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
-                        <a class="trait" href="DataConsumer.html" title=""></a>
-                        <a href="DataConsumer.html" title="">
+                        <a class="trait" href="DataConsumer.html" title="A data consumer."></a>
+                        <a href="DataConsumer.html" title="A data consumer.">
                           DataConsumer
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="" title=""></a>
-                        <a href="" title="">
+                        <a class="trait" href="" title="A data provider."></a>
+                        <a href="" title="A data provider.">
                           DataProvider
                         </a>
                       </li><li class="current-entities indented3">
@@ -151,9 +145,21 @@
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
+                        <a class="trait" href="Provider.html" title="A data provider."></a>
+                        <a href="Provider.html" title="A data provider.">
+                          Provider
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
                         <a class="trait" href="Step.html" title="An atomic pipeline step."></a>
                         <a href="Step.html" title="An atomic pipeline step.">
                           Step
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
+                        <a class="trait" href="StepDataProvider.html" title="Interface for sending outputs from atomic steps."></a>
+                        <a href="StepDataProvider.html" title="Interface for sending outputs from atomic steps.">
+                          StepDataProvider
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
@@ -190,16 +196,16 @@
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <span class="name">DataProvider</span><span class="result"> extends <a href="Consumer.html" class="extype" name="com.jafpl.steps.Consumer">Consumer</a></span>
+        <span class="name">DataProvider</span><span class="result"> extends <a href="Provider.html" class="extype" name="com.jafpl.steps.Provider">Provider</a></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A data provider.</p><p>This trait is used to expose the input requirements of a pipeline.</p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><a href="Consumer.html" class="extype" name="com.jafpl.steps.Consumer">Consumer</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="Provider.html" class="extype" name="com.jafpl.steps.Provider">Provider</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block">
             <span class="toggle">
               Known Subclasses
@@ -230,7 +236,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.jafpl.steps.DataProvider"><span>DataProvider</span></li><li class="in" name="com.jafpl.steps.Consumer"><span>Consumer</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.jafpl.steps.DataProvider"><span>DataProvider</span></li><li class="in" name="com.jafpl.steps.Provider"><span>Provider</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -269,7 +275,7 @@
         <span class="name">close</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <p class="shortcomment cmt">Close the port.</p><div class="fullcomment"><div class="comment cmt"><p>Close the port.</p><p>This will be called after the last output has been sent.</p></div></div>
+      <p class="shortcomment cmt">Close the provider.</p><div class="fullcomment"><div class="comment cmt"><p>Close the provider.</p><p>This will be called after the last <code>input</code> has been sent.</p></div></div>
     </li><li name="com.jafpl.steps.DataProvider#send" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="send(item:Any):Unit"></a><a id="send(Any):Unit"></a>
       <span class="permalink">
@@ -285,25 +291,8 @@
         <span class="name">send</span><span class="params">(<span name="item">item: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <p class="shortcomment cmt">Provide input on the specified port.</p><div class="fullcomment"><div class="comment cmt"><p>Provide input on the specified port.</p><p>Calling this method sends the specified <code>item</code> as an output on the specified <code>port</code>.
+      <p class="shortcomment cmt">Provide an input item.</p><div class="fullcomment"><div class="comment cmt"><p>Provide an input item.</p><p>Calling this method sends the specified <code>item</code> as an input.
 </p></div><dl class="paramcmts block"><dt class="param">item</dt><dd class="cmt"><p>The item.</p></dd></dl></div>
-    </li><li name="com.jafpl.steps.Consumer#send" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="send(port:String,item:Any):Unit"></a><a id="send(String,Any):Unit"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/steps/DataProvider.html#send(port:String,item:Any):Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">send</span><span class="params">(<span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="item">item: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Send output from a step.</p><div class="fullcomment"><div class="comment cmt"><p>Send output from a step.</p><p>Calling this method sends the specified <code>item</code> as an output on the specified <code>port</code>.
-</p></div><dl class="paramcmts block"><dt class="param">port</dt><dd class="cmt"><p>The output port.</p></dd><dt class="param">item</dt><dd class="cmt"><p>The item.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Consumer.html" class="extype" name="com.jafpl.steps.Consumer">Consumer</a></dd></dl></div>
     </li></ol>
             </div>
 
@@ -654,8 +643,8 @@
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="com.jafpl.steps.Consumer">
-              <h3>Inherited from <a href="Consumer.html" class="extype" name="com.jafpl.steps.Consumer">Consumer</a></h3>
+        <div class="parent" name="com.jafpl.steps.Provider">
+              <h3>Inherited from <a href="Provider.html" class="extype" name="com.jafpl.steps.Provider">Provider</a></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">

@@ -151,14 +151,14 @@
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="" title="An atomic pipeline step."></a>
-                        <a href="" title="An atomic pipeline step.">
+                        <a class="trait" href="Step.html" title="An atomic pipeline step."></a>
+                        <a href="Step.html" title="An atomic pipeline step.">
                           Step
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="StepDataProvider.html" title="Interface for sending outputs from atomic steps."></a>
-                        <a href="StepDataProvider.html" title="Interface for sending outputs from atomic steps.">
+                        <a class="trait" href="" title="Interface for sending outputs from atomic steps."></a>
+                        <a href="" title="Interface for sending outputs from atomic steps.">
                           StepDataProvider
                         </a>
                       </li><li class="current-entities indented3">
@@ -182,8 +182,8 @@
       <div id="definition">
         <div class="big-circle trait">t</div>
         <p id="owner"><a href="../../index.html" class="extype" name="com">com</a>.<a href="../index.html" class="extype" name="com.jafpl">jafpl</a>.<a href="index.html" class="extype" name="com.jafpl.steps">steps</a></p>
-        <h1>Step<span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html" title="Permalink">
+        <h1>StepDataProvider<span class="permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
@@ -196,25 +196,22 @@
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <span class="name">Step</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+        <span class="name">StepDataProvider</span><span class="result"> extends <a href="Provider.html" class="extype" name="com.jafpl.steps.Provider">Provider</a></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>An atomic pipeline step.</p><p>Steps must implement this interface. The step lifecycle is as follows:</p><p>1. The <code>setConsumer</code> method will be called. The step must hold onto the consumer object.
-Calling <code>send</code> on this object is the step's one and only way to send output to the
-next steps(s) in the pipeline.
-2. The <code>receive</code> method will be called for each input item that the step receives.
-3. The <code>run</code> method will be called after all inputs have been received.
-4. If the step is in a loop, the <code>reset</code> method will be called between iterations.</p><p>Steps are not required to wait until their run method is called before beginning execution.
-Note, however, that if a step has side effects (writing to disk, interacting with a web service,
-etc.) it is prudent to do so. A step may receive several inputs and then never run if
-some sibling step raised an exception that caused an entire container to fail.</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Interface for sending outputs from atomic steps.</p><p>Atomic step implementations are independent of the graph execution infrastructure.</p><p>Steps call the <code>send</code> method on this object to deliver output.</p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
-        </div></div>
+          <div class="superTypes hiddenContent"><a href="Provider.html" class="extype" name="com.jafpl.steps.Provider">Provider</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div><div class="toggleContainer block">
+            <span class="toggle">
+              Known Subclasses
+            </span>
+            <div class="subClasses hiddenContent"><a href="../runtime/OutputProxy.html" class="extype" name="com.jafpl.runtime.OutputProxy">OutputProxy</a>, <a href="DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></div>
+          </div></div>
         
 
       <div id="mbrsel">
@@ -239,7 +236,7 @@ some sibling step raised an exception that caused an entire container to fail.</
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.jafpl.steps.Step"><span>Step</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.jafpl.steps.StepDataProvider"><span>StepDataProvider</span></li><li class="in" name="com.jafpl.steps.Provider"><span>Provider</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -263,10 +260,10 @@ some sibling step raised an exception that caused an entire container to fail.</
 
         <div class="values members">
               <h3>Abstract Value Members</h3>
-              <ol><li name="com.jafpl.steps.Step#abort" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="abort():Unit"></a>
+              <ol><li name="com.jafpl.steps.StepDataProvider#send" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="send(port:String,item:Any):Unit"></a><a id="send(String,Any):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#abort():Unit" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html#send(port:String,item:Any):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -275,166 +272,11 @@ some sibling step raised an exception that caused an entire container to fail.</
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">abort</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">send</span><span class="params">(<span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="item">item: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <p class="shortcomment cmt">Abort processing.</p><div class="fullcomment"><div class="comment cmt"><p>Abort processing.</p><p>This method will be called if <code>run</code> will never be called because an exception
-has terminated execution of the container that contains this step.</p><p>Note that <code>reset</code> will also called before processing restarts if this step
-is in a loop.</p></div></div>
-    </li><li name="com.jafpl.steps.Step#inputSpec" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="inputSpec:com.jafpl.steps.PortBindingSpecification"></a><a id="inputSpec:PortBindingSpecification"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#inputSpec:com.jafpl.steps.PortBindingSpecification" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">inputSpec</span><span class="result">: <a href="PortBindingSpecification.html" class="extype" name="com.jafpl.steps.PortBindingSpecification">PortBindingSpecification</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">The names of the input ports this step requires.</p><div class="fullcomment"><div class="comment cmt"><p>The names of the input ports this step requires.</p><p>This method returns the names of the input ports that the step requires.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The list of required port names.</p></dd></dl></div>
-    </li><li name="com.jafpl.steps.Step#outputSpec" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="outputSpec:com.jafpl.steps.PortBindingSpecification"></a><a id="outputSpec:PortBindingSpecification"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#outputSpec:com.jafpl.steps.PortBindingSpecification" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">outputSpec</span><span class="result">: <a href="PortBindingSpecification.html" class="extype" name="com.jafpl.steps.PortBindingSpecification">PortBindingSpecification</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">The names of the output ports this step requires.</p><div class="fullcomment"><div class="comment cmt"><p>The names of the output ports this step requires.</p><p>This method returns the names of the output ports that the step requires.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The list of required port names.</p></dd></dl></div>
-    </li><li name="com.jafpl.steps.Step#receive" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="receive(port:String,item:Any):Unit"></a><a id="receive(String,Any):Unit"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#receive(port:String,item:Any):Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">receive</span><span class="params">(<span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="item">item: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Receive a document.</p><div class="fullcomment"><div class="comment cmt"><p>Receive a document.
-</p></div><dl class="paramcmts block"><dt class="param">port</dt><dd class="cmt"><p>The input port name.</p></dd><dt class="param">item</dt><dd class="cmt"><p>The item.</p></dd></dl></div>
-    </li><li name="com.jafpl.steps.Step#receiveBinding" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="receiveBinding(variable:String,value:Any):Unit"></a><a id="receiveBinding(String,Any):Unit"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#receiveBinding(variable:String,value:Any):Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">receiveBinding</span><span class="params">(<span name="variable">variable: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="value">value: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Receive a binding.</p><div class="fullcomment"><div class="comment cmt"><p>Receive a binding.</p><p>Receive a variable binding from the pipeline.
-</p></div><dl class="paramcmts block"><dt class="param">variable</dt><dd class="cmt"><p>The name of the variable.</p></dd><dt class="param">value</dt><dd class="cmt"><p>The computed value of the variable.</p></dd></dl></div>
-    </li><li name="com.jafpl.steps.Step#requiredBindings" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="requiredBindings:Set[String]"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#requiredBindings:Set[String]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">requiredBindings</span><span class="result">: <span class="extype" name="scala.Predef.Set">Set</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
-      </span>
-      
-      <p class="shortcomment cmt">The names of the variable bindings this step requires.</p><div class="fullcomment"><div class="comment cmt"><p>The names of the variable bindings this step requires.</p><p>This method returns the names of the variables for which
-the step requires a binding.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The list of variable names.</p></dd></dl></div>
-    </li><li name="com.jafpl.steps.Step#reset" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="reset():Unit"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#reset():Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">reset</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Reset to starting conditions.</p><div class="fullcomment"><div class="comment cmt"><p>Reset to starting conditions.</p><p>Inputs are about to begin arriving, you're going to be asked to run again,
-get yourself ready!</p></div></div>
-    </li><li name="com.jafpl.steps.Step#run" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="run():Unit"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#run():Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">run</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Run!</p><div class="fullcomment"><div class="comment cmt"><p>Run!</p><p>All inputs have been recieved, so your deal.</p></div></div>
-    </li><li name="com.jafpl.steps.Step#setConsumer" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="setConsumer(consumer:com.jafpl.steps.StepDataProvider):Unit"></a><a id="setConsumer(StepDataProvider):Unit"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#setConsumer(consumer:com.jafpl.steps.StepDataProvider):Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">setConsumer</span><span class="params">(<span name="consumer">consumer: <a href="StepDataProvider.html" class="extype" name="com.jafpl.steps.StepDataProvider">StepDataProvider</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Set the consumer for sending output to the pipeline.</p><div class="fullcomment"><div class="comment cmt"><p>Set the consumer for sending output to the pipeline.
-</p></div><dl class="paramcmts block"><dt class="param">consumer</dt><dd class="cmt"><p>The consumer.</p></dd></dl></div>
-    </li><li name="com.jafpl.steps.Step#stop" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="stop():Unit"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#stop():Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">stop</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Stop processing.</p><div class="fullcomment"><div class="comment cmt"><p>Stop processing.</p><p>This method will be called when all processing has finished and the pipeline
-is about to end.
-</p></div></div>
+      <p class="shortcomment cmt">Send output from a step.</p><div class="fullcomment"><div class="comment cmt"><p>Send output from a step.</p><p>Calling this method sends the specified <code>item</code> as an output on the specified <code>port</code>.
+</p></div><dl class="paramcmts block"><dt class="param">port</dt><dd class="cmt"><p>The output port.</p></dd><dt class="param">item</dt><dd class="cmt"><p>The item.</p></dd></dl></div>
     </li></ol>
             </div>
 
@@ -444,7 +286,7 @@ is about to end.
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -460,7 +302,7 @@ is about to end.
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html###():Int" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -476,7 +318,7 @@ is about to end.
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -492,7 +334,7 @@ is about to end.
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -508,7 +350,7 @@ is about to end.
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#clone():Object" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -530,7 +372,7 @@ is about to end.
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -546,7 +388,7 @@ is about to end.
     </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#equals(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html#equals(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -562,7 +404,7 @@ is about to end.
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#finalize():Unit" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -584,7 +426,7 @@ is about to end.
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -600,7 +442,7 @@ is about to end.
     </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#hashCode():Int" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html#hashCode():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -616,7 +458,7 @@ is about to end.
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -632,7 +474,7 @@ is about to end.
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -648,7 +490,7 @@ is about to end.
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#notify():Unit" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -664,7 +506,7 @@ is about to end.
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -680,7 +522,7 @@ is about to end.
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -696,7 +538,7 @@ is about to end.
     </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#toString():String" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html#toString():String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -712,7 +554,7 @@ is about to end.
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#wait():Unit" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -734,7 +576,7 @@ is about to end.
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -756,7 +598,7 @@ is about to end.
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../com/jafpl/steps/StepDataProvider.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -785,7 +627,9 @@ is about to end.
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.AnyRef">
+        <div class="parent" name="com.jafpl.steps.Provider">
+              <h3>Inherited from <a href="Provider.html" class="extype" name="com.jafpl.steps.Provider">Provider</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
