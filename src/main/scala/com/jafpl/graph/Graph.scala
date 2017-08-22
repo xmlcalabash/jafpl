@@ -606,7 +606,12 @@ class Graph(listener: Option[ErrorListener]) {
           val splitter = if (node.parent.isDefined) {
             node.parent.get.addSplitter()
           } else {
-            addSplitter()
+            node match {
+              case pl: PipelineStart =>
+                // Stick the splitter inside the pipeline.
+                pl.addSplitter()
+              case _ => addSplitter()
+            }
           }
           addEdge(node, port, splitter, "source")
           var count = 1
