@@ -139,9 +139,21 @@
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
+                        <a class="trait" href="Location.html" title="A location."></a>
+                        <a href="Location.html" title="A location.">
+                          Location
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
                         <a class="class" href="Node.html" title="A node in the pipeline graph."></a>
                         <a href="Node.html" title="A node in the pipeline graph.">
                           Node
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <a class="object" href="NodeLocation$.html" title=""></a>
+                        <a class="class" href="NodeLocation.html" title=""></a>
+                        <a href="NodeLocation.html" title="">
+                          NodeLocation
                         </a>
                       </li>
               </ul>
@@ -348,25 +360,6 @@ body of the loop.</p><p>In practice, containers are represented by a start and a
       
       <p class="shortcomment cmt">Add a new atomic step to this container.</p><div class="fullcomment"><div class="comment cmt"><p>Add a new atomic step to this container.
 </p></div><dl class="paramcmts block"><dt class="param">step</dt><dd class="cmt"><p>The step implementation.</p></dd><dt>returns</dt><dd class="cmt"><p>The node added.</p></dd></dl></div>
-    </li><li name="com.jafpl.graph.ContainerStart#addBinding" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addBinding(name:String,expression:String):com.jafpl.graph.Binding"></a><a id="addBinding(String,String):Binding"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/graph/ContainerStart.html#addBinding(name:String,expression:String):com.jafpl.graph.Binding" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">addBinding</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.Binding">Binding</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Add a new variable to this container.</p><div class="fullcomment"><div class="comment cmt"><p>Add a new variable to this container.</p><p>This method inserts a variable binding into the container. This binding is
-effectively the source of a variable's value. Other steps may connect to this
-binding in order to read it's computed value at runtime.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The node added.</p></dd></dl></div>
     </li><li name="com.jafpl.graph.ContainerStart#addChild" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="addChild(node:com.jafpl.graph.Node):Unit"></a><a id="addChild(Node):Unit"></a>
       <span class="permalink">
@@ -618,6 +611,28 @@ binding in order to read it's computed value at runtime.
       </span>
       
       <p class="shortcomment cmt">Add a new try/catch container to this container.</p><div class="fullcomment"><div class="comment cmt"><p>Add a new try/catch container to this container.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The node added.</p></dd></dl></div>
+    </li><li name="com.jafpl.graph.ContainerStart#addVariable" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="addVariable(name:String,expression:String):com.jafpl.graph.Binding"></a><a id="addVariable(String,String):Binding"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/ContainerStart.html#addVariable(name:String,expression:String):com.jafpl.graph.Binding" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addVariable</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.Binding">Binding</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Add a variable to this container.</p><div class="fullcomment"><div class="comment cmt"><p>Add a variable to this container.</p><p>This method inserts a variable binding into the container. This binding is
+effectively the source of a variable's value. Other steps may connect to this
+binding in order to read its computed value at runtime.</p><p>Variable bindings consist of a name and an expression. The name and expression are
+arbitrary. At runtime the <a href="../runtime/ExpressionEvaluator.html" class="extype" name="com.jafpl.runtime.ExpressionEvaluator">com.jafpl.runtime.ExpressionEvaluator</a> provided as
+part of the <a href="../runtime/GraphRuntime.html" class="extype" name="com.jafpl.runtime.GraphRuntime">com.jafpl.runtime.GraphRuntime</a> must understand how to evaluate
+the expression.</p><p>At runtime, the computed values are provided to steps through binding edges.
 </p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The node added.</p></dd></dl></div>
     </li><li name="com.jafpl.graph.ContainerStart#addViewport" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="addViewport(composer:com.jafpl.steps.ViewportComposer,label:Option[String]):com.jafpl.graph.ViewportStart"></a><a id="addViewport(ViewportComposer,Option[String]):ViewportStart"></a>
@@ -992,6 +1007,40 @@ order, you can impose one by saying that <code>A.dependsOn(B)</code>.
       </span>
       
       <p class="shortcomment cmt">The node lebel.</p><div class="fullcomment"><div class="comment cmt"><p>The node lebel.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
+    </li><li name="com.jafpl.graph.Node#location" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="location:Option[com.jafpl.graph.Location]"></a><a id="location:Option[Location]"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/ContainerStart.html#location:Option[com.jafpl.graph.Location]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">location</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>
+      </span>
+      
+      <p class="shortcomment cmt">The node's location.</p><div class="fullcomment"><div class="comment cmt"><p>The node's location.</p><p>The node location will be used for reporting (for example in errors). If no location
+has been provided, <a href="NodeLocation$.html#UNKNOWN:com.jafpl.graph.NodeLocation" class="extmbr" name="com.jafpl.graph.NodeLocation#UNKNOWN">com.jafpl.graph.NodeLocation.UNKNOWN</a> is returned.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
+    </li><li name="com.jafpl.graph.Node#location_=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="location_=(loc:com.jafpl.graph.Location):Unit"></a><a id="location_=(Location):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/ContainerStart.html#location_=(loc:com.jafpl.graph.Location):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: location_$eq" class="name">location_=</span><span class="params">(<span name="loc">loc: <a href="Location.html" class="extype" name="com.jafpl.graph.Location">Location</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">

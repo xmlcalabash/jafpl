@@ -139,9 +139,21 @@
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
+                        <a class="trait" href="Location.html" title="A location."></a>
+                        <a href="Location.html" title="A location.">
+                          Location
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
                         <a class="class" href="Node.html" title="A node in the pipeline graph."></a>
                         <a href="Node.html" title="A node in the pipeline graph.">
                           Node
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <a class="object" href="NodeLocation$.html" title=""></a>
+                        <a class="class" href="NodeLocation.html" title=""></a>
+                        <a href="NodeLocation.html" title="">
+                          NodeLocation
                         </a>
                       </li>
               </ul>
@@ -231,6 +243,22 @@ digits, hyphens, and underscores.
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.jafpl.graph.Graph#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(listener:com.jafpl.util.ErrorListener):com.jafpl.graph.Graph"></a><a id="&lt;init&gt;:Graph"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#&lt;init&gt;(listener:com.jafpl.util.ErrorListener):com.jafpl.graph.Graph" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Graph</span><span class="params">(<span name="listener">listener: <a href="../util/ErrorListener.html" class="extype" name="com.jafpl.util.ErrorListener">ErrorListener</a></span>)</span>
+      </span>
+      
+      
+    </li><li name="com.jafpl.graph.Graph#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="&lt;init&gt;():com.jafpl.graph.Graph"></a><a id="&lt;init&gt;:Graph"></a>
       <span class="permalink">
       <a href="../../../com/jafpl/graph/Graph.html#&lt;init&gt;():com.jafpl.graph.Graph" title="Permalink">
@@ -243,6 +271,22 @@ digits, hyphens, and underscores.
       </span>
       <span class="symbol">
         <span class="name">Graph</span><span class="params">()</span>
+      </span>
+      
+      
+    </li><li name="com.jafpl.graph.Graph#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(listener:Option[com.jafpl.util.ErrorListener]):com.jafpl.graph.Graph"></a><a id="&lt;init&gt;:Graph"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#&lt;init&gt;(listener:Option[com.jafpl.util.ErrorListener]):com.jafpl.graph.Graph" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Graph</span><span class="params">(<span name="listener">listener: <span class="extype" name="scala.Option">Option</span>[<a href="../util/ErrorListener.html" class="extype" name="com.jafpl.util.ErrorListener">ErrorListener</a>]</span>)</span>
       </span>
       
       <p class="shortcomment cmt">A pipeline graph.</p>
@@ -356,9 +400,9 @@ digits, hyphens, and underscores.
       <p class="shortcomment cmt">Adds an atomic step to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds an atomic step to the graph.
 </p></div><dl class="paramcmts block"><dt class="param">step</dt><dd class="cmt"><p>The step implementation.</p></dd><dt>returns</dt><dd class="cmt"><p>The constructed atomic.</p></dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addBinding" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addBinding(name:String,expression:String):com.jafpl.graph.Binding"></a><a id="addBinding(String,String):Binding"></a>
+      <a id="addBinding(name:String):com.jafpl.graph.Binding"></a><a id="addBinding(String):Binding"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addBinding(name:String,expression:String):com.jafpl.graph.Binding" title="Permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addBinding(name:String):com.jafpl.graph.Binding" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -367,14 +411,12 @@ digits, hyphens, and underscores.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addBinding</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.Binding">Binding</span></span>
+        <span class="name">addBinding</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.Binding">Binding</span></span>
       </span>
       
-      <p class="shortcomment cmt">Add a variable binding to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Add a variable binding to the graph.</p><p>Variable bindings consist of a name and an expression. The name and expression are
-arbitrary. At runtime the <a href="../runtime/ExpressionEvaluator.html" class="extype" name="com.jafpl.runtime.ExpressionEvaluator">com.jafpl.runtime.ExpressionEvaluator</a> provided as
-part of the <a href="../runtime/GraphRuntime.html" class="extype" name="com.jafpl.runtime.GraphRuntime">com.jafpl.runtime.GraphRuntime</a> must understand how to evaluate
-the expression.</p><p>At runtime, the computed values are provided to steps through binding edges.
-</p></div><dl class="paramcmts block"><dt class="param">name</dt><dd class="cmt"><p>The variable name.</p></dd><dt class="param">expression</dt><dd class="cmt"><p>An expression in a grammar that the evaluator will understand.</p></dd><dt>returns</dt><dd class="cmt"><p>The constructed binding.</p></dd></dl></div>
+      <p class="shortcomment cmt">Add a graph variable binding.</p><div class="fullcomment"><div class="comment cmt"><p>Add a graph variable binding.</p><p>Graph variable bindings are named variables for which some input must be
+provided at runtime.
+</p></div><dl class="paramcmts block"><dt class="param">name</dt><dd class="cmt"><p>The variable name.</p></dd><dt>returns</dt><dd class="cmt"><p>The constructed binding.</p></dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addBindingEdge" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="addBindingEdge(from:com.jafpl.graph.Binding,to:com.jafpl.graph.Node):Unit"></a><a id="addBindingEdge(Binding,Node):Unit"></a>
       <span class="permalink">
@@ -603,10 +645,10 @@ the inner steps must provide outputs through their container.
       
       <p class="shortcomment cmt">Adds a group to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a group to the graph.
 </p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The constructed group.</p></dd></dl></div>
-    </li><li name="com.jafpl.graph.Graph#addInputRequirement" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addInputRequirement(node:com.jafpl.graph.Node,port:String):Unit"></a><a id="addInputRequirement(Node,String):Unit"></a>
+    </li><li name="com.jafpl.graph.Graph#addInput" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="addInput(node:com.jafpl.graph.Node,port:String):Unit"></a><a id="addInput(Node,String):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addInputRequirement(node:com.jafpl.graph.Node,port:String):Unit" title="Permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addInput(node:com.jafpl.graph.Node,port:String):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -615,10 +657,11 @@ the inner steps must provide outputs through their container.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addInputRequirement</span><span class="params">(<span name="node">node: <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></span>, <span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">addInput</span><span class="params">(<span name="node">node: <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></span>, <span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <p class="shortcomment cmt">Adds an input requirement.</p><div class="fullcomment"><div class="comment cmt"><p>Adds an input requirement.
+      <p class="shortcomment cmt">Adds a graph input.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a graph input.</p><p>Graph inputs are values that must be provided at runtime. They're effectively
+ports into which data can be poured before the pipeline is run.
 </p></div><dl class="paramcmts block"><dt class="param">node</dt><dd class="cmt"><p>The node that needs the input.</p></dd><dt class="param">port</dt><dd class="cmt"><p>The port that needs the input.</p></dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addJoiner" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="addJoiner():com.jafpl.graph.Joiner"></a><a id="addJoiner():Joiner"></a>
@@ -636,10 +679,10 @@ the inner steps must provide outputs through their container.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
-    </li><li name="com.jafpl.graph.Graph#addOutputRequirement" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addOutputRequirement(node:com.jafpl.graph.Node,port:String):Unit"></a><a id="addOutputRequirement(Node,String):Unit"></a>
+    </li><li name="com.jafpl.graph.Graph#addOutput" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="addOutput(node:com.jafpl.graph.Node,port:String):Unit"></a><a id="addOutput(Node,String):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addOutputRequirement(node:com.jafpl.graph.Node,port:String):Unit" title="Permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addOutput(node:com.jafpl.graph.Node,port:String):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -648,10 +691,10 @@ the inner steps must provide outputs through their container.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addOutputRequirement</span><span class="params">(<span name="node">node: <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></span>, <span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">addOutput</span><span class="params">(<span name="node">node: <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></span>, <span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <p class="shortcomment cmt">Adds an output requirement.</p><div class="fullcomment"><div class="comment cmt"><p>Adds an output requirement.
+      <p class="shortcomment cmt">Adds a graph output.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a graph output.</p><p>Graph outputs are places where pipeline outputs can be poured.
 </p></div><dl class="paramcmts block"><dt class="param">node</dt><dd class="cmt"><p>The node that will produce output.</p></dd><dt class="param">port</dt><dd class="cmt"><p>The port port on which it will produce.</p></dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addPipeline" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="addPipeline(label:Option[String]):com.jafpl.graph.PipelineStart"></a><a id="addPipeline(Option[String]):PipelineStart"></a>
@@ -787,6 +830,22 @@ the inner steps must provide outputs through their container.
       
       <p class="shortcomment cmt">Adds a try/catch to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a try/catch to the graph.
 </p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The constructed try/catch.</p></dd></dl></div>
+    </li><li name="com.jafpl.graph.Graph#addVariable" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="addVariable(name:String,expression:String):com.jafpl.graph.Binding"></a><a id="addVariable(String,String):Binding"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addVariable(name:String,expression:String):com.jafpl.graph.Binding" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addVariable</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.Binding">Binding</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addViewport" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="addViewport(composer:com.jafpl.steps.ViewportComposer,label:Option[String]):com.jafpl.graph.ViewportStart"></a><a id="addViewport(ViewportComposer,Option[String]):ViewportStart"></a>
       <span class="permalink">
@@ -945,7 +1004,9 @@ There is also a stylesheet that will transform the graph into an SVG diagram.
 - Every output port is connected to a single input port. (Splitters will be added.)
 - Every input port is connected to a single output port. (Joiners will be added.)
 - If steps inside a loop read from steps outside a loop, a buffer will be added so that
-  the second and subsequent iterations can (re)read the input.</p><p>This step will throw <a href="../exceptions/GraphException.html" class="extype" name="com.jafpl.exceptions.GraphException">com.jafpl.exceptions.GraphException</a>s if errors are detected.</p><p>* After a graph is closed, no changes can be made to it.
+  the second and subsequent iterations can (re)read the input.</p><p>If exceptions have occurred (or occur during the validation of the graph, the first
+such exception will be thrown. (All of the exceptions will be sent to the graph error listener,
+if there is one.)</p><p>* After a graph is closed, no changes can be made to it.
 * Only valid graphs can be executed.
 </p></div></div>
     </li><li name="com.jafpl.graph.Graph#edgesFrom" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">

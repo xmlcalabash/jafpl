@@ -107,10 +107,10 @@
       </span>
       
       <p class="shortcomment cmt">This is the Scaladoc for the jafpl package.</p><div class="fullcomment"><div class="comment cmt"><p>This is the Scaladoc for the jafpl package.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../../index.html" class="extype" name="com">com</a></dd></dl></div>
-    </li><li name="com.jafpl.runtime" visbl="pub" class="indented3 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="runtime"></a><a id="runtime:runtime"></a>
+    </li><li name="com.jafpl.util" visbl="pub" class="indented3 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="util"></a><a id="util:util"></a>
       <span class="permalink">
-      <a href="../../com/jafpl/index.html#runtime" title="Permalink">
+      <a href="../../com/jafpl/index.html#util" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -119,59 +119,35 @@
         <span class="kind">package</span>
       </span>
       <span class="symbol">
-        <a title="This is the Scaladoc for the runtime package." href="index.html">
-              <span class="name">runtime</span>
+        <a title="" href="index.html">
+              <span class="name">util</span>
             </a>
       </span>
       
-      <p class="shortcomment cmt">This is the Scaladoc for the runtime package.</p><div class="fullcomment"><div class="comment cmt"><p>This is the Scaladoc for the runtime package.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.jafpl">jafpl</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.jafpl">jafpl</a></dd></dl></div>
     </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="class" href="BindingProxy.html" title=""></a>
-                        <a href="BindingProxy.html" title="">
-                          BindingProxy
+                        <a class="class" href="" title=""></a>
+                        <a href="" title="">
+                          DefaultErrorListener
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="" title="Evaluate expressions (for variable bindings and the alternatives in a choose)."></a>
-                        <a href="" title="Evaluate expressions (for variable bindings and the alternatives in a choose).">
-                          ExpressionEvaluator
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
-                        <a class="class" href="GraphRuntime.html" title="Execute a pipeline."></a>
-                        <a href="GraphRuntime.html" title="Execute a pipeline.">
-                          GraphRuntime
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
-                        <a class="class" href="InputProxy.html" title=""></a>
-                        <a href="InputProxy.html" title="">
-                          InputProxy
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
-                        <a class="class" href="OutputProxy.html" title=""></a>
-                        <a href="OutputProxy.html" title="">
-                          OutputProxy
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
-                        <a class="trait" href="RuntimeConfiguration.html" title="The runtime configuration for pipeline execution."></a>
-                        <a href="RuntimeConfiguration.html" title="The runtime configuration for pipeline execution.">
-                          RuntimeConfiguration
+                        <a class="trait" href="ErrorListener.html" title=""></a>
+                        <a href="ErrorListener.html" title="">
+                          ErrorListener
                         </a>
                       </li>
               </ul>
             </div>
           </div>
           <div id="content">
-            <body class="trait type">
+            <body class="class type">
       <div id="definition">
-        <div class="big-circle trait">t</div>
-        <p id="owner"><a href="../../index.html" class="extype" name="com">com</a>.<a href="../index.html" class="extype" name="com.jafpl">jafpl</a>.<a href="index.html" class="extype" name="com.jafpl.runtime">runtime</a></p>
-        <h1>ExpressionEvaluator<span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html" title="Permalink">
+        <div class="big-circle class">c</div>
+        <p id="owner"><a href="../../index.html" class="extype" name="com">com</a>.<a href="../index.html" class="extype" name="com.jafpl">jafpl</a>.<a href="index.html" class="extype" name="com.jafpl.util">util</a></p>
+        <h1>DefaultErrorListener<span class="permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
@@ -181,22 +157,19 @@
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">trait</span>
+        <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">ExpressionEvaluator</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+        <span class="name">DefaultErrorListener</span><span class="result"> extends <a href="ErrorListener.html" class="extype" name="com.jafpl.util.ErrorListener">ErrorListener</a></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Evaluate expressions (for variable bindings and the alternatives in a choose).</p><p>The expression evaluator is responsible for taking the string form of an expression and evaluating it.
-The runtime is agnostic to the form of the expressions or their results. In order to support choose
-steps, it's necessary for the evaluator to be able to return a boolean result for an expression.</p><p>The evaluator may throw a <a href="../exceptions/PipelineException.html" class="extype" name="com.jafpl.exceptions.PipelineException">com.jafpl.exceptions.PipelineException</a> if the specified expression is
-invalid or, in the case of a request for a boolean, if it has no boolean value.</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="ErrorListener.html" class="extype" name="com.jafpl.util.ErrorListener">ErrorListener</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -222,7 +195,7 @@ invalid or, in the case of a request for a boolean, if it has no boolean value.<
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.jafpl.runtime.ExpressionEvaluator"><span>ExpressionEvaluator</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.jafpl.util.DefaultErrorListener"><span>DefaultErrorListener</span></li><li class="in" name="com.jafpl.util.ErrorListener"><span>ErrorListener</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -240,57 +213,38 @@ invalid or, in the case of a request for a boolean, if it has no boolean value.<
 
       <div id="template">
         <div id="allMembers">
-        
-
-        
-
-        <div class="values members">
-              <h3>Abstract Value Members</h3>
-              <ol><li name="com.jafpl.runtime.ExpressionEvaluator#booleanValue" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="booleanValue(expr:String,context:Option[Any],bindings:Option[Map[String,Any]]):Boolean"></a><a id="booleanValue(String,Option[Any],Option[Map[String,Any]]):Boolean"></a>
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="com.jafpl.util.DefaultErrorListener#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;():com.jafpl.util.DefaultErrorListener"></a><a id="&lt;init&gt;:DefaultErrorListener"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#booleanValue(expr:String,context:Option[Any],bindings:Option[Map[String,Any]]):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#&lt;init&gt;():com.jafpl.util.DefaultErrorListener" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
+        <span class="modifier"></span>
+        <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">booleanValue</span><span class="params">(<span name="expr">expr: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="context">context: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>, <span name="bindings">bindings: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Any">Any</span>]]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+        <span class="name">DefaultErrorListener</span><span class="params">()</span>
       </span>
       
-      <p class="shortcomment cmt">Evaluate an expression and cast the result to a boolean.</p><div class="fullcomment"><div class="comment cmt"><p>Evaluate an expression and cast the result to a boolean.
-</p></div><dl class="paramcmts block"><dt class="param">expr</dt><dd class="cmt"><p>The expression to evaluate.</p></dd><dt class="param">context</dt><dd class="cmt"><p>An optional, single item that is flowing through the pipeline.</p></dd><dt class="param">bindings</dt><dd class="cmt"><p>Any variable bindings that are provided for the expression.</p></dd><dt>returns</dt><dd class="cmt"><p>The boolean value of the computed expression.</p></dd></dl></div>
-    </li><li name="com.jafpl.runtime.ExpressionEvaluator#value" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="value(expr:String,context:Option[Any],bindings:Option[Map[String,Any]]):Any"></a><a id="value(String,Option[Any],Option[Map[String,Any]]):Any"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#value(expr:String,context:Option[Any],bindings:Option[Map[String,Any]]):Any" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">value</span><span class="params">(<span name="expr">expr: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="context">context: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>, <span name="bindings">bindings: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Any">Any</span>]]</span>)</span><span class="result">: <span class="extype" name="scala.Any">Any</span></span>
-      </span>
       
-      <p class="shortcomment cmt">Evaluate an expression.</p><div class="fullcomment"><div class="comment cmt"><p>Evaluate an expression.</p><p>The <code>expr</code> is evaluated according to whatever grammar the evaluator supports. The context is
-an item from the pipeline. The bindings are variable bindings from the pipeline.
-</p></div><dl class="paramcmts block"><dt class="param">expr</dt><dd class="cmt"><p>The expression to evaluate.</p></dd><dt class="param">context</dt><dd class="cmt"><p>An optional, single item that is flowing through the pipeline.</p></dd><dt class="param">bindings</dt><dd class="cmt"><p>Any variable bindings that are provided for the expression.</p></dd><dt>returns</dt><dd class="cmt"><p>The computed value of the expression.</p></dd></dl></div>
     </li></ol>
             </div>
 
+        
+
+        
+
         <div class="values members">
-              <h3>Concrete Value Members</h3>
+              <h3>Value Members</h3>
               <ol>
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -306,7 +260,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html###():Int" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -322,7 +276,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -338,7 +292,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -354,7 +308,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#clone():Object" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -376,7 +330,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -392,7 +346,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#equals(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#equals(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -405,10 +359,42 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.jafpl.util.DefaultErrorListener#error" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="error(cause:Throwable,location:Option[com.jafpl.graph.Location]):Unit"></a><a id="error(Throwable,Option[Location]):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#error(cause:Throwable,location:Option[com.jafpl.graph.Location]):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">error</span><span class="params">(<span name="cause">cause: <span class="extype" name="scala.Throwable">Throwable</span></span>, <span name="location">location: <span class="extype" name="scala.Option">Option</span>[<a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.util.DefaultErrorListener">DefaultErrorListener</a> → <a href="ErrorListener.html" class="extype" name="com.jafpl.util.ErrorListener">ErrorListener</a></dd></dl></div>
+    </li><li name="com.jafpl.util.DefaultErrorListener#error" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="error(message:String,location:Option[com.jafpl.graph.Location]):Unit"></a><a id="error(String,Option[Location]):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#error(message:String,location:Option[com.jafpl.graph.Location]):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">error</span><span class="params">(<span name="message">message: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="location">location: <span class="extype" name="scala.Option">Option</span>[<a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.util.DefaultErrorListener">DefaultErrorListener</a> → <a href="ErrorListener.html" class="extype" name="com.jafpl.util.ErrorListener">ErrorListener</a></dd></dl></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#finalize():Unit" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -430,7 +416,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -446,7 +432,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#hashCode():Int" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#hashCode():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -459,10 +445,26 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.jafpl.util.DefaultErrorListener#info" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="info(message:String,location:Option[com.jafpl.graph.Location]):Unit"></a><a id="info(String,Option[Location]):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#info(message:String,location:Option[com.jafpl.graph.Location]):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">info</span><span class="params">(<span name="message">message: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="location">location: <span class="extype" name="scala.Option">Option</span>[<a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.util.DefaultErrorListener">DefaultErrorListener</a> → <a href="ErrorListener.html" class="extype" name="com.jafpl.util.ErrorListener">ErrorListener</a></dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -478,7 +480,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -494,7 +496,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#notify():Unit" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -510,7 +512,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -526,7 +528,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -542,7 +544,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#toString():String" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#toString():String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -558,7 +560,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#wait():Unit" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -580,7 +582,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -602,7 +604,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -621,6 +623,38 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.jafpl.util.DefaultErrorListener#warning" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="warning(cause:Throwable,location:Option[com.jafpl.graph.Location]):Unit"></a><a id="warning(Throwable,Option[Location]):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#warning(cause:Throwable,location:Option[com.jafpl.graph.Location]):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">warning</span><span class="params">(<span name="cause">cause: <span class="extype" name="scala.Throwable">Throwable</span></span>, <span name="location">location: <span class="extype" name="scala.Option">Option</span>[<a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.util.DefaultErrorListener">DefaultErrorListener</a> → <a href="ErrorListener.html" class="extype" name="com.jafpl.util.ErrorListener">ErrorListener</a></dd></dl></div>
+    </li><li name="com.jafpl.util.DefaultErrorListener#warning" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="warning(message:String,location:Option[com.jafpl.graph.Location]):Unit"></a><a id="warning(String,Option[Location]):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/util/DefaultErrorListener.html#warning(message:String,location:Option[com.jafpl.graph.Location]):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">warning</span><span class="params">(<span name="message">message: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="location">location: <span class="extype" name="scala.Option">Option</span>[<a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.util.DefaultErrorListener">DefaultErrorListener</a> → <a href="ErrorListener.html" class="extype" name="com.jafpl.util.ErrorListener">ErrorListener</a></dd></dl></div>
     </li>
               </ol>
             </div>
@@ -631,7 +665,9 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.AnyRef">
+        <div class="parent" name="com.jafpl.util.ErrorListener">
+              <h3>Inherited from <a href="ErrorListener.html" class="extype" name="com.jafpl.util.ErrorListener">ErrorListener</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
