@@ -3,7 +3,7 @@ package com.jafpl.graph
 import com.jafpl.steps.ViewportComposer
 
 private[jafpl] class ViewportStart(override val graph: Graph,
-                                   override val end: ContainerEnd,
+                                   override protected val end: ContainerEnd,
                                    override val userLabel: Option[String],
                                    val composer: ViewportComposer)
   extends ContainerStart(graph, end, userLabel) {

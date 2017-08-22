@@ -150,7 +150,7 @@ class Graph(listener: Option[ErrorListener]) {
     * @param step The step implementation.
     * @return The constructed atomic.
     */
-  def addAtomic(step: Step): Node = addAtomic(step, None)
+  protected[graph] def addAtomic(step: Step): Node = addAtomic(step, None)
 
   /** Adds an atomic step to the graph.
     *
@@ -158,7 +158,7 @@ class Graph(listener: Option[ErrorListener]) {
     * @param label A user-defined label.
     * @return The constructed atomic.
     */
-  def addAtomic(step: Step, label: String): Node = addAtomic(step, Some(label))
+  protected[graph] def addAtomic(step: Step, label: String): Node = addAtomic(step, Some(label))
 
   /** Adds an atomic step to the graph.
     *
@@ -166,7 +166,7 @@ class Graph(listener: Option[ErrorListener]) {
     * @param label An optional, user-defined label.
     * @return The constructed atomic.
     */
-  def addAtomic(step: Step, label: Option[String]): Node = {
+  protected[graph] def addAtomic(step: Step, label: Option[String]): Node = {
     checkOpen()
 
     val node = new AtomicNode(this, Some(step), label)
@@ -178,21 +178,21 @@ class Graph(listener: Option[ErrorListener]) {
     *
     * @return The constructed group.
     */
-  def addGroup(): ContainerStart = addGroup(None)
+  protected[graph] def addGroup(): ContainerStart = addGroup(None)
 
   /** Adds a group to the graph.
     *
     * @param label A user-defined label.
     * @return The constructed group.
     */
-  def addGroup(label: String): ContainerStart = addGroup(Some(label))
+  protected[graph] def addGroup(label: String): ContainerStart = addGroup(Some(label))
 
   /** Adds a group to the graph.
     *
     * @param label An optional, user-defined label.
     * @return The constructed group.
     */
-  def addGroup(label: Option[String]): ContainerStart = {
+  protected[graph] def addGroup(label: Option[String]): ContainerStart = {
     checkOpen()
 
     val end = new ContainerEnd(this)
@@ -208,21 +208,21 @@ class Graph(listener: Option[ErrorListener]) {
     *
     * @return The constructed choose.
     */
-  def addChoose(): ChooseStart = addChoose(None)
+  protected[graph] def addChoose(): ChooseStart = addChoose(None)
 
   /** Adds a choose to the graph.
     *
     * @param label A user-defined label.
     * @return The constructed choose.
     */
-  def addChoose(label: String): ChooseStart = addChoose(Some(label))
+  protected[graph] def addChoose(label: String): ChooseStart = addChoose(Some(label))
 
   /** Adds a choose to the graph.
     *
     * @param label An optional, user-defined label.
     * @return The constructed choose.
     */
-  def addChoose(label: Option[String]): ChooseStart = {
+  protected[graph] def addChoose(label: Option[String]): ChooseStart = {
     checkOpen()
 
     val end = new ContainerEnd(this)
@@ -250,21 +250,21 @@ class Graph(listener: Option[ErrorListener]) {
     *
     * @return The constructed for-each.
     */
-  def addForEach(): ForEachStart = addForEach(None)
+  protected[graph] def addForEach(): ForEachStart = addForEach(None)
 
   /** Adds a for-each to the graph.
     *
     * @param label A user-defined label.
     * @return The constructed for-each.
     */
-  def addForEach(label: String): ForEachStart = addForEach(Some(label))
+  protected[graph] def addForEach(label: String): ForEachStart = addForEach(Some(label))
 
   /** Adds a for-each to the graph.
     *
     * @param label An optional, user-defined label.
     * @return The constructed for-each.
     */
-  def addForEach(label: Option[String]): ForEachStart = {
+  protected[graph] def addForEach(label: Option[String]): ForEachStart = {
     checkOpen()
 
     val end = new ContainerEnd(this)
@@ -281,7 +281,7 @@ class Graph(listener: Option[ErrorListener]) {
     * @param composer The viewport composer.
     * @return The constructed viewport.
     */
-  def addViewport(composer: ViewportComposer): ViewportStart = addViewport(composer, None)
+  protected[graph] def addViewport(composer: ViewportComposer): ViewportStart = addViewport(composer, None)
 
   /** Adds a viewport to the graph.
     *
@@ -289,7 +289,7 @@ class Graph(listener: Option[ErrorListener]) {
     * @param label A user-defined label.
     * @return The constructed viewport.
     */
-  def addViewport(composer: ViewportComposer, label: String): ViewportStart = addViewport(composer, Some(label))
+  protected[graph] def addViewport(composer: ViewportComposer, label: String): ViewportStart = addViewport(composer, Some(label))
 
   /** Adds a viewport to the graph.
     *
@@ -297,7 +297,7 @@ class Graph(listener: Option[ErrorListener]) {
     * @param label An optional, user-defined label.
     * @return The constructed viewport.
     */
-  def addViewport(composer: ViewportComposer, label: Option[String]): ViewportStart = {
+  protected[graph] def addViewport(composer: ViewportComposer, label: Option[String]): ViewportStart = {
     checkOpen()
 
     val end = new ContainerEnd(this)
@@ -313,21 +313,21 @@ class Graph(listener: Option[ErrorListener]) {
     *
     * @return The constructed try/catch.
     */
-  def addTryCatch(): TryCatchStart = addTryCatch(None)
+  protected[graph] def addTryCatch(): TryCatchStart = addTryCatch(None)
 
   /** Adds a try/catch to the graph.
     *
     * @param label A user-defined label.
     * @return The constructed try/catch.
     */
-  def addTryCatch(label: String): TryCatchStart = addTryCatch(Some(label))
+  protected[graph] def addTryCatch(label: String): TryCatchStart = addTryCatch(Some(label))
 
   /** Adds a try/catch to the graph.
     *
     * @param label An optional, user-defined label.
     * @return The constructed try/catch.
     */
-  def addTryCatch(label: Option[String]): TryCatchStart = {
+  protected[graph] def addTryCatch(label: Option[String]): TryCatchStart = {
     checkOpen()
 
     val end = new ContainerEnd(this)
@@ -424,8 +424,17 @@ class Graph(listener: Option[ErrorListener]) {
     checkOpen()
 
     if (_nodes.contains(from) && _nodes.contains(to)) {
-      val edge = new Edge(this, from, fromName, to, toName)
-      _edges += edge
+      // If `from` is a child of `to`, then we really mean to write to the *end*
+      // of the container, not the beginning
+      val ancestor = commonAncestor(from, to)
+      if (ancestor.isDefined && ancestor.get == to) {
+        // println(s"patch $from/$to to ${to.asInstanceOf[ContainerStart].containerEnd} for $from.$fromName")
+        val edge = new Edge(this, from, fromName, to.asInstanceOf[ContainerStart].containerEnd, toName)
+        _edges += edge
+      } else {
+        val edge = new Edge(this, from, fromName, to, toName)
+        _edges += edge
+      }
     } else {
       error(new GraphException(s"Cannot add edge. $from and $to are in different graphs.", from.location))
     }
@@ -871,12 +880,18 @@ class Graph(listener: Option[ErrorListener]) {
     val xmlNodes = ListBuffer.empty[xml.Node]
     xmlNodes += xml.Text("\n")
     for (node <- _nodes) {
+      //println(node)
       if (node.parent.isEmpty) {
         xmlNodes += xml.Text("  ")
         xmlNodes += node.dump(4)
         xmlNodes += xml.Text("\n")
       }
     }
+    /*
+    for (edge <- _edges) {
+      println(edge)
+    }
+    */
     <graph xmlns="http://jafpl.com/ns/graph">{ xmlNodes }</graph>
   }
 }

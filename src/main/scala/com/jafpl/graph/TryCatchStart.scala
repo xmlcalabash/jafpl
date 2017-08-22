@@ -4,7 +4,7 @@ import com.jafpl.exceptions.GraphException
 import com.jafpl.steps.{Step, ViewportComposer}
 
 private[jafpl] class TryCatchStart(override val graph: Graph,
-                                   override val end: ContainerEnd,
+                                   override protected val end: ContainerEnd,
                                    override val userLabel: Option[String])
   extends ContainerStart(graph, end, userLabel) {
 

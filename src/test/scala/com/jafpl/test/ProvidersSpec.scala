@@ -19,7 +19,7 @@ class ProvidersSpec extends FlatSpec {
     val ident = pipeline.addAtomic(new Identity(), "ident")
 
     graph.addEdge(pipeline, "source", ident, "source")
-    graph.addEdge(ident, "result", pipeline.end, "result")
+    graph.addEdge(ident, "result", pipeline, "result")
 
     graph.addInput(pipeline, "source")
     graph.addOutput(pipeline, "result")

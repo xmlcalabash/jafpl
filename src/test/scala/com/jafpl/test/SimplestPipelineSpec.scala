@@ -25,7 +25,7 @@ class SimplestPipelineSpec extends FlatSpec {
   "A pipeline with splits and joins " should " run" in {
     val graph = new Graph()
     val pipeline = graph.addPipeline()
-    val producer = graph.addAtomic(new Producer(List("DOCUMENT")), "producer")
+    val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
     val ident1 = pipeline.addAtomic(new Identity(), "ident1")
     val ident2 = pipeline.addAtomic(new Identity(), "ident2")
     val sink = pipeline.addAtomic(new Sink(), "sink")
@@ -48,10 +48,10 @@ class SimplestPipelineSpec extends FlatSpec {
     val p1       = pipeline.addAtomic(new Producer(List("P1")), "P1")
     val p2       = pipeline.addAtomic(new Producer(List("P2")), "P2")
     val sleep    = pipeline.addAtomic(new Sleep(500), "sleep")
-    val consumer = graph.addAtomic(bc, "consumer")
+    val consumer = pipeline.addAtomic(bc, "consumer")
 
-    graph.addEdge(p1, "result", pipeline.end, "result")
-    graph.addEdge(p2, "result", pipeline.end, "result")
+    graph.addEdge(p1, "result", pipeline, "result")
+    graph.addEdge(p2, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
     p2.dependsOn(sleep)
 

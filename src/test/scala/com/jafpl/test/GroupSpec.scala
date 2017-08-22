@@ -18,7 +18,7 @@ class GroupSpec extends FlatSpec {
     val sink     = pipeline.addAtomic(new Sink(), "sink")
 
     graph.addEdge(producer, "result", ident, "source")
-    graph.addEdge(ident, "result", group.end, "result")
+    graph.addEdge(ident, "result", group, "result")
     graph.addEdge(group, "result", sink, "source")
 
     //println(graph.asXML)

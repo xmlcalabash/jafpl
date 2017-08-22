@@ -1,7 +1,7 @@
 package com.jafpl.graph
 
 private[jafpl] class ForEachStart(override val graph: Graph,
-                                  override val end: ContainerEnd,
+                                  override protected val end: ContainerEnd,
                                   override val userLabel: Option[String])
   extends ContainerStart(graph, end, userLabel) {
 

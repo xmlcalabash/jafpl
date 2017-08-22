@@ -18,12 +18,12 @@ class ViewportSpec extends FlatSpec {
     val prod     = pipeline.addAtomic(new Producer(List("Now is the time; just do it.")), "prod")
     val viewport = pipeline.addViewport(new StringComposer(), "viewport")
     val uc       = viewport.addAtomic(new Uppercase(), "uc")
-    val consumer = graph.addAtomic(bc, "consumer")
+    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(prod, "result", viewport, "source")
     graph.addEdge(viewport, "source", uc, "source")
-    graph.addEdge(uc, "result", viewport.end, "result")
-    graph.addEdge(viewport, "result", pipeline.end, "result")
+    graph.addEdge(uc, "result", viewport, "result")
+    graph.addEdge(viewport, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     graph.close()

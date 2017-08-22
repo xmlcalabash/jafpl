@@ -19,11 +19,11 @@ class BindingSpec extends FlatSpec {
     val binding  = pipeline.addVariable("x", "twelve")
     val binding2 = pipeline.addVariable("y", "eleven")
     val pb       = pipeline.addAtomic(new ProduceBinding("x"), "pb")
-    val output   = graph.addAtomic(bc, "output")
+    val output   = pipeline.addAtomic(bc, "output")
 
     graph.addBindingEdge(binding, pb)
     graph.addBindingEdge(binding2, pb)
-    graph.addEdge(pb, "result", pipeline.end, "result")
+    graph.addEdge(pb, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", output, "source")
 
     graph.close()
@@ -43,7 +43,7 @@ class BindingSpec extends FlatSpec {
     val pb       = pipeline.addAtomic(new ProduceBinding("foo"), "pb")
 
     graph.addBindingEdge(binding, pb)
-    graph.addEdge(pb, "result", pipeline.end, "result")
+    graph.addEdge(pb, "result", pipeline, "result")
     graph.addOutput(pipeline, "result")
 
     graph.close()
@@ -69,7 +69,7 @@ class BindingSpec extends FlatSpec {
     val pb       = pipeline.addAtomic(new ProduceBinding("foo"), "pb")
 
     graph.addBindingEdge(binding, pb)
-    graph.addEdge(pb, "result", pipeline.end, "result")
+    graph.addEdge(pb, "result", pipeline, "result")
     graph.addOutput(pipeline, "result")
 
     graph.close()

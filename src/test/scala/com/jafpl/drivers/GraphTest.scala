@@ -21,10 +21,10 @@ object GraphTest extends App {
     val graph = new Graph()
 
     val pipeline = graph.addPipeline()
-    val producer = graph.addAtomic(new Producer(List("DOCUMENT")), "producer")
+    val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
     val ident1 = pipeline.addAtomic(new Identity(), "ident1")
     val ident2 = pipeline.addAtomic(new Identity(), "ident2")
-    val consumer = graph.addAtomic(new Sink(), "consumer")
+    val consumer = pipeline.addAtomic(new Sink(), "consumer")
 
     graph.addEdge(producer, "result", pipeline, "source")
     graph.addEdge(pipeline, "source", ident1, "source")
@@ -47,7 +47,7 @@ object GraphTest extends App {
     val pb       = pipeline.addAtomic(new ProduceBinding("foo"), "pb")
 
     graph.addBindingEdge(binding, pb)
-    graph.addEdge(pb, "result", pipeline.end, "result")
+    graph.addEdge(pb, "result", pipeline, "result")
     graph.addOutput(pipeline, "result")
 
     graph.close()
@@ -77,7 +77,7 @@ object GraphTest extends App {
     val ident = pipeline.addAtomic(new Identity(), "ident")
 
     graph.addEdge(pipeline, "source", ident, "source")
-    graph.addEdge(ident, "result", pipeline.end, "result")
+    graph.addEdge(ident, "result", pipeline, "result")
 
     graph.addInput(pipeline, "source")
     graph.addOutput(pipeline, "result")
@@ -105,13 +105,13 @@ object GraphTest extends App {
     val bc = new BufferSink()
 
     val pipeline = graph.addPipeline()
-    val p1       = graph.addAtomic(new Producer(List("P1", "P2")), "producer")
+    val p1       = pipeline.addAtomic(new Producer(List("P1", "P2")), "producer")
     val ident    = pipeline.addAtomic(new Identity(false), "identity")
-    val consumer = graph.addAtomic(bc, "consumer")
+    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(p1, "result", pipeline, "source")
     graph.addEdge(pipeline, "source", ident, "source")
-    graph.addEdge(ident, "result", pipeline.end, "result")
+    graph.addEdge(ident, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     graph.close()
@@ -122,7 +122,7 @@ object GraphTest extends App {
     val graph = new Graph()
 
     val pipeline = graph.addPipeline(None)
-    val producer = graph.addAtomic(new Producer(List("SomeDocument")), "producer")
+    val producer = pipeline.addAtomic(new Producer(List("SomeDocument")), "producer")
     val choose = pipeline.addChoose("choose")
     val when1 = choose.addWhen("true", "when1")
     val when2 = choose.addWhen("false", "when2")
@@ -131,18 +131,18 @@ object GraphTest extends App {
     val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")
 
     val bc = new BufferSink()
-    val consumer = graph.addAtomic(bc, "finalconsumer")
+    val consumer = pipeline.addAtomic(bc, "finalconsumer")
 
     graph.addEdge(producer, "result", when1, "condition")
     graph.addEdge(producer, "result", when2, "condition")
 
-    graph.addEdge(p1, "result", when1.end, "result")
-    graph.addEdge(p2, "result", when2.end, "result")
+    graph.addEdge(p1, "result", when1, "result")
+    graph.addEdge(p2, "result", when2, "result")
 
-    graph.addEdge(when1, "result", choose.end, "result")
-    graph.addEdge(when2, "result", choose.end, "result")
+    graph.addEdge(when1, "result", choose, "result")
+    graph.addEdge(when2, "result", choose, "result")
 
-    graph.addEdge(choose, "result", pipeline.end, "result")
+    graph.addEdge(choose, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     graph.close()
@@ -161,9 +161,9 @@ object GraphTest extends App {
 
     val graph = new Graph()
     val pipeline = graph.addPipeline()
-    //val p1       = graph.addAtomic(new Producer(List("doc1")), "prod")
+    //val p1       = pipeline.addAtomic(new Producer(List("doc1")), "prod")
     val p2       = pipeline.addAtomic(new LogBinding(), "logbinding")
-    //val p3       = graph.addAtomic(new Sink(), "sink")
+    //val p3       = pipeline.addAtomic(new Sink(), "sink")
     val binding  = pipeline.addVariable("message", "this is the bound value")
 
     //graph.addEdge(p1, "result", p3, "source")
@@ -187,32 +187,32 @@ object GraphTest extends App {
 
     val graph = new Graph()
     val pipeline = graph.addPipeline()
-    val p1       = graph.addAtomic(new Producer(List("doc1")), "p1")
-    val p2       = graph.addAtomic(new Producer(List("doc2")), "p2")
-    val p3       = graph.addAtomic(new Producer(List("doc3")), "p3")
+    val p1       = pipeline.addAtomic(new Producer(List("doc1")), "p1")
+    val p2       = pipeline.addAtomic(new Producer(List("doc2")), "p2")
+    val p3       = pipeline.addAtomic(new Producer(List("doc3")), "p3")
 
-    val trycatch = graph.addTryCatch("trycatch")
+    val trycatch = pipeline.addTryCatch("trycatch")
     val try1     = trycatch.addTry("try")
     val ident    = try1.addAtomic(new RaiseError("e2"), "e2")
     val catch1   = trycatch.addCatch("catch1", List("e1","e2"))
     val ident1   = catch1.addAtomic(new Identity(), "ident1")
     val catch2   = trycatch.addCatch("catch2")
     val ident2   = catch2.addAtomic(new Identity(), "ident2")
-    val consumer = graph.addAtomic(bc, "consumer")
+    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(p1, "result", ident, "source")
-    graph.addEdge(ident, "result", try1.end, "result")
-    graph.addEdge(try1, "result", trycatch.end, "result")
+    graph.addEdge(ident, "result", try1, "result")
+    graph.addEdge(try1, "result", trycatch, "result")
 
     graph.addEdge(p2, "result", ident1, "source")
-    graph.addEdge(ident1, "result", catch1.end, "result")
-    graph.addEdge(catch1, "result", trycatch.end, "result")
+    graph.addEdge(ident1, "result", catch1, "result")
+    graph.addEdge(catch1, "result", trycatch, "result")
 
     graph.addEdge(p3, "result", ident2, "source")
-    graph.addEdge(ident2, "result", catch2.end, "result")
-    graph.addEdge(catch2, "result", trycatch.end, "result")
+    graph.addEdge(ident2, "result", catch2, "result")
+    graph.addEdge(catch2, "result", trycatch, "result")
 
-    graph.addEdge(trycatch, "result", pipeline.end, "result")
+    graph.addEdge(trycatch, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     graph.close()

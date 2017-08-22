@@ -58,7 +58,7 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
 
   /** A map of the inputs that the pipeline expects.
     *
-    * This mapping from names (strings) to [[DataProvider]]s is the set of inputs that
+    * This mapping from names (strings) to [[com.jafpl.steps.DataProvider]]s is the set of inputs that
     * the pipeline expects from the outside world. If you do not provide an input, an
     * empty sequence of items will be provided.
     *
@@ -68,7 +68,7 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
 
   /** A map of the variable bindings that the pipeline expects.
     *
-    * This mapping from names (strings) to [[DataProvider]]s is the set of variable
+    * This mapping from names (strings) to [[com.jafpl.steps.DataProvider]]s is the set of variable
     * bindings that
     * the pipeline expects from the outside world. If you do not provide an input,
     * the name will be unbound. The result of referring to an unbound variable
@@ -80,7 +80,7 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
 
   /** A map of the outputs that the pipeline produces.
     *
-    * This mapping from names (strings) to [[DataConsumer]]s is the set of outputs that
+    * This mapping from names (strings) to [[com.jafpl.steps.DataConsumer]]s is the set of outputs that
     * the pipeline. If you do not call the `setProvider` method, the output will be
     * discarded.
     *

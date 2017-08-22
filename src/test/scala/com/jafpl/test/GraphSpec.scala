@@ -13,15 +13,15 @@ class GraphSpec extends FlatSpec {
     val graph = new Graph()
 
     val pipeline = graph.addPipeline()
-    val producer = graph.addAtomic(new Producer(List("DOCUMENT")), "producer")
+    val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
     val ident1 = pipeline.addAtomic(new Identity(), "ident1")
     val ident2 = pipeline.addAtomic(new Identity(), "ident2")
-    val consumer = graph.addAtomic(new Sink(), "consumer")
+    val consumer = pipeline.addAtomic(new Sink(), "consumer")
 
     graph.addEdge(producer, "result", pipeline, "source")
     graph.addEdge(pipeline, "source", ident1, "source")
     graph.addEdge(ident1, "result", ident2, "source")
-    graph.addEdge(ident2, "result", pipeline.end, "result")
+    graph.addEdge(ident2, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     graph.close()
@@ -35,11 +35,11 @@ class GraphSpec extends FlatSpec {
     val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
     val group    = pipeline.addGroup("group")
     val inner    = group.addAtomic(new Identity(), "ident")
-    val consumer = graph.addAtomic(new Sink(), "consumer")
+    val consumer = pipeline.addAtomic(new Sink(), "consumer")
 
     graph.addEdge(producer, "result", inner, "source")
-    graph.addEdge(inner, "result", group.end, "result")
-    graph.addEdge(group, "result", pipeline.end, "result")
+    graph.addEdge(inner, "result", group, "result")
+    graph.addEdge(group, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     graph.close()
@@ -54,13 +54,13 @@ class GraphSpec extends FlatSpec {
     val group    = pipeline.addGroup("group")
     val inner    = group.addAtomic(new Identity(), "inner")
     val outer    = pipeline.addAtomic(new Identity(), "outer")
-    val consumer = graph.addAtomic(new Sink(), "consumer")
+    val consumer = pipeline.addAtomic(new Sink(), "consumer")
 
     graph.addEdge(producer, "result", inner, "source")
-    graph.addEdge(inner, "result", group.end, "result")
-    graph.addEdge(group, "result", pipeline.end, "result")
+    graph.addEdge(inner, "result", group, "result")
+    graph.addEdge(group, "result", pipeline, "result")
     graph.addEdge(inner, "result", outer, "source")
-    graph.addEdge(outer, "result", pipeline.end, "result")
+    graph.addEdge(outer, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     var pass = false
@@ -97,15 +97,15 @@ class GraphSpec extends FlatSpec {
     val graph = new Graph()
 
     val pipeline = graph.addPipeline()
-    val producer = graph.addAtomic(new Producer(List("DOCUMENT")), "producer")
+    val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
     val ident1 = pipeline.addAtomic(new Identity(), "ident1")
     val ident2 = pipeline.addAtomic(new Identity(), "ident2")
-    val consumer = graph.addAtomic(new Sink(), "consumer")
+    val consumer = pipeline.addAtomic(new Sink(), "consumer")
 
     graph.addEdge(producer, "result", pipeline, "source")
     graph.addEdge(pipeline, "source", ident1, "source")
     graph.addEdge(ident1, "result", ident2, "source")
-    graph.addEdge(ident2, "result", pipeline.end, "result")
+    graph.addEdge(ident2, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     graph.close()
@@ -124,10 +124,10 @@ class GraphSpec extends FlatSpec {
     val graph = new Graph()
 
     val pipeline = graph.addPipeline()
-    val producer = graph.addAtomic(new Producer(List("DOCUMENT")), "producer")
+    val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
     val ident1 = pipeline.addAtomic(new Identity(), "ident1")
     val ident2 = pipeline.addAtomic(new Identity(), "ident2")
-    val consumer = graph.addAtomic(new Sink(), "consumer")
+    val consumer = pipeline.addAtomic(new Sink(), "consumer")
 
     graph.addEdge(producer, "result", pipeline, "source")
     graph.addEdge(pipeline, "source", ident1, "source")

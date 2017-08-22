@@ -31,12 +31,12 @@ object Website extends App {
     //graph.addEdge(prod, "result", doSomethingElse, "source")
 
     graph.addInput(pipeline, "source")
-    graph.addOutput(pipeline.end, "result")
+    graph.addOutput(pipeline, "result")
     graph.addEdge(pipeline, "source", doSomething, "source")
     graph.addEdge(pipeline, "source", doSomethingElse, "source")
 
-    graph.addEdge(doSomething, "result", pipeline.end, "result")
-    graph.addEdge(doSomethingElse, "result", pipeline.end, "result")
+    graph.addEdge(doSomething, "result", pipeline, "result")
+    graph.addEdge(doSomethingElse, "result", pipeline, "result")
 
     graph.close()
 

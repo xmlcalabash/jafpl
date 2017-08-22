@@ -16,10 +16,10 @@ class CardinalitySpec extends FlatSpec {
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List("P1", "P2")), "producer")
     val ident    = pipeline.addAtomic(new Identity(false), "identity")
-    val consumer = graph.addAtomic(bc, "consumer")
+    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(p1, "result", ident, "source")
-    graph.addEdge(ident, "result", pipeline.end, "result")
+    graph.addEdge(ident, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     var pass = false
@@ -40,10 +40,10 @@ class CardinalitySpec extends FlatSpec {
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List("P1", "P2")), "producer")
     val liar     = pipeline.addAtomic(new LiesAboutOutputBindings(), "liar")
-    val consumer = graph.addAtomic(bc, "consumer")
+    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(p1, "result", liar, "source")
-    graph.addEdge(liar, "result", pipeline.end, "result")
+    graph.addEdge(liar, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     var pass = false

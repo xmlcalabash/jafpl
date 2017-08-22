@@ -44,7 +44,7 @@ class ChooseSpec extends FlatSpec {
     val graph = new Graph()
 
     val pipeline = graph.addPipeline(None)
-    val producer = graph.addAtomic(new Producer(List("SomeDocument")), "producer")
+    val producer = pipeline.addAtomic(new Producer(List("SomeDocument")), "producer")
     val choose = pipeline.addChoose("choose")
     val when1 = choose.addWhen("true", "when1")
     val when2 = choose.addWhen("false", "when2")
@@ -53,18 +53,18 @@ class ChooseSpec extends FlatSpec {
     val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")
 
     val bc = new BufferSink()
-    val consumer = graph.addAtomic(bc, "finalconsumer")
+    val consumer = pipeline.addAtomic(bc, "finalconsumer")
 
     graph.addEdge(producer, "result", when1, "condition")
     graph.addEdge(producer, "result", when2, "condition")
 
-    graph.addEdge(p1, "result", when1.end, "result")
-    graph.addEdge(p2, "result", when2.end, "result")
+    graph.addEdge(p1, "result", when1, "result")
+    graph.addEdge(p2, "result", when2, "result")
 
-    graph.addEdge(when1, "result", choose.end, "result")
-    graph.addEdge(when2, "result", choose.end, "result")
+    graph.addEdge(when1, "result", choose, "result")
+    graph.addEdge(when2, "result", choose, "result")
 
-    graph.addEdge(choose, "result", pipeline.end, "result")
+    graph.addEdge(choose, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
@@ -78,7 +78,7 @@ class ChooseSpec extends FlatSpec {
     val graph = new Graph()
 
     val pipeline = graph.addPipeline(None)
-    val producer = graph.addAtomic(new Producer(List("SomeDocument")), "producer")
+    val producer = pipeline.addAtomic(new Producer(List("SomeDocument")), "producer")
     val choose = pipeline.addChoose("choose")
     val when1 = choose.addWhen("false", "when1")
     val when2 = choose.addWhen("true", "when2")
@@ -87,18 +87,18 @@ class ChooseSpec extends FlatSpec {
     val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")
 
     val bc = new BufferSink()
-    val consumer = graph.addAtomic(bc, "finalconsumer")
+    val consumer = pipeline.addAtomic(bc, "finalconsumer")
 
     graph.addEdge(producer, "result", when1, "condition")
     graph.addEdge(producer, "result", when2, "condition")
 
-    graph.addEdge(p1, "result", when1.end, "result")
-    graph.addEdge(p2, "result", when2.end, "result")
+    graph.addEdge(p1, "result", when1, "result")
+    graph.addEdge(p2, "result", when2, "result")
 
-    graph.addEdge(when1, "result", choose.end, "result")
-    graph.addEdge(when2, "result", choose.end, "result")
+    graph.addEdge(when1, "result", choose, "result")
+    graph.addEdge(when2, "result", choose, "result")
 
-    graph.addEdge(choose, "result", pipeline.end, "result")
+    graph.addEdge(choose, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
@@ -112,7 +112,7 @@ class ChooseSpec extends FlatSpec {
     val graph = new Graph()
 
     val pipeline = graph.addPipeline(None)
-    val producer = graph.addAtomic(new Producer(List("SomeDocument")), "producer")
+    val producer = pipeline.addAtomic(new Producer(List("SomeDocument")), "producer")
     val choose = pipeline.addChoose("choose")
     val when1 = choose.addWhen("true", "when1")
     val when2 = choose.addWhen("true", "when2")
@@ -121,18 +121,18 @@ class ChooseSpec extends FlatSpec {
     val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")
 
     val bc = new BufferSink()
-    val consumer = graph.addAtomic(bc, "finalconsumer")
+    val consumer = pipeline.addAtomic(bc, "finalconsumer")
 
     graph.addEdge(producer, "result", when1, "condition")
     graph.addEdge(producer, "result", when2, "condition")
 
-    graph.addEdge(p1, "result", when1.end, "result")
-    graph.addEdge(p2, "result", when2.end, "result")
+    graph.addEdge(p1, "result", when1, "result")
+    graph.addEdge(p2, "result", when2, "result")
 
-    graph.addEdge(when1, "result", choose.end, "result")
-    graph.addEdge(when2, "result", choose.end, "result")
+    graph.addEdge(when1, "result", choose, "result")
+    graph.addEdge(when2, "result", choose, "result")
 
-    graph.addEdge(choose, "result", pipeline.end, "result")
+    graph.addEdge(choose, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
@@ -146,7 +146,7 @@ class ChooseSpec extends FlatSpec {
     val graph = new Graph()
 
     val pipeline = graph.addPipeline(None)
-    val producer = graph.addAtomic(new Producer(List("SomeDocument")), "producer")
+    val producer = pipeline.addAtomic(new Producer(List("SomeDocument")), "producer")
     val choose = pipeline.addChoose("choose")
     val when1 = choose.addWhen("false", "when1")
     val when2 = choose.addWhen("false", "when2")
@@ -155,18 +155,18 @@ class ChooseSpec extends FlatSpec {
     val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")
 
     val bc = new BufferSink()
-    val consumer = graph.addAtomic(bc, "finalconsumer")
+    val consumer = pipeline.addAtomic(bc, "finalconsumer")
 
     graph.addEdge(producer, "result", when1, "condition")
     graph.addEdge(producer, "result", when2, "condition")
 
-    graph.addEdge(p1, "result", when1.end, "result")
-    graph.addEdge(p2, "result", when2.end, "result")
+    graph.addEdge(p1, "result", when1, "result")
+    graph.addEdge(p2, "result", when2, "result")
 
-    graph.addEdge(when1, "result", choose.end, "result")
-    graph.addEdge(when2, "result", choose.end, "result")
+    graph.addEdge(when1, "result", choose, "result")
+    graph.addEdge(when2, "result", choose, "result")
 
-    graph.addEdge(choose, "result", pipeline.end, "result")
+    graph.addEdge(choose, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)

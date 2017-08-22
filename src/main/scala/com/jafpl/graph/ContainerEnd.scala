@@ -11,7 +11,7 @@ private[jafpl] class ContainerEnd(override val graph: Graph) extends Node(graph,
   def start: Option[ContainerStart] = _start
   def start_=(node: ContainerStart): Unit = {
     if (_start.isEmpty) {
-      if (node.end != this) {
+      if (node.containerEnd != this) {
         throw new GraphException("End of " + this + " is this: " + node)
       }
       _start = Some(node)

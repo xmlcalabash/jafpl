@@ -142,14 +142,14 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
 
     case GOutput(node, port, item) =>
       lastMessage = Instant.now()
+      trace(s"SNDTO $node.$port ($item)", "StepIO")
       val edge = node.outputEdge(port)
-      trace(s"SNDTO $node.$port -> ${edge.to}.${edge.toPort} ($item)", "StepIO")
       actors(edge.to) ! NInput(edge.toPort, item)
 
     case GClose(node, port) =>
       lastMessage = Instant.now()
+      trace(s"CLOSE $node.$port", "StepIO")
       val edge = node.outputEdge(port)
-      trace(s"CLOSE $node.$port -> ${edge.to}.${edge.toPort}", "StepIO")
       actors(edge.to) ! NClose(edge.toPort)
 
     case GCheckGuard(node) =>
@@ -184,7 +184,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
           actors(end.start.get) ! NContainerFinished()
         case _ =>
           if (node.parent.isDefined) {
-            val end = node.parent.get.end
+            val end = node.parent.get.containerEnd
             trace(s"TELLF tell end ${end.start.get} that $node finished", "Run")
             actors(end) ! NChildFinished(node)
           }
@@ -212,7 +212,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
           actors(end.start.get) ! NViewportFinished(buffer)
         case _ =>
           if (node.parent.isDefined) {
-            val end = node.parent.get.end
+            val end = node.parent.get.containerEnd
             trace(s"TELLF tell end ${end.start.get} that $node finished", "Run")
             actors(end) ! NChildFinished(node)
           }
@@ -220,8 +220,8 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
 
     case GTrace(event) =>
       lastMessage = Instant.now()
-      traces += event
       trace(s"TRACE $event", "Traces")
+      traces += event
 
     case GNode(node,actor) =>
       lastMessage = Instant.now()

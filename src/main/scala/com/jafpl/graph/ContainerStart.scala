@@ -16,14 +16,15 @@ import scala.collection.mutable.ListBuffer
   * @param end The end of this container.
   * @param userLabel An optional user-defined label.
   */
-
 class ContainerStart(override val graph: Graph,
-                                    val end: ContainerEnd,
-                                    override val userLabel: Option[String]) extends Node(graph, None, userLabel) {
+                     protected val end: ContainerEnd,
+                     override val userLabel: Option[String]) extends Node(graph, None, userLabel) {
   private val _children = ListBuffer.empty[Node]
 
   /** The children of this container. */
   def children: List[Node] = _children.toList
+
+  protected[jafpl] def containerEnd = end
 
   private[graph] override def inputsOk(): Boolean = {
     if (inputs.nonEmpty) {

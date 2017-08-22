@@ -12,14 +12,14 @@ class IOPipelineSpec extends FlatSpec {
   "A pipeline with inputs and outputs " should " run" in {
     val graph = new Graph()
     val pipeline = graph.addPipeline()
-    val producer = graph.addAtomic(new Producer(List("DOCUMENT")), "producer")
+    val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
     val ident = pipeline.addAtomic(new Identity(), "ident1")
     val bc = new BufferSink()
-    val consumer = graph.addAtomic(bc, "consumer")
+    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(producer, "result", pipeline, "source")
     graph.addEdge(pipeline, "source", ident, "source")
-    graph.addEdge(ident, "result", pipeline.end, "result")
+    graph.addEdge(ident, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)

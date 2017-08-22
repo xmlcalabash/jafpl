@@ -35,7 +35,7 @@ private[runtime] class StartActor(private val monitor: ActorRef,
   override protected def reset(): Unit = {
     readyToRun = false
 
-    monitor ! GReset(node.end)
+    monitor ! GReset(node.containerEnd)
     for (child <- node.children) {
       trace(s"RESET ...$child (for $node)", "Run")
       monitor ! GReset(child)

@@ -18,12 +18,12 @@ class ForEachSpec extends FlatSpec {
     val ident    = forEach.addAtomic(new Identity(), "ident")
 
     val bc = new BufferSink()
-    val consumer = graph.addAtomic(bc, "consumer")
+    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(producer, "result", forEach, "source")
     graph.addEdge(forEach, "source", ident, "source")
-    graph.addEdge(ident, "result", forEach.end, "result")
-    graph.addEdge(forEach, "result", pipeline.end, "result")
+    graph.addEdge(ident, "result", forEach, "result")
+    graph.addEdge(forEach, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
@@ -48,13 +48,13 @@ class ForEachSpec extends FlatSpec {
     val count    = pipeline.addAtomic(new Count(), "count")
 
     val bc = new BufferSink()
-    val consumer = graph.addAtomic(bc, "consumer")
+    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(producer, "result", forEach, "source")
     graph.addEdge(forEach, "source", ident, "source")
-    graph.addEdge(ident, "result", forEach.end, "result")
+    graph.addEdge(ident, "result", forEach, "result")
     graph.addEdge(forEach, "result", count, "source")
-    graph.addEdge(count, "result", pipeline.end, "result")
+    graph.addEdge(count, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
@@ -76,15 +76,15 @@ class ForEachSpec extends FlatSpec {
     val ident    = forEach.addAtomic(new Identity(), "ident")
 
     val bc = new BufferSink()
-    val consumer = graph.addAtomic(bc, "consumer")
+    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(cprod, "result", count, "source")
     graph.addEdge(count, "result", ident, "source")
 
     graph.addEdge(lprod, "result", forEach, "source")
     graph.addEdge(forEach, "source", sink, "source")
-    graph.addEdge(ident, "result", forEach.end, "result")
-    graph.addEdge(forEach, "result", pipeline.end, "result")
+    graph.addEdge(ident, "result", forEach, "result")
+    graph.addEdge(forEach, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)

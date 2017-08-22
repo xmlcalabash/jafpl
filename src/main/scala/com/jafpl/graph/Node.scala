@@ -203,7 +203,7 @@ abstract class Node(val graph: Graph, val step: Option[Step], val userLabel: Opt
 
     val extraAttr = this match {
       case start: ContainerStart =>
-        new UnprefixedAttribute("end", xml.Text(start.end.id), xml.Null)
+        new UnprefixedAttribute("end", xml.Text(start.containerEnd.id), xml.Null)
       case end: ContainerEnd =>
         new UnprefixedAttribute("start", xml.Text(end.start.get.id), xml.Null)
       case _ => xml.Null
