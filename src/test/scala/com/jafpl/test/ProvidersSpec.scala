@@ -28,7 +28,7 @@ class ProvidersSpec extends FlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
 
-    runtime.inputs("source")send(PIPELINEDATA)
+    runtime.inputs("source").send(PIPELINEDATA)
 
     val bc = new BufferConsumer()
     runtime.outputs("result").setProvider(bc)

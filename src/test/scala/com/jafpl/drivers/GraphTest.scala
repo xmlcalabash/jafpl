@@ -15,7 +15,7 @@ object GraphTest extends App {
   //pw.write(graph.asXML.toString)
   //pw.close()
 
-  runEight()
+  runSeven()
 
   def runEight(): Unit = {
     val graph = new Graph()

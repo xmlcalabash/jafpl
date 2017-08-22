@@ -1,8 +1,8 @@
 package com.jafpl.graph
 
-import com.jafpl.exceptions.GraphException
+import com.jafpl.exceptions.{GraphException, PipelineException}
 import com.jafpl.steps.{Step, ViewportComposer}
-import com.jafpl.util.UniqueId
+import com.jafpl.util.{ErrorListener, UniqueId}
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable
@@ -29,13 +29,40 @@ import scala.collection.mutable.ListBuffer
   * @constructor A pipeline graph.
   *
   */
-class Graph {
+class Graph(listener: Option[ErrorListener]) {
   protected[jafpl] val logger: Logger = LoggerFactory.getLogger(this.getClass)
   private val _nodes = ListBuffer.empty[Node]
   private val _edges = ListBuffer.empty[Edge]
   private var open = true
   private var _valid = false
-  private var blewUp = false
+  private var exception = Option.empty[Throwable]
+
+  def this() {
+    this(None)
+  }
+
+  def this(listener: ErrorListener) {
+    this(Some(listener))
+  }
+
+  private def error(cause: Throwable): Unit = {
+    if (listener.isDefined) {
+      if (exception.isEmpty) {
+        exception = Some(cause)
+      }
+
+      cause match {
+        case err: GraphException =>
+          listener.get.error(err, err.location)
+        case err: PipelineException =>
+          listener.get.error(err, err.location)
+        case _ =>
+          listener.get.error(cause, None)
+      }
+    } else {
+      throw cause
+    }
+  }
 
   protected[jafpl] def nodes: List[Node] = _nodes.toList
 
@@ -396,13 +423,12 @@ class Graph {
   def addEdge(from: Node, fromName: String, to: Node, toName: String): Unit = {
     checkOpen()
 
-    if (!_nodes.contains(from) || !_nodes.contains(to)) {
-      blewUp = true
-      throw new GraphException("Both nodes must be in this graph to add an edge")
+    if (_nodes.contains(from) && _nodes.contains(to)) {
+      val edge = new Edge(this, from, fromName, to, toName)
+      _edges += edge
+    } else {
+      error(new GraphException(s"Cannot add edge. $from and $to are in different graphs.", from.location))
     }
-
-    val edge = new Edge(this, from, fromName, to, toName)
-    _edges += edge
   }
 
   /** Adds an edge from a variable binding to a step.
@@ -413,29 +439,27 @@ class Graph {
   def addBindingEdge(from: Binding, to: Node): Unit = {
     checkOpen()
 
-    if (!_nodes.contains(from) || !_nodes.contains(to)) {
-      blewUp = true
-      throw new GraphException("Both nodes must be in this graph to add an edge")
+    if (_nodes.contains(from) && _nodes.contains(to)) {
+      val edge = new BindingEdge(this, from, to)
+      _edges += edge
+    } else {
+      error(new GraphException(s"Cannot add binding edge. $from and $to are in different graphs.", from.location))
     }
-
-    val edge = new BindingEdge(this, from, to)
-    _edges += edge
   }
 
   protected[graph] def addDependsEdge(from: Node, to: Node): Unit = {
     checkOpen()
 
-    if (!_nodes.contains(from) || !_nodes.contains(to)) {
-      blewUp = true
-      throw new GraphException("Both nodes must be in this graph to add an edge")
+    if (_nodes.contains(from) && _nodes.contains(to)) {
+      val depid = UniqueId.nextId
+      val fromName = "#depends_from_" + depid
+      val toName = "#depends_to_" + depid
+
+      val edge = new Edge(this, from, fromName, to, toName)
+      _edges += edge
+    } else {
+      error(new GraphException(s"Cannot add dependency. $from and $to are in different graphs.", from.location))
     }
-
-    val depid = UniqueId.nextId
-    val fromName = "#depends_from_" + depid
-    val toName = "#depends_to_" + depid
-
-    val edge = new Edge(this, from, fromName, to, toName)
-    _edges += edge
   }
 
   protected[jafpl] def inboundPorts(node: Node): Set[String] = {
@@ -484,10 +508,11 @@ class Graph {
         outboundEdges += edge
       }
     }
+
     if (outboundEdges.isEmpty) {
-      blewUp = true
-      throw new GraphException("Node " + node + " has no output port " + port)
+      error(new GraphException(s"Node $node has no output port $port", node.location))
     }
+
     outboundEdges.toList
   }
 
@@ -498,10 +523,11 @@ class Graph {
         inboundEdges += edge
       }
     }
+
     if (inboundEdges.isEmpty) {
-      blewUp = true
-      throw new GraphException("Node " + node + " has no input port " + port)
+      error(new GraphException(s"Node $node has no input port $port", node.location))
     }
+
     inboundEdges.toList
   }
 
@@ -515,7 +541,9 @@ class Graph {
     * - If steps inside a loop read from steps outside a loop, a buffer will be added so that
     *   the second and subsequent iterations can (re)read the input.
     *
-    * This step will throw [[com.jafpl.exceptions.GraphException]]s if errors are detected.
+    * If exceptions have occurred (or occur during the validation of the graph, the first
+    * such exception will be thrown. (All of the exceptions will be sent to the graph error listener,
+    * if there is one.)
     *
     * * After a graph is closed, no changes can be made to it.
     * * Only valid graphs can be executed.
@@ -540,7 +568,7 @@ class Graph {
             }
             if (map.nonEmpty) {
               val port = map.toList.head
-              throw new GraphException("Required input '" + port + "' missing: " + atomic)
+              error(new GraphException(s"Required input '$port' missing: $atomic", node.location))
             }
 
             map = mutable.HashSet.empty[String] ++ atomic.step.get.outputSpec.ports()
@@ -551,7 +579,7 @@ class Graph {
             }
             if (map.nonEmpty) {
               val port = map.toList.head
-              throw new GraphException("Required output '" + port + "' missing: " + atomic)
+              error(new GraphException(s"Required output '$port' missing: $atomic", node.location))
             }
 
             map = mutable.HashSet.empty[String] ++ atomic.step.get.requiredBindings
@@ -562,7 +590,7 @@ class Graph {
             }
             if (map.nonEmpty) {
               val varname = map.toList.head
-              throw new GraphException("Required variable binding '" + varname + "' missing: " + atomic)
+              error(new GraphException(s"Required variable binding '$varname' missing: $atomic", node.location))
             }
           }
         case _ => Unit
@@ -659,11 +687,11 @@ class Graph {
     for (node <- nodes) {
       if (!node.inputsOk()) {
         _valid = false
-        throw new GraphException("Invalid inputs on " + node)
+        error(new GraphException(s"Invalid inputs on $node", node.location))
       }
       if (!node.outputsOk()) {
         _valid = false
-        throw new GraphException("Invalid outputs on " + node)
+        error(new GraphException(s"Invalid outputs on $node", node.location))
       }
       if (node.parent.isEmpty) {
         checkLoops(node, ListBuffer.empty[Node])
@@ -692,7 +720,7 @@ class Graph {
                   case "?" =>
                     logger.warn(s"${edge.from}.${edge.fromPort} may produce a sequence but ${edge.to}.${edge.toPort} requires at most one input")
                   case _ =>
-                    throw new GraphException(s"Unexpected cardinality on ${edge.to}.${edge.toPort}: ${toCard.get}")
+                    error(new GraphException(s"Unexpected cardinality on ${edge.to}.${edge.toPort}: ${toCard.get}", edge.to.location))
                 }
               case "+" =>
                 toCard.get match {
@@ -701,7 +729,7 @@ class Graph {
                   case "?" =>
                     logger.warn(s"${edge.from}.${edge.fromPort} may produce a sequence but ${edge.to}.${edge.toPort} requires at most one input")
                   case _ =>
-                    throw new GraphException(s"Unexpected cardinality on ${edge.to}.${edge.toPort}: ${toCard.get}")
+                    error(new GraphException(s"Unexpected cardinality on ${edge.to}.${edge.toPort}: ${toCard.get}", edge.to.location))
                 }
               case "?" =>
                 toCard.get match {
@@ -710,10 +738,10 @@ class Graph {
                   case "1" =>
                     logger.warn(s"${edge.from}.${edge.fromPort} may produce no output but ${edge.to}.${edge.toPort} requires exactly one input")
                   case _ =>
-                    throw new GraphException(s"Unexpected cardinality on ${edge.to}.${edge.toPort}: ${toCard.get}")
+                    error(new GraphException(s"Unexpected cardinality on ${edge.to}.${edge.toPort}: ${toCard.get}", edge.to.location))
                 }
               case _ =>
-                throw new GraphException(s"Unexpected cardinality on ${edge.from}.${edge.fromPort}: ${fromCard.get}")
+                error(new GraphException(s"Unexpected cardinality on ${edge.from}.${edge.fromPort}: ${fromCard.get}", edge.from.location))
             }
           }
         }
@@ -727,13 +755,16 @@ class Graph {
           _valid = false
           var from = usefulAncestor(edge.from)
           var to = usefulAncestor(edge.to)
-          throw new GraphException(s"Attempting to read inside a container: $from -> $to")
+          error(new GraphException(s"Attempting to read from inside a container: $from -> $to", to.location))
         }
       }
     }
 
     open = false
-    _valid = _valid && !blewUp
+    if (exception.isDefined) {
+      _valid = false
+      throw exception.get
+    }
   }
 
   private def usefulAncestor(start: Node): Node = {

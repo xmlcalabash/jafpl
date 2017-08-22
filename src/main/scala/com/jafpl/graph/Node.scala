@@ -35,14 +35,21 @@ abstract class Node(val graph: Graph, val step: Option[Step], val userLabel: Opt
     name
   }
   private val _label = s"${_name}-$id"
+  private var _loc = Option.empty[Location]
+
+  /** The node's location.
+    *
+    * The node location will be used for reporting (for example in errors). If no location
+    * has been provided, [[com.jafpl.graph.NodeLocation.UNKNOWN]] is returned.
+    */
+  def location: Option[Location] = _loc
+  def location_=(loc: Location): Unit = {
+    _loc = Some(loc)
+  }
+
 
   /** The node lebel. */
   def label: String = _label
-
-  /** To string. */
-  override def toString: String = {
-    s"{$label}"
-  }
 
   /** Add a dependency edge.
     *
@@ -98,6 +105,11 @@ abstract class Node(val graph: Graph, val step: Option[Step], val userLabel: Opt
     } else {
       throw new GraphException("Parent of " + this + " is already defined: " + _start.get)
     }
+  }
+
+  /** To string. */
+  override def toString: String = {
+    s"{$label}"
   }
 
   protected[graph] def dumpChildren(depth: Int): xml.Node = {
