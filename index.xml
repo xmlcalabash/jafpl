@@ -12,6 +12,12 @@ processor. It’s the heart of <citetitle>XML Calabash V2.x</citetitle>
 which hasn’t been released yet. This hasn’t been released in any
 official sense either. YMMV. Here there be dragons. Etc.</para>
 
+<para>On 19 August, 2017, I completely replaced the implementation.
+Some of the documentation below is a little out of date now.
+But there are <link xlink:href="apidocs/">API Docs</link>, so that’s
+something, right?
+</para>
+
 <section xml:id="what">
 <title>What is it?</title>
 
@@ -34,25 +40,27 @@ doesn’t care what kind of data flows between nodes. You construct a
 graph with edges. You pour data in at the top, stuff happens, data
 pours out the bottom.</para>
 
-<para>Many nodes can be implemented as atomic units of work
-(henceforth “atomic steps”), but some naturally operate on subgraphs
-(henceforth “compound steps”). Several compound steps are planned:</para>
+<para>Each node is a “<code>step</code>”. Steps are where “stuff happens”.
+Many steps can be implemented as atomic units of work
+(henceforth “atomic steps”), but some naturally operate on subgraphs,
+these are “containers”. The following containers are supported:</para>
 
 <orderedlist>
-<listitem><simpara>Iteration. (Iterate over a sequence, iterate until done,
-iterate until stable.)</simpara>
+<listitem><simpara>Iteration over a sequence.</simpara>
 </listitem>
 <listitem><simpara>Choose one of several alternatives.</simpara>
 </listitem>
-<listitem><simpara>Try/catch style error handling.</simpara>
+<listitem><simpara>Try/catch error handling.</simpara>
+</listitem>
+<listitem><simpara>Viewports operate on sub-portions of an object.</simpara>
+</listitem>
+<listitem><simpara>Groups, which have no semantic beyond containment.</simpara>
 </listitem>
 </orderedlist>
 
 <para>It would be nice to generalize the abstraction of “compound step” to the
 point where a small number of primitives in the core library could be used to
-build arbitrary compound steps. So far, that goal seems elusive. Each of the
-types that I’ve implemented have had quite different expressions at the graph
-level.</para>
+build arbitrary compound steps. So far, that goal seems elusive.</para>
 
 </section>
 
