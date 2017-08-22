@@ -1,7 +1,5 @@
 package com.jafpl.test
 
-import java.io.{File, PrintWriter}
-
 import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
@@ -49,12 +47,6 @@ class BindingSpec extends FlatSpec {
     graph.addOutput(pipeline, "result")
 
     graph.close()
-
-    val pw = new PrintWriter(new File("/projects/github/xproc/jafpl/pg.xml"))
-    pw.write(graph.asXML.toString)
-    pw.close()
-
-
     val runtime = new GraphRuntime(graph, runtimeConfig)
 
     runtime.bindings("foo").set("Spoon!")
@@ -81,12 +73,6 @@ class BindingSpec extends FlatSpec {
     graph.addOutput(pipeline, "result")
 
     graph.close()
-
-    val pw = new PrintWriter(new File("/projects/github/xproc/jafpl/pg.xml"))
-    pw.write(graph.asXML.toString)
-    pw.close()
-
-
     val runtime = new GraphRuntime(graph, runtimeConfig)
 
     //runtime.bindings("foo").set("Spoon!")
