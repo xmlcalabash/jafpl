@@ -166,8 +166,12 @@
   <xsl:variable name="to" select="key('uid', @destination)"/>
   <xsl:variable name="to-edge"
                 select="$to/g:inputs/g:in-edge[@input-port=$iport]"/>
+
+  <!-- It's only a link through an input edge if the input
+       edge is in a container -->
   <xsl:variable name="in-edge"
-                select="../../g:inputs/g:in-edge[@input-port=$iport]"/>
+                select="../../g:inputs[parent::g:container]
+                        /g:in-edge[@input-port=$iport]"/>
 
   <xsl:choose>
     <xsl:when test="$in-edge">
