@@ -822,15 +822,18 @@ class Graph(listener: Option[ErrorListener]) {
 
     if (path.contains(node)) {
       _valid = false
-      println("ERROR: Loop detected")
+      var loop = ""
+      var arrow = ""
       var started = false
       for (pnode <- path) {
         started = started || (pnode == node)
         if (started) {
-          println("  " + pnode)
+          loop = loop + arrow + pnode
+          arrow = "→"
         }
       }
-      println("  " + node)
+      loop = loop + arrow + node
+      error(new GraphException("Loop detected: " + loop, node.location))
     }
 
     if (valid) {

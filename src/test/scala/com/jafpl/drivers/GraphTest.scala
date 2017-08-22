@@ -15,7 +15,28 @@ object GraphTest extends App {
   //pw.write(graph.asXML.toString)
   //pw.close()
 
-  runSeven()
+  runNine()
+
+  def runNine(): Unit = {
+    val graph = new Graph()
+
+    val pipeline = graph.addPipeline()
+    val producer = graph.addAtomic(new Producer(List("DOCUMENT")), "producer")
+    val ident1 = pipeline.addAtomic(new Identity(), "ident1")
+    val ident2 = pipeline.addAtomic(new Identity(), "ident2")
+    val consumer = graph.addAtomic(new Sink(), "consumer")
+
+    graph.addEdge(producer, "result", pipeline, "source")
+    graph.addEdge(pipeline, "source", ident1, "source")
+
+    graph.addEdge(ident1, "result", ident2, "source")
+    graph.addEdge(ident2, "result", ident1, "source")
+
+    graph.addEdge(pipeline, "result", consumer, "source")
+
+    graph.close()
+    assert(!graph.valid)
+  }
 
   def runEight(): Unit = {
     val graph = new Graph()

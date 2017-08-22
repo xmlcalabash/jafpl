@@ -14,4 +14,23 @@ class GraphException(val msg: String, val location: Option[Location]) extends Ru
   def this(msg: String) {
     this(msg, None)
   }
+
+  override def toString: String = {
+    var str = ""
+
+    if (location.isDefined) {
+      val loc = location.get
+      if (loc.uri.isDefined) {
+        str = str + loc.uri.get + ":"
+      }
+      if (loc.line.isDefined) {
+        str = str + loc.line.get + ":"
+      }
+      if (loc.column.isDefined) {
+        str = str + loc.column.get + ":"
+      }
+    }
+
+    str + msg
+  }
 }
