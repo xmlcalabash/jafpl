@@ -72,30 +72,50 @@ class Graph {
     start
   }
 
-  /**Adds an input requirement.
+  /** Adds a graph input.
+    *
+    * Graph inputs are values that must be provided at runtime. They're effectively
+    * ports into which data can be poured before the pipeline is run.
     *
     * @param node The node that needs the input.
     * @param port The port that needs the input.
     */
-  def addInputRequirement(node: Node, port: String): Unit = {
+  def addInput(node: Node, port: String): Unit = {
     checkOpen()
 
-    val reqdInput = new InputRequirement(this, port)
+    val reqdInput = new GraphInput(this, port)
     _nodes += reqdInput
     addEdge(reqdInput, "result", node, port)
   }
 
-  /**Adds an output requirement.
+  /** Adds a graph output.
+    *
+    * Graph outputs are places where pipeline outputs can be poured.
     *
     * @param node The node that will produce output.
     * @param port The port port on which it will produce.
     */
-  def addOutputRequirement(node: Node, port: String): Unit = {
+  def addOutput(node: Node, port: String): Unit = {
     checkOpen()
 
-    val reqdOutput = new OutputRequirement(this, port)
+    val reqdOutput = new GraphOutput(this, port)
     _nodes += reqdOutput
     addEdge(node, port, reqdOutput, "source")
+  }
+
+  /** Add a graph variable binding.
+    *
+    * Graph variable bindings are named variables for which some input must be
+    * provided at runtime.
+    *
+    * @param name The variable name.
+    * @return The constructed binding.
+    */
+  def addBinding(name: String): Binding = {
+    checkOpen()
+    val binding = new Binding(this, name)
+    _nodes += binding
+    binding
   }
 
   /** Adds an atomic step to the graph.
@@ -344,22 +364,9 @@ class Graph {
     loop.addChild(node)
   }
 
-  /** Add a variable binding to the graph.
-    *
-    * Variable bindings consist of a name and an expression. The name and expression are
-    * arbitrary. At runtime the [[com.jafpl.runtime.ExpressionEvaluator]] provided as
-    * part of the [[com.jafpl.runtime.GraphRuntime]] must understand how to evaluate
-    * the expression.
-    *
-    * At runtime, the computed values are provided to steps through binding edges.
-    *
-    * @param name The variable name.
-    * @param expression An expression in a grammar that the evaluator will understand.
-    * @return The constructed binding.
-    */
-  def addBinding(name: String, expression: String): Binding = {
+  protected[graph] def addVariable(name: String, expression: String): Binding = {
     checkOpen()
-    val binding = new Binding(this, name, expression)
+    val binding = new Binding(this, name, Some(expression))
     _nodes += binding
     binding
   }

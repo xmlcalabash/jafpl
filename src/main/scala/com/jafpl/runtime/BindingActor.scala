@@ -10,41 +10,25 @@ import scala.collection.mutable
 
 private[runtime] class BindingActor(private val monitor: ActorRef,
                                     private val runtime: GraphRuntime,
-                                    private val binding: Binding)
+                                    private val binding: Binding,
+                                    private val provider: BindingProxy)
   extends NodeActor(monitor, runtime, binding)  {
-  var exprContext = Option.empty[Any]
-  val bindings = mutable.HashMap.empty[String, Any]
 
-  override protected def input(port: String, item: Any): Unit = {
-    if (port == "source") {
-      trace(s"BCNXT $item", "Bindings")
-      exprContext = Some(item)
-    } else {
-      item match {
-        case msg: BindingMessage =>
-          trace(s"BOUND ${msg.name}=${msg.item}", "Bindings")
-          bindings.put(msg.name, msg.item)
-        case _ => throw new GraphException(s"Unexpected message on $port")
-      }
+  override protected def start(): Unit = {
+    readyToRun = true
+    runIfReady()
+  }
+
+  private def runIfReady(): Unit = {
+    trace(s"RNIFR $binding $readyToRun ${provider.closed}", "StepExec")
+
+    if (readyToRun && provider.closed) {
+      run()
     }
   }
 
   override protected def run(): Unit = {
-    if (traceEnabled("Bindings")) {
-      var sbindings = ""
-      for (name <- bindings.keySet) {
-        if (sbindings != "") {
-          sbindings += ", "
-        }
-        sbindings += s"$name=${bindings(name)}"
-      }
-      if (sbindings != "") {
-        sbindings = " (with " + sbindings + ")"
-      }
-      trace(s"CMPUT ${binding.name}=${binding.expression}$sbindings", "Bindings")
-    }
-
-    val msg = new BindingMessage(binding.name, binding.expression)
+    val msg = new BindingMessage(binding.name, provider.value.get)
     monitor ! GOutput(binding, "result", msg)
     monitor ! GClose(binding, "result")
     monitor ! GFinished(binding)

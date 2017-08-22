@@ -2,12 +2,13 @@ package com.jafpl.runtime
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.jafpl.exceptions.{GraphException, PipelineException}
-import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, ForEachStart, Graph, GroupStart, InputRequirement, Joiner, OutputRequirement, PipelineStart, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
+import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, ForEachStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, PipelineStart, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
 import com.jafpl.runtime.GraphMonitor.{GNode, GRun, GWatchdog}
-import com.jafpl.steps.{DataConsumer, DataProvider}
+import com.jafpl.steps.{BindingProvider, DataConsumer, DataProvider}
 import com.jafpl.util.UniqueId
 import org.slf4j.LoggerFactory
 
+import scala.collection.immutable.HashMap
 import scala.collection.mutable
 
 /** Execute a pipeline.
@@ -28,8 +29,9 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
   private var _started = false
   private var _finished = false
   private var _exception = Option.empty[Throwable]
-  private var _inputRequirements = mutable.ListBuffer.empty[DataProvider]
-  private var _outputRequirements = mutable.ListBuffer.empty[DataConsumer]
+  private var _graphInputs = mutable.HashMap.empty[String, InputProxy]
+  private var _graphBindings = mutable.HashMap.empty[String, BindingProxy]
+  private var _graphOutputs = mutable.HashMap.empty[String, OutputProxy]
 
   graph.close()
 
@@ -54,9 +56,37 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
     */
   def exception: Option[Throwable] = _exception
 
-  def inputRequirements: List[DataProvider] = _inputRequirements.toList
-  def outputRequirements: List[DataConsumer] = _outputRequirements.toList
+  /** A map of the inputs that the pipeline expects.
+    *
+    * This mapping from names (strings) to [[DataProvider]]s is the set of inputs that
+    * the pipeline expects from the outside world. If you do not provide an input, an
+    * empty sequence of items will be provided.
+    *
+    * @return A map of the expected inputs.
+    */
+  def inputs: Map[String, DataProvider] = Map() ++ _graphInputs
 
+  /** A map of the variable bindings that the pipeline expects.
+    *
+    * This mapping from names (strings) to [[DataProvider]]s is the set of variable
+    * bindings that
+    * the pipeline expects from the outside world. If you do not provide an input,
+    * the name will be unbound. The result of referring to an unbound variable
+    * is undefined.
+    *
+    * @return A map of the expected variable bindings.
+    */
+  def bindings: Map[String, BindingProvider] =  Map() ++ _graphBindings
+
+  /** A map of the outputs that the pipeline produces.
+    *
+    * This mapping from names (strings) to [[DataConsumer]]s is the set of outputs that
+    * the pipeline. If you do not call the `setProvider` method, the output will be
+    * discarded.
+    *
+    * @return A map of the expected inputs.
+    */
+  def outputs: Map[String, DataConsumer] = Map() ++ _graphOutputs
 
   protected[runtime] def finish(): Unit = {
     _finished = true
@@ -87,9 +117,15 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
     * To determine if execution has completed, check the `finished` value.
     */
   def runInBackground(): Unit = {
-    for (provider <- inputRequirements) {
+    for (provider <- inputs.values) {
       provider.close()
     }
+    for ((name, provider) <- _graphBindings) {
+      if (!provider.closed) {
+        throw new PipelineException("nobinding", "No binding was provided for " + name)
+      }
+    }
+
     _monitor ! GRun()
     _started = true
   }
@@ -138,8 +174,6 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
       var actorName = "_" * (7 - node.id.length) + node.id
 
       val actor = node match {
-        case binding: Binding =>
-          _system.actorOf(Props(new BindingActor(_monitor, this, binding)), actorName)
         case split: Splitter =>
           _system.actorOf(Props(new SplitterActor(_monitor, this, split)), actorName)
         case join: Joiner =>
@@ -183,14 +217,31 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
             case _ =>
               _system.actorOf(Props(new EndActor(_monitor, this, end)), actorName)
           }
-        case req: InputRequirement =>
+        case req: GraphInput =>
+          if (_graphInputs.contains(req.name)) {
+            throw new PipelineException("dupname", "Input port name repeated: " + req.name)
+          }
           val ip = new InputProxy(_monitor, this, node)
-          _inputRequirements += ip
-          _system.actorOf(Props(new InputRequirementActor(_monitor, this, node, ip)), actorName)
-        case req: OutputRequirement =>
+          _graphInputs.put(req.name, ip)
+          _system.actorOf(Props(new InputActor(_monitor, this, node, ip)), actorName)
+        case req: GraphOutput =>
+          if (_graphOutputs.contains(req.name)) {
+            throw new PipelineException("dupname", "Output port name repeated: " + req.name)
+          }
           val op = new OutputProxy(_monitor, this, node)
-          _outputRequirements += op
-          _system.actorOf(Props(new OutputRequirementActor(_monitor, this, node, op)), actorName)
+          _graphOutputs.put(req.name, op)
+          _system.actorOf(Props(new OutputActor(_monitor, this, node, op)), actorName)
+        case req: Binding =>
+          if (req.expression.isDefined) {
+            _system.actorOf(Props(new VariableActor(_monitor, this, req)), actorName)
+          } else {
+            if (_graphBindings.contains(req.name)) {
+              throw new PipelineException("dupname", "Input binding name repeated: " + req.name)
+            }
+            val ip = new BindingProxy(_monitor, this, req)
+            _graphBindings.put(req.name, ip)
+            _system.actorOf(Props(new BindingActor(_monitor, this, req, ip)), actorName)
+          }
         case atomic: AtomicNode =>
           if (node.step.isDefined) {
             val cp = new ConsumingProxy(_monitor, this, node)

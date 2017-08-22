@@ -2,10 +2,13 @@ package com.jafpl.graph
 
 private[jafpl] class Binding(override val graph: Graph,
                              val name: String,
-                             val expression: String) extends Node(graph,None,None) {
+                             val expression: Option[String]) extends Node(graph,None,None) {
   private var _start: Option[ContainerStart] = None
-
   private val _label = s"${name}-$id"
+
+  def this(graph: Graph, name: String) {
+    this(graph, name, None)
+  }
 
   override def label: String = _label
 

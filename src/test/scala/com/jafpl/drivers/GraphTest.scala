@@ -6,12 +6,48 @@ import com.jafpl.graph.Graph
 import com.jafpl.io.{BufferConsumer, PrintingConsumer}
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, Identity, LogBinding, Producer, RaiseError, Sink, Sleep}
+import com.jafpl.steps.{BufferSink, Identity, LogBinding, ProduceBinding, Producer, RaiseError, Sink, Sleep}
 
 object GraphTest extends App {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
-  runSeven()
+  //val pw = new PrintWriter(new File("/projects/github/xproc/jafpl/pg.xml"))
+  //pw.write(graph.asXML.toString)
+  //pw.close()
+
+  runEight()
+
+  def runEight(): Unit = {
+    val graph = new Graph()
+
+    val binding  = graph.addBinding("foo")
+    val pipeline = graph.addPipeline()
+
+    val pb       = pipeline.addAtomic(new ProduceBinding("foo"), "pb")
+
+    graph.addBindingEdge(binding, pb)
+    graph.addEdge(pb, "result", pipeline.end, "result")
+    graph.addOutput(pipeline, "result")
+
+    graph.close()
+
+    val pw = new PrintWriter(new File("/projects/github/xproc/jafpl/pg.xml"))
+    pw.write(graph.asXML.toString)
+    pw.close()
+
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+
+    runtime.bindings("foo").set("Spoon!")
+
+    val bc = new BufferConsumer()
+    runtime.outputs("result").setProvider(bc)
+
+    runtime.run()
+
+    assert(bc.items.size == 1)
+    assert(bc.items.head == "Spoon!")
+  }
 
   def runSeven(): Unit = {
     val graph = new Graph()
@@ -22,8 +58,8 @@ object GraphTest extends App {
     graph.addEdge(pipeline, "source", ident, "source")
     graph.addEdge(ident, "result", pipeline.end, "result")
 
-    graph.addInputRequirement(pipeline, "source")
-    graph.addOutputRequirement(pipeline, "result")
+    graph.addInput(pipeline, "source")
+    graph.addOutput(pipeline, "result")
 
     graph.close()
     //val pw = new PrintWriter(new File("/projects/github/xproc/jafpl/pg.xml"))
@@ -32,12 +68,10 @@ object GraphTest extends App {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
 
-    // There's only one input requirement.
-    runtime.inputRequirements.head.send("Input document")
+    runtime.inputs("source").send("Input document")
 
-    // There's only one output requirement.
     val bc = new BufferConsumer()
-    runtime.outputRequirements.head.setProvider(bc)
+    runtime.outputs("result").setProvider(bc)
 
     runtime.run()
 
@@ -109,7 +143,7 @@ object GraphTest extends App {
     //val p1       = graph.addAtomic(new Producer(List("doc1")), "prod")
     val p2       = pipeline.addAtomic(new LogBinding(), "logbinding")
     //val p3       = graph.addAtomic(new Sink(), "sink")
-    val binding  = graph.addBinding("message", "this is the bound value")
+    val binding  = pipeline.addVariable("message", "this is the bound value")
 
     //graph.addEdge(p1, "result", p3, "source")
     graph.addBindingEdge(binding, p2)

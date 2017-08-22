@@ -194,16 +194,23 @@ class ContainerStart(override val graph: Graph,
     node
   }
 
-  /** Add a new variable to this container.
+  /** Add a variable to this container.
     *
     * This method inserts a variable binding into the container. This binding is
     * effectively the source of a variable's value. Other steps may connect to this
-    * binding in order to read it's computed value at runtime.
+    * binding in order to read its computed value at runtime.
+    *
+    * Variable bindings consist of a name and an expression. The name and expression are
+    * arbitrary. At runtime the [[com.jafpl.runtime.ExpressionEvaluator]] provided as
+    * part of the [[com.jafpl.runtime.GraphRuntime]] must understand how to evaluate
+    * the expression.
+    *
+    * At runtime, the computed values are provided to steps through binding edges.
     *
     * @return The node added.
     */
-  def addBinding(name: String, expression: String): Binding = {
-    val binding = graph.addBinding(name, expression)
+  def addVariable(name: String, expression: String): Binding = {
+    val binding = graph.addVariable(name, expression)
     addChild(binding)
     binding
   }

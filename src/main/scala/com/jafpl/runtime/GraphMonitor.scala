@@ -95,17 +95,12 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
         watchdog(millis)
       }
 
-    case GNode(node,actor) =>
-      lastMessage = Instant.now()
-      trace(s"ADDND $node", "AddNode")
-      actors.put(node, actor)
-      unstoppedNodes += node
-      actor ! NInitialize()
-
     case GRun() =>
       lastMessage = Instant.now()
       trace("RUNGR", "Run")
       for (node <- graph.nodes) {
+        trace(s"INITL $node", "Run")
+        actors(node) ! NInitialize()
         if (node.parent.isEmpty) {
           unfinishedNodes += node
         }
@@ -227,6 +222,12 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
       lastMessage = Instant.now()
       traces += event
       trace(s"TRACE $event", "Traces")
+
+    case GNode(node,actor) =>
+      lastMessage = Instant.now()
+      trace(s"ADDND $node", "AddNode")
+      actors.put(node, actor)
+      unstoppedNodes += node
 
     case GException(node, cause) =>
       lastMessage = Instant.now()

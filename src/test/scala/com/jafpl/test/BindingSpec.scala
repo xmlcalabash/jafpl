@@ -1,6 +1,9 @@
 package com.jafpl.test
 
+import java.io.{File, PrintWriter}
+
 import com.jafpl.graph.Graph
+import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{BufferSink, ProduceBinding}
@@ -15,8 +18,8 @@ class BindingSpec extends FlatSpec {
     val graph = new Graph()
     val pipeline = graph.addPipeline()
 
-    val binding  = pipeline.addBinding("x", "twelve")
-    val binding2 = pipeline.addBinding("y", "eleven")
+    val binding  = pipeline.addVariable("x", "twelve")
+    val binding2 = pipeline.addVariable("y", "eleven")
     val pb       = pipeline.addAtomic(new ProduceBinding("x"), "pb")
     val output   = graph.addAtomic(bc, "output")
 
@@ -30,6 +33,74 @@ class BindingSpec extends FlatSpec {
     runtime.run()
 
     assert(bc.items.size == 1)
-    assert(bc.items.head== "twelve")
+    assert(bc.items.head == "twelve")
+  }
+
+  "An external binding " should " be consumable" in {
+    val graph = new Graph()
+
+    val binding  = graph.addBinding("foo")
+    val pipeline = graph.addPipeline()
+
+    val pb       = pipeline.addAtomic(new ProduceBinding("foo"), "pb")
+
+    graph.addBindingEdge(binding, pb)
+    graph.addEdge(pb, "result", pipeline.end, "result")
+    graph.addOutput(pipeline, "result")
+
+    graph.close()
+
+    val pw = new PrintWriter(new File("/projects/github/xproc/jafpl/pg.xml"))
+    pw.write(graph.asXML.toString)
+    pw.close()
+
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+
+    runtime.bindings("foo").set("Spoon!")
+
+    val bc = new BufferConsumer()
+    runtime.outputs("result").setProvider(bc)
+
+    runtime.run()
+
+    assert(bc.items.size == 1)
+    assert(bc.items.head == "Spoon!")
+  }
+
+  "Leaving an external binding unbound " should " be an error" in {
+    val graph = new Graph()
+
+    val binding  = graph.addBinding("foo")
+    val pipeline = graph.addPipeline()
+
+    val pb       = pipeline.addAtomic(new ProduceBinding("foo"), "pb")
+
+    graph.addBindingEdge(binding, pb)
+    graph.addEdge(pb, "result", pipeline.end, "result")
+    graph.addOutput(pipeline, "result")
+
+    graph.close()
+
+    val pw = new PrintWriter(new File("/projects/github/xproc/jafpl/pg.xml"))
+    pw.write(graph.asXML.toString)
+    pw.close()
+
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+
+    //runtime.bindings("foo").set("Spoon!")
+
+    val bc = new BufferConsumer()
+    runtime.outputs("result").setProvider(bc)
+
+    var pass = false
+    try {
+      runtime.run()
+    } catch {
+      case _: Throwable => pass = true
+    }
+
+    assert(pass)
   }
 }

@@ -21,19 +21,17 @@ class ProvidersSpec extends FlatSpec {
     graph.addEdge(pipeline, "source", ident, "source")
     graph.addEdge(ident, "result", pipeline.end, "result")
 
-    graph.addInputRequirement(pipeline, "source")
-    graph.addOutputRequirement(pipeline, "result")
+    graph.addInput(pipeline, "source")
+    graph.addOutput(pipeline, "result")
 
     graph.close()
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
 
-    // There's only one input requirement.
-    runtime.inputRequirements.head.send(PIPELINEDATA)
+    runtime.inputs("source")send(PIPELINEDATA)
 
-    // There's only one output requirement.
     val bc = new BufferConsumer()
-    runtime.outputRequirements.head.setProvider(bc)
+    runtime.outputs("result").setProvider(bc)
 
     runtime.run()
 
