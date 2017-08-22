@@ -137,7 +137,13 @@ class GraphSpec extends FlatSpec {
 
     graph.addEdge(pipeline, "result", consumer, "source")
 
-    graph.close()
-    assert(!graph.valid)
+    var pass = false
+    try {
+      graph.close()
+    } catch {
+      case _: Throwable => pass = true
+    }
+
+    assert(pass && !graph.valid)
   }
 }
