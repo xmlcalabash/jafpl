@@ -699,9 +699,7 @@ class Graph(listener: Option[ErrorListener]) {
           var loop = Option.empty[ContainerStart]
           while (walker != ancestor.get) {
             walker match {
-              case node: ForEachStart =>
-                loop = Some(node)
-              case node: ViewportStart =>
+              case node: LoopStart =>
                 loop = Some(node)
               case _ => Unit
             }

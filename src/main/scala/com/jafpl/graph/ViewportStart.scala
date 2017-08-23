@@ -6,7 +6,7 @@ private[jafpl] class ViewportStart(override val graph: Graph,
                                    override protected val end: ContainerEnd,
                                    override val userLabel: Option[String],
                                    val composer: ViewportComposer)
-  extends ContainerStart(graph, end, userLabel) {
+  extends LoopStart(graph, end, userLabel) {
 
   override def inputsOk(): Boolean = {
     var hasSource = false

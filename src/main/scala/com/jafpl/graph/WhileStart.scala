@@ -4,7 +4,7 @@ private[jafpl] class WhileStart(override val graph: Graph,
                                 override protected val end: ContainerEnd,
                                 override val userLabel: Option[String],
                                 val testexpr: String)
-  extends ContainerStart(graph, end, userLabel) {
+  extends LoopStart(graph, end, userLabel) {
 
   override def inputsOk(): Boolean = {
     var hasSource = false
