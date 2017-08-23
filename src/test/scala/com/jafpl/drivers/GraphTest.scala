@@ -15,7 +15,37 @@ object GraphTest extends App {
   //pw.write(graph.asXML.toString)
   //pw.close()
 
-  runTwo()
+  runThree()
+
+  def runThree(): Unit = {
+    val graph = new Graph()
+    val pipeline = graph.addPipeline()
+    val p1       = pipeline.addAtomic(new Producer(List(0)), "p1")
+
+    val wstep    = pipeline.addWhile(". > 0")
+    val decr     = wstep.addAtomic(new Decrement(), "decr")
+
+    graph.addEdge(p1, "result", wstep, "source")
+    graph.addEdge(wstep, "source", decr, "source")
+    graph.addEdge(decr, "result", wstep, "result")
+
+    graph.addEdge(wstep, "result", pipeline, "result")
+
+    graph.addOutput(pipeline, "result")
+
+    graph.close()
+    val pw = new PrintWriter(new File("/projects/github/xproc/jafpl/pg.xml"))
+    pw.write(graph.asXML.toString)
+    pw.close()
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+    val bc = new BufferConsumer()
+    runtime.outputs("result").setProvider(bc)
+    runtime.run()
+
+    println(bc.items.size)
+    println(bc.items.head)
+  }
 
   def runTwo(): Unit = {
     val graph = new Graph()

@@ -12,7 +12,6 @@ private[runtime] class WhileEndActor(private val monitor: ActorRef,
     monitor ! GLoop(node.start.get, item)
   }
 
-
   override protected def close(port: String): Unit = {
     openInputs -= port
     checkFinished()

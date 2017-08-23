@@ -15,6 +15,7 @@ private[runtime] class WhileActor(private val monitor: ActorRef,
   var running = false
   var looped = false
   val bindings = mutable.HashMap.empty[String, Any]
+  var initiallyTrue = true
 
   override protected def start(): Unit = {
     readyToRun = true
@@ -35,6 +36,12 @@ private[runtime] class WhileActor(private val monitor: ActorRef,
         throw new PipelineException("seqinput", "While received a sequence.")
       }
       currentItem = Some(item)
+
+      initiallyTrue = runtime.dynamicContext.expressionEvaluator()
+        .booleanValue(node.testexpr, currentItem, Some(bindings.toMap))
+
+      trace(s"INTRU While: $initiallyTrue", "While")
+
     } else if (port == "#bindings") {
       item match {
         case msg: BindingMessage =>
@@ -59,15 +66,19 @@ private[runtime] class WhileActor(private val monitor: ActorRef,
     if (!running && readyToRun && currentItem.isDefined) {
       running = true
 
-      val edge = node.outputEdge("source")
-      monitor ! GOutput(node, edge.toPort, currentItem.get)
-      monitor ! GClose(node, edge.toPort)
+      if (initiallyTrue) {
+        val edge = node.outputEdge("source")
+        monitor ! GOutput(node, edge.toPort, currentItem.get)
+        monitor ! GClose(node, edge.toPort)
 
-      trace(s"START While: $node", "While")
+        trace(s"START While: $node", "While")
 
-      for (child <- node.children) {
-        trace(s"START ...$child (for $node)", "While")
-        monitor ! GStart(child)
+        for (child <- node.children) {
+          trace(s"START ...$child (for $node)", "While")
+          monitor ! GStart(child)
+        }
+      } else {
+        finished()
       }
     }
   }
