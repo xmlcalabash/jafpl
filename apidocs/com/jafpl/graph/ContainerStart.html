@@ -127,6 +127,12 @@
       <p class="shortcomment cmt">This is the Scaladoc for the graph package.</p><div class="fullcomment"><div class="comment cmt"><p>This is the Scaladoc for the graph package.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.jafpl">jafpl</a></dd></dl></div>
     </li><li class="current-entities indented3">
                         <span class="separator"></span>
+                        <a class="class" href="Binding.html" title="A variable binding."></a>
+                        <a href="Binding.html" title="A variable binding.">
+                          Binding
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
                         <a class="class" href="" title="A node that contains other nodes."></a>
                         <a href="" title="A node that contains other nodes.">
                           ContainerStart
@@ -624,7 +630,7 @@ body of the loop.</p><p>In practice, containers are represented by a start and a
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addVariable</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.Binding">Binding</span></span>
+        <span class="name">addVariable</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="Binding.html" class="extype" name="com.jafpl.graph.Binding">Binding</a></span>
       </span>
       
       <p class="shortcomment cmt">Add a variable to this container.</p><div class="fullcomment"><div class="comment cmt"><p>Add a variable to this container.</p><p>This method inserts a variable binding into the container. This binding is
@@ -756,6 +762,22 @@ the expression.</p><p>At runtime, the computed values are provided to steps thro
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.jafpl.graph.ContainerStart#containerEnd" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="containerEnd:com.jafpl.graph.ContainerEnd"></a><a id="containerEnd:ContainerEnd"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/ContainerStart.html#containerEnd:com.jafpl.graph.ContainerEnd" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">containerEnd</span><span class="result">: <span class="extype" name="com.jafpl.graph.ContainerEnd">ContainerEnd</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../index.html" class="extype" name="com.jafpl">com.jafpl</a>] </dd></dl></div>
     </li><li name="com.jafpl.graph.Node#dependsOn" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="dependsOn(node:com.jafpl.graph.Node):Unit"></a><a id="dependsOn(Node):Unit"></a>
       <span class="permalink">
@@ -808,7 +830,7 @@ order, you can impose one by saying that <code>A.dependsOn(B)</code>.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd><dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.graph.ContainerStart">ContainerStart</a> → <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
-    </li><li name="com.jafpl.graph.ContainerStart#end" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.jafpl.graph.ContainerStart#end" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="end:com.jafpl.graph.ContainerEnd"></a><a id="end:ContainerEnd"></a>
       <span class="permalink">
       <a href="../../../com/jafpl/graph/ContainerStart.html#end:com.jafpl.graph.ContainerEnd" title="Permalink">
@@ -823,7 +845,7 @@ order, you can impose one by saying that <code>A.dependsOn(B)</code>.
         <span class="name">end</span><span class="result">: <span class="extype" name="com.jafpl.graph.ContainerEnd">ContainerEnd</span></span>
       </span>
       
-      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
