@@ -135,7 +135,7 @@ any port, a “fan in” or “fan out” step will be inserted as appropriate.<
 
 <mediaobject>
 <imageobject>
-<imagedata fileref="byhand-2.svg"/>
+<imagedata fileref="figure0.svg"/>
 </imageobject>
 </mediaobject>
 
@@ -144,7 +144,7 @@ restructure it so that this graph is produced:</para>
 
 <mediaobject>
 <imageobject>
-<imagedata fileref="byhand-3.svg"/>
+<imagedata fileref="figure1.svg"/>
 </imageobject>
 </mediaobject>
 
