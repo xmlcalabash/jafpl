@@ -3,10 +3,10 @@ package com.jafpl.runtime
 import akka.actor.{Actor, ActorRef}
 import akka.event.Logging
 import com.jafpl.exceptions.{GraphException, PipelineException}
-import com.jafpl.graph.{ContainerEnd, Node}
+import com.jafpl.graph.{ContainerEnd, Node, WhileStart}
 import com.jafpl.messages.BindingMessage
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GStopped}
-import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NGuardResult, NInitialize, NInput, NReset, NStart, NStop, NTraceDisable, NTraceEnable, NViewportFinished}
+import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NGuardResult, NInitialize, NInput, NLoop, NReset, NStart, NStop, NTraceDisable, NTraceEnable, NViewportFinished}
 import com.jafpl.steps.{DataProvider, PortBindingSpecification, Provider, StepDataProvider}
 
 import scala.collection.mutable
@@ -19,6 +19,7 @@ private[runtime] object NodeActor {
   case class NCatch(cause: Throwable)
   case class NReset()
   case class NInput(port: String, item: Any)
+  case class NLoop(item: Any)
   case class NClose(port: String)
   case class NChildFinished(otherNode: Node)
   case class NContainerFinished()
@@ -218,12 +219,16 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     }
   }
 
+  protected def loop(item: Any): Unit = {
+    throw new PipelineException("invloop", "Invalid loop to " + node)
+  }
+
   protected def checkGuard(): Unit = {
-    throw new GraphException("Attempted to check guard on something that isn't a when")
+    throw new GraphException("Attempted to check guard on something that isn't a when", node.location)
   }
 
   protected def guardResult(when: Node, pass: Boolean): Unit = {
-    throw new GraphException("Attempted to pass guard result to something that isn't a when")
+    throw new GraphException("Attempted to pass guard result to something that isn't a when", node.location)
   }
 
   final def receive: PartialFunction[Any, Unit] = {
@@ -234,6 +239,10 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     case NInput(port, item) =>
       trace(s"RCVON $node.$port", "StepIO")
       input(port, item)
+
+    case NLoop(item) =>
+      trace(s"LOOPI $item", "StepIO")
+      loop(item)
 
     case NClose(port) =>
       trace(s"CLOSE $node.$port", "StepIO")
@@ -293,7 +302,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         case start: ViewportActor =>
           start.returnItems(buffer)
           start.finished()
-        case _ => throw new GraphException("Container finish message sent to " + node)
+        case _ => throw new GraphException("Container finish message sent to " + node, node.location)
       }
 
     case NChildFinished(otherNode) =>
@@ -301,7 +310,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       this match {
         case end: EndActor =>
           end.finished(otherNode)
-        case _ => throw new GraphException("Child finish message sent to " + node)
+        case _ => throw new GraphException("Child finish message sent to " + node, node.location)
       }
 
     case NCheckGuard() =>

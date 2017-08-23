@@ -147,6 +147,33 @@ class ContainerStart(override val graph: Graph,
     node
   }
 
+  /** Add a new while container to this container.
+    *
+    * @param testexpr The test expression.
+    * @return The node added.
+    */
+  def addWhile(testexpr: String): WhileStart = addWhile(testexpr, None)
+
+  /** Add a new while container to this container.
+    *
+    * @param testexpr The test expression.
+    * @param label A user-defined label.
+    * @return The node added.
+    */
+  def addWhile(testexpr: String, label: String): WhileStart = addWhile(testexpr, Some(label))
+
+  /** Add a new for-each container to this container.
+    *
+    * @param testexpr The test expression.
+    * @param label An optional, user-defined label.
+    * @return The node added.
+    */
+  def addWhile(testexpr: String, label: Option[String]): WhileStart = {
+    val node = graph.addWhile(testexpr, label)
+    addChild(node)
+    node
+  }
+
   /** Add a new viewport container to this container.
     *
     * @return The node added.

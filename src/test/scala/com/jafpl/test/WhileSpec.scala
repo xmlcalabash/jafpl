@@ -1,23 +1,19 @@
-package com.jafpl.drivers
+package com.jafpl.test
 
 import java.io.{File, PrintWriter}
 
+import com.jafpl.drivers.GraphTest.runtimeConfig
 import com.jafpl.graph.Graph
-import com.jafpl.io.{BufferConsumer, PrintingConsumer}
+import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, Count, Decrement, Identity, LogBinding, ProduceBinding, Producer, RaiseError, Sink, Sleep}
+import com.jafpl.steps.{BufferSink, Count, Decrement, Identity, Producer, Sink}
+import org.scalatest.FlatSpec
 
-object GraphTest extends App {
+class WhileSpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
-  //val pw = new PrintWriter(new File("/projects/github/xproc/jafpl/pg.xml"))
-  //pw.write(graph.asXML.toString)
-  //pw.close()
-
-  runOne()
-
-  def runOne(): Unit = {
+  "A while " should " iterate until finished" in {
     val graph = new Graph()
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List(7)), "p1")
@@ -43,7 +39,7 @@ object GraphTest extends App {
     runtime.outputs("result").setProvider(bc)
     runtime.run()
 
-    println(bc.items.size)
-    println(bc.items.head)
+    assert(bc.items.size == 1)
+    assert(bc.items.head == 0)
   }
 }

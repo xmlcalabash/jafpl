@@ -27,26 +27,26 @@ private[jafpl] class TryCatchStart(override val graph: Graph,
   def addCatch(label: String, codes: List[String]): CatchStart = addCatch(None, codes)
 
   override def addAtomic(step: Step, label: Option[String]): Node = {
-    throw new GraphException("Cannot add Atomic steps to Try/Catch")
+    throw new GraphException("Cannot add Atomic steps to Try/Catch", location)
   }
 
   override def addGroup(label: Option[String]): ContainerStart = {
-    throw new GraphException("Cannot add Group steps to Try/Catch")
+    throw new GraphException("Cannot add Group steps to Try/Catch", location)
   }
 
   override def addChoose(label: Option[String]): ChooseStart = {
-    throw new GraphException("Cannot add Choose steps to Try/Catch")
+    throw new GraphException("Cannot add Choose steps to Try/Catch", location)
   }
 
   override def addForEach(label: Option[String]): ForEachStart = {
-    throw new GraphException("Cannot add For-Each steps to Try/Catch")
+    throw new GraphException("Cannot add For-Each steps to Try/Catch", location)
   }
 
   override def addViewport(composer: ViewportComposer, label: Option[String]): ViewportStart = {
-    throw new GraphException("Cannot add Viewport steps to Try/Catch")
+    throw new GraphException("Cannot add Viewport steps to Try/Catch", location)
   }
 
   override def addTryCatch(label: Option[String]): TryCatchStart = {
-    throw new GraphException("Cannot add Try/Catch steps to Try/Catch")
+    throw new GraphException("Cannot add Try/Catch steps to Try/Catch", location)
   }
 }

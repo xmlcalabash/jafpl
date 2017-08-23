@@ -1,7 +1,7 @@
 package com.jafpl.steps
 
-class Producer(val items: List[String]) extends DefaultStep {
-  def this(str: String) {
+class Producer(val items: List[Any]) extends DefaultStep {
+  def this(str: Any) {
     this(List(str))
   }
 

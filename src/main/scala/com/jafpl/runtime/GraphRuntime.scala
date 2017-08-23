@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.jafpl.exceptions.{GraphException, PipelineException}
-import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, ForEachStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, PipelineStart, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
+import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, ForEachStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, PipelineStart, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart, WhileStart}
 import com.jafpl.runtime.GraphMonitor.{GNode, GRun, GWatchdog}
 import com.jafpl.steps.{BindingProvider, DataConsumer, DataProvider}
 import com.jafpl.util.UniqueId
@@ -36,7 +36,7 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
   graph.close()
 
   if (!graph.valid) {
-    throw new GraphException("Cannot run an invalid graph")
+    throw new GraphException("Cannot run an invalid graph", None)
   }
 
   makeActors()
@@ -198,8 +198,10 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
           _system.actorOf(Props(new PipelineActor(_monitor, this, pipe)), actorName)
         case group: GroupStart =>
           _system.actorOf(Props(new StartActor(_monitor, this, group)), actorName)
+        case wstart: WhileStart =>
+          _system.actorOf(Props(new WhileActor(_monitor, this, wstart)), actorName)
         case start: ContainerStart =>
-          throw new GraphException("Attempt to instantiate naked container: " + start)
+          throw new GraphException("Attempt to instantiate naked container: " + start, start.location)
         case end: ContainerEnd =>
           end.start.get match {
             case trycatch: TryCatchStart =>
@@ -212,6 +214,8 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
               _system.actorOf(Props(new ConditionalEndActor(_monitor, this, end)), actorName)
             case foreach: ForEachStart =>
               _system.actorOf(Props(new ForEachEndActor(_monitor, this, end)), actorName)
+            case wstart: WhileStart =>
+              _system.actorOf(Props(new WhileEndActor(_monitor, this, end)), actorName)
             case viewport: ViewportStart =>
               _system.actorOf(Props(new ViewportEndActor(_monitor, this, end)), actorName)
             case _ =>

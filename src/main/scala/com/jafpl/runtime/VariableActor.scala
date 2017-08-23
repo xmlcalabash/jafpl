@@ -24,7 +24,7 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
         case msg: BindingMessage =>
           trace(s"BOUND ${msg.name}=${msg.item}", "Bindings")
           bindings.put(msg.name, msg.item)
-        case _ => throw new GraphException(s"Unexpected message on $port")
+        case _ => throw new GraphException(s"Unexpected message on $port", binding.location)
       }
     }
   }

@@ -16,26 +16,26 @@ private[jafpl] class ChooseStart(override val graph: Graph,
   }
 
   override def addAtomic(step: Step, label: Option[String]): Node = {
-    throw new GraphException("Cannot add Atomic steps to Choose")
+    throw new GraphException("Cannot add Atomic steps to Choose", location)
   }
 
   override def addGroup(label: Option[String]): ContainerStart = {
-    throw new GraphException("Cannot add Group steps to Choose")
+    throw new GraphException("Cannot add Group steps to Choose", location)
   }
 
   override def addChoose(label: Option[String]): ChooseStart = {
-    throw new GraphException("Cannot add Choose steps to Choose")
+    throw new GraphException("Cannot add Choose steps to Choose", location)
   }
 
   override def addForEach(label: Option[String]): ForEachStart = {
-    throw new GraphException("Cannot add For-Each steps to Choose")
+    throw new GraphException("Cannot add For-Each steps to Choose", location)
   }
 
   override def addViewport(composer: ViewportComposer, label: Option[String]): ViewportStart = {
-    throw new GraphException("Cannot add Viewport steps to Choose")
+    throw new GraphException("Cannot add Viewport steps to Choose", location)
   }
 
   override def addTryCatch(label: Option[String]): TryCatchStart = {
-    throw new GraphException("Cannot add Try/Catch steps to Choose")
+    throw new GraphException("Cannot add Try/Catch steps to Choose", location)
   }
 }

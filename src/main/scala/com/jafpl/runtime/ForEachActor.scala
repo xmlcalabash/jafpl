@@ -7,8 +7,8 @@ import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput, GReset, GStar
 import scala.collection.mutable.ListBuffer
 
 private[runtime] class ForEachActor(private val monitor: ActorRef,
-                                  private val runtime: GraphRuntime,
-                                  private val node: ForEachStart) extends StartActor(monitor, runtime, node)  {
+                                    private val runtime: GraphRuntime,
+                                    private val node: ForEachStart) extends StartActor(monitor, runtime, node)  {
   val queue = ListBuffer.empty[Any]
   var running = false
   var sourceClosed = false

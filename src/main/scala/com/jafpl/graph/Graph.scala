@@ -148,21 +148,6 @@ class Graph(listener: Option[ErrorListener]) {
   /** Adds an atomic step to the graph.
     *
     * @param step The step implementation.
-    * @return The constructed atomic.
-    */
-  protected[graph] def addAtomic(step: Step): Node = addAtomic(step, None)
-
-  /** Adds an atomic step to the graph.
-    *
-    * @param step The step implementation.
-    * @param label A user-defined label.
-    * @return The constructed atomic.
-    */
-  protected[graph] def addAtomic(step: Step, label: String): Node = addAtomic(step, Some(label))
-
-  /** Adds an atomic step to the graph.
-    *
-    * @param step The step implementation.
     * @param label An optional, user-defined label.
     * @return The constructed atomic.
     */
@@ -173,19 +158,6 @@ class Graph(listener: Option[ErrorListener]) {
     _nodes += node
     node
   }
-
-  /** Adds a group to the graph.
-    *
-    * @return The constructed group.
-    */
-  protected[graph] def addGroup(): ContainerStart = addGroup(None)
-
-  /** Adds a group to the graph.
-    *
-    * @param label A user-defined label.
-    * @return The constructed group.
-    */
-  protected[graph] def addGroup(label: String): ContainerStart = addGroup(Some(label))
 
   /** Adds a group to the graph.
     *
@@ -203,19 +175,6 @@ class Graph(listener: Option[ErrorListener]) {
     _nodes += end
     start
   }
-
-  /** Adds a choose to the graph.
-    *
-    * @return The constructed choose.
-    */
-  protected[graph] def addChoose(): ChooseStart = addChoose(None)
-
-  /** Adds a choose to the graph.
-    *
-    * @param label A user-defined label.
-    * @return The constructed choose.
-    */
-  protected[graph] def addChoose(label: String): ChooseStart = addChoose(Some(label))
 
   /** Adds a choose to the graph.
     *
@@ -248,19 +207,6 @@ class Graph(listener: Option[ErrorListener]) {
 
   /** Adds a for-each to the graph.
     *
-    * @return The constructed for-each.
-    */
-  protected[graph] def addForEach(): ForEachStart = addForEach(None)
-
-  /** Adds a for-each to the graph.
-    *
-    * @param label A user-defined label.
-    * @return The constructed for-each.
-    */
-  protected[graph] def addForEach(label: String): ForEachStart = addForEach(Some(label))
-
-  /** Adds a for-each to the graph.
-    *
     * @param label An optional, user-defined label.
     * @return The constructed for-each.
     */
@@ -276,20 +222,23 @@ class Graph(listener: Option[ErrorListener]) {
     start
   }
 
-  /** Adds a viewport to the graph.
+  /** Adds a while to the graph.
     *
-    * @param composer The viewport composer.
-    * @return The constructed viewport.
+    * @param testexpr The test expression.
+    * @param label An optional, user-defined label.
+    * @return The constructed for-each.
     */
-  protected[graph] def addViewport(composer: ViewportComposer): ViewportStart = addViewport(composer, None)
+  protected[graph] def addWhile(testexpr: String, label: Option[String]): WhileStart = {
+    checkOpen()
 
-  /** Adds a viewport to the graph.
-    *
-    * @param composer The viewport composer.
-    * @param label A user-defined label.
-    * @return The constructed viewport.
-    */
-  protected[graph] def addViewport(composer: ViewportComposer, label: String): ViewportStart = addViewport(composer, Some(label))
+    val end = new ContainerEnd(this)
+    val start = new WhileStart(this, end, label, testexpr)
+    end.parent = start
+    end.start = start
+    _nodes += start
+    _nodes += end
+    start
+  }
 
   /** Adds a viewport to the graph.
     *
@@ -308,19 +257,6 @@ class Graph(listener: Option[ErrorListener]) {
     _nodes += end
     start
   }
-
-  /** Adds a try/catch to the graph.
-    *
-    * @return The constructed try/catch.
-    */
-  protected[graph] def addTryCatch(): TryCatchStart = addTryCatch(None)
-
-  /** Adds a try/catch to the graph.
-    *
-    * @param label A user-defined label.
-    * @return The constructed try/catch.
-    */
-  protected[graph] def addTryCatch(label: String): TryCatchStart = addTryCatch(Some(label))
 
   /** Adds a try/catch to the graph.
     *
@@ -451,7 +387,7 @@ class Graph(listener: Option[ErrorListener]) {
     // Find the variable
     val binding = findInScopeBinding(varname, to)
     if (binding.isEmpty) {
-      error(new GraphException(s"No in-scope binding for $varname from $to"))
+      error(new GraphException(s"No in-scope binding for $varname from $to", None))
     } else {
       addBindingEdge(binding.get, to)
     }
@@ -948,7 +884,7 @@ class Graph(listener: Option[ErrorListener]) {
 
   private def checkOpen(): Unit = {
     if (!open) {
-      throw new GraphException("Changes cannot be made to a closed graph")
+      throw new GraphException("Changes cannot be made to a closed graph", None)
     }
   }
 

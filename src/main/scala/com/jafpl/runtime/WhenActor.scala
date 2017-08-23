@@ -23,7 +23,7 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
       item match {
         case msg: BindingMessage =>
           bindings.put(msg.name, msg.item)
-        case _ => throw new GraphException(s"Unexpected message on $port")
+        case _ => throw new GraphException(s"Unexpected message on $port", node.location)
       }
     }
   }

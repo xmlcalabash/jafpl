@@ -6,8 +6,8 @@ import akka.actor.{Actor, ActorRef}
 import akka.event.Logging
 import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.{ContainerEnd, Graph, Node}
-import com.jafpl.runtime.GraphMonitor.{GAbort, GCatch, GCheckGuard, GClose, GException, GFinished, GFinishedViewport, GGuardResult, GNode, GOutput, GReset, GRun, GStart, GStop, GStopped, GTrace, GWatchdog}
-import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NGuardResult, NInitialize, NInput, NReset, NStart, NStop, NViewportFinished}
+import com.jafpl.runtime.GraphMonitor.{GAbort, GCatch, GCheckGuard, GClose, GException, GFinished, GFinishedViewport, GGuardResult, GLoop, GNode, GOutput, GReset, GRun, GStart, GStop, GStopped, GTrace, GWatchdog}
+import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NGuardResult, NInitialize, NInput, NLoop, NReset, NStart, NStop, NViewportFinished}
 
 import scala.collection.mutable
 
@@ -19,6 +19,7 @@ private[runtime] object GraphMonitor {
   case class GCatch(node: Node, cause: Throwable)
   case class GException(node: Option[Node], cause: Throwable)
   case class GOutput(node: Node, port: String, item: Any)
+  case class GLoop(node: Node, item: Any)
   case class GClose(node: Node, port: String)
   case class GFinished(node: Node)
   case class GFinishedViewport(node: Node, buffer: List[Any])
@@ -145,6 +146,11 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
       trace(s"SNDTO $node.$port ($item)", "StepIO")
       val edge = node.outputEdge(port)
       actors(edge.to) ! NInput(edge.toPort, item)
+
+    case GLoop(node, item) =>
+      lastMessage = Instant.now()
+      trace(s"LOOPT ($item)", "StepIO")
+      actors(node) ! NLoop(item)
 
     case GClose(node, port) =>
       lastMessage = Instant.now()

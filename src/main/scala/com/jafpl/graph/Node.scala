@@ -25,7 +25,7 @@ abstract class Node(val graph: Graph, val step: Option[Step], val userLabel: Opt
     val regex = """([\p{L}_][-\p{L}_\p{N}]*)""".r
     userLabel.get match {
       case regex(lbl) => lbl
-      case _ => throw new GraphException(s"Invalid label: ${userLabel.get}")
+      case _ => throw new GraphException(s"Invalid label: ${userLabel.get}", location)
     }
   } else {
     var name = super.toString.split('.').last
@@ -103,7 +103,7 @@ abstract class Node(val graph: Graph, val step: Option[Step], val userLabel: Opt
     if (_start.isEmpty) {
       _start = Some(node)
     } else {
-      throw new GraphException("Parent of " + this + " is already defined: " + _start.get)
+      throw new GraphException("Parent of " + this + " is already defined: " + _start.get, location)
     }
   }
 

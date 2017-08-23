@@ -53,10 +53,10 @@ class PortBindingSpecification(spec: immutable.Map[String,String]) {
   private val cardinalities: List[String] = List("1", "?", "+", "*")
   for (port <- spec.keySet) {
     if (!cardinalities.contains(spec(port))) {
-      throw new GraphException(s"Invalid cardinality for port $port: ${spec(port)}")
+      throw new GraphException(s"Invalid cardinality for port $port: ${spec(port)}", None)
     }
     if ((port == "*") && (spec(port) != "*")) {
-      throw new GraphException(s"Only cardinality '*' is allowed for the wildcard port")
+      throw new GraphException(s"Only cardinality '*' is allowed for the wildcard port", None)
     }
   }
 
