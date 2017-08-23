@@ -4,7 +4,7 @@ import java.util.Comparator
 
 import com.jafpl.exceptions.{GraphException, PipelineException}
 import com.jafpl.steps.{Step, ViewportComposer}
-import com.jafpl.util.{ErrorListener, ItemComparator, UniqueId}
+import com.jafpl.util.{ErrorListener, ItemComparator, ItemTester, UniqueId}
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable
@@ -226,15 +226,15 @@ class Graph(listener: Option[ErrorListener]) {
 
   /** Adds a while to the graph.
     *
-    * @param testexpr The test expression.
+    * @param tester The test evaluator.
     * @param label An optional, user-defined label.
     * @return The constructed for-each.
     */
-  protected[graph] def addWhile(testexpr: String, label: Option[String]): WhileStart = {
+  protected[graph] def addWhile(tester: ItemTester, label: Option[String]): WhileStart = {
     checkOpen()
 
     val end = new ContainerEnd(this)
-    val start = new WhileStart(this, end, label, testexpr)
+    val start = new WhileStart(this, end, label, tester)
     end.parent = start
     end.start = start
     _nodes += start

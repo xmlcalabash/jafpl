@@ -1,13 +1,10 @@
 package com.jafpl.test
 
-import java.io.{File, PrintWriter}
-
-import com.jafpl.drivers.GraphTest.runtimeConfig
 import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
-import com.jafpl.primitive.PrimitiveRuntimeConfiguration
+import com.jafpl.primitive.{PrimitiveItemTester, PrimitiveRuntimeConfiguration}
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, Count, Decrement, Identity, Producer, Sink}
+import com.jafpl.steps.{Decrement, Producer}
 import org.scalatest.FlatSpec
 
 class WhileSpec extends FlatSpec {
@@ -18,7 +15,8 @@ class WhileSpec extends FlatSpec {
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List(7)), "p1")
 
-    val wstep    = pipeline.addWhile(". > 0")
+    val tester   = new PrimitiveItemTester(runtimeConfig, ". > 0")
+    val wstep    = pipeline.addWhile(tester)
     val decr     = wstep.addAtomic(new Decrement(), "decr")
 
     graph.addEdge(p1, "result", wstep, "source")
@@ -43,7 +41,8 @@ class WhileSpec extends FlatSpec {
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List(0)), "p1")
 
-    val wstep    = pipeline.addWhile(". > 0")
+    val tester   = new PrimitiveItemTester(runtimeConfig, ". > 0")
+    val wstep    = pipeline.addWhile(tester)
     val decr     = wstep.addAtomic(new Decrement(), "decr")
 
     graph.addEdge(p1, "result", wstep, "source")

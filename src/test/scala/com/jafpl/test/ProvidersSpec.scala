@@ -1,11 +1,10 @@
 package com.jafpl.test
 
-import com.jafpl.drivers.GraphTest.runtimeConfig
 import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{Identity, Producer, Sink}
+import com.jafpl.steps.Identity
 import org.scalatest.FlatSpec
 
 class ProvidersSpec extends FlatSpec {

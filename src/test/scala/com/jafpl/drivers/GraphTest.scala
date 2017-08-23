@@ -4,7 +4,7 @@ import java.io.{File, PrintWriter}
 
 import com.jafpl.graph.Graph
 import com.jafpl.io.{BufferConsumer, PrintingConsumer}
-import com.jafpl.primitive.{PrimitiveItemComparator, PrimitiveRuntimeConfiguration}
+import com.jafpl.primitive.{PrimitiveItemComparator, PrimitiveItemTester, PrimitiveRuntimeConfiguration}
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{BufferSink, Count, Decrement, Identity, LogBinding, ProduceBinding, Producer, RaiseError, Sink, Sleep}
 
@@ -22,7 +22,8 @@ object GraphTest extends App {
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List(0)), "p1")
 
-    val wstep    = pipeline.addWhile(". > 0")
+    val tester   = new PrimitiveItemTester(runtimeConfig, ". > 0")
+    val wstep    = pipeline.addWhile(tester)
     val decr     = wstep.addAtomic(new Decrement(), "decr")
 
     graph.addEdge(p1, "result", wstep, "source")
@@ -85,7 +86,8 @@ object GraphTest extends App {
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List(7)), "p1")
 
-    val wstep    = pipeline.addWhile(". > 0")
+    val tester   = new PrimitiveItemTester(runtimeConfig, ". > 0")
+    val wstep    = pipeline.addWhile(tester)
     val decr     = wstep.addAtomic(new Decrement(), "decr")
 
     graph.addEdge(p1, "result", wstep, "source")

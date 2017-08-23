@@ -37,8 +37,7 @@ private[runtime] class WhileActor(private val monitor: ActorRef,
       }
       currentItem = Some(item)
 
-      initiallyTrue = runtime.dynamicContext.expressionEvaluator()
-        .booleanValue(node.testexpr, currentItem, Some(bindings.toMap))
+      initiallyTrue = node.tester.test(currentItem, Some(bindings.toMap))
 
       trace(s"INTRU While: $initiallyTrue", "While")
 
@@ -84,10 +83,9 @@ private[runtime] class WhileActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def finished(): Unit = {
-    val pass = runtime.dynamicContext.expressionEvaluator()
-      .booleanValue(node.testexpr, currentItem, Some(bindings.toMap))
+    val pass = node.tester.test(currentItem, Some(bindings.toMap))
 
-    trace(s"TESTE While: " + node.testexpr + ": " + currentItem.get + ": " + pass, "While")
+    trace(s"TESTE While: " + currentItem.get + ": " + pass, "While")
 
     if (pass) {
       trace(s"LOOPR While", "While")

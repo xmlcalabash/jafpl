@@ -1,7 +1,7 @@
 package com.jafpl.graph
 
 import com.jafpl.steps.{Step, ViewportComposer}
-import com.jafpl.util.ItemComparator
+import com.jafpl.util.{ItemComparator, ItemTester}
 
 import scala.collection.mutable.ListBuffer
 
@@ -150,27 +150,27 @@ class ContainerStart(override val graph: Graph,
 
   /** Add a new while container to this container.
     *
-    * @param testexpr The test expression.
+    * @param tester The test evaluator.
     * @return The node added.
     */
-  def addWhile(testexpr: String): WhileStart = addWhile(testexpr, None)
+  def addWhile(tester: ItemTester): WhileStart = addWhile(tester, None)
 
   /** Add a new while container to this container.
     *
-    * @param testexpr The test expression.
+    * @param tester The test evaluator.
     * @param label A user-defined label.
     * @return The node added.
     */
-  def addWhile(testexpr: String, label: String): WhileStart = addWhile(testexpr, Some(label))
+  def addWhile(tester: ItemTester, label: String): WhileStart = addWhile(tester, Some(label))
 
   /** Add a new while container to this container.
     *
-    * @param testexpr The test expression.
+    * @param tester The test evaluator.
     * @param label An optional, user-defined label.
     * @return The node added.
     */
-  def addWhile(testexpr: String, label: Option[String]): WhileStart = {
-    val node = graph.addWhile(testexpr, label)
+  def addWhile(tester: ItemTester, label: Option[String]): WhileStart = {
+    val node = graph.addWhile(tester, label)
     addChild(node)
     node
   }

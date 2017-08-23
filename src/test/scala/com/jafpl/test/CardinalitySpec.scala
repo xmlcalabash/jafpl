@@ -3,7 +3,7 @@ package com.jafpl.test
 import com.jafpl.graph.Graph
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, Identity, LiesAboutOutputBindings, Producer, Sink, Sleep}
+import com.jafpl.steps.{BufferSink, Identity, LiesAboutOutputBindings, Producer}
 import org.scalatest.FlatSpec
 
 class CardinalitySpec extends FlatSpec {

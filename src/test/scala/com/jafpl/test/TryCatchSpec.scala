@@ -1,7 +1,5 @@
 package com.jafpl.test
 
-import java.io.{File, PrintWriter}
-
 import com.jafpl.graph.Graph
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
