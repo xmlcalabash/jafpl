@@ -147,6 +147,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def run(): Unit = {
+    readyToRun = false
     var threwException = false
 
     if (node.step.isDefined) {
@@ -206,7 +207,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
             node.step.get.receiveBinding(binding.name, binding.item)
           }
           openBindings -= binding.name
-        case _ => throw new GraphException("Unexpected item on #bindings port")
+        case _ => throw new PipelineException("badbinding", "Unexpected item on #bindings port")
       }
     } else {
       val card = cardinalities.getOrElse(port, 0L) + 1L

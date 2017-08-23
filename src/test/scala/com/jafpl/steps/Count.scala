@@ -11,6 +11,6 @@ class Count extends DefaultStep {
   }
 
   override def run(): Unit = {
-    consumer.get.send("result", count.toString)
+    consumer.get.send("result", count)
   }
 }

@@ -4,7 +4,7 @@ import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, ProduceBinding}
+import com.jafpl.steps.{BufferSink, Count, ProduceBinding}
 import org.scalatest.FlatSpec
 
 class BindingSpec extends FlatSpec {
@@ -58,6 +58,39 @@ class BindingSpec extends FlatSpec {
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "Spoon!")
+  }
+
+  "Reading an external binding twice " should " work" in {
+    val graph = new Graph()
+
+    val binding  = graph.addBinding("foo")
+    val pipeline = graph.addPipeline()
+
+    val pb1      = pipeline.addAtomic(new ProduceBinding("foo"), "pb")
+    val pb2      = pipeline.addAtomic(new ProduceBinding("foo"), "pb")
+    val count    = pipeline.addAtomic(new Count(), "count")
+
+    graph.addBindingEdge("foo", pb1)
+    graph.addBindingEdge("foo", pb2)
+
+    graph.addEdge(pb1, "result", count, "source")
+    graph.addEdge(pb2, "result", count, "source")
+
+    graph.addEdge(count, "result", pipeline, "result")
+    graph.addOutput(pipeline, "result")
+
+    graph.close()
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+
+    runtime.bindings("foo").set("Spoon!")
+
+    val bc = new BufferConsumer()
+    runtime.outputs("result").setProvider(bc)
+    runtime.run()
+
+    assert(bc.items.size == 1)
+    assert(bc.items.head == 2)
   }
 
   "Leaving an external binding unbound " should " be an error" in {

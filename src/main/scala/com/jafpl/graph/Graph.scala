@@ -440,6 +440,61 @@ class Graph(listener: Option[ErrorListener]) {
     }
   }
 
+  /** Adds a binding edge from the in-scope binding for a variable.
+    *
+    * @param varname The name of the variable.
+    * @param to The step that should receive the binding.
+    */
+  def addBindingEdge(varname: String, to: Node): Unit = {
+    checkOpen()
+
+    // Find the variable
+    val binding = findInScopeBinding(varname, to)
+    if (binding.isEmpty) {
+      error(new GraphException(s"No in-scope binding for $varname from $to"))
+    } else {
+      addBindingEdge(binding.get, to)
+    }
+  }
+
+  private def findInScopeBinding(varname: String, start: Node): Option[Binding] = {
+    if (start.parent.isEmpty) {
+      // Look for global ones
+      for (node <- _nodes) {
+        if (node.parent.isEmpty) {
+          node match {
+            case bind: Binding =>
+              if (bind.name == varname) {
+                return Some(bind)
+              }
+            case _ => Unit
+          }
+        }
+      }
+      return None
+    }
+
+    var binding = Option.empty[Binding]
+    for (child <- start.parent.get.children) {
+      child match {
+        case bind: Binding =>
+          if (bind.name == varname) {
+            binding = Some(bind)
+          }
+        case _ =>
+          if (child == start) {
+            if (binding.isDefined) {
+              return binding
+            } else {
+              return findInScopeBinding(varname, start.parent.get)
+            }
+          }
+      }
+    }
+
+    None // This can't actually happen, but the compiler can't tell.
+  }
+
   /** Adds an edge from a variable binding to a step.
     *
     * @param from The variable binding.
@@ -508,6 +563,17 @@ class Graph(listener: Option[ErrorListener]) {
       }
     }
     varnames.toSet
+  }
+
+  protected[jafpl] def edgesFrom(node: Node): List[Edge] = {
+    val outboundEdges = ListBuffer.empty[Edge]
+    for (edge <- _edges) {
+      if (edge.from == node) {
+        outboundEdges += edge
+      }
+    }
+
+    outboundEdges.toList
   }
 
   protected[jafpl] def edgesFrom(node: Node, port: String): List[Edge] = {
@@ -607,26 +673,42 @@ class Graph(listener: Option[ErrorListener]) {
     }
 
     // For every case where an outbound edge has more than one connection,
-    // insert a splitter so that it has only one outbound edge
+    // insert a splitter so that it has only one outbound edge. Note
+    // that there's a little special-casing for the bindings.
     for (node <- nodes) {
-      for (port <- node.outputs) {
+      val isBindingOutput = node.isInstanceOf[Binding]
+      val ports = if (isBindingOutput) {
+        Set("result")
+      } else {
+        node.outputs
+      }
+
+      for (port <- ports) {
         val edges = edgesFrom(node, port)
         if (edges.length > 1) {
           val splitter = if (node.parent.isDefined) {
             node.parent.get.addSplitter()
           } else {
-            node match {
-              case pl: PipelineStart =>
-                // Stick the splitter inside the pipeline.
-                pl.addSplitter()
-              case _ => addSplitter()
+            // Stick it in the pipeline
+            var pl = edges.head.to
+            while (pl.parent.isDefined) {
+              pl = pl.parent.get
             }
+            pl.asInstanceOf[ContainerStart].addSplitter()
           }
-          addEdge(node, port, splitter, "source")
+
+          if (isBindingOutput) {
+            addBindingEdge(node.asInstanceOf[Binding], splitter)
+          } else {
+            addEdge(node, port, splitter, "source")
+          }
+
           var count = 1
           for (edge <- edges) {
             val oport = "result_" + count
-            addEdge(splitter, oport, edge.to, edge.toPort)
+            // Special case; the addEdge method trips up in the bindings case.
+            val newEdge = new Edge(this, splitter, oport, edge.to, edge.toPort)
+            _edges += newEdge
             count += 1
           }
 
@@ -713,7 +795,8 @@ class Graph(listener: Option[ErrorListener]) {
     }
 
     for (edge <- _edges) {
-      if (edge.from.step.isDefined && edge.to.step.isDefined) {
+      if (edge.from.step.isDefined && edge.to.step.isDefined
+          && !edge.fromPort.startsWith("#depends_from")) {
         val fromCard = edge.from.step.get.outputSpec.cardinality(edge.fromPort)
         val toCard = edge.to.step.get.inputSpec.cardinality(edge.toPort)
         if (fromCard.isEmpty) {

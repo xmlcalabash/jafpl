@@ -1,6 +1,5 @@
 package com.jafpl.test
 
-import com.jafpl.drivers.GraphTest.runtimeConfig
 import com.jafpl.graph.Graph
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
@@ -61,5 +60,31 @@ class SimplestPipelineSpec extends FlatSpec {
     assert(bc.items.size == 2)
     assert(bc.items(0) == "P1")
     assert(bc.items(1) == "P2")
+  }
+
+  "Multiple dependencies to the same step " should " be allowed" in {
+    val graph = new Graph()
+    val bc = new BufferSink()
+
+    val pipeline = graph.addPipeline()
+    val p1       = pipeline.addAtomic(new Producer(List("P1")), "P1")
+    val p2       = pipeline.addAtomic(new Producer(List("P2")), "P2")
+    val p3       = pipeline.addAtomic(new Producer(List("P3")), "P3")
+    val sleep    = pipeline.addAtomic(new Sleep(500), "sleep")
+    val consumer = pipeline.addAtomic(bc, "consumer")
+
+    graph.addEdge(p1, "result", pipeline, "result")
+    graph.addEdge(p2, "result", pipeline, "result")
+    graph.addEdge(p3, "result", pipeline, "result")
+    graph.addEdge(pipeline, "result", consumer, "source")
+    p2.dependsOn(sleep)
+    p3.dependsOn(sleep)
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.run()
+
+    assert(bc.items.size == 3)
+    assert(bc.items.head == "P1")
+    // P2 and P3 can occur in either order
   }
 }

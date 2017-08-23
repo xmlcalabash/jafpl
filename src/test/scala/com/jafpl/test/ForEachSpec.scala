@@ -61,7 +61,7 @@ class ForEachSpec extends FlatSpec {
     runtime.run()
 
     assert(bc.items.size == 1)
-    assert(bc.items.head == "3")
+    assert(bc.items.head == 3)
   }
 
   "Inputs that cross a for-each " should " be buffered" in {
@@ -92,7 +92,7 @@ class ForEachSpec extends FlatSpec {
 
     assert(bc.items.size == 3)
     for (item <- bc.items) {
-      assert(item == "4")
+      assert(item == 4)
     }
   }
 

@@ -6,7 +6,7 @@ import com.jafpl.graph.Graph
 import com.jafpl.io.{BufferConsumer, PrintingConsumer}
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, Identity, LogBinding, ProduceBinding, Producer, RaiseError, Sink, Sleep}
+import com.jafpl.steps.{BufferSink, Count, Identity, LogBinding, ProduceBinding, Producer, RaiseError, Sink, Sleep}
 
 object GraphTest extends App {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
@@ -15,7 +15,75 @@ object GraphTest extends App {
   //pw.write(graph.asXML.toString)
   //pw.close()
 
-  runNine()
+  runEleven()
+
+  def runEleven(): Unit = {
+    val graph = new Graph()
+    val bc = new BufferSink()
+
+    val pipeline = graph.addPipeline()
+    val p1       = pipeline.addAtomic(new Producer(List("P1")), "P1")
+    val p2       = pipeline.addAtomic(new Producer(List("P2")), "P2")
+    val p3       = pipeline.addAtomic(new Producer(List("P3")), "P3")
+    val sleep    = pipeline.addAtomic(new Sleep(500), "sleep")
+    val consumer = pipeline.addAtomic(bc, "consumer")
+
+    graph.addEdge(p1, "result", pipeline, "result")
+    graph.addEdge(p2, "result", pipeline, "result")
+    graph.addEdge(p3, "result", pipeline, "result")
+    graph.addEdge(pipeline, "result", consumer, "source")
+    p2.dependsOn(sleep)
+    p3.dependsOn(sleep)
+
+    graph.close()
+    val pw = new PrintWriter(new File("/projects/github/xproc/jafpl/pg.xml"))
+    pw.write(graph.asXML.toString)
+    pw.close()
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.run()
+
+    assert(bc.items.size == 3)
+    assert(bc.items.head == "P1")
+    // P2 and P3 can occur in either order
+  }
+
+  def runTen(): Unit = {
+    val graph = new Graph()
+
+    val binding  = graph.addBinding("foo")
+    val pipeline = graph.addPipeline()
+
+    val pb1      = pipeline.addAtomic(new ProduceBinding("foo"), "pb")
+    val pb2      = pipeline.addAtomic(new ProduceBinding("foo"), "pb")
+    val count    = pipeline.addAtomic(new Count(), "count")
+
+    graph.addBindingEdge(binding, pb1)
+    graph.addBindingEdge(binding, pb2)
+
+    graph.addEdge(pb1, "result", count, "source")
+    graph.addEdge(pb2, "result", count, "source")
+
+    graph.addEdge(count, "result", pipeline, "result")
+    graph.addOutput(pipeline, "result")
+
+    graph.close()
+
+    val pw = new PrintWriter(new File("/projects/github/xproc/jafpl/pg.xml"))
+    pw.write(graph.asXML.toString)
+    pw.close()
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+
+    runtime.bindings("foo").set("Spoon!")
+
+    val bc = new BufferConsumer()
+    runtime.outputs("result").setProvider(bc)
+    runtime.run()
+
+    println(bc.items.head)
+
+  }
 
   def runNine(): Unit = {
     val graph = new Graph()

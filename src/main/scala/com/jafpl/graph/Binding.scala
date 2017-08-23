@@ -1,8 +1,16 @@
 package com.jafpl.graph
 
-private[jafpl] class Binding(override val graph: Graph,
-                             val name: String,
-                             val expression: Option[String]) extends Node(graph,None,None) {
+// FIXME: Exposing Binding is abstration leakage
+
+/** A variable binding.
+  *
+  * @param graph The graph into which this node is to be inserted.
+  * @param name The variable's name
+  * @param expression It's initializer expression
+  */
+class Binding(override val graph: Graph,
+              val name: String,
+              val expression: Option[String]) extends Node(graph,None,None) {
   private var _start: Option[ContainerStart] = None
   private val _label = s"${name}-$id"
 
