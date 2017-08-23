@@ -133,14 +133,14 @@
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="" title=""></a>
-                        <a href="" title="">
+                        <a class="trait" href="ErrorListener.html" title=""></a>
+                        <a href="ErrorListener.html" title="">
                           ErrorListener
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="ItemComparator.html" title=""></a>
-                        <a href="ItemComparator.html" title="">
+                        <a class="trait" href="" title=""></a>
+                        <a href="" title="">
                           ItemComparator
                         </a>
                       </li>
@@ -152,8 +152,8 @@
       <div id="definition">
         <div class="big-circle trait">t</div>
         <p id="owner"><a href="../../index.html" class="extype" name="com">com</a>.<a href="../index.html" class="extype" name="com.jafpl">jafpl</a>.<a href="index.html" class="extype" name="com.jafpl.util">util</a></p>
-        <h1>ErrorListener<span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html" title="Permalink">
+        <h1>ItemComparator<span class="permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
@@ -166,7 +166,7 @@
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <span class="name">ErrorListener</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+        <span class="name">ItemComparator</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4>
 
@@ -176,12 +176,7 @@
             Linear Supertypes
           </span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
-        </div><div class="toggleContainer block">
-            <span class="toggle">
-              Known Subclasses
-            </span>
-            <div class="subClasses hiddenContent"><a href="DefaultErrorListener.html" class="extype" name="com.jafpl.util.DefaultErrorListener">DefaultErrorListener</a></div>
-          </div></div>
+        </div></div>
         
 
       <div id="mbrsel">
@@ -206,7 +201,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.jafpl.util.ErrorListener"><span>ErrorListener</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.jafpl.util.ItemComparator"><span>ItemComparator</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -230,10 +225,10 @@
 
         <div class="values members">
               <h3>Abstract Value Members</h3>
-              <ol><li name="com.jafpl.util.ErrorListener#error" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="error(cause:Throwable,location:Option[com.jafpl.graph.Location]):Unit"></a><a id="error(Throwable,Option[Location]):Unit"></a>
+              <ol><li name="com.jafpl.util.ItemComparator#areTheSame" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="areTheSame(a:Any,b:Any):Boolean"></a><a id="areTheSame(Any,Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#error(cause:Throwable,location:Option[com.jafpl.graph.Location]):Unit" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html#areTheSame(a:Any,b:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -242,71 +237,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">error</span><span class="params">(<span name="cause">cause: <span class="extype" name="scala.Throwable">Throwable</span></span>, <span name="location">location: <span class="extype" name="scala.Option">Option</span>[<a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      
-    </li><li name="com.jafpl.util.ErrorListener#error" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="error(message:String,location:Option[com.jafpl.graph.Location]):Unit"></a><a id="error(String,Option[Location]):Unit"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#error(message:String,location:Option[com.jafpl.graph.Location]):Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">error</span><span class="params">(<span name="message">message: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="location">location: <span class="extype" name="scala.Option">Option</span>[<a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      
-    </li><li name="com.jafpl.util.ErrorListener#info" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="info(message:String,location:Option[com.jafpl.graph.Location]):Unit"></a><a id="info(String,Option[Location]):Unit"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#info(message:String,location:Option[com.jafpl.graph.Location]):Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">info</span><span class="params">(<span name="message">message: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="location">location: <span class="extype" name="scala.Option">Option</span>[<a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      
-    </li><li name="com.jafpl.util.ErrorListener#warning" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="warning(cause:Throwable,location:Option[com.jafpl.graph.Location]):Unit"></a><a id="warning(Throwable,Option[Location]):Unit"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#warning(cause:Throwable,location:Option[com.jafpl.graph.Location]):Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">warning</span><span class="params">(<span name="cause">cause: <span class="extype" name="scala.Throwable">Throwable</span></span>, <span name="location">location: <span class="extype" name="scala.Option">Option</span>[<a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      
-    </li><li name="com.jafpl.util.ErrorListener#warning" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="warning(message:String,location:Option[com.jafpl.graph.Location]):Unit"></a><a id="warning(String,Option[Location]):Unit"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#warning(message:String,location:Option[com.jafpl.graph.Location]):Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">warning</span><span class="params">(<span name="message">message: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="location">location: <span class="extype" name="scala.Option">Option</span>[<a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">areTheSame</span><span class="params">(<span name="a">a: <span class="extype" name="scala.Any">Any</span></span>, <span name="b">b: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       
       
@@ -319,7 +250,7 @@
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -335,7 +266,7 @@
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html###():Int" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -351,7 +282,7 @@
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -367,7 +298,7 @@
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -383,7 +314,7 @@
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#clone():Object" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -405,7 +336,7 @@
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -421,7 +352,7 @@
     </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#equals(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html#equals(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -437,7 +368,7 @@
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#finalize():Unit" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -459,7 +390,7 @@
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -475,7 +406,7 @@
     </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#hashCode():Int" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html#hashCode():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -491,7 +422,7 @@
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -507,7 +438,7 @@
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -523,7 +454,7 @@
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#notify():Unit" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -539,7 +470,7 @@
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -555,7 +486,7 @@
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -571,7 +502,7 @@
     </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#toString():String" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html#toString():String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -587,7 +518,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#wait():Unit" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -609,7 +540,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -631,7 +562,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/util/ErrorListener.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../com/jafpl/util/ItemComparator.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
