@@ -1,8 +1,10 @@
 package com.jafpl.graph
 
+import java.util.Comparator
+
 import com.jafpl.exceptions.{GraphException, PipelineException}
 import com.jafpl.steps.{Step, ViewportComposer}
-import com.jafpl.util.{ErrorListener, UniqueId}
+import com.jafpl.util.{ErrorListener, ItemComparator, UniqueId}
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable
@@ -233,6 +235,24 @@ class Graph(listener: Option[ErrorListener]) {
 
     val end = new ContainerEnd(this)
     val start = new WhileStart(this, end, label, testexpr)
+    end.parent = start
+    end.start = start
+    _nodes += start
+    _nodes += end
+    start
+  }
+
+  /** Adds an until to the graph.
+    *
+    * @param comparator The comparator.
+    * @param label An optional, user-defined label.
+    * @return The constructed for-each.
+    */
+  protected[graph] def addUntil(comparator: ItemComparator, label: Option[String]): UntilFinishedStart = {
+    checkOpen()
+
+    val end = new ContainerEnd(this)
+    val start = new UntilFinishedStart(this, end, label, comparator)
     end.parent = start
     end.start = start
     _nodes += start

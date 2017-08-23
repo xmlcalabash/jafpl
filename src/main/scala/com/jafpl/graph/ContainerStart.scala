@@ -1,6 +1,7 @@
 package com.jafpl.graph
 
 import com.jafpl.steps.{Step, ViewportComposer}
+import com.jafpl.util.ItemComparator
 
 import scala.collection.mutable.ListBuffer
 
@@ -162,7 +163,7 @@ class ContainerStart(override val graph: Graph,
     */
   def addWhile(testexpr: String, label: String): WhileStart = addWhile(testexpr, Some(label))
 
-  /** Add a new for-each container to this container.
+  /** Add a new while container to this container.
     *
     * @param testexpr The test expression.
     * @param label An optional, user-defined label.
@@ -170,6 +171,34 @@ class ContainerStart(override val graph: Graph,
     */
   def addWhile(testexpr: String, label: Option[String]): WhileStart = {
     val node = graph.addWhile(testexpr, label)
+    addChild(node)
+    node
+  }
+
+  /** Add a new until container to this container.
+    *
+    * @param comparator The comparator.
+    * @return The node added.
+    */
+  def addUntil(comparator: ItemComparator): UntilFinishedStart = addUntil(comparator, None)
+
+  /** Add a new until container to this container.
+    *
+    * @param comparator The comparator.
+    * @param label A user-defined label.
+    * @return The node added.
+    */
+  def addUntil(comparator: ItemComparator, label: String): UntilFinishedStart =
+    addUntil(comparator, Some(label))
+
+  /** Add a new until container to this container.
+    *
+    * @param comparator The comparator.
+    * @param label An optional, user-defined label.
+    * @return The node added.
+    */
+  def addUntil(comparator: ItemComparator, label: Option[String]): UntilFinishedStart = {
+    val node = graph.addUntil(comparator, label)
     addChild(node)
     node
   }
