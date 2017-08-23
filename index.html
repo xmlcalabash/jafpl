@@ -47,8 +47,8 @@ has to be replayable. This happens because multiple steps may read the same outp
 port and the reads may be interleaved. This problem cannot occur in JAFPL.
 Every port is read by exactly one step and exactly one step writes to every
 input port. If the graph described by your edges multiplexes access to
-any port, a “fan in” or “fan out” step will be inserted as appropriate.</p><p>In other words, this graph never happens:</p><div id="how.9" class="mediaobject"><img src="byhand-2.svg" /></div><p>If you attempt to construct that graph, the library will automatically
-restructure it so that this graph is produced:</p><div id="how.11" class="mediaobject"><img src="byhand-3.svg" /></div><p>You must provide an
+any port, a “fan in” or “fan out” step will be inserted as appropriate.</p><p>In other words, this graph never happens:</p><div id="how.9" class="mediaobject"><img src="figure0.svg" /></div><p>If you attempt to construct that graph, the library will automatically
+restructure it so that this graph is produced:</p><div id="how.11" class="mediaobject"><img src="figure1.svg" /></div><p>You must provide an
 <a href="#api">implementation class</a> for every node that you
 construct. That’s the class that will be called upon to perform the
 work of the step.</p><p>The graph is executed with the <a href="http://akka.io/">Akka</a> framework. Actors are created
@@ -198,4 +198,4 @@ it can tell if it will run before it is reset again. If any inputs arrive,
 what’s going to work best.</p></section></section><section id="whatsnext" class="section"><div class="section-titlepage"><h2>What’s next?</h2></div><p>Well. Continued development, I hope. But no promises.</p></section><section id="whatif" class="section"><div class="section-titlepage"><h2>What if I want a …?</h2></div><p>Just <a href="https://github.com/ndw/jafpl/issues">file an issue</a>,
 man, that’s all I got.</p></section><footer><p>Copyright © 2016 Norman Walsh. See
       <a href="https://github.com/ndw/jafpl/blob/master/LICENSE.md">LICENSE</a>.
-      Last updated on 22 Aug 2017 at 09:37a.m. GMT-05:00 by Norman Walsh</p></footer></article><script src="https://docbook.github.io/release/2.0.20/resources/js/prism.js"></script></body></html>
+      Last updated on 23 Aug 2017 at 09:07a.m. GMT-05:00 by Norman Walsh</p></footer></article><script src="https://docbook.github.io/release/2.0.20/resources/js/prism.js"></script></body></html>
