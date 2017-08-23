@@ -29,11 +29,6 @@ class WhileSpec extends FlatSpec {
 
     graph.addOutput(pipeline, "result")
 
-    graph.close()
-    val pw = new PrintWriter(new File("/projects/github/xproc/jafpl/pg.xml"))
-    pw.write(graph.asXML.toString)
-    pw.close()
-
     val runtime = new GraphRuntime(graph, runtimeConfig)
     val bc = new BufferConsumer()
     runtime.outputs("result").setProvider(bc)
