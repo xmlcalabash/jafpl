@@ -65,6 +65,14 @@ trait Step {
     */
   def receive(port: String, item: Any)
 
+  /** One time, startup initialization.
+    *
+    * The pipeline has been constructed and is going to run. This method is called once
+    * before execution begins.
+    *
+    */
+  def initialize()
+
   /** Run!
     *
     * All inputs have been recieved, so your deal.

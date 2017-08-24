@@ -72,6 +72,15 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     for (input <- node.bindings) {
       openBindings.add(input)
     }
+    if (node.step.isDefined) {
+      trace(s"RESET $node", "StepExec")
+      try {
+        node.step.get.initialize()
+      } catch {
+        case cause: Throwable =>
+          monitor ! GException(Some(node), cause)
+      }
+    }
   }
 
   protected def reset(): Unit = {
@@ -90,6 +99,15 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         case cp: ConsumingProxy =>
           cp.reset()
         case _ => Unit
+      }
+    }
+    if (node.step.isDefined) {
+      trace(s"RESET $node", "StepExec")
+      try {
+        node.step.get.reset()
+      } catch {
+        case cause: Throwable =>
+          monitor ! GException(Some(node), cause)
       }
     }
   }

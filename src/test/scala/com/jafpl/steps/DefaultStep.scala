@@ -19,6 +19,10 @@ class DefaultStep  extends Step {
     // nop
   }
 
+  override def initialize(): Unit = {
+    // nop
+  }
+
   override def run(): Unit = {
     // nop
   }
