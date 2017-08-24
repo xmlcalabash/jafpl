@@ -9,7 +9,7 @@ import org.scalatest.FlatSpec
 
 class ProvidersSpec extends FlatSpec {
   val PIPELINEDATA = "Document"
-  var runtimeConfig = new PrimitiveRuntimeConfiguration()
+  var runtimeConfig = new PrimitiveRuntimeConfiguration(true)
 
   "Pipeline providers " should " should provide input and consume output" in {
     val graph = new Graph()

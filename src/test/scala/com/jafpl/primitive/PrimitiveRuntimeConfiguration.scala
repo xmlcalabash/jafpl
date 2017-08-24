@@ -4,10 +4,14 @@ import com.jafpl.runtime.{ExpressionEvaluator, RuntimeConfiguration}
 
 import scala.collection.mutable
 
-class PrimitiveRuntimeConfiguration() extends RuntimeConfiguration() {
+class PrimitiveRuntimeConfiguration(val traceAll: Boolean) extends RuntimeConfiguration() {
   private val evaluator = new PrimitiveExpressionEvaluator()
   private val enabledTraces = mutable.HashSet.empty[String]
   private val disabledTraces = mutable.HashSet.empty[String]
+
+  def this() {
+    this(false)
+  }
 
   private val prop = Option(System.getProperty("com.xmlcalabash.trace"))
   if (prop.isDefined) {
@@ -36,13 +40,13 @@ class PrimitiveRuntimeConfiguration() extends RuntimeConfiguration() {
 
   override def traceEnabled(trace: String): Boolean = {
     if (enabledTraces.contains("ALL")) {
-      !disabledTraces.contains(trace)
+      traceAll || !disabledTraces.contains(trace)
     } else {
-      enabledTraces.contains("ALL") || enabledTraces.contains(trace)
+      traceAll || enabledTraces.contains("ALL") || enabledTraces.contains(trace)
     }
   }
 
-  override def watchdogTimeout = {
+  override def watchdogTimeout: Long = {
     var timeout: Long = 1000
     val prop = Option(System.getProperty("com.xmlcalabash.watchdogTimeout"))
     if (prop.isDefined) {
