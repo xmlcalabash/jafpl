@@ -14,11 +14,11 @@ import scala.collection.mutable.ListBuffer
 private[runtime] class ViewportActor(private val monitor: ActorRef,
                                      private val runtime: GraphRuntime,
                                      private val node: ViewportStart) extends StartActor(monitor, runtime, node)  {
-  val queue = ListBuffer.empty[ViewportItem]
-  var running = false
-  var sourceClosed = false
-  var received = false
-  var index = 0
+  private val queue = ListBuffer.empty[ViewportItem]
+  private var running = false
+  private var sourceClosed = false
+  private var received = false
+  private var index = 0
 
   override protected def start(): Unit = {
     readyToRun = true
@@ -57,21 +57,23 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
   }
 
   private def runIfReady(): Unit = {
-    if (!running && readyToRun && queue.nonEmpty) {
+    if (!running && readyToRun && sourceClosed) {
       running = true
 
-      // FIXME: What if the queue is empty
+      if (queue.nonEmpty) {
+        val item = queue(index)
+        val edge = node.outputEdge("source")
+        monitor ! GOutput(node, edge.toPort, new PipelineMessage(item.getItem))
+        monitor ! GClose(node, edge.toPort)
 
-      val item = queue(index)
-      val edge = node.outputEdge("source")
-      monitor ! GOutput(node, edge.toPort, new PipelineMessage(item.getItem))
-      monitor ! GClose(node, edge.toPort)
+        trace(s"START Viewport: $node", "Viewport")
 
-      trace(s"START Viewport: $node", "Viewport")
-
-      for (child <- node.children) {
-        trace(s"START ...$child (for $node)", "Viewport")
-        monitor ! GStart(child)
+        for (child <- node.children) {
+          trace(s"START ...$child (for $node)", "Viewport")
+          monitor ! GStart(child)
+        }
+      } else {
+        finished()
       }
     }
   }
@@ -95,23 +97,32 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def finished(): Unit = {
-    if (sourceClosed && (index >= queue.size)) {
-      trace(s"FINISH Viewport: $node $sourceClosed, ${queue.isEmpty}", "Viewport")
-      // send the transformed result and close the output
-      val recomposition = node.composer.recompose()
-      recomposition match {
-        case item: ItemMessage =>
-          monitor ! GOutput(node, "result", item)
-        case item: Message =>
-          throw new PipelineException("badrecomp", "Invalid recomposition")
-        case _ =>
-          monitor ! GOutput(node, "result", new PipelineMessage(recomposition))
+    if (sourceClosed) {
+      if (queue.isEmpty) {
+        monitor ! GClose(node, "result")
+        monitor ! GFinished(node)
+      } else {
+        if (index >= queue.size) {
+          trace(s"FINISH Viewport: $node $sourceClosed, ${queue.isEmpty}", "Viewport")
+          // send the transformed result and close the output
+          val recomposition = node.composer.recompose()
+          recomposition match {
+            case item: ItemMessage =>
+              monitor ! GOutput(node, "result", item)
+            case item: Message =>
+              throw new PipelineException("badrecomp", "Invalid recomposition")
+            case _ =>
+              monitor ! GOutput(node, "result", new PipelineMessage(recomposition))
+          }
+          monitor ! GClose(node, "result")
+          monitor ! GFinished(node)
+        } else {
+          trace(s"RESET Viewport: $node $sourceClosed, ${queue.isEmpty}", "Viewport")
+          monitor ! GReset(node)
+        }
       }
-      monitor ! GClose(node, "result")
-      monitor ! GFinished(node)
     } else {
-      trace(s"RESET Viewport: $node $sourceClosed, ${queue.isEmpty}", "Viewport")
-      monitor ! GReset(node)
+      // how does finished get called before run, exactly?
     }
   }
 }
