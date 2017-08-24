@@ -1,7 +1,7 @@
 name := "jafpl"
 
 organization := "com.jafpl"
-version      := "0.0.6"
+version      := "0.0.6b"
 scalaVersion := "2.12.3"
 
 resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"

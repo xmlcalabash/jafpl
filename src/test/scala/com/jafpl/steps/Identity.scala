@@ -5,18 +5,18 @@ class Identity(allowSeq: Boolean) extends DefaultStep {
     this(true)
   }
 
-  override def inputSpec: PortBindingSpecification = {
+  override def inputSpec: PortSpecification = {
     if (allowSeq) {
-      PortBindingSpecification.SOURCESEQ
+      PortSpecification.SOURCESEQ
     } else {
-      PortBindingSpecification.SOURCE
+      PortSpecification.SOURCE
     }
   }
-  override def outputSpec: PortBindingSpecification = {
+  override def outputSpec: PortSpecification = {
     if (allowSeq) {
-      PortBindingSpecification.RESULTSEQ
+      PortSpecification.RESULTSEQ
     } else {
-      PortBindingSpecification.RESULT
+      PortSpecification.RESULT
     }
   }
 

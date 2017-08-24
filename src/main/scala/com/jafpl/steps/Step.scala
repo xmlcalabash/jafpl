@@ -24,7 +24,7 @@ trait Step {
     *
     * @return The list of required port names.
     */
-  def inputSpec: PortBindingSpecification
+  def inputSpec: PortSpecification
 
   /** The names of the output ports this step requires.
     *
@@ -32,7 +32,7 @@ trait Step {
     *
     * @return The list of required port names.
     */
-  def outputSpec: PortBindingSpecification
+  def outputSpec: PortSpecification
 
   /** The names of the variable bindings this step requires.
     *
@@ -41,7 +41,7 @@ trait Step {
     *
     * @return The list of variable names.
     */
-  def requiredBindings: Set[String]
+  def bindingSpec: BindingSpecification
 
   /** Set the consumer for sending output to the pipeline.
     *

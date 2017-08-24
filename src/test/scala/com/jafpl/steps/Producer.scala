@@ -5,8 +5,8 @@ class Producer(val items: List[Any]) extends DefaultStep {
     this(List(str))
   }
 
-  override def inputSpec = PortBindingSpecification.NONE
-  override def outputSpec = PortBindingSpecification.RESULTSEQ
+  override def inputSpec = PortSpecification.NONE
+  override def outputSpec = PortSpecification.RESULTSEQ
 
   override def run(): Unit = {
     for (item <- items) {

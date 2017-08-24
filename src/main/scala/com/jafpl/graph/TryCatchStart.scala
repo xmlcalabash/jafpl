@@ -3,9 +3,9 @@ package com.jafpl.graph
 import com.jafpl.exceptions.GraphException
 import com.jafpl.steps.{Step, ViewportComposer}
 
-private[jafpl] class TryCatchStart(override val graph: Graph,
-                                   override protected val end: ContainerEnd,
-                                   override val userLabel: Option[String])
+class TryCatchStart private[jafpl] (override val graph: Graph,
+                                    override protected val end: ContainerEnd,
+                                    override val userLabel: Option[String])
   extends ContainerStart(graph, end, userLabel) {
 
   def addTry(label: String): TryStart = addTry(Some(label))

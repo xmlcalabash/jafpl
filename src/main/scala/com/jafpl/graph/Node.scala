@@ -10,17 +10,17 @@ import scala.xml.UnprefixedAttribute
 /** A node in the pipeline graph.
   *
   * You can't instantiate nodes directly, see the methods on [[com.jafpl.graph.Graph]] and
-  * on nodes.
+  * on [[com.jafpl.graph.ContainerStart]] and its subtypes.
   *
   * @constructor A node in the pipeline graph.
   * @param graph The graph into which this node is to be inserted.
   * @param step An optional implementation step.
   * @param userLabel An optional user-defined label.
   */
-abstract class Node(val graph: Graph, val step: Option[Step], val userLabel: Option[String]) {
+abstract class Node(val graph: Graph,
+                                     val step: Option[Step],
+                                     val userLabel: Option[String]) {
   private var _start: Option[ContainerStart] = None
-  val id: String = UniqueId.nextId.toString
-
   private val _name: String = if (userLabel.isDefined) {
     val regex = """([\p{L}_][-\p{L}_\p{N}]*)""".r
     userLabel.get match {
@@ -34,6 +34,13 @@ abstract class Node(val graph: Graph, val step: Option[Step], val userLabel: Opt
     }
     name
   }
+
+  /** A unique identifier for this node.
+    *
+    * Every node has a unique identifier.
+    */
+  val id: String = UniqueId.nextId.toString
+
   private val _label = s"${_name}-$id"
   private var _loc = Option.empty[Location]
 
@@ -43,12 +50,17 @@ abstract class Node(val graph: Graph, val step: Option[Step], val userLabel: Opt
     * has been provided, [[com.jafpl.graph.NodeLocation.UNKNOWN]] is returned.
     */
   def location: Option[Location] = _loc
-  def location_=(loc: Location): Unit = {
+
+  protected[jafpl] def location_=(loc: Location): Unit = {
     _loc = Some(loc)
   }
 
-
-  /** The node lebel. */
+  /** The node label.
+    *
+    * Labels are used in output to help identify the node in question. The `id` of the
+    * node is always appended to the label.
+    *
+    */
   def label: String = _label
 
   /** Add a dependency edge.
@@ -107,7 +119,7 @@ abstract class Node(val graph: Graph, val step: Option[Step], val userLabel: Opt
     }
   }
 
-  /** To string. */
+  /** A string representation of this node. */
   override def toString: String = {
     s"{$label}"
   }

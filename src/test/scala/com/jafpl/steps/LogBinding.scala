@@ -6,9 +6,9 @@ class LogBinding() extends DefaultStep {
   protected[jafpl] val logger = LoggerFactory.getLogger(this.getClass)
   private var message: String = ""
 
-  override def inputSpec = PortBindingSpecification.NONE
-  override def outputSpec = PortBindingSpecification.RESULT
-  override def requiredBindings = Set("message")
+  override def inputSpec = PortSpecification.NONE
+  override def outputSpec = PortSpecification.RESULT
+  override def bindingSpec = new BindingSpecification(Set("message"))
 
   override def receiveBinding(varname: String, value: Any): Unit = {
     if (varname == "message") {

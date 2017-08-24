@@ -3,8 +3,8 @@ package com.jafpl.steps
 import com.jafpl.exceptions.PipelineException
 
 class Decrement() extends DefaultStep {
-  override def inputSpec: PortBindingSpecification = PortBindingSpecification.SOURCE
-  override def outputSpec: PortBindingSpecification = PortBindingSpecification.RESULT
+  override def inputSpec: PortSpecification = PortSpecification.SOURCE
+  override def outputSpec: PortSpecification = PortSpecification.RESULT
 
   override def receive(port: String, item: Any): Unit = {
     item match {

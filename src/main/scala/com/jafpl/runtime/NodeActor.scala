@@ -7,7 +7,7 @@ import com.jafpl.graph.{ContainerEnd, Node, WhileStart}
 import com.jafpl.messages.BindingMessage
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GStopped}
 import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NGuardResult, NInitialize, NInput, NLoop, NReset, NStart, NStop, NTraceDisable, NTraceEnable, NViewportFinished}
-import com.jafpl.steps.{DataProvider, PortBindingSpecification, Provider, StepDataProvider}
+import com.jafpl.steps.{DataProvider, PortSpecification, Provider, StepDataProvider}
 
 import scala.collection.mutable
 
@@ -184,7 +184,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def close(port: String): Unit = {
-    if (node.step.isDefined && node.step.get.inputSpec != PortBindingSpecification.ANY
+    if (node.step.isDefined && node.step.get.inputSpec != PortSpecification.ANY
         && !port.startsWith("#")) {
       try {
         node.step.get.inputSpec.checkCardinality(port, cardinalities.getOrElse(port, 0L))

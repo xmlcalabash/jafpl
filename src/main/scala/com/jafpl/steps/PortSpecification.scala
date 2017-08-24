@@ -7,19 +7,19 @@ import scala.collection.{immutable, mutable}
 /** Useful default port binding specifications.
   *
   */
-object PortBindingSpecification {
+object PortSpecification {
   /** Allow any ports. */
-  val ANY: PortBindingSpecification = new PortBindingSpecification(Map("*" -> "*"))
+  val ANY: PortSpecification = new PortSpecification(Map("*" -> "*"))
   /** Allow no ports. */
-  val NONE: PortBindingSpecification = new PortBindingSpecification(Map())
+  val NONE: PortSpecification = new PortSpecification(Map())
   /** Allow a single document on the `source` port. */
-  val SOURCE: PortBindingSpecification = new PortBindingSpecification(Map("source" -> "1"))
+  val SOURCE: PortSpecification = new PortSpecification(Map("source" -> "1"))
   /** Allow a single document on the `result` port. */
-  val RESULT: PortBindingSpecification = new PortBindingSpecification(Map("result" -> "1"))
+  val RESULT: PortSpecification = new PortSpecification(Map("result" -> "1"))
   /** Allow a sequence of zero or more documents on the `source` port. */
-  val SOURCESEQ: PortBindingSpecification = new PortBindingSpecification(Map("source" -> "*"))
+  val SOURCESEQ: PortSpecification = new PortSpecification(Map("source" -> "*"))
   /** Allow a sequence of zero or more documents on the `result` port. */
-  val RESULTSEQ: PortBindingSpecification = new PortBindingSpecification(Map("result" -> "*"))
+  val RESULTSEQ: PortSpecification = new PortSpecification(Map("result" -> "*"))
 }
 
 /** Specify the valid bindings for step inputs or outputs
@@ -49,7 +49,7 @@ object PortBindingSpecification {
   * @constructor A port binding specification.
   * @param spec A map from port names to cardinalities.
   */
-class PortBindingSpecification(spec: immutable.Map[String,String]) {
+class PortSpecification(spec: immutable.Map[String,String]) {
   private val cardinalities: List[String] = List("1", "?", "+", "*")
   for (port <- spec.keySet) {
     if (!cardinalities.contains(spec(port))) {

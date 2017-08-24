@@ -17,9 +17,11 @@ import scala.collection.mutable.ListBuffer
   * @param end The end of this container.
   * @param userLabel An optional user-defined label.
   */
-class ContainerStart(override val graph: Graph,
-                     protected val end: ContainerEnd,
-                     override val userLabel: Option[String]) extends Node(graph, None, userLabel) {
+class ContainerStart protected[jafpl] (override val graph: Graph,
+                                       protected val end: ContainerEnd,
+                                       override val userLabel: Option[String])
+  extends Node(graph, None, userLabel) {
+
   private val _children = ListBuffer.empty[Node]
 
   /** The children of this container. */

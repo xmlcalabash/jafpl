@@ -1,8 +1,8 @@
 package com.jafpl.steps
 
 class LiesAboutOutputBindings extends DefaultStep {
-  override def inputSpec = PortBindingSpecification.SOURCESEQ
-  override def outputSpec = PortBindingSpecification.RESULT
+  override def inputSpec = PortSpecification.SOURCESEQ
+  override def outputSpec = PortSpecification.RESULT
 
   override def run(): Unit = {
     consumer.get.send("result", "one")

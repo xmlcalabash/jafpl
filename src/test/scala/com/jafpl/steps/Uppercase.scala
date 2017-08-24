@@ -3,8 +3,8 @@ package com.jafpl.steps
 import com.jafpl.exceptions.PipelineException
 
 class Uppercase extends DefaultStep {
-  override def inputSpec = PortBindingSpecification.SOURCE
-  override def outputSpec = PortBindingSpecification.RESULT
+  override def inputSpec = PortSpecification.SOURCE
+  override def outputSpec = PortSpecification.RESULT
 
   override def receive(port: String, item: Any): Unit = {
     item match {

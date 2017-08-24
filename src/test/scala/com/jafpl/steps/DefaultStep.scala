@@ -1,9 +1,9 @@
 package com.jafpl.steps
 
 class DefaultStep  extends Step {
-  override def inputSpec: PortBindingSpecification = PortBindingSpecification.ANY
-  override def outputSpec: PortBindingSpecification = PortBindingSpecification.ANY
-  override def requiredBindings: Set[String] = Set()
+  override def inputSpec: PortSpecification = PortSpecification.ANY
+  override def outputSpec: PortSpecification = PortSpecification.ANY
+  override def bindingSpec: BindingSpecification = BindingSpecification.ANY
 
   override def receiveBinding(variable: String, value: Any): Unit = {
     // nop

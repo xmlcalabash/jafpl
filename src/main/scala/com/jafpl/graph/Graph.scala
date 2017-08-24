@@ -613,7 +613,7 @@ class Graph(listener: Option[ErrorListener]) {
               error(new GraphException(s"Required output '$port' missing: $atomic", node.location))
             }
 
-            map = mutable.HashSet.empty[String] ++ atomic.step.get.requiredBindings
+            map = mutable.HashSet.empty[String] ++ atomic.step.get.bindingSpec.bindings
             for (varname <- node.bindings) {
               if (map.contains(varname)) {
                 map -= varname
