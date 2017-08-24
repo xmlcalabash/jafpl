@@ -132,6 +132,12 @@
                           BindingProvider
                         </a>
                       </li><li class="current-entities indented3">
+                        <a class="object" href="BindingSpecification$.html" title="Useful default binding specifications."></a>
+                        <a class="class" href="BindingSpecification.html" title="Specify the required bindings for steps."></a>
+                        <a href="BindingSpecification.html" title="Specify the required bindings for steps.">
+                          BindingSpecification
+                        </a>
+                      </li><li class="current-entities indented3">
                         <span class="separator"></span>
                         <a class="trait" href="DataConsumer.html" title="A data consumer."></a>
                         <a href="DataConsumer.html" title="A data consumer.">
@@ -144,10 +150,10 @@
                           DataProvider
                         </a>
                       </li><li class="current-entities indented3">
-                        <a class="object" href="PortBindingSpecification$.html" title="Useful default port binding specifications."></a>
-                        <a class="class" href="PortBindingSpecification.html" title="Specify the valid bindings for step inputs or outputs"></a>
-                        <a href="PortBindingSpecification.html" title="Specify the valid bindings for step inputs or outputs">
-                          PortBindingSpecification
+                        <a class="object" href="PortSpecification$.html" title="Useful default port binding specifications."></a>
+                        <a class="class" href="PortSpecification.html" title="Specify the valid bindings for step inputs or outputs"></a>
+                        <a href="PortSpecification.html" title="Specify the valid bindings for step inputs or outputs">
+                          PortSpecification
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
@@ -287,10 +293,10 @@ some sibling step raised an exception that caused an entire container to fail.</
       <p class="shortcomment cmt">Abort processing.</p><div class="fullcomment"><div class="comment cmt"><p>Abort processing.</p><p>This method will be called if <code>run</code> will never be called because an exception
 has terminated execution of the container that contains this step.</p><p>Note that <code>reset</code> will also called before processing restarts if this step
 is in a loop.</p></div></div>
-    </li><li name="com.jafpl.steps.Step#inputSpec" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="inputSpec:com.jafpl.steps.PortBindingSpecification"></a><a id="inputSpec:PortBindingSpecification"></a>
+    </li><li name="com.jafpl.steps.Step#bindingSpec" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="bindingSpec:com.jafpl.steps.BindingSpecification"></a><a id="bindingSpec:BindingSpecification"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#inputSpec:com.jafpl.steps.PortBindingSpecification" title="Permalink">
+      <a href="../../../com/jafpl/steps/Step.html#bindingSpec:com.jafpl.steps.BindingSpecification" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -299,15 +305,50 @@ is in a loop.</p></div></div>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">inputSpec</span><span class="result">: <a href="PortBindingSpecification.html" class="extype" name="com.jafpl.steps.PortBindingSpecification">PortBindingSpecification</a></span>
+        <span class="name">bindingSpec</span><span class="result">: <a href="BindingSpecification.html" class="extype" name="com.jafpl.steps.BindingSpecification">BindingSpecification</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">The names of the variable bindings this step requires.</p><div class="fullcomment"><div class="comment cmt"><p>The names of the variable bindings this step requires.</p><p>This method returns the names of the variables for which
+the step requires a binding.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The list of variable names.</p></dd></dl></div>
+    </li><li name="com.jafpl.steps.Step#initialize" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="initialize():Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/steps/Step.html#initialize():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">initialize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">One time, startup initialization.</p><div class="fullcomment"><div class="comment cmt"><p>One time, startup initialization.</p><p>The pipeline has been constructed and is going to run. This method is called once
+before execution begins.</p></div></div>
+    </li><li name="com.jafpl.steps.Step#inputSpec" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="inputSpec:com.jafpl.steps.PortSpecification"></a><a id="inputSpec:PortSpecification"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/steps/Step.html#inputSpec:com.jafpl.steps.PortSpecification" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">inputSpec</span><span class="result">: <a href="PortSpecification.html" class="extype" name="com.jafpl.steps.PortSpecification">PortSpecification</a></span>
       </span>
       
       <p class="shortcomment cmt">The names of the input ports this step requires.</p><div class="fullcomment"><div class="comment cmt"><p>The names of the input ports this step requires.</p><p>This method returns the names of the input ports that the step requires.
 </p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The list of required port names.</p></dd></dl></div>
     </li><li name="com.jafpl.steps.Step#outputSpec" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="outputSpec:com.jafpl.steps.PortBindingSpecification"></a><a id="outputSpec:PortBindingSpecification"></a>
+      <a id="outputSpec:com.jafpl.steps.PortSpecification"></a><a id="outputSpec:PortSpecification"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#outputSpec:com.jafpl.steps.PortBindingSpecification" title="Permalink">
+      <a href="../../../com/jafpl/steps/Step.html#outputSpec:com.jafpl.steps.PortSpecification" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -316,7 +357,7 @@ is in a loop.</p></div></div>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">outputSpec</span><span class="result">: <a href="PortBindingSpecification.html" class="extype" name="com.jafpl.steps.PortBindingSpecification">PortBindingSpecification</a></span>
+        <span class="name">outputSpec</span><span class="result">: <a href="PortSpecification.html" class="extype" name="com.jafpl.steps.PortSpecification">PortSpecification</a></span>
       </span>
       
       <p class="shortcomment cmt">The names of the output ports this step requires.</p><div class="fullcomment"><div class="comment cmt"><p>The names of the output ports this step requires.</p><p>This method returns the names of the output ports that the step requires.
@@ -355,24 +396,6 @@ is in a loop.</p></div></div>
       
       <p class="shortcomment cmt">Receive a binding.</p><div class="fullcomment"><div class="comment cmt"><p>Receive a binding.</p><p>Receive a variable binding from the pipeline.
 </p></div><dl class="paramcmts block"><dt class="param">variable</dt><dd class="cmt"><p>The name of the variable.</p></dd><dt class="param">value</dt><dd class="cmt"><p>The computed value of the variable.</p></dd></dl></div>
-    </li><li name="com.jafpl.steps.Step#requiredBindings" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="requiredBindings:Set[String]"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#requiredBindings:Set[String]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">requiredBindings</span><span class="result">: <span class="extype" name="scala.Predef.Set">Set</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
-      </span>
-      
-      <p class="shortcomment cmt">The names of the variable bindings this step requires.</p><div class="fullcomment"><div class="comment cmt"><p>The names of the variable bindings this step requires.</p><p>This method returns the names of the variables for which
-the step requires a binding.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The list of variable names.</p></dd></dl></div>
     </li><li name="com.jafpl.steps.Step#reset" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="reset():Unit"></a>
       <span class="permalink">

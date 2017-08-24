@@ -127,15 +127,39 @@
       <p class="shortcomment cmt">This is the Scaladoc for the graph package.</p><div class="fullcomment"><div class="comment cmt"><p>This is the Scaladoc for the graph package.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.jafpl">jafpl</a></dd></dl></div>
     </li><li class="current-entities indented3">
                         <span class="separator"></span>
+                        <a class="class" href="AtomicNode.html" title="An atomic node."></a>
+                        <a href="AtomicNode.html" title="An atomic node.">
+                          AtomicNode
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
                         <a class="class" href="Binding.html" title="A variable binding."></a>
                         <a href="Binding.html" title="A variable binding.">
                           Binding
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
+                        <a class="class" href="CatchStart.html" title="The catch block of a try catch."></a>
+                        <a href="CatchStart.html" title="The catch block of a try catch.">
+                          CatchStart
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
+                        <a class="class" href="ChooseStart.html" title="A choose container."></a>
+                        <a href="ChooseStart.html" title="A choose container.">
+                          ChooseStart
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
                         <a class="class" href="ContainerStart.html" title="A node that contains other nodes."></a>
                         <a href="ContainerStart.html" title="A node that contains other nodes.">
                           ContainerStart
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
+                        <a class="class" href="ForEachStart.html" title="A for-each container."></a>
+                        <a href="ForEachStart.html" title="A for-each container.">
+                          ForEachStart
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
@@ -166,6 +190,12 @@
                         <a class="class" href="NodeLocation.html" title=""></a>
                         <a href="NodeLocation.html" title="">
                           NodeLocation
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
+                        <a class="class" href="TryCatchStart.html" title=""></a>
+                        <a href="TryCatchStart.html" title="">
+                          TryCatchStart
                         </a>
                       </li>
               </ul>
@@ -441,7 +471,7 @@ provided at runtime.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addCatch</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="codes">codes: <span class="extype" name="scala.List">List</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.CatchStart">CatchStart</span></span>
+        <span class="name">addCatch</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="codes">codes: <span class="extype" name="scala.List">List</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="CatchStart.html" class="extype" name="com.jafpl.graph.CatchStart">CatchStart</a></span>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
@@ -457,7 +487,7 @@ provided at runtime.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addChoose</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.ChooseStart">ChooseStart</span></span>
+        <span class="name">addChoose</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="ChooseStart.html" class="extype" name="com.jafpl.graph.ChooseStart">ChooseStart</a></span>
       </span>
       
       <p class="shortcomment cmt">Adds a choose to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a choose to the graph.
@@ -516,7 +546,7 @@ the inner steps must provide outputs through their container.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addForEach</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.ForEachStart">ForEachStart</span></span>
+        <span class="name">addForEach</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="ForEachStart.html" class="extype" name="com.jafpl.graph.ForEachStart">ForEachStart</a></span>
       </span>
       
       <p class="shortcomment cmt">Adds a for-each to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a for-each to the graph.
@@ -684,7 +714,7 @@ ports into which data can be poured before the pipeline is run.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addTryCatch</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.TryCatchStart">TryCatchStart</span></span>
+        <span class="name">addTryCatch</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="TryCatchStart.html" class="extype" name="com.jafpl.graph.TryCatchStart">TryCatchStart</a></span>
       </span>
       
       <p class="shortcomment cmt">Adds a try/catch to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a try/catch to the graph.

@@ -127,15 +127,39 @@
       <p class="shortcomment cmt">This is the Scaladoc for the graph package.</p><div class="fullcomment"><div class="comment cmt"><p>This is the Scaladoc for the graph package.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.jafpl">jafpl</a></dd></dl></div>
     </li><li class="current-entities indented3">
                         <span class="separator"></span>
+                        <a class="class" href="AtomicNode.html" title="An atomic node."></a>
+                        <a href="AtomicNode.html" title="An atomic node.">
+                          AtomicNode
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
                         <a class="class" href="" title="A variable binding."></a>
                         <a href="" title="A variable binding.">
                           Binding
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
+                        <a class="class" href="CatchStart.html" title="The catch block of a try catch."></a>
+                        <a href="CatchStart.html" title="The catch block of a try catch.">
+                          CatchStart
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
+                        <a class="class" href="ChooseStart.html" title="A choose container."></a>
+                        <a href="ChooseStart.html" title="A choose container.">
+                          ChooseStart
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
                         <a class="class" href="ContainerStart.html" title="A node that contains other nodes."></a>
                         <a href="ContainerStart.html" title="A node that contains other nodes.">
                           ContainerStart
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
+                        <a class="class" href="ForEachStart.html" title="A for-each container."></a>
+                        <a href="ForEachStart.html" title="A for-each container.">
+                          ForEachStart
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
@@ -167,6 +191,12 @@
                         <a href="NodeLocation.html" title="">
                           NodeLocation
                         </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
+                        <a class="class" href="TryCatchStart.html" title=""></a>
+                        <a href="TryCatchStart.html" title="">
+                          TryCatchStart
+                        </a>
                       </li>
               </ul>
             </div>
@@ -195,7 +225,8 @@
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A variable binding.
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A variable binding.</p><p>When pipelines are constructed, variable bindings associate expressions with variable names.
+At runtime, the association is between the name and its computed value.</p><p>Variables are lexically scoped.
 </p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
@@ -246,7 +277,7 @@
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="com.jafpl.graph.Binding#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+              <ol><li name="com.jafpl.graph.Binding#&lt;init&gt;" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="&lt;init&gt;(graph:com.jafpl.graph.Graph,name:String):com.jafpl.graph.Binding"></a><a id="&lt;init&gt;:Binding"></a>
       <span class="permalink">
       <a href="../../../com/jafpl/graph/Binding.html#&lt;init&gt;(graph:com.jafpl.graph.Graph,name:String):com.jafpl.graph.Binding" title="Permalink">
@@ -261,8 +292,8 @@
         <span class="name">Binding</span><span class="params">(<span name="graph">graph: <a href="Graph.html" class="extype" name="com.jafpl.graph.Graph">Graph</a></span>, <span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
       </span>
       
-      
-    </li><li name="com.jafpl.graph.Binding#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../index.html" class="extype" name="com.jafpl">com.jafpl</a>] </dd></dl></div>
+    </li><li name="com.jafpl.graph.Binding#&lt;init&gt;" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="&lt;init&gt;(graph:com.jafpl.graph.Graph,name:String,expression:Option[String]):com.jafpl.graph.Binding"></a><a id="&lt;init&gt;:Binding"></a>
       <span class="permalink">
       <a href="../../../com/jafpl/graph/Binding.html#&lt;init&gt;(graph:com.jafpl.graph.Graph,name:String,expression:Option[String]):com.jafpl.graph.Binding" title="Permalink">
@@ -277,7 +308,7 @@
         <span class="name">Binding</span><span class="params">(<span name="graph">graph: <a href="Graph.html" class="extype" name="com.jafpl.graph.Graph">Graph</a></span>, <span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span>
       </span>
       
-      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">graph</dt><dd class="cmt"><p>The graph into which this node is to be inserted.</p></dd><dt class="param">name</dt><dd class="cmt"><p>The variable's name</p></dd><dt class="param">expression</dt><dd class="cmt"><p>It's initializer expression</p></dd></dl></div>
+      <p class="shortcomment cmt">Use the <code>addBinding()</code> method on <a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">com.jafpl.graph.ContainerStart</a> to construct a binding.</p><div class="fullcomment"><div class="comment cmt"><p>Use the <code>addBinding()</code> method on <a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">com.jafpl.graph.ContainerStart</a> to construct a binding.</p></div><dl class="paramcmts block"><dt class="param">graph</dt><dd class="cmt"><p>The graph into which this node is to be inserted.</p></dd><dt class="param">name</dt><dd class="cmt"><p>The variable's name</p></dd><dt class="param">expression</dt><dd class="cmt"><p>Its initializer expression</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../index.html" class="extype" name="com.jafpl">com.jafpl</a>] </dd></dl></div>
     </li></ol>
             </div>
 
@@ -576,7 +607,8 @@ order, you can impose one by saying that <code>A.dependsOn(B)</code>.
         <span class="name">id</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
+      <p class="shortcomment cmt">A unique identifier for this node.</p><div class="fullcomment"><div class="comment cmt"><p>A unique identifier for this node.</p><p>Every node has a unique identifier.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
     </li><li name="com.jafpl.graph.Node#inputEdge" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="inputEdge(port:String):com.jafpl.graph.Edge"></a><a id="inputEdge(String):Edge"></a>
       <span class="permalink">
@@ -610,22 +642,6 @@ order, you can impose one by saying that <code>A.dependsOn(B)</code>.
       
       <p class="shortcomment cmt">The names of this step's input ports.</p><div class="fullcomment"><div class="comment cmt"><p>The names of this step's input ports.
 </p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The input port names.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
-    </li><li name="com.jafpl.graph.Binding#inputsOk" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="inputsOk():Boolean"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/graph/Binding.html#inputsOk():Boolean" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">inputsOk</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.graph.Binding">Binding</a> → <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
@@ -657,7 +673,8 @@ order, you can impose one by saying that <code>A.dependsOn(B)</code>.
         <span class="name">label</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       
-      <p class="shortcomment cmt">The node lebel.</p><div class="fullcomment"><div class="comment cmt"><p>The node lebel.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.graph.Binding">Binding</a> → <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
+      <p class="shortcomment cmt">The node label.</p><div class="fullcomment"><div class="comment cmt"><p>The node label.</p><p>Labels are used in output to help identify the node in question. The <code>id</code> of the
+node is always appended to the label.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.graph.Binding">Binding</a> → <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
     </li><li name="com.jafpl.graph.Node#location" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="location:Option[com.jafpl.graph.Location]"></a><a id="location:Option[Location]"></a>
       <span class="permalink">
@@ -676,7 +693,7 @@ order, you can impose one by saying that <code>A.dependsOn(B)</code>.
       <p class="shortcomment cmt">The node's location.</p><div class="fullcomment"><div class="comment cmt"><p>The node's location.</p><p>The node location will be used for reporting (for example in errors). If no location
 has been provided, <a href="NodeLocation$.html#UNKNOWN:com.jafpl.graph.NodeLocation" class="extmbr" name="com.jafpl.graph.NodeLocation#UNKNOWN">com.jafpl.graph.NodeLocation.UNKNOWN</a> is returned.
 </p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
-    </li><li name="com.jafpl.graph.Node#location_=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="com.jafpl.graph.Node#location_=" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="location_=(loc:com.jafpl.graph.Location):Unit"></a><a id="location_=(Location):Unit"></a>
       <span class="permalink">
       <a href="../../../com/jafpl/graph/Binding.html#location_=(loc:com.jafpl.graph.Location):Unit" title="Permalink">
@@ -691,7 +708,7 @@ has been provided, <a href="NodeLocation$.html#UNKNOWN:com.jafpl.graph.NodeLocat
         <span title="gt4s: location_$eq" class="name">location_=</span><span class="params">(<span name="loc">loc: <a href="Location.html" class="extype" name="com.jafpl.graph.Location">Location</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../index.html" class="extype" name="com.jafpl">com.jafpl</a>] </dd><dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
     </li><li name="com.jafpl.graph.Binding#name" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="name:String"></a>
       <span class="permalink">
@@ -789,22 +806,6 @@ has been provided, <a href="NodeLocation$.html#UNKNOWN:com.jafpl.graph.NodeLocat
       
       <p class="shortcomment cmt">The names of this step's output ports.</p><div class="fullcomment"><div class="comment cmt"><p>The names of this step's output ports.
 </p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The output port names.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
-    </li><li name="com.jafpl.graph.Binding#outputsOk" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="outputsOk():Boolean"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/graph/Binding.html#outputsOk():Boolean" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">outputsOk</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.graph.Binding">Binding</a> → <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
     </li><li name="com.jafpl.graph.Node#parent" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="parent:Option[com.jafpl.graph.ContainerStart]"></a><a id="parent:Option[ContainerStart]"></a>
       <span class="permalink">
@@ -869,7 +870,7 @@ has been provided, <a href="NodeLocation$.html#UNKNOWN:com.jafpl.graph.NodeLocat
         <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       
-      <p class="shortcomment cmt">To string.</p><div class="fullcomment"><div class="comment cmt"><p>To string.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.graph.Binding">Binding</a> → <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a> → AnyRef → Any</dd></dl></div>
+      <p class="shortcomment cmt">A string representation of this node.</p><div class="fullcomment"><div class="comment cmt"><p>A string representation of this node.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.graph.Binding">Binding</a> → <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a> → AnyRef → Any</dd></dl></div>
     </li><li name="com.jafpl.graph.Node#userLabel" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="userLabel:Option[String]"></a>
       <span class="permalink">

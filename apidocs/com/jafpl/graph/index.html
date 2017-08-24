@@ -143,15 +143,39 @@
       <p class="shortcomment cmt">This is the Scaladoc for the graph package.</p><div class="fullcomment"><div class="comment cmt"><p>This is the Scaladoc for the graph package.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.jafpl">jafpl</a></dd></dl></div>
     </li><li class="current-entities indented3">
                         <span class="separator"></span>
+                        <a class="class" href="AtomicNode.html" title="An atomic node."></a>
+                        <a href="AtomicNode.html" title="An atomic node.">
+                          AtomicNode
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
                         <a class="class" href="Binding.html" title="A variable binding."></a>
                         <a href="Binding.html" title="A variable binding.">
                           Binding
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
+                        <a class="class" href="CatchStart.html" title="The catch block of a try catch."></a>
+                        <a href="CatchStart.html" title="The catch block of a try catch.">
+                          CatchStart
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
+                        <a class="class" href="ChooseStart.html" title="A choose container."></a>
+                        <a href="ChooseStart.html" title="A choose container.">
+                          ChooseStart
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
                         <a class="class" href="ContainerStart.html" title="A node that contains other nodes."></a>
                         <a href="ContainerStart.html" title="A node that contains other nodes.">
                           ContainerStart
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
+                        <a class="class" href="ForEachStart.html" title="A for-each container."></a>
+                        <a href="ForEachStart.html" title="A for-each container.">
+                          ForEachStart
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
@@ -183,7 +207,31 @@
                         <a href="NodeLocation.html" title="">
                           NodeLocation
                         </a>
-                      </li><li name="com.jafpl.runtime" visbl="pub" class="indented3 " data-isabs="false" fullComment="yes" group="Ungrouped">
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
+                        <a class="class" href="TryCatchStart.html" title=""></a>
+                        <a href="TryCatchStart.html" title="">
+                          TryCatchStart
+                        </a>
+                      </li><li name="com.jafpl.messages" visbl="pub" class="indented3 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="messages"></a><a id="messages:messages"></a>
+      <span class="permalink">
+      <a href="../../com/jafpl/index.html#messages" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="../messages/index.html">
+              <span class="name">messages</span>
+            </a>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.jafpl">jafpl</a></dd></dl></div>
+    </li><li name="com.jafpl.runtime" visbl="pub" class="indented3 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="runtime"></a><a id="runtime:runtime"></a>
       <span class="permalink">
       <a href="../../com/jafpl/index.html#runtime" title="Permalink">
@@ -317,7 +365,27 @@
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="com.jafpl.graph.Binding" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+              <ol><li name="com.jafpl.graph.AtomicNode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="AtomicNodeextendsNode"></a><a id="AtomicNode:AtomicNode"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/index.html#AtomicNodeextendsNode" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a title="An atomic node." href="AtomicNode.html">
+              <span class="name">AtomicNode</span>
+            </a><span class="result"> extends <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">An atomic node.</p><div class="fullcomment"><div class="comment cmt"><p>An atomic node.</p><p>Atomic nodes are the most common pipeline extension point. The implementation is provided
+by the <code>step</code>.
+</p></div></div>
+    </li><li name="com.jafpl.graph.Binding" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="BindingextendsNode"></a><a id="Binding:Binding"></a>
       <span class="permalink">
       <a href="../../../com/jafpl/graph/index.html#BindingextendsNode" title="Permalink">
@@ -334,7 +402,47 @@
             </a><span class="result"> extends <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></span>
       </span>
       
-      <p class="shortcomment cmt">A variable binding.</p>
+      <p class="shortcomment cmt">A variable binding.</p><div class="fullcomment"><div class="comment cmt"><p>A variable binding.</p><p>When pipelines are constructed, variable bindings associate expressions with variable names.
+At runtime, the association is between the name and its computed value.</p><p>Variables are lexically scoped.
+</p></div></div>
+    </li><li name="com.jafpl.graph.CatchStart" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="CatchStartextendsContainerStart"></a><a id="CatchStart:CatchStart"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/index.html#CatchStartextendsContainerStart" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a title="The catch block of a try catch." href="CatchStart.html">
+              <span class="name">CatchStart</span>
+            </a><span class="result"> extends <a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">ContainerStart</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">The catch block of a try catch.</p><div class="fullcomment"><div class="comment cmt"><p>The catch block of a try catch.</p><p>Catch containers are created with the <code>addCatch</code> method of <a href="TryCatchStart.html" class="extype" name="com.jafpl.graph.TryCatchStart">com.jafpl.graph.TryCatchStart</a>.
+</p></div></div>
+    </li><li name="com.jafpl.graph.ChooseStart" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ChooseStartextendsContainerStart"></a><a id="ChooseStart:ChooseStart"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/index.html#ChooseStartextendsContainerStart" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a title="A choose container." href="ChooseStart.html">
+              <span class="name">ChooseStart</span>
+            </a><span class="result"> extends <a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">ContainerStart</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">A choose container.</p><div class="fullcomment"><div class="comment cmt"><p>A choose container.</p><p>Choose containers are created with the <code>addChoose</code> method of <a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">com.jafpl.graph.ContainerStart</a>.
+</p></div></div>
     </li><li name="com.jafpl.graph.ContainerStart" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ContainerStartextendsNode"></a><a id="ContainerStart:ContainerStart"></a>
       <span class="permalink">
@@ -354,6 +462,25 @@
       
       <p class="shortcomment cmt">A node that contains other nodes.</p><div class="fullcomment"><div class="comment cmt"><p>A node that contains other nodes.</p><p>Conceptually, some nodes contain others. A loop, for example, contains the steps that form the
 body of the loop.</p><p>In practice, containers are represented by a start and an end.
+</p></div></div>
+    </li><li name="com.jafpl.graph.ForEachStart" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ForEachStartextendsLoopStart"></a><a id="ForEachStart:ForEachStart"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/index.html#ForEachStartextendsLoopStart" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a title="A for-each container." href="ForEachStart.html">
+              <span class="name">ForEachStart</span>
+            </a><span class="result"> extends <a href="LoopStart.html" class="extype" name="com.jafpl.graph.LoopStart">LoopStart</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">A for-each container.</p><div class="fullcomment"><div class="comment cmt"><p>A for-each container.</p><p>ForEach containers are created with the <code>addForEach</code> method of <a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">com.jafpl.graph.ContainerStart</a>.
 </p></div></div>
     </li><li name="com.jafpl.graph.Graph" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="GraphextendsAnyRef"></a><a id="Graph:Graph"></a>
@@ -437,7 +564,7 @@ digits, hyphens, and underscores.
       </span>
       
       <p class="shortcomment cmt">A node in the pipeline graph.</p><div class="fullcomment"><div class="comment cmt"><p>A node in the pipeline graph.</p><p>You can't instantiate nodes directly, see the methods on <a href="Graph.html" class="extype" name="com.jafpl.graph.Graph">com.jafpl.graph.Graph</a> and
-on nodes.
+on <a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">com.jafpl.graph.ContainerStart</a> and its subtypes.
 </p></div></div>
     </li><li name="com.jafpl.graph.NodeLocation" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="NodeLocationextendsLocation"></a><a id="NodeLocation:NodeLocation"></a>
@@ -454,6 +581,24 @@ on nodes.
         <a title="" href="NodeLocation.html">
               <span class="name">NodeLocation</span>
             </a><span class="result"> extends <a href="Location.html" class="extype" name="com.jafpl.graph.Location">Location</a></span>
+      </span>
+      
+      
+    </li><li name="com.jafpl.graph.TryCatchStart" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="TryCatchStartextendsContainerStart"></a><a id="TryCatchStart:TryCatchStart"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/index.html#TryCatchStartextendsContainerStart" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="TryCatchStart.html">
+              <span class="name">TryCatchStart</span>
+            </a><span class="result"> extends <a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">ContainerStart</a></span>
       </span>
       
       

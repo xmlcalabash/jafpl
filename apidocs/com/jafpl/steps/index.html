@@ -143,6 +143,24 @@
       </span>
       
       <p class="shortcomment cmt">This is the Scaladoc for the graph package.</p><div class="fullcomment"><div class="comment cmt"><p>This is the Scaladoc for the graph package.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.jafpl">jafpl</a></dd></dl></div>
+    </li><li name="com.jafpl.messages" visbl="pub" class="indented3 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="messages"></a><a id="messages:messages"></a>
+      <span class="permalink">
+      <a href="../../com/jafpl/index.html#messages" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="../messages/index.html">
+              <span class="name">messages</span>
+            </a>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.jafpl">jafpl</a></dd></dl></div>
     </li><li name="com.jafpl.runtime" visbl="pub" class="indented3 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="runtime"></a><a id="runtime:runtime"></a>
       <span class="permalink">
@@ -184,6 +202,12 @@
                           BindingProvider
                         </a>
                       </li><li class="current-entities indented3">
+                        <a class="object" href="BindingSpecification$.html" title="Useful default binding specifications."></a>
+                        <a class="class" href="BindingSpecification.html" title="Specify the required bindings for steps."></a>
+                        <a href="BindingSpecification.html" title="Specify the required bindings for steps.">
+                          BindingSpecification
+                        </a>
+                      </li><li class="current-entities indented3">
                         <span class="separator"></span>
                         <a class="trait" href="DataConsumer.html" title="A data consumer."></a>
                         <a href="DataConsumer.html" title="A data consumer.">
@@ -196,10 +220,10 @@
                           DataProvider
                         </a>
                       </li><li class="current-entities indented3">
-                        <a class="object" href="PortBindingSpecification$.html" title="Useful default port binding specifications."></a>
-                        <a class="class" href="PortBindingSpecification.html" title="Specify the valid bindings for step inputs or outputs"></a>
-                        <a href="PortBindingSpecification.html" title="Specify the valid bindings for step inputs or outputs">
-                          PortBindingSpecification
+                        <a class="object" href="PortSpecification$.html" title="Useful default port binding specifications."></a>
+                        <a class="class" href="PortSpecification.html" title="Specify the valid bindings for step inputs or outputs"></a>
+                        <a href="PortSpecification.html" title="Specify the valid bindings for step inputs or outputs">
+                          PortSpecification
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
@@ -347,6 +371,29 @@
       </span>
       
       <p class="shortcomment cmt">A data provider.</p><div class="fullcomment"><div class="comment cmt"><p>A data provider.</p><p>This trait is used to expose the input requirements of a pipeline.</p></div></div>
+    </li><li name="com.jafpl.steps.BindingSpecification" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="BindingSpecificationextendsAnyRef"></a><a id="BindingSpecification:BindingSpecification"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/steps/index.html#BindingSpecificationextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a title="Specify the required bindings for steps." href="BindingSpecification.html">
+              <span class="name">BindingSpecification</span>
+            </a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Specify the required bindings for steps.</p><div class="fullcomment"><div class="comment cmt"><p>Specify the required bindings for steps.</p><p>The core engine doesn't care what bindings are passed to steps. If you have a step
+that requires a specific set of bindings, you can declare that explicitly. Once declared
+the pipeline engine will assure that a binding is provided.</p><p>Unlike ports, which have cardinalities, all that you can specify for bindings is that
+they are required. You cannot forbid bindings; steps must ignore &quot;extra&quot; bindings
+that might be provided by the pipeline.
+</p></div></div>
     </li><li name="com.jafpl.steps.DataConsumer" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="DataConsumerextendsStepDataProvider"></a><a id="DataConsumer:DataConsumer"></a>
       <span class="permalink">
@@ -385,10 +432,10 @@ where the data should be delivered.</p></div></div>
       </span>
       
       <p class="shortcomment cmt">A data provider.</p><div class="fullcomment"><div class="comment cmt"><p>A data provider.</p><p>This trait is used to expose the input requirements of a pipeline.</p></div></div>
-    </li><li name="com.jafpl.steps.PortBindingSpecification" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="PortBindingSpecificationextendsAnyRef"></a><a id="PortBindingSpecification:PortBindingSpecification"></a>
+    </li><li name="com.jafpl.steps.PortSpecification" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="PortSpecificationextendsAnyRef"></a><a id="PortSpecification:PortSpecification"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/index.html#PortBindingSpecificationextendsAnyRef" title="Permalink">
+      <a href="../../../com/jafpl/steps/index.html#PortSpecificationextendsAnyRef" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -397,8 +444,8 @@ where the data should be delivered.</p></div></div>
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a title="Specify the valid bindings for step inputs or outputs" href="PortBindingSpecification.html">
-              <span class="name">PortBindingSpecification</span>
+        <a title="Specify the valid bindings for step inputs or outputs" href="PortSpecification.html">
+              <span class="name">PortSpecification</span>
             </a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       
@@ -533,10 +580,10 @@ larger resource.</p></div></div>
         <div class="values members">
               <h3>Value Members</h3>
               <ol>
-                <li name="com.jafpl.steps.PortBindingSpecification" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="PortBindingSpecification"></a><a id="PortBindingSpecification:PortBindingSpecification"></a>
+                <li name="com.jafpl.steps.BindingSpecification" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BindingSpecification"></a><a id="BindingSpecification:BindingSpecification"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/index.html#PortBindingSpecification" title="Permalink">
+      <a href="../../../com/jafpl/steps/index.html#BindingSpecification" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -545,8 +592,26 @@ larger resource.</p></div></div>
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a title="Useful default port binding specifications." href="PortBindingSpecification$.html">
-              <span class="name">PortBindingSpecification</span>
+        <a title="Useful default binding specifications." href="BindingSpecification$.html">
+              <span class="name">BindingSpecification</span>
+            </a>
+      </span>
+      
+      <p class="shortcomment cmt">Useful default binding specifications.</p>
+    </li><li name="com.jafpl.steps.PortSpecification" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PortSpecification"></a><a id="PortSpecification:PortSpecification"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/steps/index.html#PortSpecification" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="Useful default port binding specifications." href="PortSpecification$.html">
+              <span class="name">PortSpecification</span>
             </a>
       </span>
       

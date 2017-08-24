@@ -127,15 +127,39 @@
       <p class="shortcomment cmt">This is the Scaladoc for the graph package.</p><div class="fullcomment"><div class="comment cmt"><p>This is the Scaladoc for the graph package.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.jafpl">jafpl</a></dd></dl></div>
     </li><li class="current-entities indented3">
                         <span class="separator"></span>
+                        <a class="class" href="AtomicNode.html" title="An atomic node."></a>
+                        <a href="AtomicNode.html" title="An atomic node.">
+                          AtomicNode
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
                         <a class="class" href="Binding.html" title="A variable binding."></a>
                         <a href="Binding.html" title="A variable binding.">
                           Binding
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
+                        <a class="class" href="CatchStart.html" title="The catch block of a try catch."></a>
+                        <a href="CatchStart.html" title="The catch block of a try catch.">
+                          CatchStart
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
+                        <a class="class" href="ChooseStart.html" title="A choose container."></a>
+                        <a href="ChooseStart.html" title="A choose container.">
+                          ChooseStart
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
                         <a class="class" href="" title="A node that contains other nodes."></a>
                         <a href="" title="A node that contains other nodes.">
                           ContainerStart
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
+                        <a class="class" href="ForEachStart.html" title="A for-each container."></a>
+                        <a href="ForEachStart.html" title="A for-each container.">
+                          ForEachStart
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
@@ -166,6 +190,12 @@
                         <a class="class" href="NodeLocation.html" title=""></a>
                         <a href="NodeLocation.html" title="">
                           NodeLocation
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
+                        <a class="class" href="TryCatchStart.html" title=""></a>
+                        <a href="TryCatchStart.html" title="">
+                          TryCatchStart
                         </a>
                       </li>
               </ul>
@@ -206,7 +236,7 @@ body of the loop.</p><p>In practice, containers are represented by a start and a
             <span class="toggle">
               Known Subclasses
             </span>
-            <div class="subClasses hiddenContent"><a href="LoopStart.html" class="extype" name="com.jafpl.graph.LoopStart">LoopStart</a></div>
+            <div class="subClasses hiddenContent"><a href="CatchStart.html" class="extype" name="com.jafpl.graph.CatchStart">CatchStart</a>, <a href="ChooseStart.html" class="extype" name="com.jafpl.graph.ChooseStart">ChooseStart</a>, <a href="ForEachStart.html" class="extype" name="com.jafpl.graph.ForEachStart">ForEachStart</a>, <a href="LoopStart.html" class="extype" name="com.jafpl.graph.LoopStart">LoopStart</a>, <a href="TryCatchStart.html" class="extype" name="com.jafpl.graph.TryCatchStart">TryCatchStart</a></div>
           </div></div>
         
 
@@ -252,7 +282,7 @@ body of the loop.</p><p>In practice, containers are represented by a start and a
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="com.jafpl.graph.ContainerStart#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+              <ol><li name="com.jafpl.graph.ContainerStart#&lt;init&gt;" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="&lt;init&gt;(graph:com.jafpl.graph.Graph,end:com.jafpl.graph.ContainerEnd,userLabel:Option[String]):com.jafpl.graph.ContainerStart"></a><a id="&lt;init&gt;:ContainerStart"></a>
       <span class="permalink">
       <a href="../../../com/jafpl/graph/ContainerStart.html#&lt;init&gt;(graph:com.jafpl.graph.Graph,end:com.jafpl.graph.ContainerEnd,userLabel:Option[String]):com.jafpl.graph.ContainerStart" title="Permalink">
@@ -267,7 +297,7 @@ body of the loop.</p><p>In practice, containers are represented by a start and a
         <span class="name">ContainerStart</span><span class="params">(<span name="graph">graph: <a href="Graph.html" class="extype" name="com.jafpl.graph.Graph">Graph</a></span>, <span name="end">end: <span class="extype" name="com.jafpl.graph.ContainerEnd">ContainerEnd</span></span>, <span name="userLabel">userLabel: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span>
       </span>
       
-      <p class="shortcomment cmt">A container in the pipeline graph.</p><div class="fullcomment"><div class="comment cmt"><p>A container in the pipeline graph.</p></div><dl class="paramcmts block"><dt class="param">graph</dt><dd class="cmt"><p>The graph into which this node is to be inserted.</p></dd><dt class="param">end</dt><dd class="cmt"><p>The end of this container.</p></dd><dt class="param">userLabel</dt><dd class="cmt"><p>An optional user-defined label.</p></dd></dl></div>
+      <p class="shortcomment cmt">A container in the pipeline graph.</p><div class="fullcomment"><div class="comment cmt"><p>A container in the pipeline graph.</p></div><dl class="paramcmts block"><dt class="param">graph</dt><dd class="cmt"><p>The graph into which this node is to be inserted.</p></dd><dt class="param">end</dt><dd class="cmt"><p>The end of this container.</p></dd><dt class="param">userLabel</dt><dd class="cmt"><p>An optional user-defined label.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../index.html" class="extype" name="com.jafpl">com.jafpl</a>] </dd></dl></div>
     </li></ol>
             </div>
 
@@ -405,7 +435,7 @@ body of the loop.</p><p>In practice, containers are represented by a start and a
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addChoose</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.ChooseStart">ChooseStart</span></span>
+        <span class="name">addChoose</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="ChooseStart.html" class="extype" name="com.jafpl.graph.ChooseStart">ChooseStart</a></span>
       </span>
       
       <p class="shortcomment cmt">Add a new choose/when container to this container.</p><div class="fullcomment"><div class="comment cmt"><p>Add a new choose/when container to this container.
@@ -422,7 +452,7 @@ body of the loop.</p><p>In practice, containers are represented by a start and a
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addChoose</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.ChooseStart">ChooseStart</span></span>
+        <span class="name">addChoose</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="ChooseStart.html" class="extype" name="com.jafpl.graph.ChooseStart">ChooseStart</a></span>
       </span>
       
       <p class="shortcomment cmt">Add a new choose/when container to this container.</p><div class="fullcomment"><div class="comment cmt"><p>Add a new choose/when container to this container.
@@ -439,7 +469,7 @@ body of the loop.</p><p>In practice, containers are represented by a start and a
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addChoose</span><span class="params">()</span><span class="result">: <span class="extype" name="com.jafpl.graph.ChooseStart">ChooseStart</span></span>
+        <span class="name">addChoose</span><span class="params">()</span><span class="result">: <a href="ChooseStart.html" class="extype" name="com.jafpl.graph.ChooseStart">ChooseStart</a></span>
       </span>
       
       <p class="shortcomment cmt">Add a new choose/when container to this container.</p><div class="fullcomment"><div class="comment cmt"><p>Add a new choose/when container to this container.
@@ -456,7 +486,7 @@ body of the loop.</p><p>In practice, containers are represented by a start and a
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addForEach</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.ForEachStart">ForEachStart</span></span>
+        <span class="name">addForEach</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="ForEachStart.html" class="extype" name="com.jafpl.graph.ForEachStart">ForEachStart</a></span>
       </span>
       
       <p class="shortcomment cmt">Add a new for-each container to this container.</p><div class="fullcomment"><div class="comment cmt"><p>Add a new for-each container to this container.
@@ -473,7 +503,7 @@ body of the loop.</p><p>In practice, containers are represented by a start and a
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addForEach</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.ForEachStart">ForEachStart</span></span>
+        <span class="name">addForEach</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="ForEachStart.html" class="extype" name="com.jafpl.graph.ForEachStart">ForEachStart</a></span>
       </span>
       
       <p class="shortcomment cmt">Add a new for-each container to this container.</p><div class="fullcomment"><div class="comment cmt"><p>Add a new for-each container to this container.
@@ -490,7 +520,7 @@ body of the loop.</p><p>In practice, containers are represented by a start and a
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addForEach</span><span class="params">()</span><span class="result">: <span class="extype" name="com.jafpl.graph.ForEachStart">ForEachStart</span></span>
+        <span class="name">addForEach</span><span class="params">()</span><span class="result">: <a href="ForEachStart.html" class="extype" name="com.jafpl.graph.ForEachStart">ForEachStart</a></span>
       </span>
       
       <p class="shortcomment cmt">Add a new for-each container to this container.</p><div class="fullcomment"><div class="comment cmt"><p>Add a new for-each container to this container.
@@ -590,7 +620,7 @@ body of the loop.</p><p>In practice, containers are represented by a start and a
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addTryCatch</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.TryCatchStart">TryCatchStart</span></span>
+        <span class="name">addTryCatch</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="TryCatchStart.html" class="extype" name="com.jafpl.graph.TryCatchStart">TryCatchStart</a></span>
       </span>
       
       <p class="shortcomment cmt">Add a new try/catch container to this container.</p><div class="fullcomment"><div class="comment cmt"><p>Add a new try/catch container to this container.
@@ -607,7 +637,7 @@ body of the loop.</p><p>In practice, containers are represented by a start and a
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addTryCatch</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.TryCatchStart">TryCatchStart</span></span>
+        <span class="name">addTryCatch</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="TryCatchStart.html" class="extype" name="com.jafpl.graph.TryCatchStart">TryCatchStart</a></span>
       </span>
       
       <p class="shortcomment cmt">Add a new try/catch container to this container.</p><div class="fullcomment"><div class="comment cmt"><p>Add a new try/catch container to this container.
@@ -624,7 +654,7 @@ body of the loop.</p><p>In practice, containers are represented by a start and a
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addTryCatch</span><span class="params">()</span><span class="result">: <span class="extype" name="com.jafpl.graph.TryCatchStart">TryCatchStart</span></span>
+        <span class="name">addTryCatch</span><span class="params">()</span><span class="result">: <a href="TryCatchStart.html" class="extype" name="com.jafpl.graph.TryCatchStart">TryCatchStart</a></span>
       </span>
       
       <p class="shortcomment cmt">Add a new try/catch container to this container.</p><div class="fullcomment"><div class="comment cmt"><p>Add a new try/catch container to this container.
@@ -1076,7 +1106,8 @@ order, you can impose one by saying that <code>A.dependsOn(B)</code>.
         <span class="name">id</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
+      <p class="shortcomment cmt">A unique identifier for this node.</p><div class="fullcomment"><div class="comment cmt"><p>A unique identifier for this node.</p><p>Every node has a unique identifier.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
     </li><li name="com.jafpl.graph.Node#inputEdge" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="inputEdge(port:String):com.jafpl.graph.Edge"></a><a id="inputEdge(String):Edge"></a>
       <span class="permalink">
@@ -1141,7 +1172,8 @@ order, you can impose one by saying that <code>A.dependsOn(B)</code>.
         <span class="name">label</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       
-      <p class="shortcomment cmt">The node lebel.</p><div class="fullcomment"><div class="comment cmt"><p>The node lebel.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
+      <p class="shortcomment cmt">The node label.</p><div class="fullcomment"><div class="comment cmt"><p>The node label.</p><p>Labels are used in output to help identify the node in question. The <code>id</code> of the
+node is always appended to the label.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
     </li><li name="com.jafpl.graph.Node#location" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="location:Option[com.jafpl.graph.Location]"></a><a id="location:Option[Location]"></a>
       <span class="permalink">
@@ -1160,7 +1192,7 @@ order, you can impose one by saying that <code>A.dependsOn(B)</code>.
       <p class="shortcomment cmt">The node's location.</p><div class="fullcomment"><div class="comment cmt"><p>The node's location.</p><p>The node location will be used for reporting (for example in errors). If no location
 has been provided, <a href="NodeLocation$.html#UNKNOWN:com.jafpl.graph.NodeLocation" class="extmbr" name="com.jafpl.graph.NodeLocation#UNKNOWN">com.jafpl.graph.NodeLocation.UNKNOWN</a> is returned.
 </p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
-    </li><li name="com.jafpl.graph.Node#location_=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="com.jafpl.graph.Node#location_=" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="location_=(loc:com.jafpl.graph.Location):Unit"></a><a id="location_=(Location):Unit"></a>
       <span class="permalink">
       <a href="../../../com/jafpl/graph/ContainerStart.html#location_=(loc:com.jafpl.graph.Location):Unit" title="Permalink">
@@ -1175,7 +1207,7 @@ has been provided, <a href="NodeLocation$.html#UNKNOWN:com.jafpl.graph.NodeLocat
         <span title="gt4s: location_$eq" class="name">location_=</span><span class="params">(<span name="loc">loc: <a href="Location.html" class="extype" name="com.jafpl.graph.Location">Location</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../index.html" class="extype" name="com.jafpl">com.jafpl</a>] </dd><dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -1321,7 +1353,7 @@ has been provided, <a href="NodeLocation$.html#UNKNOWN:com.jafpl.graph.NodeLocat
         <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       
-      <p class="shortcomment cmt">To string.</p><div class="fullcomment"><div class="comment cmt"><p>To string.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a> → AnyRef → Any</dd></dl></div>
+      <p class="shortcomment cmt">A string representation of this node.</p><div class="fullcomment"><div class="comment cmt"><p>A string representation of this node.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a> → AnyRef → Any</dd></dl></div>
     </li><li name="com.jafpl.graph.ContainerStart#userLabel" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="userLabel:Option[String]"></a>
       <span class="permalink">
