@@ -5,6 +5,7 @@ import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.ForEachStart
 import com.jafpl.messages.{ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
+import com.jafpl.util.PipelineMessage
 
 import scala.collection.mutable.ListBuffer
 
@@ -46,20 +47,24 @@ private[runtime] class ForEachActor(private val monitor: ActorRef,
   }
 
   private def runIfReady(): Unit = {
-    if (!running && readyToRun && queue.nonEmpty) {
+    if (!running && readyToRun && sourceClosed) {
       running = true
 
-      val item = queue.head
-      queue -= item
-      val edge = node.outputEdge("source")
-      monitor ! GOutput(node, edge.toPort, item)
-      monitor ! GClose(node, edge.toPort)
+      if (queue.nonEmpty) {
+        val item = queue.head
+        queue -= item
+        val edge = node.outputEdge("source")
+        monitor ! GOutput(node, edge.toPort, item)
+        monitor ! GClose(node, edge.toPort)
 
-      trace(s"START ForEach: $node", "ForEach")
+        trace(s"START ForEach: $node", "ForEach")
 
-      for (child <- node.children) {
-        trace(s"START ...$child (for $node)", "ForEach")
-        monitor ! GStart(child)
+        for (child <- node.children) {
+          trace(s"START ...$child (for $node)", "ForEach")
+          monitor ! GStart(child)
+        }
+      } else {
+        finished()
       }
     }
   }

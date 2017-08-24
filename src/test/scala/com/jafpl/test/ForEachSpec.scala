@@ -96,4 +96,27 @@ class ForEachSpec extends FlatSpec {
     }
   }
 
+  "A for-each with no input " should " produce no output" in {
+    val graph = new Graph()
+
+    val pipeline = graph.addPipeline()
+    val producer = pipeline.addAtomic(new Producer(List()), "producer")
+    val forEach  = pipeline.addForEach("for-each")
+    val ident    = forEach.addAtomic(new Identity(), "ident")
+
+    val bc = new BufferSink()
+    val consumer = pipeline.addAtomic(bc, "consumer")
+
+    graph.addEdge(producer, "result", forEach, "source")
+    graph.addEdge(forEach, "source", ident, "source")
+    graph.addEdge(ident, "result", forEach, "result")
+    graph.addEdge(forEach, "result", pipeline, "result")
+    graph.addEdge(pipeline, "result", consumer, "source")
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.run()
+
+    assert(bc.items.isEmpty)
+  }
+
 }
