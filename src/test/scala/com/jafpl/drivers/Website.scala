@@ -4,7 +4,7 @@ import java.io.{File, PrintWriter}
 
 import com.jafpl.graph.Graph
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
-import com.jafpl.steps.{Identity, Producer}
+import com.jafpl.steps.Identity
 import com.jafpl.util.DefaultErrorListener
 
 /** Build graphs for the website docs.

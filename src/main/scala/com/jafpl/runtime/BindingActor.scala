@@ -1,12 +1,9 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.exceptions.GraphException
 import com.jafpl.graph.Binding
 import com.jafpl.messages.BindingMessage
 import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput}
-
-import scala.collection.mutable
 
 private[runtime] class BindingActor(private val monitor: ActorRef,
                                     private val runtime: GraphRuntime,

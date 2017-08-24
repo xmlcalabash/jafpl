@@ -2,10 +2,9 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
-import com.jafpl.graph.{Binding, Node}
-import com.jafpl.messages.BindingMessage
-import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput}
-import com.jafpl.steps.{BindingProvider, DataProvider}
+import com.jafpl.graph.Binding
+import com.jafpl.runtime.GraphMonitor.GException
+import com.jafpl.steps.BindingProvider
 
 class BindingProxy(private val monitor: ActorRef,
                    private val runtime: GraphRuntime,

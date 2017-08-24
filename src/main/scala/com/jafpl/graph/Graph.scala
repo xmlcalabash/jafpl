@@ -1,7 +1,5 @@
 package com.jafpl.graph
 
-import java.util.Comparator
-
 import com.jafpl.exceptions.{GraphException, PipelineException}
 import com.jafpl.steps.{Step, ViewportComposer}
 import com.jafpl.util.{ErrorListener, ItemComparator, ItemTester, UniqueId}

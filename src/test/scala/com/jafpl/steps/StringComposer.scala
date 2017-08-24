@@ -1,6 +1,6 @@
 package com.jafpl.steps
 
-import com.jafpl.exceptions.{PipelineException, StepException}
+import com.jafpl.exceptions.StepException
 
 import scala.collection.mutable.ListBuffer
 

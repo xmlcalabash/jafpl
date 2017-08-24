@@ -1,6 +1,6 @@
 package com.jafpl.steps
 
-import com.jafpl.exceptions.{PipelineException, StepException}
+import com.jafpl.exceptions.StepException
 
 class Decrement() extends DefaultStep {
   override def inputSpec: PortSpecification = PortSpecification.SOURCE

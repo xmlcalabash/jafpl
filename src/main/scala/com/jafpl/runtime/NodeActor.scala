@@ -2,12 +2,12 @@ package com.jafpl.runtime
 
 import akka.actor.{Actor, ActorRef}
 import akka.event.Logging
-import com.jafpl.exceptions.{GraphException, PipelineException, StepException}
-import com.jafpl.graph.{ContainerEnd, Node, WhileStart}
+import com.jafpl.exceptions.{PipelineException, StepException}
+import com.jafpl.graph.{ContainerEnd, Node}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GStopped}
 import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NGuardResult, NInitialize, NInput, NLoop, NReset, NStart, NStop, NTraceDisable, NTraceEnable, NViewportFinished}
-import com.jafpl.steps.{DataProvider, PortSpecification, Provider, StepDataProvider}
+import com.jafpl.steps.{PortSpecification, Provider}
 
 import scala.collection.mutable
 

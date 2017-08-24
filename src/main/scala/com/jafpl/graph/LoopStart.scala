@@ -1,9 +1,5 @@
 package com.jafpl.graph
 
-import com.jafpl.steps.{Step, ViewportComposer}
-
-import scala.collection.mutable.ListBuffer
-
 /** A looping containre.
   *
   * Loops need buffers when they read from steps outside the loop.

@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.graph.Buffer
-import com.jafpl.messages.{ItemMessage, Message}
+import com.jafpl.messages.Message
 import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput}
 
 import scala.collection.mutable.ListBuffer

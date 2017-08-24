@@ -1,7 +1,5 @@
 package com.jafpl.exceptions
 
-import com.jafpl.graph.Location
-
 /** An exception raised during step evaluation.
   *
   * @constructor A pipeline exception.

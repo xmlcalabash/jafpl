@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.exceptions.{GraphException, PipelineException}
+import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.Binding
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput}

@@ -3,10 +3,10 @@ package com.jafpl.drivers
 import java.io.{File, PrintWriter}
 
 import com.jafpl.graph.Graph
-import com.jafpl.io.{BufferConsumer, PrintingConsumer}
+import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.{PrimitiveItemComparator, PrimitiveItemTester, PrimitiveRuntimeConfiguration}
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, Count, Decrement, Identity, LogBinding, ProduceBinding, Producer, RaiseError, Sink, Sleep}
+import com.jafpl.steps.{Decrement, Producer}
 
 object GraphTest extends App {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()

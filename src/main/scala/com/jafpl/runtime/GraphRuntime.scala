@@ -8,7 +8,6 @@ import com.jafpl.steps.{BindingProvider, DataConsumer, DataProvider}
 import com.jafpl.util.UniqueId
 import org.slf4j.LoggerFactory
 
-import scala.collection.immutable.HashMap
 import scala.collection.mutable
 
 /** Execute a pipeline.

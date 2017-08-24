@@ -3,8 +3,7 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.graph.Node
 import com.jafpl.messages.Message
-import com.jafpl.runtime.GraphMonitor.{GClose, GOutput}
-import com.jafpl.steps.{DataProvider, StepDataProvider}
+import com.jafpl.steps.DataProvider
 import com.jafpl.util.PipelineMessage
 
 import scala.collection.mutable

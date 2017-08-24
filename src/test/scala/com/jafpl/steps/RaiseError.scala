@@ -1,6 +1,6 @@
 package com.jafpl.steps
 
-import com.jafpl.exceptions.{PipelineException, StepException}
+import com.jafpl.exceptions.StepException
 
 class RaiseError(err: String) extends DefaultStep {
   override def inputSpec = PortSpecification.SOURCESEQ

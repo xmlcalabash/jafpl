@@ -1,8 +1,6 @@
 package com.jafpl.steps
 
-import com.jafpl.exceptions.{GraphException, PipelineException}
-
-import scala.collection.{immutable, mutable}
+import scala.collection.immutable
 
 /** Useful default binding specifications.
   *

@@ -2,8 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.graph.Node
-import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput}
-import com.jafpl.steps.StepDataProvider
+import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput}
 
 private[runtime] class InputActor(private val monitor: ActorRef,
                                   private val runtime: GraphRuntime,
