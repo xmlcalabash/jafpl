@@ -1,6 +1,6 @@
 package com.jafpl.steps
 
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.{PipelineException, StepException}
 
 import scala.collection.mutable.ListBuffer
 
@@ -15,7 +15,7 @@ class StringViewportItem(val prefix: String, val item: String) extends ViewportI
     for (item <- xformed) {
       item match {
         case s: String => items += s
-        case _ => throw new PipelineException("UnexpectedType", s"Unexpected item type: $item")
+        case _ => throw new StepException("UnexpectedType", s"Unexpected item type: $item")
       }
     }
   }

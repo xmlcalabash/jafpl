@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.{Binding, Node}
 import com.jafpl.messages.BindingMessage
-import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput}
+import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput}
 import com.jafpl.steps.{BindingProvider, DataProvider}
 
 class BindingProxy(private val monitor: ActorRef,
@@ -18,9 +18,11 @@ class BindingProxy(private val monitor: ActorRef,
 
   def set(item: Any): Unit = {
     if (closed) {
-      throw new PipelineException("bindclosed", "Attempt to change closed binding for " + binding.name)
+      monitor ! GException(None,
+        new PipelineException("bindingclosed", s"Attempt to change closed binding: ${binding.name}", binding.location))
+    } else {
+      _value = Some(item)
+      _closed = true
     }
-    _value = Some(item)
-    _closed = true
   }
 }

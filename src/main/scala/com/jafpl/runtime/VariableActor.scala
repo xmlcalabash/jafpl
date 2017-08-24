@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import com.jafpl.exceptions.{GraphException, PipelineException}
 import com.jafpl.graph.Binding
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
-import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput}
+import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput}
 
 import scala.collection.mutable
 
@@ -25,7 +25,10 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
         assert(port == "#bindings")
         trace(s"BOUND ${binding.name}=${binding.item}", "Bindings")
         bindings.put(binding.name, binding.item)
-      case _ => throw new PipelineException("badmessage", s"Unexpected message $msg on $port")
+      case _ =>
+        monitor ! GException(None,
+          new PipelineException("badmessage", s"Unexpected message on $msg on $port", binding.location))
+        return
     }
   }
 

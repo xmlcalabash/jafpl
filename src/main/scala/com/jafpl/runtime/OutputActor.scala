@@ -4,6 +4,7 @@ import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.Node
 import com.jafpl.messages.{ItemMessage, Message}
+import com.jafpl.runtime.GraphMonitor.GException
 
 private[runtime] class OutputActor(private val monitor: ActorRef,
                                    private val runtime: GraphRuntime,
@@ -21,7 +22,9 @@ private[runtime] class OutputActor(private val monitor: ActorRef,
         } else {
           trace(s"!!CNSM $item", "Consumer")
         }
-      case _ => throw new PipelineException("badmessage", "Unexpected message $msg on $port")
+      case _ =>
+        monitor ! GException(None,
+          new PipelineException("badmessage", "Unexpected message $msg on $port", node.location))
     }
   }
 

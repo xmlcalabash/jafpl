@@ -63,7 +63,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
     for (node <- unfinishedNodes) {
       trace(s"----- $node", "Watchdog")
     }
-    crashAndBurn(new PipelineException("watchdog", "Watchdog timer expired"))
+    crashAndBurn(new PipelineException("watchdog", "Watchdog timer expired", None))
   }
 
   def stopPipeline(): Unit = {

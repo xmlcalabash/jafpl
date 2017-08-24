@@ -96,7 +96,7 @@ class PortSpecification(spec: immutable.Map[String,String]) {
     */
   def checkCardinality(port: String, count: Long): Unit = {
     if (count < 0) {
-      throw new PipelineException("badcount", s"Impossible document count '$count' for port '$port'")
+      throw new PipelineException("badcount", s"Impossible document count '$count' for port '$port'", None)
     }
 
     var pass = false
@@ -113,11 +113,11 @@ class PortSpecification(spec: immutable.Map[String,String]) {
 
       if (!pass) {
         throw new PipelineException("badcardinality",
-          s"Cardinality error: '$count' document(s) sent to port '$port' (allowed: ${spec(port)})")
+          s"Cardinality error: '$count' document(s) sent to port '$port' (allowed: ${spec(port)})", None)
       }
     } else {
       if (!spec.contains("*")) {
-        throw new PipelineException("badport", s"Port named '$port' is not allowed")
+        throw new PipelineException("badport", s"Port named '$port' is not allowed", None)
       }
     }
   }

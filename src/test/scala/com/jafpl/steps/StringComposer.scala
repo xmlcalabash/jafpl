@@ -1,6 +1,6 @@
 package com.jafpl.steps
 
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.{PipelineException, StepException}
 
 import scala.collection.mutable.ListBuffer
 
@@ -25,7 +25,7 @@ class StringComposer extends ViewportComposer {
           }
         }
 
-      case _ => throw new PipelineException("UnexpectedType", s"Unexpected item type: $item")
+      case _ => throw new StepException("UnexpectedType", s"Unexpected item type: $item")
     }
 
     items.toList

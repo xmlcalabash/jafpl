@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.ForEachStart
 import com.jafpl.messages.{ItemMessage, Message}
-import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput, GReset, GStart}
+import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
 
 import scala.collection.mutable.ListBuffer
 
@@ -13,9 +13,9 @@ private[runtime] class ForEachActor(private val monitor: ActorRef,
                                     private val node: ForEachStart)
   extends StartActor(monitor, runtime, node)  {
 
-  val queue = ListBuffer.empty[ItemMessage]
-  var running = false
-  var sourceClosed = false
+  private val queue = ListBuffer.empty[ItemMessage]
+  private var running = false
+  private var sourceClosed = false
 
   override protected def start(): Unit = {
     readyToRun = true
@@ -33,7 +33,9 @@ private[runtime] class ForEachActor(private val monitor: ActorRef,
     item match {
       case message: ItemMessage =>
         queue += message
-      case _ => throw new PipelineException("badmessage", "Unexpected message $item on input")
+      case _ =>
+        monitor ! GException(None,
+          new PipelineException("badmessage", "Unexpected message $item on input", node.location))
     }
     runIfReady()
   }

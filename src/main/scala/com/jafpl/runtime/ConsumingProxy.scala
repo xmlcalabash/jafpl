@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.Node
 import com.jafpl.messages.{ItemMessage, Message}
-import com.jafpl.runtime.GraphMonitor.GOutput
+import com.jafpl.runtime.GraphMonitor.{GException, GOutput}
 import com.jafpl.steps.StepDataProvider
 import com.jafpl.util.PipelineMessage
 
@@ -22,7 +22,7 @@ private[runtime] class ConsumingProxy(private val monitor: ActorRef,
       case msg: ItemMessage =>
         monitor ! GOutput(node, port, msg)
       case msg: Message =>
-        throw new PipelineException("badmessage", "Unexpected message sent to send()")
+        monitor ! GException(None, new PipelineException("badmessage", s"Unexpected message on send: $item", node.location))
       case _ =>
         monitor ! GOutput(node, port, new PipelineMessage(item))
     }

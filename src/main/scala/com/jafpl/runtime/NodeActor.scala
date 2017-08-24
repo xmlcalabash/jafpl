@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.{Actor, ActorRef}
 import akka.event.Logging
-import com.jafpl.exceptions.{GraphException, PipelineException}
+import com.jafpl.exceptions.{GraphException, PipelineException, StepException}
 import com.jafpl.graph.{ContainerEnd, Node, WhileStart}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GStopped}
@@ -166,6 +166,10 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           }
         }
       } catch {
+        case stepex: StepException =>
+          threwException = true
+          monitor ! GException(Some(node),
+            new PipelineException(stepex.code, stepex.message, node.location, stepex.cause, stepex.data))
         case cause: Throwable =>
           threwException = true
           monitor ! GException(Some(node), cause)
@@ -206,7 +210,10 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
             node.step.get.receiveBinding(binding.name, binding.item)
           }
           openBindings -= binding.name
-        case _ => throw new PipelineException("badbinding", s"Unexpected message $item on #bindings port")
+        case _ =>
+          monitor ! GException(None,
+            new PipelineException("badbinding", s"Unexpected message $item on #bindings port", node.location))
+          return
       }
     } else {
       item match {
@@ -216,21 +223,26 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           if (node.step.isDefined) {
             node.step.get.receive(port, message.item)
           }
-        case _ => throw new PipelineException("badmessage", s"Unexpected message $item on port $port")
+        case _ =>
+          monitor ! GException(None,
+            new PipelineException("badmessage", s"Unexpected message $item on port $port", node.location))
+          return
       }
     }
   }
 
   protected def loop(item: ItemMessage): Unit = {
-    throw new PipelineException("invloop", "Invalid loop to " + node)
+    monitor ! GException(None, new PipelineException("invloop", s"Invalid loop to $node", node.location))
   }
 
   protected def checkGuard(): Unit = {
-    throw new GraphException("Attempted to check guard on something that isn't a when", node.location)
+    monitor ! GException(None,
+      new PipelineException("badguard", "Attempted to check guard on something that isn't a when", node.location))
   }
 
   protected def guardResult(when: Node, pass: Boolean): Unit = {
-    throw new GraphException("Attempted to pass guard result to something that isn't a when", node.location)
+    monitor ! GException(None,
+      new PipelineException("badguard", "Attempted to pass guard result to something that isn't a when", node.location))
   }
 
   final def receive: PartialFunction[Any, Unit] = {
@@ -268,8 +280,8 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         case catchStep: CatchActor =>
           catchStep.start(cause)
         case _ =>
-          monitor ! GException(Some(node),
-            new PipelineException("notcatch", "Attempt to send exception to something that's not a catch"))
+          monitor ! GException(None,
+            new PipelineException("notcatch", "Attempt to send exception to something that's not a catch", node.location))
       }
 
     case NReset() =>
@@ -288,8 +300,8 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         case start: StartActor =>
           start.finished()
         case _ =>
-          monitor ! GException(Some(node),
-            new PipelineException("notstart", "Container finish message sent to " + node))
+          monitor ! GException(None,
+            new PipelineException("notstart", s"Container finish message sent to $node", node.location))
       }
 
     case NViewportFinished(buffer) =>
@@ -304,7 +316,9 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         case start: ViewportActor =>
           start.returnItems(buffer)
           start.finished()
-        case _ => throw new GraphException("Container finish message sent to " + node, node.location)
+        case _ =>
+          monitor ! GException(None,
+            new PipelineException("notviewport", s"Viewport finish message sent to $node", node.location))
       }
 
     case NChildFinished(otherNode) =>
@@ -312,7 +326,9 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       this match {
         case end: EndActor =>
           end.finished(otherNode)
-        case _ => throw new GraphException("Child finish message sent to " + node, node.location)
+        case _ =>
+          monitor ! GException(None,
+            new PipelineException("notend", s"Child finish message sent to $node", node.location))
       }
 
     case NCheckGuard() =>

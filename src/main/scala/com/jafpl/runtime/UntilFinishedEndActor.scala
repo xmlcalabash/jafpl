@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.ContainerEnd
 import com.jafpl.messages.{ItemMessage, Message}
-import com.jafpl.runtime.GraphMonitor.GLoop
+import com.jafpl.runtime.GraphMonitor.{GException, GLoop}
 
 private[runtime] class UntilFinishedEndActor(private val monitor: ActorRef,
                                              private val runtime: GraphRuntime,
@@ -14,7 +14,10 @@ private[runtime] class UntilFinishedEndActor(private val monitor: ActorRef,
     msg match {
       case message: ItemMessage =>
         monitor ! GLoop(node.start.get, message)
-      case _ => throw new PipelineException("badmessage", s"Unexpected message $msg on port $port")
+      case _ =>
+        monitor ! GException(None,
+          new PipelineException("badmessage", s"Unexpected message on $msg on $port", node.location))
+        return
     }
   }
 

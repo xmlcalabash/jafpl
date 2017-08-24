@@ -3,7 +3,7 @@ package com.jafpl.runtime
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.jafpl.exceptions.{GraphException, PipelineException}
 import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, ForEachStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, PipelineStart, Splitter, TryCatchStart, TryStart, UntilFinishedStart, ViewportStart, WhenStart, WhileStart}
-import com.jafpl.runtime.GraphMonitor.{GNode, GRun, GWatchdog}
+import com.jafpl.runtime.GraphMonitor.{GException, GNode, GRun, GWatchdog}
 import com.jafpl.steps.{BindingProvider, DataConsumer, DataProvider}
 import com.jafpl.util.UniqueId
 import org.slf4j.LoggerFactory
@@ -122,7 +122,7 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
     }
     for ((name, provider) <- _graphBindings) {
       if (!provider.closed) {
-        throw new PipelineException("nobinding", "No binding was provided for " + name)
+        throw new PipelineException("nobinding", "No binding was provided for " + name, None)
       }
     }
 
@@ -138,14 +138,15 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
     */
   def waitForPipeline(): Unit = {
     if (!started) {
-      _exception = Some(new PipelineException("notstarted", "Pipeline execution has not started"))
+      _exception = Some(new PipelineException("notstarted", "Pipeline execution has not started", None))
       throw _exception.get
     }
 
     if (!finished) {
       val watchdog = dynamicContext.watchdogTimeout
       if (watchdog < 0) {
-        throw new PipelineException("invwatchdog", "The watchdog timer value must have a non-negative value")
+        _monitor ! GException(None,
+          new PipelineException("invwatchdog", "The watchdog timer value must have a non-negative value", None))
       }
 
       var ticker = watchdog
@@ -227,14 +228,14 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
           }
         case req: GraphInput =>
           if (_graphInputs.contains(req.name)) {
-            throw new PipelineException("dupname", "Input port name repeated: " + req.name)
+            throw new PipelineException("dupname", s"Input port name repeated: ${req.name}", req.location)
           }
           val ip = new InputProxy(_monitor, this, node)
           _graphInputs.put(req.name, ip)
           _system.actorOf(Props(new InputActor(_monitor, this, node, ip)), actorName)
         case req: GraphOutput =>
           if (_graphOutputs.contains(req.name)) {
-            throw new PipelineException("dupname", "Output port name repeated: " + req.name)
+            throw new PipelineException("dupname", s"Output port name repeated: ${req.name}", req.location)
           }
           val op = new OutputProxy(_monitor, this, node)
           _graphOutputs.put(req.name, op)
@@ -244,7 +245,7 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
             _system.actorOf(Props(new VariableActor(_monitor, this, req)), actorName)
           } else {
             if (_graphBindings.contains(req.name)) {
-              throw new PipelineException("dupname", "Input binding name repeated: " + req.name)
+              throw new PipelineException("dupname", s"Input binding name repeated: ${req.name}", req.location)
             }
             val ip = new BindingProxy(_monitor, this, req)
             _graphBindings.put(req.name, ip)
@@ -260,7 +261,7 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
           }
 
         case _ =>
-          throw new PipelineException("unexpected", "Unexpected step type: " + node)
+          throw new PipelineException("unexpected", s"Unexpected step type: $node", node.location)
       }
 
       _monitor ! GNode(node, actor)

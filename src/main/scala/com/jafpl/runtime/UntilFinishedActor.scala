@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import com.jafpl.exceptions.{GraphException, PipelineException}
 import com.jafpl.graph.{UntilFinishedStart, WhileStart}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
-import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput, GReset, GStart}
+import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
 
 import scala.collection.mutable
 
@@ -37,16 +37,24 @@ private[runtime] class UntilFinishedActor(private val monitor: ActorRef,
       item match {
         case message: ItemMessage =>
           if (currentItem.isDefined) {
-            throw new PipelineException("seqinput", "UntilFinished received a sequence.")
+            monitor ! GException(None,
+              new PipelineException("seqinput", "UntilFinished received a sequence.", node.location))
+            return
           }
           currentItem = Some(message)
-        case _ => throw new GraphException(s"Unexpected message on $port: $item", node.location)
+        case _ =>
+          monitor ! GException(None,
+            new PipelineException("badmessage", s"Unexpected message on $port: $item", node.location))
+          return
       }
     } else if (port == "#bindings") {
       item match {
         case msg: BindingMessage =>
           bindings.put(msg.name, msg.item)
-        case _ => throw new GraphException(s"Unexpected message on $port: $item", node.location)
+        case _ =>
+          monitor ! GException(None,
+            new PipelineException("badmessage", s"Unexpected message on $port: $item", node.location))
+          return
       }
     }
     runIfReady()

@@ -1,6 +1,6 @@
 package com.jafpl.steps
 
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.{PipelineException, StepException}
 
 class Decrement() extends DefaultStep {
   override def inputSpec: PortSpecification = PortSpecification.SOURCE
@@ -10,7 +10,7 @@ class Decrement() extends DefaultStep {
     item match {
       case num: Long => consumer.get.send("result", num - 1)
       case num: Int => consumer.get.send("result", num - 1)
-      case _ => throw new PipelineException("nam", "Decrement input not a number: " + item)
+      case _ => throw new StepException("nan", "Decrement input not a number: " + item)
     }
   }
 }

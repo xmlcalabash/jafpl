@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.ViewportStart
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
-import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput, GReset, GStart}
+import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
 import com.jafpl.steps.ViewportItem
 import com.jafpl.util.PipelineMessage
 
@@ -38,14 +38,19 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
       case item: ItemMessage =>
         if (port == "source") {
           if (received) {
-            throw new PipelineException("NoSeq", "Sequence not allowed on viewport")
+            monitor ! GException(None,
+              new PipelineException("noseq", "Sequence not allowed on viewport", node.location))
+            return
           }
           received = true
           for (item <- node.composer.decompose(item.item)) {
             queue += item
           }
         }
-      case _ => throw new PipelineException("badmessage", "Unexpected message $msg on $port")
+      case _ =>
+        monitor ! GException(None,
+          new PipelineException("badmessage", s"Unexpected message on $msg on $port", node.location))
+        return
     }
 
     runIfReady()
@@ -86,7 +91,9 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
         case msg: ItemMessage =>
           ibuffer += msg.item
         case msg: Message =>
-          throw new PipelineException("badmessage", "Unexpected message on returnItems")
+          monitor ! GException(None,
+            new PipelineException("badmessage", s"Unexpected message on returnItems", node.location))
+          return
         case _ =>
           ibuffer += item
       }
@@ -110,7 +117,9 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
             case item: ItemMessage =>
               monitor ! GOutput(node, "result", item)
             case item: Message =>
-              throw new PipelineException("badrecomp", "Invalid recomposition")
+              monitor ! GException(None,
+                new PipelineException("badrecomp", "Invalid recomposition", node.location))
+              return
             case _ =>
               monitor ! GOutput(node, "result", new PipelineMessage(recomposition))
           }

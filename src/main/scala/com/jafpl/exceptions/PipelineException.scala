@@ -23,9 +23,9 @@ class PipelineException(val code: String,
     "PipelineException(" + code + "," + message + ")"
   }
 
-  /** Alternate constructor with no location, cause, or data. */
-  def this(code: String, message: String) {
-    this(code, message, None, None, None)
+  /** Alternate constructor with no cause or data. */
+  def this(code: String, message: String, location: Option[Location]) {
+    this(code, message, location, None, None)
   }
 
   /** Alternate constructor with no cause or data. */

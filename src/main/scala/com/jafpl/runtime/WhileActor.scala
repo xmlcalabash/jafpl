@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import com.jafpl.exceptions.{GraphException, PipelineException}
 import com.jafpl.graph.WhileStart
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
-import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput, GReset, GStart}
+import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
 
 import scala.collection.mutable
 
@@ -34,7 +34,9 @@ private[runtime] class WhileActor(private val monitor: ActorRef,
     msg match {
       case item: ItemMessage =>
         if (currentItem.isDefined) {
-          throw new PipelineException("seqinput", "While received a sequence.")
+          monitor ! GException(None,
+            new PipelineException("noseq", "Sequence not allowed on while", node.location))
+          return
         }
         currentItem = Some(item)
         val testItem = if (currentItem.isDefined) {
@@ -46,7 +48,10 @@ private[runtime] class WhileActor(private val monitor: ActorRef,
         trace(s"INTRU While: $initiallyTrue", "While")
       case item: BindingMessage =>
         bindings.put(item.name, item.item)
-      case _ => throw new GraphException(s"Unexpected message on $port", node.location)
+      case _ =>
+        monitor ! GException(None,
+          new PipelineException("badmessage", s"Unexpected message on $port", node.location))
+        return
     }
     runIfReady()
   }
