@@ -1,5 +1,7 @@
 package com.jafpl.steps
 
+import com.jafpl.messages.ItemMessage
+
 /** Interface for sending outputs from atomic steps.
   *
   * Atomic step implementations are independent of the graph execution infrastructure.

@@ -1,7 +1,9 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
+import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.Node
+import com.jafpl.messages.{ItemMessage, Message}
 
 private[runtime] class OutputActor(private val monitor: ActorRef,
                                    private val runtime: GraphRuntime,
@@ -10,12 +12,16 @@ private[runtime] class OutputActor(private val monitor: ActorRef,
   extends NodeActor(monitor, runtime, node, consumer) {
   private var closed = false
 
-  override protected def input(port: String, item: Any): Unit = {
-    if (consumer.provider.isDefined) {
-      trace(s"??CNSM $item", "Consumer")
-      consumer.provider.get.send(item)
-    } else {
-      trace(s"!!CNSM $item", "Consumer")
+  override protected def input(port: String, msg: Message): Unit = {
+    msg match {
+      case item: ItemMessage =>
+        if (consumer.provider.isDefined) {
+          trace(s"??CNSM $item", "Consumer")
+          consumer.provider.get.send(item.item)
+        } else {
+          trace(s"!!CNSM $item", "Consumer")
+        }
+      case _ => throw new PipelineException("badmessage", "Unexpected message $msg on $port")
     }
   }
 

@@ -2,6 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.graph.{ContainerEnd, Node}
+import com.jafpl.messages.Message
 import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput}
 
 import scala.collection.mutable
@@ -24,7 +25,7 @@ private[runtime] class EndActor(private val monitor: ActorRef,
     readyToRun = true
   }
 
-  override protected def input(port: String, item: Any): Unit = {
+  override protected def input(port: String, item: Message): Unit = {
     // Container ends are special, they copy input they receive on "X" to the
     // output named "X" on the container start.
     monitor ! GOutput(node.start.get, port, item)

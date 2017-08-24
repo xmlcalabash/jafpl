@@ -2,6 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.graph.ContainerEnd
+import com.jafpl.messages.{ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.GFinishedViewport
 
 import scala.collection.mutable.ListBuffer
@@ -9,16 +10,20 @@ import scala.collection.mutable.ListBuffer
 private[runtime] class ViewportEndActor(private val monitor: ActorRef,
                                         private val runtime: GraphRuntime,
                                         private val node: ContainerEnd) extends EndActor(monitor, runtime, node)  {
-  val buffer = ListBuffer.empty[Any]
+  val buffer = ListBuffer.empty[ItemMessage]
 
   override protected def reset(): Unit = {
     super.reset()
     buffer.clear()
   }
 
-  override protected def input(port: String, item: Any): Unit = {
-    if (port == "result") {
-      buffer += item
+  override protected def input(port: String, msg: Message): Unit = {
+    msg match {
+      case item: ItemMessage =>
+        if (port == "result") {
+          buffer += item
+        }
+      case _ => Unit
     }
   }
 

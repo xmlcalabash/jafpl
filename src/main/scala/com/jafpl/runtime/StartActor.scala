@@ -2,6 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.graph.ContainerStart
+import com.jafpl.messages.Message
 import com.jafpl.runtime.GraphMonitor.{GAbort, GFinished, GOutput, GReset, GStart, GStop, GStopped}
 
 private[runtime] class StartActor(private val monitor: ActorRef,
@@ -42,7 +43,7 @@ private[runtime] class StartActor(private val monitor: ActorRef,
     }
   }
 
-  override protected def input(port: String, item: Any): Unit = {
+  override protected def input(port: String, item: Message): Unit = {
     val edge = node.outputEdge(port)
     trace(s"Start actor $node sends to ${edge.toPort}: $item", "StepIO")
     monitor ! GOutput(node, edge.toPort, item)

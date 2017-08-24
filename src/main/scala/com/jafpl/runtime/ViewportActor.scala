@@ -3,9 +3,12 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.ViewportStart
+import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput, GReset, GStart}
 import com.jafpl.steps.ViewportItem
+import com.jafpl.util.PipelineMessage
 
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 private[runtime] class ViewportActor(private val monitor: ActorRef,
@@ -29,15 +32,20 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
     runIfReady()
   }
 
-  override protected def input(port: String, item: Any): Unit = {
-    if (port == "source") {
-      if (received) {
-        throw new PipelineException("NoSeq", "Sequence not allowed on viewport")
-      }
-      received = true
-      for (item <- node.composer.decompose(item)) {
-        queue += item
-      }
+  override protected def input(port: String, msg: Message): Unit = {
+    msg match {
+      case binding: BindingMessage => Unit
+      case item: ItemMessage =>
+        if (port == "source") {
+          if (received) {
+            throw new PipelineException("NoSeq", "Sequence not allowed on viewport")
+          }
+          received = true
+          for (item <- node.composer.decompose(item.item)) {
+            queue += item
+          }
+        }
+      case _ => throw new PipelineException("badmessage", "Unexpected message $msg on $port")
     }
 
     runIfReady()
@@ -56,7 +64,7 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
 
       val item = queue(index)
       val edge = node.outputEdge("source")
-      monitor ! GOutput(node, edge.toPort, item.getItem)
+      monitor ! GOutput(node, edge.toPort, new PipelineMessage(item.getItem))
       monitor ! GClose(node, edge.toPort)
 
       trace(s"START Viewport: $node", "Viewport")
@@ -70,7 +78,19 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
 
   protected[runtime] def returnItems(buffer: List[Any]): Unit = {
     val item = queue(index)
-    item.putItems(buffer)
+    val ibuffer = mutable.ListBuffer.empty[Any]
+    for (item <- buffer) {
+      item match {
+        case msg: ItemMessage =>
+          ibuffer += msg.item
+        case msg: Message =>
+          throw new PipelineException("badmessage", "Unexpected message on returnItems")
+        case _ =>
+          ibuffer += item
+      }
+    }
+
+    item.putItems(ibuffer.toList)
     index += 1
   }
 
@@ -78,7 +98,15 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
     if (sourceClosed && (index >= queue.size)) {
       trace(s"FINISH Viewport: $node $sourceClosed, ${queue.isEmpty}", "Viewport")
       // send the transformed result and close the output
-      monitor ! GOutput(node, "result", node.composer.recompose())
+      val recomposition = node.composer.recompose()
+      recomposition match {
+        case item: ItemMessage =>
+          monitor ! GOutput(node, "result", item)
+        case item: Message =>
+          throw new PipelineException("badrecomp", "Invalid recomposition")
+        case _ =>
+          monitor ! GOutput(node, "result", new PipelineMessage(recomposition))
+      }
       monitor ! GClose(node, "result")
       monitor ! GFinished(node)
     } else {

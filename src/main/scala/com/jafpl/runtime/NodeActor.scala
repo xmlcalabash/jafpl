@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorRef}
 import akka.event.Logging
 import com.jafpl.exceptions.{GraphException, PipelineException}
 import com.jafpl.graph.{ContainerEnd, Node, WhileStart}
-import com.jafpl.messages.BindingMessage
+import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GStopped}
 import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NGuardResult, NInitialize, NInput, NLoop, NReset, NStart, NStop, NTraceDisable, NTraceEnable, NViewportFinished}
 import com.jafpl.steps.{DataProvider, PortSpecification, Provider, StepDataProvider}
@@ -18,12 +18,12 @@ private[runtime] object NodeActor {
   case class NStop()
   case class NCatch(cause: Throwable)
   case class NReset()
-  case class NInput(port: String, item: Any)
-  case class NLoop(item: Any)
+  case class NInput(port: String, item: Message)
+  case class NLoop(item: ItemMessage)
   case class NClose(port: String)
   case class NChildFinished(otherNode: Node)
   case class NContainerFinished()
-  case class NViewportFinished(buffer: List[Any])
+  case class NViewportFinished(buffer: List[Message])
   case class NTraceEnable(event: String)
   case class NTraceDisable(event: String)
   case class NCheckGuard()
@@ -168,7 +168,6 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       } catch {
         case cause: Throwable =>
           threwException = true
-          println("BANG: "+ node)
           monitor ! GException(Some(node), cause)
       }
     } else {
@@ -190,7 +189,6 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         node.step.get.inputSpec.checkCardinality(port, cardinalities.getOrElse(port, 0L))
       } catch {
         case cause: Throwable =>
-          println("BANG in " + node)
           monitor ! GException(Some(node), cause)
         case _: Throwable => Unit
       }
@@ -199,7 +197,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     runIfReady()
   }
 
-  protected def input(port: String, item: Any): Unit = {
+  protected def input(port: String, item: Message): Unit = {
     if (port == "#bindings") {
       item match {
         case binding: BindingMessage =>
@@ -208,18 +206,22 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
             node.step.get.receiveBinding(binding.name, binding.item)
           }
           openBindings -= binding.name
-        case _ => throw new PipelineException("badbinding", "Unexpected item on #bindings port")
+        case _ => throw new PipelineException("badbinding", s"Unexpected message $item on #bindings port")
       }
     } else {
-      val card = cardinalities.getOrElse(port, 0L) + 1L
-      cardinalities.put(port, card)
-      if (node.step.isDefined) {
-        node.step.get.receive(port, item)
+      item match {
+        case message: ItemMessage =>
+          val card = cardinalities.getOrElse(port, 0L) + 1L
+          cardinalities.put(port, card)
+          if (node.step.isDefined) {
+            node.step.get.receive(port, message.item)
+          }
+        case _ => throw new PipelineException("badmessage", s"Unexpected message $item on port $port")
       }
     }
   }
 
-  protected def loop(item: Any): Unit = {
+  protected def loop(item: ItemMessage): Unit = {
     throw new PipelineException("invloop", "Invalid loop to " + node)
   }
 

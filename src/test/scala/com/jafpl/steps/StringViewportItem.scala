@@ -15,7 +15,7 @@ class StringViewportItem(val prefix: String, val item: String) extends ViewportI
     for (item <- xformed) {
       item match {
         case s: String => items += s
-        case _ => throw new PipelineException("UnexpectedType", "Unexpected item type")
+        case _ => throw new PipelineException("UnexpectedType", s"Unexpected item type: $item")
       }
     }
   }

@@ -3,7 +3,7 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.exceptions.{GraphException, PipelineException}
 import com.jafpl.graph.{UntilFinishedStart, WhileStart}
-import com.jafpl.messages.BindingMessage
+import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput, GReset, GStart}
 
 import scala.collection.mutable
@@ -13,8 +13,8 @@ private[runtime] class UntilFinishedActor(private val monitor: ActorRef,
                                           private val node: UntilFinishedStart)
   extends StartActor(monitor, runtime, node)  {
 
-  var currentItem = Option.empty[Any]
-  var nextItem = Option.empty[Any]
+  var currentItem = Option.empty[ItemMessage]
+  var nextItem = Option.empty[ItemMessage]
   var running = false
   var looped = false
   val bindings = mutable.HashMap.empty[String, Any]
@@ -32,23 +32,27 @@ private[runtime] class UntilFinishedActor(private val monitor: ActorRef,
     runIfReady()
   }
 
-  override protected def input(port: String, item: Any): Unit = {
+  override protected def input(port: String, item: Message): Unit = {
     if (port == "source") {
-      if (currentItem.isDefined) {
-        throw new PipelineException("seqinput", "UntilFinished received a sequence.")
+      item match {
+        case message: ItemMessage =>
+          if (currentItem.isDefined) {
+            throw new PipelineException("seqinput", "UntilFinished received a sequence.")
+          }
+          currentItem = Some(message)
+        case _ => throw new GraphException(s"Unexpected message on $port: $item", node.location)
       }
-      currentItem = Some(item)
     } else if (port == "#bindings") {
       item match {
         case msg: BindingMessage =>
           bindings.put(msg.name, msg.item)
-        case _ => throw new GraphException(s"Unexpected message on $port", node.location)
+        case _ => throw new GraphException(s"Unexpected message on $port: $item", node.location)
       }
     }
     runIfReady()
   }
 
-  override def loop(item: Any): Unit = {
+  override def loop(item: ItemMessage): Unit = {
     nextItem = Some(item)
     looped = true
   }
@@ -76,7 +80,7 @@ private[runtime] class UntilFinishedActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def finished(): Unit = {
-    val finished = node.comparator.areTheSame(currentItem.get, nextItem.get)
+    val finished = node.comparator.areTheSame(currentItem.get.item, nextItem.get.item)
 
     trace(s"TESTE UntilFinished: " + currentItem.get + ": " + nextItem.get + ": " + finished, "UntilFinished")
 

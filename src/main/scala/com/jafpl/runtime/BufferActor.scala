@@ -2,17 +2,20 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.graph.Buffer
+import com.jafpl.messages.{ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput}
 
 import scala.collection.mutable.ListBuffer
 
 private[runtime] class BufferActor(private val monitor: ActorRef,
-                                 private val runtime: GraphRuntime,
-                                 private val node: Buffer) extends NodeActor(monitor, runtime, node)  {
-  var hasBeenReset = false
-  var buffer = ListBuffer.empty[Any]
+                                   private val runtime: GraphRuntime,
+                                   private val node: Buffer)
+  extends NodeActor(monitor, runtime, node)  {
 
-  override protected def input(port: String, item: Any): Unit = {
+  var hasBeenReset = false
+  var buffer = ListBuffer.empty[Message]
+
+  override protected def input(port: String, item: Message): Unit = {
     buffer += item
     monitor ! GOutput(node, "result", item)
   }

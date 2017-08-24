@@ -1,15 +1,19 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
+import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.ForEachStart
+import com.jafpl.messages.{ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput, GReset, GStart}
 
 import scala.collection.mutable.ListBuffer
 
 private[runtime] class ForEachActor(private val monitor: ActorRef,
                                     private val runtime: GraphRuntime,
-                                    private val node: ForEachStart) extends StartActor(monitor, runtime, node)  {
-  val queue = ListBuffer.empty[Any]
+                                    private val node: ForEachStart)
+  extends StartActor(monitor, runtime, node)  {
+
+  val queue = ListBuffer.empty[ItemMessage]
   var running = false
   var sourceClosed = false
 
@@ -25,8 +29,12 @@ private[runtime] class ForEachActor(private val monitor: ActorRef,
     runIfReady()
   }
 
-  override protected def input(port: String, item: Any): Unit = {
-    queue += item
+  override protected def input(port: String, item: Message): Unit = {
+    item match {
+      case message: ItemMessage =>
+        queue += message
+      case _ => throw new PipelineException("badmessage", "Unexpected message $item on input")
+    }
     runIfReady()
   }
 

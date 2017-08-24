@@ -3,7 +3,7 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.exceptions.{GraphException, PipelineException}
 import com.jafpl.graph.WhileStart
-import com.jafpl.messages.BindingMessage
+import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput, GReset, GStart}
 
 import scala.collection.mutable
@@ -11,7 +11,7 @@ import scala.collection.mutable
 private[runtime] class WhileActor(private val monitor: ActorRef,
                                   private val runtime: GraphRuntime,
                                   private val node: WhileStart) extends StartActor(monitor, runtime, node)  {
-  var currentItem = Option.empty[Any]
+  var currentItem = Option.empty[ItemMessage]
   var running = false
   var looped = false
   val bindings = mutable.HashMap.empty[String, Any]
@@ -30,28 +30,28 @@ private[runtime] class WhileActor(private val monitor: ActorRef,
     runIfReady()
   }
 
-  override protected def input(port: String, item: Any): Unit = {
-    if (port == "source") {
-      if (currentItem.isDefined) {
-        throw new PipelineException("seqinput", "While received a sequence.")
-      }
-      currentItem = Some(item)
-
-      initiallyTrue = node.tester.test(currentItem, Some(bindings.toMap))
-
-      trace(s"INTRU While: $initiallyTrue", "While")
-
-    } else if (port == "#bindings") {
-      item match {
-        case msg: BindingMessage =>
-          bindings.put(msg.name, msg.item)
-        case _ => throw new GraphException(s"Unexpected message on $port", node.location)
-      }
+  override protected def input(port: String, msg: Message): Unit = {
+    msg match {
+      case item: ItemMessage =>
+        if (currentItem.isDefined) {
+          throw new PipelineException("seqinput", "While received a sequence.")
+        }
+        currentItem = Some(item)
+        val testItem = if (currentItem.isDefined) {
+          Some(currentItem.get.item)
+        } else {
+          None
+        }
+        initiallyTrue = node.tester.test(testItem, Some(bindings.toMap))
+        trace(s"INTRU While: $initiallyTrue", "While")
+      case item: BindingMessage =>
+        bindings.put(item.name, item.item)
+      case _ => throw new GraphException(s"Unexpected message on $port", node.location)
     }
     runIfReady()
   }
 
-  override def loop(item: Any): Unit = {
+  override def loop(item: ItemMessage): Unit = {
     currentItem = Some(item)
     looped = true
   }
@@ -83,9 +83,9 @@ private[runtime] class WhileActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def finished(): Unit = {
-    val pass = node.tester.test(currentItem, Some(bindings.toMap))
+    val pass = node.tester.test(Some(currentItem.get.item), Some(bindings.toMap))
 
-    trace(s"TESTE While: " + currentItem.get + ": " + pass, "While")
+    trace(s"TESTE While: " + currentItem.get.item + ": " + pass, "While")
 
     if (pass) {
       trace(s"LOOPR While", "While")

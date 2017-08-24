@@ -3,6 +3,7 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.Node
+import com.jafpl.messages.{ItemMessage, Message}
 import com.jafpl.steps.{DataConsumer, DataProvider}
 
 class OutputProxy(private val monitor: ActorRef,
@@ -21,7 +22,7 @@ class OutputProxy(private val monitor: ActorRef,
 
   override def send(port: String, item: Any): Unit = {
     if (_provider.isDefined) {
-      _provider.get.send(port, item)
+      _provider.get.send(item)
     }
   }
 }

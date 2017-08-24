@@ -1,5 +1,7 @@
 package com.jafpl.steps
 
+import com.jafpl.messages.ItemMessage
+
 /** Decompose and recompose data for viewport processing.
   *
   * Viewports operate on sub-portions of a resource (some of the children in an XML document,

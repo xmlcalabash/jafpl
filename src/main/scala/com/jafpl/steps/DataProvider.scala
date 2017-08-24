@@ -1,5 +1,7 @@
 package com.jafpl.steps
 
+import com.jafpl.messages.Message
+
 /** A data provider.
   *
   * This trait is used to expose the input requirements of a pipeline.

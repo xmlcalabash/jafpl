@@ -25,7 +25,7 @@ class StringComposer extends ViewportComposer {
           }
         }
 
-      case _ => throw new PipelineException("UnexpectedType", "Unexpected item type")
+      case _ => throw new PipelineException("UnexpectedType", s"Unexpected item type: $item")
     }
 
     items.toList

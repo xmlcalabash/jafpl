@@ -1,9 +1,9 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.exceptions.GraphException
+import com.jafpl.exceptions.{GraphException, PipelineException}
 import com.jafpl.graph.Binding
-import com.jafpl.messages.BindingMessage
+import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput}
 
 import scala.collection.mutable
@@ -12,20 +12,20 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
                                      private val runtime: GraphRuntime,
                                      private val binding: Binding)
   extends NodeActor(monitor, runtime, binding)  {
-  var exprContext = Option.empty[Any]
+  var exprContext = Option.empty[ItemMessage]
   val bindings = mutable.HashMap.empty[String, Any]
 
-  override protected def input(port: String, item: Any): Unit = {
-    if (port == "source") {
-      trace(s"BCNXT $item", "Bindings")
-      exprContext = Some(item)
-    } else {
-      item match {
-        case msg: BindingMessage =>
-          trace(s"BOUND ${msg.name}=${msg.item}", "Bindings")
-          bindings.put(msg.name, msg.item)
-        case _ => throw new GraphException(s"Unexpected message on $port", binding.location)
-      }
+  override protected def input(port: String, msg: Message): Unit = {
+    msg match {
+      case item: ItemMessage =>
+        assert(port == "source")
+        trace(s"BCNXT $item", "Bindings")
+        exprContext = Some(item)
+      case binding: BindingMessage =>
+        assert(port == "#bindings")
+        trace(s"BOUND ${binding.name}=${binding.item}", "Bindings")
+        bindings.put(binding.name, binding.item)
+      case _ => throw new PipelineException("badmessage", s"Unexpected message $msg on $port")
     }
   }
 

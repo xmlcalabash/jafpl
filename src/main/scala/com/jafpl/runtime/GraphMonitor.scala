@@ -6,6 +6,7 @@ import akka.actor.{Actor, ActorRef}
 import akka.event.Logging
 import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.{ContainerEnd, Graph, Node}
+import com.jafpl.messages.{ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GAbort, GCatch, GCheckGuard, GClose, GException, GFinished, GFinishedViewport, GGuardResult, GLoop, GNode, GOutput, GReset, GRun, GStart, GStop, GStopped, GTrace, GWatchdog}
 import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NGuardResult, NInitialize, NInput, NLoop, NReset, NStart, NStop, NViewportFinished}
 
@@ -18,11 +19,11 @@ private[runtime] object GraphMonitor {
   case class GStart(node: Node)
   case class GCatch(node: Node, cause: Throwable)
   case class GException(node: Option[Node], cause: Throwable)
-  case class GOutput(node: Node, port: String, item: Any)
-  case class GLoop(node: Node, item: Any)
+  case class GOutput(node: Node, port: String, item: Message)
+  case class GLoop(node: Node, item: ItemMessage)
   case class GClose(node: Node, port: String)
   case class GFinished(node: Node)
-  case class GFinishedViewport(node: Node, buffer: List[Any])
+  case class GFinishedViewport(node: Node, buffer: List[Message])
   case class GAbort(node: Node)
   case class GStop(node: Node)
   case class GStopped(node: Node)
