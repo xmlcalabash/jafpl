@@ -210,11 +210,11 @@ class Graph(listener: Option[ErrorListener]) {
     * @param label An optional, user-defined label.
     * @return The constructed for-each.
     */
-  protected[graph] def addForEach(label: Option[String]): ForEachStart = {
+  protected[graph] def addForEach(label: Option[String]): LoopEachStart = {
     checkOpen()
 
     val end = new ContainerEnd(this)
-    val start = new ForEachStart(this, end, label)
+    val start = new LoopEachStart(this, end, label)
     end.parent = start
     end.start = start
     _nodes += start
@@ -228,11 +228,11 @@ class Graph(listener: Option[ErrorListener]) {
     * @param label An optional, user-defined label.
     * @return The constructed for-each.
     */
-  protected[graph] def addWhile(tester: ItemTester, label: Option[String]): WhileStart = {
+  protected[graph] def addWhile(tester: ItemTester, label: Option[String]): LoopWhileStart = {
     checkOpen()
 
     val end = new ContainerEnd(this)
-    val start = new WhileStart(this, end, label, tester)
+    val start = new LoopWhileStart(this, end, label, tester)
     end.parent = start
     end.start = start
     _nodes += start
@@ -246,11 +246,11 @@ class Graph(listener: Option[ErrorListener]) {
     * @param label An optional, user-defined label.
     * @return The constructed for-each.
     */
-  protected[graph] def addUntil(comparator: ItemComparator, label: Option[String]): UntilFinishedStart = {
+  protected[graph] def addUntil(comparator: ItemComparator, label: Option[String]): LoopUntilStart = {
     checkOpen()
 
     val end = new ContainerEnd(this)
-    val start = new UntilFinishedStart(this, end, label, comparator)
+    val start = new LoopUntilStart(this, end, label, comparator)
     end.parent = start
     end.start = start
     _nodes += start

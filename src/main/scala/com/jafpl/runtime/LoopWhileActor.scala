@@ -2,15 +2,15 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
-import com.jafpl.graph.WhileStart
+import com.jafpl.graph.LoopWhileStart
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
 
 import scala.collection.mutable
 
-private[runtime] class WhileActor(private val monitor: ActorRef,
-                                  private val runtime: GraphRuntime,
-                                  private val node: WhileStart) extends StartActor(monitor, runtime, node)  {
+private[runtime] class LoopWhileActor(private val monitor: ActorRef,
+                                      private val runtime: GraphRuntime,
+                                      private val node: LoopWhileStart) extends StartActor(monitor, runtime, node)  {
   var currentItem = Option.empty[ItemMessage]
   var running = false
   var looped = false

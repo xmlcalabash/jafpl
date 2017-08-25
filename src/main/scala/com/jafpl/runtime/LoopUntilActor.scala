@@ -2,15 +2,15 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
-import com.jafpl.graph.UntilFinishedStart
+import com.jafpl.graph.LoopUntilStart
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
 
 import scala.collection.mutable
 
-private[runtime] class UntilFinishedActor(private val monitor: ActorRef,
-                                          private val runtime: GraphRuntime,
-                                          private val node: UntilFinishedStart)
+private[runtime] class LoopUntilActor(private val monitor: ActorRef,
+                                      private val runtime: GraphRuntime,
+                                      private val node: LoopUntilStart)
   extends StartActor(monitor, runtime, node)  {
 
   var currentItem = Option.empty[ItemMessage]

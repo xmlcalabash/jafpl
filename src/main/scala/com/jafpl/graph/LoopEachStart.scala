@@ -8,7 +8,7 @@ package com.jafpl.graph
   * @param end The end of this container.
   * @param userLabel An optional user-defined label.
   */
-class ForEachStart private[jafpl] (override val graph: Graph,
+class LoopEachStart private[jafpl](override val graph: Graph,
                                    override protected val end: ContainerEnd,
                                    override val userLabel: Option[String])
   extends LoopStart(graph, end, userLabel) {

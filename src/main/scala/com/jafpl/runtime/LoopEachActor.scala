@@ -2,16 +2,16 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
-import com.jafpl.graph.ForEachStart
+import com.jafpl.graph.LoopEachStart
 import com.jafpl.messages.{ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
 import com.jafpl.util.PipelineMessage
 
 import scala.collection.mutable.ListBuffer
 
-private[runtime] class ForEachActor(private val monitor: ActorRef,
-                                    private val runtime: GraphRuntime,
-                                    private val node: ForEachStart)
+private[runtime] class LoopEachActor(private val monitor: ActorRef,
+                                     private val runtime: GraphRuntime,
+                                     private val node: LoopEachStart)
   extends StartActor(monitor, runtime, node)  {
 
   private val queue = ListBuffer.empty[ItemMessage]

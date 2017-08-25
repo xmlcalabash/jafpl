@@ -2,10 +2,10 @@ package com.jafpl.graph
 
 import com.jafpl.util.ItemTester
 
-private[jafpl] class WhileStart(override val graph: Graph,
-                                override protected val end: ContainerEnd,
-                                override val userLabel: Option[String],
-                                val tester: ItemTester)
+private[jafpl] class LoopWhileStart(override val graph: Graph,
+                                    override protected val end: ContainerEnd,
+                                    override val userLabel: Option[String],
+                                    val tester: ItemTester)
   extends LoopStart(graph, end, userLabel) {
 
   override def inputsOk(): Boolean = {

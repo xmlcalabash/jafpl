@@ -35,7 +35,7 @@ class ChooseStart private[jafpl] (override val graph: Graph,
     throw new GraphException("Cannot add Choose steps to Choose", location)
   }
 
-  override def addForEach(label: Option[String]): ForEachStart = {
+  override def addForEach(label: Option[String]): LoopEachStart = {
     throw new GraphException("Cannot add For-Each steps to Choose", location)
   }
 

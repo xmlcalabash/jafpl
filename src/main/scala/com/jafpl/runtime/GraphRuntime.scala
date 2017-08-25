@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.jafpl.exceptions.{GraphException, PipelineException}
-import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, ForEachStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, PipelineStart, Splitter, TryCatchStart, TryStart, UntilFinishedStart, ViewportStart, WhenStart, WhileStart}
+import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, LoopEachStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, PipelineStart, Splitter, TryCatchStart, TryStart, LoopUntilStart, ViewportStart, WhenStart, LoopWhileStart}
 import com.jafpl.runtime.GraphMonitor.{GException, GNode, GRun, GWatchdog}
 import com.jafpl.steps.{BindingProvider, DataConsumer, DataProvider}
 import com.jafpl.util.UniqueId
@@ -180,8 +180,8 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
           _system.actorOf(Props(new JoinerActor(_monitor, this, join)), actorName)
         case buf: Buffer =>
           _system.actorOf(Props(new BufferActor(_monitor, this, buf)), actorName)
-        case forEach: ForEachStart =>
-          _system.actorOf(Props(new ForEachActor(_monitor, this, forEach)), actorName)
+        case forEach: LoopEachStart =>
+          _system.actorOf(Props(new LoopEachActor(_monitor, this, forEach)), actorName)
         case viewport: ViewportStart =>
           _system.actorOf(Props(new ViewportActor(_monitor, this, viewport)), actorName)
         case choose: ChooseStart =>
@@ -198,10 +198,10 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
           _system.actorOf(Props(new PipelineActor(_monitor, this, pipe)), actorName)
         case group: GroupStart =>
           _system.actorOf(Props(new StartActor(_monitor, this, group)), actorName)
-        case wstart: WhileStart =>
-          _system.actorOf(Props(new WhileActor(_monitor, this, wstart)), actorName)
-        case start: UntilFinishedStart =>
-          _system.actorOf(Props(new UntilFinishedActor(_monitor, this, start)), actorName)
+        case wstart: LoopWhileStart =>
+          _system.actorOf(Props(new LoopWhileActor(_monitor, this, wstart)), actorName)
+        case start: LoopUntilStart =>
+          _system.actorOf(Props(new LoopUntilActor(_monitor, this, start)), actorName)
         case start: ContainerStart =>
           throw new GraphException("Attempt to instantiate naked container: " + start, start.location)
         case end: ContainerEnd =>
@@ -214,12 +214,12 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
               _system.actorOf(Props(new ConditionalEndActor(_monitor, this, end)), actorName)
             case trycatch: WhenStart =>
               _system.actorOf(Props(new ConditionalEndActor(_monitor, this, end)), actorName)
-            case foreach: ForEachStart =>
-              _system.actorOf(Props(new ForEachEndActor(_monitor, this, end)), actorName)
-            case wstart: WhileStart =>
-              _system.actorOf(Props(new WhileEndActor(_monitor, this, end)), actorName)
-            case start: UntilFinishedStart =>
-              _system.actorOf(Props(new UntilFinishedEndActor(_monitor, this, end)), actorName)
+            case foreach: LoopEachStart =>
+              _system.actorOf(Props(new LoopEachEndActor(_monitor, this, end)), actorName)
+            case wstart: LoopWhileStart =>
+              _system.actorOf(Props(new LoopWhileEndActor(_monitor, this, end)), actorName)
+            case start: LoopUntilStart =>
+              _system.actorOf(Props(new LoopUntilEndActor(_monitor, this, end)), actorName)
             case viewport: ViewportStart =>
               _system.actorOf(Props(new ViewportEndActor(_monitor, this, end)), actorName)
             case _ =>

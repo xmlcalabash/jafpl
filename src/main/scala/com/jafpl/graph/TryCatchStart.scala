@@ -38,7 +38,7 @@ class TryCatchStart private[jafpl] (override val graph: Graph,
     throw new GraphException("Cannot add Choose steps to Try/Catch", location)
   }
 
-  override def addForEach(label: Option[String]): ForEachStart = {
+  override def addForEach(label: Option[String]): LoopEachStart = {
     throw new GraphException("Cannot add For-Each steps to Try/Catch", location)
   }
 
