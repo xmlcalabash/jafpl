@@ -545,6 +545,15 @@ class Graph(listener: Option[ErrorListener]) {
     outboundEdges.toList
   }
 
+  protected[jafpl] def hasEdgeFrom(node: Node, port: String): Boolean = {
+    for (edge <- _edges) {
+      if (edge.from == node && edge.fromPort == port) {
+        return true
+      }
+    }
+    false
+  }
+
   protected[jafpl] def edgesTo(node: Node, port: String): List[Edge] = {
     val inboundEdges = ListBuffer.empty[Edge]
     for (edge <- _edges) {
@@ -600,6 +609,8 @@ class Graph(listener: Option[ErrorListener]) {
               error(new GraphException(s"Required input '$port' missing: $atomic", node.location))
             }
 
+            // It's always ok to drop outputs on the floor.
+            /*
             map = mutable.HashSet.empty[String] ++ atomic.step.get.outputSpec.ports()
             for (port <- node.outputs) {
               if (map.contains(port)) {
@@ -610,7 +621,8 @@ class Graph(listener: Option[ErrorListener]) {
               val port = map.toList.head
               error(new GraphException(s"Required output '$port' missing: $atomic", node.location))
             }
-
+            */
+            
             map = mutable.HashSet.empty[String] ++ atomic.step.get.bindingSpec.bindings
             for (varname <- node.bindings) {
               if (map.contains(varname)) {

@@ -106,6 +106,10 @@ abstract class Node(val graph: Graph,
     graph.edgesFrom(this, port).head
   }
 
+  protected[jafpl] def hasOutputEdge(port: String): Boolean = {
+    graph.hasEdgeFrom(this, port)
+  }
+
   /** This node's parent.
     *
     * @return This node's parent.

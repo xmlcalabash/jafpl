@@ -144,9 +144,13 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
 
     case GOutput(node, port, item) =>
       lastMessage = Instant.now()
-      trace(s"SNDTO $node.$port ($item)", "StepIO")
-      val edge = node.outputEdge(port)
-      actors(edge.to) ! NInput(edge.toPort, item)
+      if (node.hasOutputEdge(port)) {
+        trace(s"SNDTO $node.$port ($item)", "StepIO")
+        val edge = node.outputEdge(port)
+        actors(edge.to) ! NInput(edge.toPort, item)
+      } else {
+        trace(s"DROPO $node.$port ($item)", "StepIO")
+      }
 
     case GLoop(node, item) =>
       lastMessage = Instant.now()

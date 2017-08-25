@@ -15,7 +15,21 @@ object GraphTest extends App {
   //pw.write(graph.asXML.toString)
   //pw.close()
 
-  runThree()
+  runFour()
+
+  def runFour(): Unit = {
+    val graph = new Graph()
+    val pipeline = graph.addPipeline()
+    val p1       = pipeline.addAtomic(new Producer(List("Hello")), "p1")
+
+    graph.close()
+    val pw = new PrintWriter(new File("/projects/github/xproc/jafpl/pg.xml"))
+    pw.write(graph.asXML.toString)
+    pw.close()
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.run()
+  }
 
   def runThree(): Unit = {
     val graph = new Graph()
