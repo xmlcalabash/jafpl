@@ -173,12 +173,6 @@
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="class" href="ForEachStart.html" title="A for-each container."></a>
-                        <a href="ForEachStart.html" title="A for-each container.">
-                          ForEachStart
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
                         <a class="class" href="Graph.html" title="A pipeline graph."></a>
                         <a href="Graph.html" title="A pipeline graph.">
                           Graph
@@ -188,6 +182,12 @@
                         <a class="trait" href="Location.html" title="A location."></a>
                         <a href="Location.html" title="A location.">
                           Location
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
+                        <a class="class" href="LoopEachStart.html" title="A for-each container."></a>
+                        <a href="LoopEachStart.html" title="A for-each container.">
+                          LoopEachStart
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
@@ -463,25 +463,6 @@ At runtime, the association is between the name and its computed value.</p><p>Va
       <p class="shortcomment cmt">A node that contains other nodes.</p><div class="fullcomment"><div class="comment cmt"><p>A node that contains other nodes.</p><p>Conceptually, some nodes contain others. A loop, for example, contains the steps that form the
 body of the loop.</p><p>In practice, containers are represented by a start and an end.
 </p></div></div>
-    </li><li name="com.jafpl.graph.ForEachStart" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="ForEachStartextendsLoopStart"></a><a id="ForEachStart:ForEachStart"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/graph/index.html#ForEachStartextendsLoopStart" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">class</span>
-      </span>
-      <span class="symbol">
-        <a title="A for-each container." href="ForEachStart.html">
-              <span class="name">ForEachStart</span>
-            </a><span class="result"> extends <a href="LoopStart.html" class="extype" name="com.jafpl.graph.LoopStart">LoopStart</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">A for-each container.</p><div class="fullcomment"><div class="comment cmt"><p>A for-each container.</p><p>ForEach containers are created with the <code>addForEach</code> method of <a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">com.jafpl.graph.ContainerStart</a>.
-</p></div></div>
     </li><li name="com.jafpl.graph.Graph" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="GraphextendsAnyRef"></a><a id="Graph:Graph"></a>
       <span class="permalink">
@@ -527,6 +508,25 @@ digits, hyphens, and underscores.
       </span>
       
       <p class="shortcomment cmt">A location.</p><div class="fullcomment"><div class="comment cmt"><p>A location.</p><p>This interface indentifies a location for use in subsequent reporting.</p></div></div>
+    </li><li name="com.jafpl.graph.LoopEachStart" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="LoopEachStartextendsLoopStart"></a><a id="LoopEachStart:LoopEachStart"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/index.html#LoopEachStartextendsLoopStart" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a title="A for-each container." href="LoopEachStart.html">
+              <span class="name">LoopEachStart</span>
+            </a><span class="result"> extends <a href="LoopStart.html" class="extype" name="com.jafpl.graph.LoopStart">LoopStart</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">A for-each container.</p><div class="fullcomment"><div class="comment cmt"><p>A for-each container.</p><p>ForEach containers are created with the <code>addForEach</code> method of <a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">com.jafpl.graph.ContainerStart</a>.
+</p></div></div>
     </li><li name="com.jafpl.graph.LoopStart" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="LoopStartextendsContainerStart"></a><a id="LoopStart:LoopStart"></a>
       <span class="permalink">
