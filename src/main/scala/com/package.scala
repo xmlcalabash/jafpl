@@ -1,5 +1,10 @@
 package com
 
-/** This is the Scaladoc for the jafpl package. */
+/** The jafpl package.
+  *
+  * Nothing to see here either, keep going deeper.
+  *
+  * @author Norman Walsh
+  */
 package object jafpl {
 }

@@ -1,17 +1,25 @@
 package com.jafpl
 
-/** This is the Scaladoc for the exceptions package. */
+/** Exceptions thrown. */
 package object exceptions {
 }
 
-/** This is the Scaladoc for the graph package. */
+/** The graph construction APIs. */
 package object graph {
 }
 
-/** This is the Scaladoc for the runtime package. */
+/** The messages passed between actors. */
+package object messages {
+}
+
+/** The graph runtime APIs. */
 package object runtime {
 }
 
-/** This is the Scaladoc for the steps package. */
+/** Step and step-related traits. */
 package object steps {
+}
+
+/** Utility classes. */
+package object util {
 }
