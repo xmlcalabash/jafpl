@@ -4,6 +4,20 @@
     <ul>
       <li><a href="/">Overview</a></li>
       <li id="contact"><a href="/contact">Contact us</a></li>
+    </ul>
+  </li>
+  <li id="pipelines">
+    <a href="/pipelines">Pipelines</a>
+    <ul>
+      <li><a href="/pipelines">Overview</a></li>
+    </ul>
+  </li>
+  <li id="apis">
+    <a href="/apis">APIs</a>
+    <ul>
+      <li><a href="/apis">Overview</a></li>
+      <li id="pipelineapis"><a href="/apis/pipelines">Pipeline APIs</a></li>
+      <li id="stepapis"><a href="/apis/steps">Step APIs</a></li>
       <li id="apidocs"><a href="/apidocs">API Docs</a></li>
     </ul>
   </li>

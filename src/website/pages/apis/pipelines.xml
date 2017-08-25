@@ -1,0 +1,15 @@
+<article xmlns="http://docbook.org/ns/docbook"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+	 xml:id="pipelineapis"
+         version="5.0">
+<info>
+  <title>Pipeline APIs</title>
+</info>
+
+<para>This project is the core runtime for a general purpose pipeline
+processor. It’s the heart of <citetitle>XML Calabash V2.x</citetitle>
+which hasn’t been released yet. This hasn’t been released in any
+official sense either. YMMV. Here there be dragons. Etc.</para>
+
+</article>

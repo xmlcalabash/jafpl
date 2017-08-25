@@ -64,7 +64,11 @@ setupDocBook.onlyIf { !file("$buildDir/docbook").exists() }
 // All of the hand-authored pages
 def pages = [
              'pages/index',
-             'pages/contact'
+             'pages/contact',
+             'pages/pipelines/index',
+             'pages/apis/index',
+             'pages/apis/pipelines',
+             'pages/apis/steps'
             ]
 
 // Create a task for each page to update it if necessary
@@ -107,13 +111,18 @@ task builddirs {
 }
 
 // Copy a bunch of files
-task copyrsrcs(dependsOn: ['copycss','copyimages','copygraphics','copypages']) {
+task copyrsrcs(dependsOn: ['copycss','copyjs','copyimages','copygraphics','copypages']) {
   // nop
 }
 
 task copycss(dependsOn: builddirs, type: Copy) {
   from 'src/website/css'
   into 'build/pages/css'
+}
+
+task copyjs(dependsOn: builddirs, type: Copy) {
+  from 'src/website/js'
+  into 'build/pages/js'
 }
 
 task copyimages(dependsOn: builddirs, type: Copy) {

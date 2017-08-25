@@ -26,6 +26,9 @@
   <db:chapter/>
 </xsl:param>
 
+<xsl:param name="resource.root"
+           select="concat('http://cdn.docbook.org/release/',$VERSION,'/resources/')"/>
+
 <xsl:param name="linenumbering" as="element()*">
 <ln path="literallayout" everyNth="0"/>
 <ln path="programlisting" everyNth="0"/>
@@ -59,6 +62,17 @@
 -->
 </xsl:template>
 
+<xsl:template match="*" mode="m:javascript-head">
+  <xsl:param name="node" select="."/>
+
+  <xsl:if test="/*/@xml:id = 'home'">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+    <script src="/js/jafpl.js"></script>
+  </xsl:if>
+</xsl:template>
+
 <!-- ============================================================ -->
 
 <xsl:template match="db:article[@xml:id]">
@@ -90,7 +104,7 @@
       <xsl:choose>
 	<xsl:when test="@xml:id = 'home'">
 	  <xsl:text>Just another </xsl:text>
-          <em>fine</em>
+          <em id="fine">fine</em>
           <xsl:text> pipeline language</xsl:text>
           <a href="https://github.com/ndw/jafpl" class="github-corner">
 <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"
