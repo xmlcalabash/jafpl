@@ -1,0 +1,294 @@
+<article xmlns="http://docbook.org/ns/docbook"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+	 xml:id="pipelineapis"
+         version="5.0">
+<info>
+  <title>Pipeline APIs</title>
+</info>
+
+<para>Pipelines are constructed using a straightfoward JVM API. The examples
+below are in Scala, but I believe they’ll work from Java as well. And probably
+any other JVM language.</para>
+
+<para>All of the examples that follow are available in the
+<package>com.jafpldemo.examples</package> package at
+<link xlink:href="https://github.com/ndw/jafpl-demo/"/>.</para>
+
+<para>The simplest possible pipeline is one that does nothing,
+<xref linkend="example1"/>.</para>
+
+<example xml:id="example1">
+<title>NOP pipeline</title>
+<programlisting language="scala">  val graph  = new Graph()                               <co xml:id="x.graph"/>
+
+  val pipeline = graph.addPipeline("pipeline")           <co xml:id="x.pipeline"/>
+  val nop      = pipeline.addAtomic(new NOP(), "nop")    <co xml:id="x.nop"/>
+
+  val config = new PrimitiveRuntimeConfiguration()       <co xml:id="x.prtc"/>
+  val runtime = new GraphRuntime(graph, config)          <co xml:id="x.runtime"/>
+  runtime.run()                                          <co xml:id="x.run"/></programlisting>
+</example>
+
+<para>Let’s look at this in more detail.</para>
+
+<calloutlist>
+<callout arearefs="x.graph">
+<para>A <classname xlink:href="/apidocs/com/jafpl/graph/Graph.html">Graph</classname>
+is the representation of a JAFPL pipeline.</para>
+</callout>
+<callout arearefs="x.pipeline">
+<para>A pipeline is the top-level container in a graph.</para>
+</callout>
+<callout arearefs="x.nop">
+<para>Atomic steps have two parts: an implementation and an optional label. The
+label is used in graph output, if you request it, and in error messages. It’s
+a good idea to provide unique labels for each of your steps.</para>
+<para>The <classname>NOP</classname> step is an atomic step that does nothing.
+It has no inputs, it has no outputs. Step implementations are independent of the
+JAFPL pipeline library. See <link xlink:href="steps">the steps API</link>.</para>
+</callout>
+<callout arearefs="x.prtc">
+<para>Actually running a pipeline requires a runtime configuration. That’s where
+things like an expression language and runtime trace events are implemented.
+The
+<classname xlink:href="/apidocs/com/jafpl/runtime/RuntimeConfiguration.html">PrimitiveRuntimeConfiguration</classname>,
+as it’s name implies,
+is a primitive stub implementation. It does the bare minimum required.</para>
+</callout>
+<callout arearefs="x.runtime">
+<para>A
+<classname xlink:href="/apidocs/com/jafpl/runtime/GraphRuntime.html">Runtime</classname>
+can actually evaluate the pipeline.</para>
+</callout>
+<callout arearefs="x.run">
+<para>And
+<methodname xlink:href="/apidocs/com/jafpl/runtime/GraphRuntime.html#run():Unit">run</methodname>
+runs it, unsurprisingly.</para>
+</callout>
+</calloutlist>
+
+<para>Of course, this pipeline does nothing, so it’s not very interesting.
+Pipelines are only interesting when data flows through them. In order to have
+data flow, we either need to connect our pipeline to some external data source, or
+we have to introduce a step that produces some data.
+Introducing a step that produces data is simpler, in the short term,
+than plumbing an external data source, so let’s do that.</para>
+
+<para>The <classname>Producer</classname> step is constructed with a list of
+items. When it runs, it produces those items on it’s “result” port. (Port names
+are arbitrary, but as a matter of practicality, the pipeline and the step
+implementations have to agree on the names.)</para>
+
+<para>Here’s a pipeline that uses the producer step.</para>
+
+<example xml:id="example2">
+<title>Producer pipeline</title>
+<programlisting language="scala">  val config = new PrimitiveRuntimeConfiguration()
+  val graph  = new Graph()
+
+  val pipeline = graph.addPipeline("pipeline")
+  val producer = pipeline.addAtomic(new Producer(List("Hello, world")), "producer")
+
+  val runtime = new GraphRuntime(graph, config)
+  runtime.run()</programlisting>
+</example>
+
+<para>Curiously, running this pipeline doesn’t do anything either. Well. It does,
+but because the output of the producer step isn’t connected to anything, the
+pipeline just drops the output on the floor.</para>
+
+<para>Data flow involves both producers and consumers. Let’s introduce a consumer
+step. The <classname>Consumer</classname> will read an arbitrary number of items
+on it’s input “source” port. When it runs, it will print them on the console. It
+produces no output. <xref linkend="example3"/> uses both the producer and
+the consumer.</para>
+
+<example xml:id="example3">
+<title>Producer/consumer pipeline</title>
+<programlisting language="scala">  val config = new PrimitiveRuntimeConfiguration()
+  val graph  = new Graph()
+
+  val pipeline = graph.addPipeline("pipeline")
+  val producer = pipeline.addAtomic(new Producer(List("Hello, world")), "producer")
+  val consumer = pipeline.addAtomic(new Consumer(), "consumer")
+
+  graph.addEdge(producer, "result", consumer, "source")  <co xml:id="x.edge1"/>
+
+  val runtime = new GraphRuntime(graph, config)
+  runtime.run()</programlisting>
+</example>
+
+<para>Our pipeline now has two steps, but that all by itself wouldn’t be enough.
+We also need to connect them together, to describe the data flow.
+(The library provides no implicit connections between steps.)
+The
+<methodname>addEdge</methodname> call at <coref linkend="x.edge1"/> establishes
+a directed edge from the “result” port of <code>producer</code> <emphasis>to</emphasis>
+the “source” port of <code>consumer</code>.</para>
+
+<para>If you run <emphasis>this</emphasis> pipeline, you’ll finally get some output:
+the canonical “Hello, world” message.</para>
+
+<para>The <classname>Identity</classname> step simply copies its input to its output,
+so it’s always safe to add them. Let’s make our pipeline a few steps longer.</para>
+
+<example xml:id="example4">
+<title>Longer producer/consumer pipeline</title>
+<programlisting language="scala">  val config = new PrimitiveRuntimeConfiguration()
+  val graph  = new Graph()
+
+  val pipeline = graph.addPipeline("pipeline")
+  val producer = pipeline.addAtomic(new Producer(List("Hello, world")), "producer")
+  val a        = pipeline.addAtomic(new Identity(), "a") <co xml:id="x.adda"/>
+  val b        = pipeline.addAtomic(new Identity(), "b") <co xml:id="x.addb"/>
+  val consumer = pipeline.addAtomic(new Consumer(), "consumer")
+
+  graph.addEdge(producer, "result", b,        "source") <co xml:id="x.linkb"/>
+  graph.addEdge(b,        "result", a,        "source") <co xml:id="x.linka"/>
+  graph.addEdge(a,        "result", consumer, "source")
+
+  val runtime = new GraphRuntime(graph, config)
+  runtime.run()</programlisting>
+</example>
+
+<para>The important point in this example is that although I added
+“a” <coref linkend="x.adda"/> then “b” <coref linkend="x.addb"/>
+to the pipeline; the edges connect the other way around. The order in which
+siblings steps run is determined entirely and exclusively by the ways in which
+they are connected.</para>
+
+<para>In this pipeline, “producer” runs first, then
+“b” <coref linkend="x.linkb"/>, then “a” <coref linkend="x.linka"/>, then
+“consumer”.</para>
+
+<para>Let’s do something transformative this time. Pipelines to do
+nothing more than copy their inputs around aren’t very interesting.
+The <classname>Uppercase</classname> step takes a single string input
+on its “source” port and returns only the words in the string, shifted
+to upper case, on its “result” port. (The semantics are a little odd,
+but we’ll come back to that.)</para>
+
+<example xml:id="example5">
+<title>Uppercase pipeline</title>
+<programlisting language="scala">  val config = new PrimitiveRuntimeConfiguration()
+  val graph  = new Graph()
+
+  val pipeline = graph.addPipeline("pipeline")
+  val producer = pipeline.addAtomic(new Producer(List("Hello, world")), "producer")
+  val upper    = pipeline.addAtomic(new Uppercase(), "uppercase")
+  val consumer = pipeline.addAtomic(new Consumer(), "consumer")
+
+  graph.addEdge(producer, "result", upper, "source")
+  graph.addEdge(upper, "result", consumer, "source")
+
+  val runtime = new GraphRuntime(graph, config)
+  runtime.run()</programlisting>
+</example>
+
+<para>If you run this pipeline, it produces “HELLO WORLD”.</para>
+
+<para>What happens if you change the produce so that it actually produces
+a sequence? (Feel free to got try it out!)</para>
+
+<para>The answer is, an error. The uppercase step does not accept a sequence,
+so the pipeline will generate an error as soon as the second input arrives on
+its input.</para>
+
+<para>The way to work around that is with a loop.</para>
+
+<example xml:id="example6">
+<title>Uppercase loop pipeline</title>
+<programlisting language="scala">  val config = new PrimitiveRuntimeConfiguration()
+  val graph  = new Graph()
+
+  val pipeline = graph.addPipeline("pipeline")
+  val producer = pipeline.addAtomic(new Producer(List("Hello", "There", "World")), "producer")
+
+  val loop     = pipeline.addForEach("loop")                      <co xml:id="x.loop"/>
+  val upper    = loop.addAtomic(new Uppercase(), "uppercase")     <co xml:id="x.loopup"/>
+
+  val consumer = pipeline.addAtomic(new Consumer(), "consumer")
+
+  graph.addEdge(producer, "result", loop, "source") <co xml:id="x.edge2"/>
+  graph.addEdge(loop, "source", upper, "source")    <co xml:id="x.edge3"/>
+  graph.addEdge(upper, "result", loop, "result")    <co xml:id="x.edge4"/>
+  graph.addEdge(loop, "result", consumer, "source") <co xml:id="x.edge5"/>
+
+  val runtime = new GraphRuntime(graph, config)
+  runtime.run()</programlisting>
+</example>
+
+<calloutlist>
+<callout arearefs="x.loop">
+<para>A loop container is created in the pipeline.
+</para>
+</callout>
+<callout arearefs="x.loopup">
+<para>The upper step is added to the loop container, not directly to the pipeline.
+</para>
+</callout>
+<callout arearefs="x.edge2">
+<para>The producer output is connected to the loop. A for-each loop has a single
+input port, source.
+</para>
+</callout>
+<callout arearefs="x.edge3">
+<para>From <emphasis>inside</emphasis> the loop, reading from the loop source
+reads the current input document in the loop. This is connected to the source
+for the upper step.
+</para>
+</callout>
+<callout arearefs="x.edge4">
+<para>The upper output is connected to the loop result port.
+</para>
+</callout>
+<callout arearefs="x.edge5">
+<para>The loop result is connected to the consumer.
+</para>
+</callout>
+</calloutlist>
+
+<para>If you run this pipeline, it produces “HELLO”, “THERE”, and “WORLD”.</para>
+
+<para>As a final example for the moment, let’s look at how we could use the
+upper step to capitalize the words of a sentence without losing the punctuation.
+JAFPL includes a “viewport” step for this purpose. Viewports expose sub-parts
+of their input to a pipeline and then stitch the results of processing those
+sub-parts back into the original.</para>
+
+<example xml:id="example7">
+<title>Viewport pipeline</title>
+<programlisting language="scala">  val config = new PrimitiveRuntimeConfiguration()
+  val graph  = new Graph()
+
+  val pipeline = graph.addPipeline()
+
+  val producer = pipeline.addAtomic(new Producer(List("Hello there, world.")), "producer")
+  val viewport = pipeline.addViewport(new StringComposer()<co xml:id="x.sc"/>, "viewport") 
+  val upper    = viewport.addAtomic(new Uppercase(), "uppercase")
+  val consumer = pipeline.addAtomic(new Consumer(), "consumer")
+
+  graph.addEdge(producer, "result", viewport, "source")
+  graph.addEdge(viewport, "source", upper, "source")
+  graph.addEdge(upper, "result", viewport, "result")
+  graph.addEdge(viewport, "result", pipeline, "result")
+  graph.addEdge(pipeline, "result", consumer, "source")
+
+  val runtime = new GraphRuntime(graph, config)
+  runtime.run()</programlisting>
+</example>
+
+<para>The magic here is in the implementation of the
+<classname xlink:href="apidocs/com/jafpl/steps/ViewportComposer.html">StringComposer</classname> <coref linkend="x.sc"/>.
+The string composer extracts the words “Hello”, “there”, and “world” from
+its input string. Each of those words is processed by the subpipeline in the viewport
+(i.e, upper). Then the results are recomposed.</para>
+
+<para>If you run this pipeline, it produces “HELLO THERE, WORLD.”.</para>
+
+<para>The decomposition/recomposition process is independent of the pipeline
+engine. You can use it to process parts of strings, JSON keys, arrays, XML
+documents, columns in CSV files, whatever you can implement.</para>
+
+</article>

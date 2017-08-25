@@ -1,0 +1,26 @@
+<article xmlns="http://docbook.org/ns/docbook"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+	 xml:id="apis"
+         version="5.0">
+<info>
+  <title>APIs</title>
+</info>
+
+<para>At the level of this library, you must construct a graph using the
+underlying APIs. There’s no “pipeline language” support.
+Broadly speaking, there are atomic steps, containers, pipelines (the top-most
+container), inputs, outputs, variable bindings, and edges.</para>
+
+<para>You can construct any graph that you like with these nodes and
+edges between them. An edge is a connection between an “output port”
+on a “source” node and an “input port” on a “destination” node. The edges
+are arbitrary; asserting that an edge exists between two ports creates
+the ports if necessary.</para>
+
+<para>For more information, see the description of
+<link xlink:href="pipelines">the pipeline library API</link>,
+<link xlink:href="steps">the step API</link>, or go straight to
+the <link xlink:href="/apidocs">API Docs</link>, if you prefer.</para>
+
+</article>

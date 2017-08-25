@@ -1,0 +1,163 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Pipeline APIs</title><meta charset="utf-8" /><meta name="generator" content="DocBook XSL 2.0 Stylesheets V2.0.20" /><link rel="stylesheet" type="text/css" href="http://cdn.docbook.org/release/2.0.20/resources/css/default.css" /><link rel="stylesheet" type="text/css" href="/css/docbook.css" /><link rel="stylesheet" type="text/css" href="/css/tabs.css" /><link rel="stylesheet" type="text/css" href="/css/website.css" /><link href="http://fonts.googleapis.com/css?family=Rambla" rel="stylesheet" type="text/css" /><script type="text/javascript" src="http://cdn.docbook.org/release/2.0.20/resources/js/dbmodnizr.js"></script><link href="http://cdn.docbook.org/release/2.0.20/resources/css/prism.css" rel="stylesheet" type="text/css" /><link href="http://cdn.docbook.org/release/2.0.20/resources/css/db-prism.css" rel="stylesheet" type="text/css" /></head><body><div class="header">
+<h1>JA<em>F</em>  PL</h1>
+</div><div class="navset" id="nav"><div class="hd"><ul><li id="home"><a href="/"><em>Home</em></a></li><li id="pipelines"><a href="/pipelines"><em>Pipelines</em></a></li><li id="apis" class="on" title="selected"><a href="/apis"><strong><em>APIs</em></strong></a></li></ul></div><div class="bd"><ul><li class=" first "><a href="/apis">Overview</a></li><li id="pipelineapis" class="on  "><a href="/apis/pipelines">Pipeline APIs</a></li><li id="stepapis" class="  "><a href="/apis/steps">Step APIs</a></li><li id="apidocs" class="  last"><a href="/apidocs">API Docs</a></li></ul></div></div><article class="article"><h1>Pipeline APIs</h1><p>Pipelines are constructed using a straightfoward JVM API. The examples
+below are in Scala, but I believe they’ll work from Java as well. And probably
+any other JVM language.</p><p>All of the examples that follow are available in the
+<span class="package">com.jafpldemo.examples</span> package at
+<a href="https://github.com/ndw/jafpl-demo/">https://github.com/ndw/jafpl-demo/</a>.</p><p>The simplest possible pipeline is one that does nothing,
+<a href="#example1">NOP pipeline</a>.</p><figure id="example1" class="example-wrapper"><div class="title">Example 1. NOP pipeline</div><div class="example"><pre class="programlisting language-scala"><code>  val graph  = new Graph()                               <a name="x.graph" id="x.graph"></a><span data-number="1" class="callout-bug callout-bug-unicode">❶</span>
+
+  val pipeline = graph.addPipeline("pipeline")           <a name="x.pipeline" id="x.pipeline"></a><span data-number="2" class="callout-bug callout-bug-unicode">❷</span>
+  val nop      = pipeline.addAtomic(new NOP(), "nop")    <a name="x.nop" id="x.nop"></a><span data-number="3" class="callout-bug callout-bug-unicode">❸</span>
+
+  val config = new PrimitiveRuntimeConfiguration()       <a name="x.prtc" id="x.prtc"></a><span data-number="4" class="callout-bug callout-bug-unicode">❹</span>
+  val runtime = new GraphRuntime(graph, config)          <a name="x.runtime" id="x.runtime"></a><span data-number="5" class="callout-bug callout-bug-unicode">❺</span>
+  runtime.run()                                          <a name="x.run" id="x.run"></a><span data-number="6" class="callout-bug callout-bug-unicode">❻</span></code></pre></div></figure><p>Let’s look at this in more detail.</p><div class="calloutlist"><dl><dt class="callout"><a href="#x.graph" class="callout-link"><span data-number="1" class="callout-bug callout-bug-unicode">❶</span></a> </dt><dd><p>A <code class="classname"><a href="/apidocs/com/jafpl/graph/Graph.html">Graph</a></code>
+is the representation of a JAFPL pipeline.</p></dd><dt class="callout"><a href="#x.pipeline" class="callout-link"><span data-number="2" class="callout-bug callout-bug-unicode">❷</span></a> </dt><dd><p>A pipeline is the top-level container in a graph.</p></dd><dt class="callout"><a href="#x.nop" class="callout-link"><span data-number="3" class="callout-bug callout-bug-unicode">❸</span></a> </dt><dd><p>Atomic steps have two parts: an implementation and an optional label. The
+label is used in graph output, if you request it, and in error messages. It’s
+a good idea to provide unique labels for each of your steps.</p><p>The <code class="classname">NOP</code> step is an atomic step that does nothing.
+It has no inputs, it has no outputs. Step implementations are independent of the
+JAFPL pipeline library. See <a href="steps">the steps API</a>.</p></dd><dt class="callout"><a href="#x.prtc" class="callout-link"><span data-number="4" class="callout-bug callout-bug-unicode">❹</span></a> </dt><dd><p>Actually running a pipeline requires a runtime configuration. That’s where
+things like an expression language and runtime trace events are implemented.
+The
+<code class="classname"><a href="/apidocs/com/jafpl/runtime/RuntimeConfiguration.html">PrimitiveRuntimeConfiguration</a></code>,
+as it’s name implies,
+is a primitive stub implementation. It does the bare minimum required.</p></dd><dt class="callout"><a href="#x.runtime" class="callout-link"><span data-number="5" class="callout-bug callout-bug-unicode">❺</span></a> </dt><dd><p>A
+<code class="classname"><a href="/apidocs/com/jafpl/runtime/GraphRuntime.html">Runtime</a></code>
+can actually evaluate the pipeline.</p></dd><dt class="callout"><a href="#x.run" class="callout-link"><span data-number="6" class="callout-bug callout-bug-unicode">❻</span></a> </dt><dd><p>And
+<code class="methodname"><a href="/apidocs/com/jafpl/runtime/GraphRuntime.html#run():Unit">run</a></code>
+runs it, unsurprisingly.</p></dd></dl></div><p>Of course, this pipeline does nothing, so it’s not very interesting.
+Pipelines are only interesting when data flows through them. In order to have
+data flow, we either need to connect our pipeline to some external data source, or
+we have to introduce a step that produces some data.
+Introducing a step that produces data is simpler, in the short term,
+than plumbing an external data source, so let’s do that.</p><p>The <code class="classname">Producer</code> step is constructed with a list of
+items. When it runs, it produces those items on it’s “result” port. (Port names
+are arbitrary, but as a matter of practicality, the pipeline and the step
+implementations have to agree on the names.)</p><p>Here’s a pipeline that uses the producer step.</p><figure id="example2" class="example-wrapper"><div class="title">Example 2. Producer pipeline</div><div class="example"><pre class="programlisting language-scala"><code>  val config = new PrimitiveRuntimeConfiguration()
+  val graph  = new Graph()
+
+  val pipeline = graph.addPipeline("pipeline")
+  val producer = pipeline.addAtomic(new Producer(List("Hello, world")), "producer")
+
+  val runtime = new GraphRuntime(graph, config)
+  runtime.run()</code></pre></div></figure><p>Curiously, running this pipeline doesn’t do anything either. Well. It does,
+but because the output of the producer step isn’t connected to anything, the
+pipeline just drops the output on the floor.</p><p>Data flow involves both producers and consumers. Let’s introduce a consumer
+step. The <code class="classname">Consumer</code> will read an arbitrary number of items
+on it’s input “source” port. When it runs, it will print them on the console. It
+produces no output. <a href="#example3">Producer/consumer pipeline</a> uses both the producer and
+the consumer.</p><figure id="example3" class="example-wrapper"><div class="title">Example 3. Producer/consumer pipeline</div><div class="example"><pre class="programlisting language-scala"><code>  val config = new PrimitiveRuntimeConfiguration()
+  val graph  = new Graph()
+
+  val pipeline = graph.addPipeline("pipeline")
+  val producer = pipeline.addAtomic(new Producer(List("Hello, world")), "producer")
+  val consumer = pipeline.addAtomic(new Consumer(), "consumer")
+
+  graph.addEdge(producer, "result", consumer, "source")  <a name="x.edge1" id="x.edge1"></a><span data-number="1" class="callout-bug callout-bug-unicode">❶</span>
+
+  val runtime = new GraphRuntime(graph, config)
+  runtime.run()</code></pre></div></figure><p>Our pipeline now has two steps, but that all by itself wouldn’t be enough.
+We also need to connect them together, to describe the data flow.
+(The library provides no implicit connections between steps.)
+The
+<code class="methodname">addEdge</code> call at <a name="x.edge1" id="x.edge1"></a><span data-number="1" class="callout-bug callout-bug-unicode">❶</span> establishes
+a directed edge from the “result” port of <code class="code">producer</code> <em>to</em>
+the “source” port of <code class="code">consumer</code>.</p><p>If you run <em>this</em> pipeline, you’ll finally get some output:
+the canonical “Hello, world” message.</p><p>The <code class="classname">Identity</code> step simply copies its input to its output,
+so it’s always safe to add them. Let’s make our pipeline a few steps longer.</p><figure id="example4" class="example-wrapper"><div class="title">Example 4. Longer producer/consumer pipeline</div><div class="example"><pre class="programlisting language-scala"><code>  val config = new PrimitiveRuntimeConfiguration()
+  val graph  = new Graph()
+
+  val pipeline = graph.addPipeline("pipeline")
+  val producer = pipeline.addAtomic(new Producer(List("Hello, world")), "producer")
+  val a        = pipeline.addAtomic(new Identity(), "a") <a name="x.adda" id="x.adda"></a><span data-number="1" class="callout-bug callout-bug-unicode">❶</span>
+  val b        = pipeline.addAtomic(new Identity(), "b") <a name="x.addb" id="x.addb"></a><span data-number="2" class="callout-bug callout-bug-unicode">❷</span>
+  val consumer = pipeline.addAtomic(new Consumer(), "consumer")
+
+  graph.addEdge(producer, "result", b,        "source") <a name="x.linkb" id="x.linkb"></a><span data-number="3" class="callout-bug callout-bug-unicode">❸</span>
+  graph.addEdge(b,        "result", a,        "source") <a name="x.linka" id="x.linka"></a><span data-number="4" class="callout-bug callout-bug-unicode">❹</span>
+  graph.addEdge(a,        "result", consumer, "source")
+
+  val runtime = new GraphRuntime(graph, config)
+  runtime.run()</code></pre></div></figure><p>The important point in this example is that although I added
+“a” <a name="x.adda" id="x.adda"></a><span data-number="1" class="callout-bug callout-bug-unicode">❶</span> then “b” <a name="x.addb" id="x.addb"></a><span data-number="2" class="callout-bug callout-bug-unicode">❷</span>
+to the pipeline; the edges connect the other way around. The order in which
+siblings steps run is determined entirely and exclusively by the ways in which
+they are connected.</p><p>In this pipeline, “producer” runs first, then
+“b” <a name="x.linkb" id="x.linkb"></a><span data-number="3" class="callout-bug callout-bug-unicode">❸</span>, then “a” <a name="x.linka" id="x.linka"></a><span data-number="4" class="callout-bug callout-bug-unicode">❹</span>, then
+“consumer”.</p><p>Let’s do something transformative this time. Pipelines to do
+nothing more than copy their inputs around aren’t very interesting.
+The <code class="classname">Uppercase</code> step takes a single string input
+on its “source” port and returns only the words in the string, shifted
+to upper case, on its “result” port. (The semantics are a little odd,
+but we’ll come back to that.)</p><figure id="example5" class="example-wrapper"><div class="title">Example 5. Uppercase pipeline</div><div class="example"><pre class="programlisting language-scala"><code>  val config = new PrimitiveRuntimeConfiguration()
+  val graph  = new Graph()
+
+  val pipeline = graph.addPipeline("pipeline")
+  val producer = pipeline.addAtomic(new Producer(List("Hello, world")), "producer")
+  val upper    = pipeline.addAtomic(new Uppercase(), "uppercase")
+  val consumer = pipeline.addAtomic(new Consumer(), "consumer")
+
+  graph.addEdge(producer, "result", upper, "source")
+  graph.addEdge(upper, "result", consumer, "source")
+
+  val runtime = new GraphRuntime(graph, config)
+  runtime.run()</code></pre></div></figure><p>If you run this pipeline, it produces “HELLO WORLD”.</p><p>What happens if you change the produce so that it actually produces
+a sequence? (Feel free to got try it out!)</p><p>The answer is, an error. The uppercase step does not accept a sequence,
+so the pipeline will generate an error as soon as the second input arrives on
+its input.</p><p>The way to work around that is with a loop.</p><figure id="example6" class="example-wrapper"><div class="title">Example 6. Uppercase loop pipeline</div><div class="example"><pre class="programlisting language-scala"><code>  val config = new PrimitiveRuntimeConfiguration()
+  val graph  = new Graph()
+
+  val pipeline = graph.addPipeline("pipeline")
+  val producer = pipeline.addAtomic(new Producer(List("Hello", "There", "World")), "producer")
+
+  val loop     = pipeline.addForEach("loop")                      <a name="x.loop" id="x.loop"></a><span data-number="1" class="callout-bug callout-bug-unicode">❶</span>
+  val upper    = loop.addAtomic(new Uppercase(), "uppercase")     <a name="x.loopup" id="x.loopup"></a><span data-number="2" class="callout-bug callout-bug-unicode">❷</span>
+
+  val consumer = pipeline.addAtomic(new Consumer(), "consumer")
+
+  graph.addEdge(producer, "result", loop, "source") <a name="x.edge2" id="x.edge2"></a><span data-number="3" class="callout-bug callout-bug-unicode">❸</span>
+  graph.addEdge(loop, "source", upper, "source")    <a name="x.edge3" id="x.edge3"></a><span data-number="4" class="callout-bug callout-bug-unicode">❹</span>
+  graph.addEdge(upper, "result", loop, "result")    <a name="x.edge4" id="x.edge4"></a><span data-number="5" class="callout-bug callout-bug-unicode">❺</span>
+  graph.addEdge(loop, "result", consumer, "source") <a name="x.edge5" id="x.edge5"></a><span data-number="6" class="callout-bug callout-bug-unicode">❻</span>
+
+  val runtime = new GraphRuntime(graph, config)
+  runtime.run()</code></pre></div></figure><div class="calloutlist"><dl><dt class="callout"><a href="#x.loop" class="callout-link"><span data-number="1" class="callout-bug callout-bug-unicode">❶</span></a> </dt><dd><p>A loop container is created in the pipeline.
+</p></dd><dt class="callout"><a href="#x.loopup" class="callout-link"><span data-number="2" class="callout-bug callout-bug-unicode">❷</span></a> </dt><dd><p>The upper step is added to the loop container, not directly to the pipeline.
+</p></dd><dt class="callout"><a href="#x.edge2" class="callout-link"><span data-number="3" class="callout-bug callout-bug-unicode">❸</span></a> </dt><dd><p>The producer output is connected to the loop. A for-each loop has a single
+input port, source.
+</p></dd><dt class="callout"><a href="#x.edge3" class="callout-link"><span data-number="4" class="callout-bug callout-bug-unicode">❹</span></a> </dt><dd><p>From <em>inside</em> the loop, reading from the loop source
+reads the current input document in the loop. This is connected to the source
+for the upper step.
+</p></dd><dt class="callout"><a href="#x.edge4" class="callout-link"><span data-number="5" class="callout-bug callout-bug-unicode">❺</span></a> </dt><dd><p>The upper output is connected to the loop result port.
+</p></dd><dt class="callout"><a href="#x.edge5" class="callout-link"><span data-number="6" class="callout-bug callout-bug-unicode">❻</span></a> </dt><dd><p>The loop result is connected to the consumer.
+</p></dd></dl></div><p>If you run this pipeline, it produces “HELLO”, “THERE”, and “WORLD”.</p><p>As a final example for the moment, let’s look at how we could use the
+upper step to capitalize the words of a sentence without losing the punctuation.
+JAFPL includes a “viewport” step for this purpose. Viewports expose sub-parts
+of their input to a pipeline and then stitch the results of processing those
+sub-parts back into the original.</p><figure id="example7" class="example-wrapper"><div class="title">Example 7. Viewport pipeline</div><div class="example"><pre class="programlisting language-scala"><code>  val config = new PrimitiveRuntimeConfiguration()
+  val graph  = new Graph()
+
+  val pipeline = graph.addPipeline()
+
+  val producer = pipeline.addAtomic(new Producer(List("Hello there, world.")), "producer")
+  val viewport = pipeline.addViewport(new StringComposer()<a name="x.sc" id="x.sc"></a><span data-number="1" class="callout-bug callout-bug-unicode">❶</span>, "viewport") 
+  val upper    = viewport.addAtomic(new Uppercase(), "uppercase")
+  val consumer = pipeline.addAtomic(new Consumer(), "consumer")
+
+  graph.addEdge(producer, "result", viewport, "source")
+  graph.addEdge(viewport, "source", upper, "source")
+  graph.addEdge(upper, "result", viewport, "result")
+  graph.addEdge(viewport, "result", pipeline, "result")
+  graph.addEdge(pipeline, "result", consumer, "source")
+
+  val runtime = new GraphRuntime(graph, config)
+  runtime.run()</code></pre></div></figure><p>The magic here is in the implementation of the
+<code class="classname"><a href="apidocs/com/jafpl/steps/ViewportComposer.html">StringComposer</a></code> <a name="x.sc" id="x.sc"></a><span data-number="1" class="callout-bug callout-bug-unicode">❶</span>.
+The string composer extracts the words “Hello”, “there”, and “world” from
+its input string. Each of those words is processed by the subpipeline in the viewport
+(i.e, upper). Then the results are recomposed.</p><p>If you run this pipeline, it produces “HELLO THERE, WORLD.”.</p><p>The decomposition/recomposition process is independent of the pipeline
+engine. You can use it to process parts of strings, JSON keys, arrays, XML
+documents, columns in CSV files, whatever you can implement.</p><footer><p>Copyright © 2016 Norman Walsh. See
+      <a href="https://github.com/ndw/jafpl/blob/master/LICENSE.md">LICENSE</a>.
+      Last updated on 25 Aug 2017 at 08:29a.m. GMT-05:00 by Norman Walsh</p></footer></article><script src="http://cdn.docbook.org/release/2.0.20/resources/js/prism.js"></script></body></html>

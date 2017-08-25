@@ -1,13 +1,11 @@
-<html xmlns="http://www.w3.org/1999/xhtml"><head><title>JAFPL.com</title><meta charset="utf-8" /><meta name="generator" content="DocBook XSL 2.0 Stylesheets V2.0.20" /><link rel="stylesheet" type="text/css" href="https://docbook.github.io/release/2.0.20/resources/css/default.css" /><link rel="stylesheet" type="text/css" href="/css/docbook.css" /><link rel="stylesheet" type="text/css" href="/css/tabs.css" /><link rel="stylesheet" type="text/css" href="/css/website.css" /><link href="http://fonts.googleapis.com/css?family=Rambla" rel="stylesheet" type="text/css" /><script type="text/javascript" src="https://docbook.github.io/release/2.0.20/resources/js/dbmodnizr.js"></script><link href="https://docbook.github.io/release/2.0.20/resources/css/prism.css" rel="stylesheet" type="text/css" /><link href="https://docbook.github.io/release/2.0.20/resources/css/db-prism.css" rel="stylesheet" type="text/css" /></head><body><div class="header">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>JAFPL.com</title><meta charset="utf-8" /><meta name="generator" content="DocBook XSL 2.0 Stylesheets V2.0.20" /><link rel="stylesheet" type="text/css" href="http://cdn.docbook.org/release/2.0.20/resources/css/default.css" /><link rel="stylesheet" type="text/css" href="/css/docbook.css" /><link rel="stylesheet" type="text/css" href="/css/tabs.css" /><link rel="stylesheet" type="text/css" href="/css/website.css" /><link href="http://fonts.googleapis.com/css?family=Rambla" rel="stylesheet" type="text/css" /><script type="text/javascript" src="http://cdn.docbook.org/release/2.0.20/resources/js/dbmodnizr.js"></script><link href="http://cdn.docbook.org/release/2.0.20/resources/css/prism.css" rel="stylesheet" type="text/css" /><link href="http://cdn.docbook.org/release/2.0.20/resources/css/db-prism.css" rel="stylesheet" type="text/css" /><script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script><script src="/js/jafpl.js"></script></head><body><div class="header">
 <h1>JA<em>F</em>  PL</h1>
-</div><div class="navset" id="nav"><div class="hd"><ul><li id="home" class="on" title="selected"><a href="/"><strong><em>Home</em></strong></a></li></ul></div><div class="bd"><ul><li class="on first "><a href="/">Overview</a></li><li id="contact" class="  "><a href="/contact">Contact us</a></li><li id="apidocs" class="  last"><a href="/apidocs">API Docs</a></li></ul></div></div><article class="article"><h1>Just another <em>fine</em> pipeline language<a href="https://github.com/ndw/jafpl" class="github-corner"><svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a></h1><p>This project is the core runtime for a general purpose pipeline
-processor. It’s the heart of <em class="citetitle">XML Calabash V2.x</em>
-which hasn’t been released yet. This hasn’t been released in any
-official sense either. YMMV. Here there be dragons. Etc.</p><p>On 19 August, 2017, I completely replaced the implementation.
-Some of the documentation below is a little out of date now.
-But there are <a href="apidocs/">API Docs</a>, so that’s
-something, right?
-</p><section id="what" class="section"><div class="section-titlepage"><h2>What is it?</h2></div><p>This is a JVM library for evaluating pipelines composed of
+</div><div class="navset" id="nav"><div class="hd"><ul><li id="home" class="on" title="selected"><a href="/"><strong><em>Home</em></strong></a></li><li id="pipelines"><a href="/pipelines"><em>Pipelines</em></a></li><li id="apis"><a href="/apis"><em>APIs</em></a></li></ul></div><div class="bd"><ul><li class="on first "><a href="/">Overview</a></li><li id="contact" class="  last"><a href="/contact">Contact us</a></li></ul></div></div><div class="inline-toc"><span class="toc"><span class="item">§ <a href="#what">What is it?</a>   </span><span class="item">§ <a href="#where">Where is it?</a>   </span><span class="item">§ <a href="#whatsnext">What’s next?</a>   </span><span class="item">§ <a href="#whatif">What if I want a …?</a>   </span></span></div><article class="article"><h1>Just another <em id="fine">fine</em> pipeline language<a href="https://github.com/ndw/jafpl" class="github-corner"><svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a></h1><p>This project is the core runtime for a general purpose pipeline
+processor. It’s the heart of <em class="citetitle">XML Calabash V2.x</em>,
+but there is <em>nothing</em> XML-centric about the pipeline
+processor.</p><p><em class="citetitle">XML Calabash V2.x</em> hasn’t been released
+yet. This processor hasn’t been released in any official sense either.
+YMMV. Here there be dragons. Etc.</p><section id="what" class="section"><div class="section-titlepage"><h2>What is it?</h2></div><p>This is a JVM library for evaluating pipelines composed of
 arbitrary steps.</p><p>For the purpose of this discussion, a pipeline is a directed,
 acyclic graph. Each node in the graph represents some kind of
 processing. The edges between the nodes are how the data flows through
@@ -31,125 +29,10 @@ errors and react accordingly.
 </p></dd><dt><span class="term"></span></dt><dd><p>
 </p></dd></dl></div><p>It would be nice to generalize the abstraction of “container” to the
 point where a small number of primitives in the core library could be used to
-build arbitrary containers. So far, that goal seems elusive.</p></section><section id="where" class="section"><div class="section-titlepage"><h2>Where is it?</h2></div><p><span class="inlinemediaobject"><img src="https://travis-ci.org/ndw/jafpl.svg?branch=master" /></span></p><p>It’s <a href="https://github.com/ndw/jafpl">on GitHub</a>.
-</p></section><section id="how" class="section"><div class="section-titlepage"><h2>How does it work?</h2></div><p>At the level of this library, you must construct a graph using the
-underlying APIs. There’s no “pipeline language” support at this level.
-Broadly speaking, there atomic steps, containers, pipelines (the top-most
-container), inputs, outputs, and variable bindings.</p><p>You can construct any graph that you like with these nodes and
-edges between them. An edge is a connection between an “output port”
-on a “source” node and an “input port” on a “destination” node. The edges
-are arbitrary; asserting that an edge exists between two ports creates
-the ports if necessary.</p><p>There are only a few inviolable constraints on the graph:</p><div class="orderedlist"><ol style="list-style: decimal;"><li><p>Edges can only connect nodes in the same graph.
-</p></li><li><p>No loops. It’s a
-<a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">DAG</a>.
-</p></li><li><p>If steps declare required inputs or required outputs,
-those must have edges connected to them.
-</p></li></ol></div><p>One of the design flaws in
-<a href="http://github.com/ndw/xmlcalabash1/">XML Calabash 1.x</a>
-is that the edges between steps have to buffer what they produce and the sequence
-has to be replayable. This happens because multiple steps may read the same output
-port and the reads may be interleaved. This problem cannot occur in JAFPL.
-Every port is read by exactly one step and exactly one step writes to every
-input port. If the graph described by your edges multiplexes access to
-any port, a “splitter” or “joiner” step will be inserted as appropriate.</p><p>In other words, this graph never happens:</p><div id="how.8" class="mediaobject"><img src="figure0.svg" /></div><p>If you attempt to construct that graph, the library will automatically
-restructure it so that this graph is produced:</p><div id="how.10" class="mediaobject"><img src="figure1.svg" /></div><p>You must provide an
-<a href="#api">implementation class</a> for every atomic node that you
-construct. That’s the class that will be called upon to perform the
-work of the step.</p><p>The graph is executed with the <a href="http://akka.io/">Akka</a> framework. Actors are created
-to manage each node. All steps “start” at the same time and execute in
-parallel (to the extent that the graph allows for parallelism, of
-course). When the last step reports that it is finished, execution
-finishes.</p><p>The actors know the topology of the graph. Any step that has no
-inputs can run immediately. Steps that have inputs, can’t run until
-all of their inputs have been provided. Inputs pass between the steps
-as messages. Consider the simple, linear pipeline at the beginning of
-this document.</p><p>When execution begins, “Do Something” can’t run because
-it’s waiting for input from the “outside”. “Do Something Else” can’t
-run because it’s waiting for input from “Do Something.” The process
-that is running the pipeline pours an arbitrary number of documents
-into the input port. Each document is received immediately by “Do
-Something”, which is solely responsible for buffering it or doing
-whatever is necessary. Eventually, the process running the pipeline
-closes the input port.</p><p>At this point, the actor framework tells “Do Something” to run.
-It does whatever it does, dropping documents into its output port.
-The framework turns those documents into messages that are sent
-immediately to “Do Something Else.”</p><p>When “Do Something” finishes, the framework closes each of its
-output ports and consequently the input port that is reading it. When
-the last input port on “Do Something Else” is closed, the framework
-tells it to run. And thus it continues until every step has run. When
-every step has run, the pipeline is finished. The process running the
-pipeline can collect its results from the output port(s).</p><p>In practice, there are a number of subtleties here. Loops have
-to buffer inputs so that they’re available to each iteration. A choose
-must make sure that <em>none</em> of the steps in any of its
-branches run before a specific branch is selected. Etc.</p><p>This library will amend the graph and introduce additional steps as
-necessary to hide all of this complexity from the user.</p><section id="example" class="section"><div class="section-titlepage"><h3>An example</h3></div><p>An example may help. I plan to use this library as the core of
-my new XProc implementation, but if you aren’t familiar with XProc
-(and odds are, you’re not), that’s not going to be very intuitive.
-</p><p>To illustrate how things work, a small repository of demonstration
-pipelines is provided at
-<a href="https://github.com/ndw/jafpl-demo">https://github.com/ndw/jafpl-demo</a>. One of the larger
-examples is the “calc” demo. The calc demo application that uses the
-library to evaluate simple arithmetic expressions. Using a pipeline
-language for this purpose is a bit crazy, but assuming you understand
-how arithmetic works, it demonstrates a features.</p><p>Consider the expression “<code class="code">(1+2)*(3+4+5)</code>”. It’s possible to construct
-a pipeline to evaluate this expression:</p><div id="example.5" class="mediaobject"><img src="pipe1.svg" /></div><p>The “Literal” steps are atomic steps that provide numbers. For
-convenience, they’re labled “number-<em class="replaceable"><code>n</code></em>” for
-the number “n”. These are simple atomic steps with no inputs and a
-single output. When they run, they produce the corresponding number on
-their output port.</p><p>The expression has been decomposed into a series of binary operations
-(3+4+5 = (3+4)+5 because
-<a href="https://en.wikipedia.org/wiki/Associative_property">addition
-is associative</a>). The “BinaryOp” steps perform simple binary arithetic
-operations: addition, subtraction, multiplication, and division on two inputs.
-</p><p>There are no external inputs. When this pipeline starts, the
-integer literal steps all execute in parallel, producing one output each.
-The additions can also proceed in parallel. Then the multiplication computes
-the final sum, “36”, which is output and printed by the demo.</p><p>To see what happens when inputs are required, consider this
-expression: “<code class="code">(1+2)*$foo</code>”. Here <code class="code">$foo</code> is an
-additional input to the expression. Steps have inputs and outputs and
-(almost) nothing else.</p><div id="example.10" class="mediaobject"><img src="pipe2.svg" /></div><p>All atomic steps work basically the same way. There’s also a provision for declaring
-a dependency edge between two nodes that aren’t connected by data flow. The semantics
-of the dependency are that the <em>dependent</em> step will not be run
-before the step it <em>depends on</em> has finished.</p></section></section><section id="api" class="section"><div class="section-titlepage"><h2>Step API</h2></div><p>One of my goals is to conceal as much of the underlying framework
-as possible from step implementors. Atomic steps are only required to implement
-a simple API; nothing about the framework is exposed. (Containers are
-a little trickier; there aren’t any provisions for extension containers at
-the moment, but I’m open to suggestions for new containers.)</p><p>The API for atomic steps is straigthforward. Each step
-implmentation must implement the
-<a href="http://jafpl.com/apidocs/com/jafpl/steps/Step.html">Step</a>
-trait.</p><section id="receive" class="section"><div class="section-titlepage"><h3>Receive</h3></div><pre class="programlisting language-none"><code>def receive(port: String, item: Any)</code></pre><p>Receive is how data gets delievered to the step. The actor responsible
-for managing the node will call the <code class="methodname">receive</code> method each
-time a document arrives.</p></section><section id="setup" class="section"><div class="section-titlepage"><h3>Setup</h3></div><pre class="programlisting language-none"><code>def setup(controller: StepController,
-          inputPorts: List[String],
-          outputPorts: List[String])</code></pre><p>Setup will be called once before execution begins. The graph
-constructor neither knows nor cares about the name and number of
-inputs and outputs on each node. Setup is the implementation’s
-opportunity to look at the configuration and decide if it’s ok.</p><p>All of the inputs to a step (it’s “document” inputs as
-well as any options that it accepts) arrive the same way. The names
-used during graph construction will be the names presented here. For
-my XProc implementation, incoming options are identified with QNames
-names in “Clark” format.</p><p>The implementation should keep a copy of the controller. The
-controller is how the step sends data “downstream” to the next step(s)
-in the graph. For atomic steps, there’s only one important method on
-the controller:</p><pre class="programlisting language-none"><code>def send(port: String, item: GenericItem)</code></pre><p>This method sends the item “out” of specified port. The graph handles
-delivery to the other step or steps (if any) that read from that port.</p></section><section id="run" class="section"><div class="section-titlepage"><h3>Run</h3></div><pre class="programlisting language-none"><code>def run()</code></pre><p>After all of the inputs have been delivered, the step will be
-asked to run. This will happen <em>at most</em> once. Any inputs that have not
-yet been received when <code class="methodname">run</code> is called, have
-not been provided.
-</p><p>There’s no requirement that an implementation wait until
-<code class="methodname">run</code> is called. The identity step, for
-example, can send the documents out as fast as they arrive and do
-nothing when <code class="methodname">run</code> is called.</p><p>But if a step needs all its inputs before it can run, that’s fine too,
-but it is responsible for buffering them.</p><p>When <code class="code">run</code> returns, all of the step’s output ports
-will be closed automatically.</p></section><section id="reset" class="section"><div class="section-titlepage"><h3>Reset</h3></div><pre class="programlisting language-none"><code>def reset()</code></pre><p>If the step is in a loop, it will be reset between each iteration.
-Steps should not maintain any state across <code class="methodname">reset</code> calls:
-flush all cached inputs, return all settings to the defaults that existed
-before <code class="methodname">run</code> was called, etc.
-</p><p>If a step is in a conditional block, it may be reset several times in
-a row without intervening runs.</p><p>A step cannot tell if it will be reset again before it runs, however,
-it can tell if it will run before it is reset again. If any inputs arrive,
-(are <code class="methodname">receive</code>d), then the step will be run.</p></section><section id="teardown" class="section"><div class="section-titlepage"><h3>Teardown</h3></div><pre class="programlisting language-none"><code>def teardown()</code></pre><p>Teardown is called once when the pipeline execution has finished.</p></section><section id="compound" class="section"><div class="section-titlepage"><h3>What about compound step?</h3></div><p>They’re a little bit more complicated. I’m still trying to work out
-what’s going to work best.</p></section></section><section id="whatsnext" class="section"><div class="section-titlepage"><h2>What’s next?</h2></div><p>Well. Continued development, I hope. But no promises.</p></section><section id="whatif" class="section"><div class="section-titlepage"><h2>What if I want a …?</h2></div><p>Just <a href="https://github.com/ndw/jafpl/issues">file an issue</a>,
+build arbitrary containers. So far, that goal seems elusive.</p></section><section id="where" class="section"><div class="section-titlepage"><h2>Where is it?</h2></div><p><span class="inlinemediaobject"><img src="jafpl.svg?branch=master" /></span></p><p>It’s <a href="https://github.com/ndw/jafpl">on GitHub</a>.
+</p></section><section id="whatsnext" class="section"><div class="section-titlepage"><h2>What’s next?</h2></div><p>Continued development. Work on <em class="citetitle">XML Calabash V2.x</em>,
+of course. But I’m interested in other pipeline applications, if you’ve got
+one.</p></section><section id="whatif" class="section"><div class="section-titlepage"><h2>What if I want a …?</h2></div><p>Just <a href="https://github.com/ndw/jafpl/issues">file an issue</a>,
 man, that’s all I got.</p></section><footer><p>Copyright © 2016 Norman Walsh. See
       <a href="https://github.com/ndw/jafpl/blob/master/LICENSE.md">LICENSE</a>.
-      Last updated on 24 Aug 2017 at 06:28a.m. GMT-05:00 by Norman Walsh</p></footer></article><script src="https://docbook.github.io/release/2.0.20/resources/js/prism.js"></script></body></html>
+      Last updated on 24 Aug 2017 at 08:50p.m. GMT-05:00 by Norman Walsh</p></footer></article><script src="http://cdn.docbook.org/release/2.0.20/resources/js/prism.js"></script></body></html>

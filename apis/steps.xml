@@ -1,0 +1,77 @@
+<article xmlns="http://docbook.org/ns/docbook"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+	 xml:id="stepapis"
+         version="5.0">
+<info>
+  <title>Step APIs</title>
+</info>
+
+<para>One of my goals is to conceal as much of the underlying framework
+as possible from step implementors. Atomic steps are only required to implement
+a simple API; almost nothing about the framework is exposed. (Containers are
+a little trickier; there aren’t any provisions for extension containers at
+the moment, but I’m open to suggestions for new containers.)</para>
+
+<para>The API for atomic steps is straigthforward. Each step
+implmentation must implement the
+<link xlink:href="apidocs/com/jafpl/steps/Step.html">Step</link>
+interface.</para>
+
+<para>Most of the interface is completely straightforward:
+</para>
+
+<itemizedlist>
+<listitem>
+<simpara><methodname>initialize()</methodname> will be called once as
+pipeline execution begins.</simpara>
+</listitem>
+<listitem>
+<simpara><methodname>receive(port,item)</methodname> will be called
+once for each input the step receives.
+</simpara>
+</listitem>
+<listitem>
+<simpara>If any variable bindings apply to the step,
+<methodname>receiveBinding(variable,value)</methodname> will be called
+once for each binding.
+</simpara>
+</listitem>
+<listitem>
+<simpara><methodname>run()</methodname> will be called
+once to run the step.
+</simpara>
+</listitem>
+<listitem>
+<simpara>If the step appears in a loop, <methodname>reset()</methodname> will
+be called once between each iteration.</simpara>
+</listitem>
+<listitem>
+<simpara>If the execution of the container in which the step appears fails,
+<methodname>abort()</methodname> will be called. This must be treated as a
+variation of <methodname>reset()</methodname>. If the failure is caught by
+a try/catch, and the try/catch is in a loop, the step may run again.
+</simpara>
+</listitem>
+<listitem>
+<simpara><methodname>stop()</methodname> will be called once as
+pipeline execution ends.</simpara>
+</listitem>
+</itemizedlist>
+
+<para>That leaves only a few odds and ends. The
+<methodname>inputSpec()</methodname>,
+<methodname>outputSpec()</methodname>, and
+<methodname>bindingSpec()</methodname> methods allow the step to declare
+what inputs and outputs it has (and their cardinalities) as well as
+the bindings that it requires.</para>
+
+<para>The only thing left is to provide some way for the step to return
+results to the pipeline. That’s accomplished with the
+<methodname>setConsumer()</methodname> method. The pipeline engine
+will call <methodname>setConsumer()</methodname> once, before execution
+begins, giving the step a
+<classname xlink:href="/apidocs/com/jafpl/steps/StepDataProvider.html">StepDataProvider</classname>.
+When the running step wishes to send output to the pipeline, it
+calls <methodname>send(port,item)</methodname> on that object.</para>
+</article>
