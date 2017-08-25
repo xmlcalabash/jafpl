@@ -26,6 +26,10 @@
   <db:chapter/>
 </xsl:param>
 
+<xsl:param name="generate.toc" as="element()*">
+<tocparam xmlns="http://docbook.org/ns/docbook" path="article" toc="1" title="1"/>
+</xsl:param>
+
 <xsl:param name="resource.root"
            select="concat('http://cdn.docbook.org/release/',$VERSION,'/resources/')"/>
 
@@ -98,6 +102,23 @@
 
   <xsl:apply-templates select="doc($menu)" mode="to-xhtml"/>
 
+  <xsl:variable name="toc" as="element()?">
+    <xsl:if test="not(db:toc)">
+      <!-- only generate a toc automatically if there's no explicit toc -->
+      <xsl:apply-templates select="." mode="m:toc"/>
+    </xsl:if>
+  </xsl:variable>
+
+  <xsl:if test="$toc">
+    <div class="inline-toc">
+      <span class="toc">
+        <xsl:for-each select="$toc//h:a">
+          <span class="item">§ <xsl:sequence select="."/>   </span>
+        </xsl:for-each>
+      </span>
+    </div>
+  </xsl:if>
+
   <article class="{local-name(.)}">
     <h1>
       <!-- HACK! -->
@@ -167,9 +188,32 @@ C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9
 
 <!-- ============================================================ -->
 
-<!-- complete and total f'ing hack -->
+<xsl:template match="db:co" mode="m:callout-bug">
+  <xsl:call-template name="t:callout-bug">
+    <xsl:with-param name="conum">
+      <xsl:choose>
+        <xsl:when test="@label and @label castable as xs:decimal">
+          <xsl:value-of select="xs:decimal(@label)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:number count="db:co"
+                      level="any"
+                      from="db:programlisting"
+                      format="1"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:with-param>
+  </xsl:call-template>
+</xsl:template>
+
+<!-- complete and total f'ing hack; the cwd is all wrong -->
 <xsl:function name="f:mediaobject-href" as="xs:string">
   <xsl:param name="filename" as="xs:string"/>
+
+  <!-- just throw away the path -->
+  <xsl:value-of select="tokenize($filename, '/')[last()]"/>
+
+<!--
   <xsl:choose>
     <xsl:when test="starts-with($filename, '/')">
       <xsl:value-of select="substring-after($filename, '/pages/')"/>
@@ -178,6 +222,7 @@ C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9
       <xsl:value-of select="$filename"/>
     </xsl:otherwise>
   </xsl:choose>
+-->
 </xsl:function>
 
 </xsl:stylesheet>

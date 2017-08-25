@@ -43,14 +43,23 @@ project.ext.docbookXslt = "docbook-xslt2-$docbookXsltVersion"
 
 defaultTasks 'website'
 
-task downloadDocBook(type: Download) {
+// Travis-CI seems to be having trouble downloading from http://cdn.docbook.org
+// I wonder if it's refusing to download fro a plain http: URI?
+// Anyway, the workaround is just to checkin the artifact for the time being.
+task downloadDocBook(type: Copy) {
+  from 'src/website/resources'
+  into 'build'
+}
+
+task reallyDownloadDocBook(type: Download) {
   src docbookXsltBaseUri + '/release/' + docbookXsltVersion + '/' + docbookXslt + '.zip'
   dest new File(buildDir, docbookXslt + '.zip')
 }
 downloadDocBook.onlyIf { !file("$buildDir/${docbookXslt}.zip").exists() }
 
 task setupDocBook(dependsOn: downloadDocBook, type: Copy) {
-  from zipTree(downloadDocBook.dest)
+  from zipTree(new File(buildDir, docbookXslt + '.zip'))
+  //from zipTree(downloadDocBook.dest)
   into { "build" }
   doLast {
     copy {

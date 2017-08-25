@@ -7,42 +7,33 @@
   <title>Pipelines</title>
 </info>
 
-<para>At the level of this library, you must construct a graph using the
-underlying APIs. There’s no “pipeline language” support.
-Broadly speaking, there are atomic steps, containers, pipelines (the top-most
-container), inputs, outputs, and variable bindings.</para>
-
-<section xml:id="how">
-<title>How does it work?</title>
-
-<para>You can construct any graph that you like with these nodes and
-edges between them. An edge is a connection between an “output port”
-on a “source” node and an “input port” on a “destination” node. The edges
-are arbitrary; asserting that an edge exists between two ports creates
-the ports if necessary.</para>
+<para>A pipeline is an acyclic directed graph; a data flow graph describing
+how a set of inputs is processed to produce outputs. Processing occurs at nodes
+in the graph, data flows along the edges.
+</para>
 
 <para>There are only a few inviolable constraints on the graph:</para>
 
 <orderedlist>
-<listitem><para>Edges can only connect nodes in the same graph.
-</para>
-</listitem>
-<listitem><para>No loops. It’s a
+<listitem><simpara>No loops. It’s a
 <link xlink:href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">DAG</link>.
-</para>
+</simpara>
 </listitem>
-<listitem><para>If steps declare required inputs,
+<listitem><simpara>Edges can’t cross from inside a container to outside the
+container (the children of a container are invisible to the siblings of the
+container).
+</simpara>
+</listitem>
+<listitem><simpara>If steps declare required inputs,
 those must have edges connected to them.
-</para>
+</simpara>
+</listitem>
+<listitem><simpara>Edges can only connect nodes in the same graph.
+</simpara>
 </listitem>
 </orderedlist>
 
-<para>One of the design flaws in
-<link xlink:href="http://github.com/ndw/xmlcalabash1/">XML Calabash 1.x</link>
-is that the edges between steps have to buffer what they produce and the sequence
-has to be replayable. This happens because multiple steps may read the same output
-port and the reads may be interleaved. This problem cannot occur in JAFPL.
-Every port is read by exactly one step and exactly one step writes to every
+<para>Every port in JAFPL is read by exactly one step and exactly one step writes to every
 input port. If the graph described by your edges multiplexes access to
 any port, a “splitter” or “joiner” step will be inserted as appropriate.</para>
 
@@ -55,7 +46,7 @@ any port, a “splitter” or “joiner” step will be inserted as appropriate.
 </mediaobject>
 
 <para>If you attempt to construct that graph, the library will automatically
-restructure it so that this graph is produced:</para>
+restructure it so that this graph is constructed:</para>
 
 <mediaobject>
 <imageobject>
@@ -64,7 +55,7 @@ restructure it so that this graph is produced:</para>
 </mediaobject>
 
 <para>You must provide an
-<link linkend="api">implementation class</link> for every atomic node that you
+<link xlink:href="../apis/steps">implementation class</link> for every atomic node that you
 construct. That’s the class that will be called upon to perform the
 work of the step.</para>
 
@@ -108,12 +99,8 @@ must make sure that <emphasis>none</emphasis> of the steps in any of its
 branches run before a specific branch is selected. Etc.</para>
 
 <para>This library will amend the graph and introduce additional steps as
-necessary to hide all of this complexity from the user.</para>
-
-<section xml:id="example">
-<title>An example</title>
-
-<para>An example may help. I plan to use this library as the core of
+necessary to hide all of this complexity from the user. Let’s look at
+a larger example. I plan to use this library as the core of
 my new XProc implementation, but if you aren’t familiar with XProc
 (and odds are, you’re not), that’s not going to be very intuitive.
 </para>
@@ -124,9 +111,12 @@ pipelines is provided at
 examples is the “calc” demo. The calc demo application that uses the
 library to evaluate simple arithmetic expressions. Using a pipeline
 language for this purpose is a bit crazy, but assuming you understand
-how arithmetic works, it demonstrates a features.</para>
+how arithmetic works, it demonstrates some of the features.</para>
 
-<para>Consider the expression “<code>(1+2)*(3+4+5)</code>”. It’s possible to construct
+<para>Consider the expression “<code>(1+2)*(3+4+5)</code>”. We don’t often
+think of arithmetic as a pipeline, but the expressions <code>(1+2)</code>
+and <code>(3+4+5)</code> are independent and could be executed in parallel.
+In other words, it’s possible to construct
 a pipeline to evaluate this expression:</para>
 
 <mediaobject>
@@ -168,102 +158,5 @@ additional input to the expression. Steps have inputs and outputs and
 a dependency edge between two nodes that aren’t connected by data flow. The semantics
 of the dependency are that the <emphasis>dependent</emphasis> step will not be run
 before the step it <emphasis>depends on</emphasis> has finished.</para>
-
-<!--
-<para>Concocting an example of a compound step requires a little more craziness.
-Imagine a function, “double”, that takes a series of numbers as arguments. It doubles
-each of its arguments and returns the results as a sequence.</para>
-
-<para>One way to implement this is with a compound step. The compound step takes
-the arguments and generates a sequence of numbers from them. Each item in this sequence
-is passed through a subpipeline. The result of the step is the output from the subpipeline.
-If we stick a single atomic “double” step in the subpipeline, we’ll get the desired
-result:</para>
-
-<mediaobject>
-<imageobject>
-<imagedata fileref="pipe3.svg"/>
-</imageobject>
-</mediaobject>
-
-<para>It’s worth noting that even though we conceived of the step as a
-wrapper around a subpipeline, the graph implementation is flat. Start
-and end steps, which are effectively atomic, are used to manage the iteration.</para>
-
-<para>For one final example, I will use an XProc pipeline. This pipeline is
-mostly identity steps. The <tag>p:interleave</tag> step is one that I made
-up for testing: it shuffles documents from its <code>left</code> and
-<code>right</code> inputs together in strict alternation.</para>
-
-<para>Here is the pipeline:</para>
-
-<programlisting><![CDATA[<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
-                xmlns:xi="http://www.w3.org/2001/XInclude"
-                xmlns:c="http://www.w3.org/ns/xproc-step"
-                name="main" version="1.0">
-  <p:input port="source" sequence="true" primary="true"/>
-  <p:output port="result" step="end" sequence="true"/>
-
-  <p:identity name="start"/>
-
-  <p:identity name="outside-the-loop"/>
-
-  <p:for-each name="loop">
-    <p:iteration-source>
-      <p:pipe step="start" port="result"/>
-    </p:iteration-source>
-    <p:output port="result">
-      <p:pipe step="interleave" port="result"/>
-    </p:output>
-
-    <p:identity name="first"/>
-
-    <p:interleave name="interleave">
-      <p:input port="left">
-        <p:pipe step="first" port="result"/>
-      </p:input>
-      <p:input port="right">
-        <p:pipe step="outside-the-loop" port="result"/>
-      </p:input>
-    </p:interleave>
-  </p:for-each>
-
-  <p:identity name="end"/>
-
-</p:declare-step>]]></programlisting>
-
-<para>And here is the somewhat larger graph:</para>
-
-<mediaobject>
-<imageobject>
-<imagedata fileref="pipe4.svg"/>
-</imageobject>
-</mediaobject>
-
-
-<para>There are two interesting features in this graph:</para>
-
-<orderedlist>
-<listitem>
-<para>First, an explicit “fan out” step has been added. This is
-done automatically by the graph engine. In the execution graph,
-every output port will be read by at most one input port and every
-input port will consume data from exactly one output port.</para>
-</listitem>
-<listitem>
-<para>The ordinary semantic for atomic steps is that they take inputs,
-perform computation, and produce output. Once. If you want to iterate,
-you have to make that iteration explicit.</para>
-<para>But the <tag>p:interleave</tag> step reads “across” the loop boundary. If it
-simply read from the “start” identity step (or the fan out that acts as its
-proxy), there would be nothing to read on the second iteration.
-The graph engine automatically inserts caching proxies where necessary.
-</para>
-</listitem>
-</orderedlist>
--->
-</section>
-</section>
-
 
 </article>

@@ -142,3 +142,11 @@ sup {
         animation:octocat-wave 560ms ease-in-out
     }
 }
+
+.inline-toc {
+    background-color: #f2f3f5;
+}
+
+span.toc a, span.toc a:visited {
+    color: inherit;
+}

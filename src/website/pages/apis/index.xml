@@ -7,9 +7,20 @@
   <title>APIs</title>
 </info>
 
-<para>This project is the core runtime for a general purpose pipeline
-processor. It’s the heart of <citetitle>XML Calabash V2.x</citetitle>
-which hasn’t been released yet. This hasn’t been released in any
-official sense either. YMMV. Here there be dragons. Etc.</para>
+<para>At the level of this library, you must construct a graph using the
+underlying APIs. There’s no “pipeline language” support.
+Broadly speaking, there are atomic steps, containers, pipelines (the top-most
+container), inputs, outputs, variable bindings, and edges.</para>
+
+<para>You can construct any graph that you like with these nodes and
+edges between them. An edge is a connection between an “output port”
+on a “source” node and an “input port” on a “destination” node. The edges
+are arbitrary; asserting that an edge exists between two ports creates
+the ports if necessary.</para>
+
+<para>For more information, see the description of
+<link xlink:href="pipelines">the pipeline library API</link>,
+<link xlink:href="steps">the step API</link>, or go straight to
+the <link xlink:href="/apidocs">API Docs</link>, if you prefer.</para>
 
 </article>

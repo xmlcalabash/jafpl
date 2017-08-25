@@ -7,135 +7,71 @@
   <title>Step APIs</title>
 </info>
 
-<section xml:id="api">
-<title>Step API</title>
-
 <para>One of my goals is to conceal as much of the underlying framework
 as possible from step implementors. Atomic steps are only required to implement
-a simple API; nothing about the framework is exposed. (Containers are
+a simple API; almost nothing about the framework is exposed. (Containers are
 a little trickier; there aren’t any provisions for extension containers at
 the moment, but I’m open to suggestions for new containers.)</para>
 
 <para>The API for atomic steps is straigthforward. Each step
 implmentation must implement the
-<link xlink:href="http://jafpl.com/apidocs/com/jafpl/steps/Step.html">Step</link>
-trait.</para>
+<link xlink:href="apidocs/com/jafpl/steps/Step.html">Step</link>
+interface.</para>
 
-<!--
-abort
-inputSpec
-outputSpec
-receive
-receiveBinding
-requiredBindings
-reset
-run
-setConsumer
-stop
-
--->
-
-<section xml:id="receive">
-<title>Receive</title>
-<programlisting><![CDATA[def receive(port: String, item: Any)]]></programlisting>
-
-<para>Receive is how data gets delievered to the step. The actor responsible
-for managing the node will call the <methodname>receive</methodname> method each
-time a document arrives.</para>
-</section>
-
-
-
-
-
-
-
-
-
-
-<section xml:id="setup">
-<title>Setup</title>
-<programlisting><![CDATA[def setup(controller: StepController,
-          inputPorts: List[String],
-          outputPorts: List[String])]]></programlisting>
-
-<para>Setup will be called once before execution begins. The graph
-constructor neither knows nor cares about the name and number of
-inputs and outputs on each node. Setup is the implementation’s
-opportunity to look at the configuration and decide if it’s ok.</para>
-
-<para>All of the inputs to a step (it’s “document” inputs as
-well as any options that it accepts) arrive the same way. The names
-used during graph construction will be the names presented here. For
-my XProc implementation, incoming options are identified with QNames
-names in “Clark” format.</para>
-
-<para>The implementation should keep a copy of the controller. The
-controller is how the step sends data “downstream” to the next step(s)
-in the graph. For atomic steps, there’s only one important method on
-the controller:</para>
-
-<programlisting><![CDATA[def send(port: String, item: GenericItem)]]></programlisting>
-
-<para>This method sends the item “out” of specified port. The graph handles
-delivery to the other step or steps (if any) that read from that port.</para>
-</section>
-
-<section xml:id="run">
-<title>Run</title>
-<programlisting><![CDATA[def run()]]></programlisting>
-
-<para>After all of the inputs have been delivered, the step will be
-asked to run. This will happen <emphasis>at most</emphasis> once. Any inputs that have not
-yet been received when <methodname>run</methodname> is called, have
-not been provided.
+<para>Most of the interface is completely straightforward:
 </para>
 
-<para>There’s no requirement that an implementation wait until
-<methodname>run</methodname> is called. The identity step, for
-example, can send the documents out as fast as they arrive and do
-nothing when <methodname>run</methodname> is called.</para>
+<itemizedlist>
+<listitem>
+<simpara><methodname>initialize()</methodname> will be called once as
+pipeline execution begins.</simpara>
+</listitem>
+<listitem>
+<simpara><methodname>receive(port,item)</methodname> will be called
+once for each input the step receives.
+</simpara>
+</listitem>
+<listitem>
+<simpara>If any variable bindings apply to the step,
+<methodname>receiveBinding(variable,value)</methodname> will be called
+once for each binding.
+</simpara>
+</listitem>
+<listitem>
+<simpara><methodname>run()</methodname> will be called
+once to run the step.
+</simpara>
+</listitem>
+<listitem>
+<simpara>If the step appears in a loop, <methodname>reset()</methodname> will
+be called once between each iteration.</simpara>
+</listitem>
+<listitem>
+<simpara>If the execution of the container in which the step appears fails,
+<methodname>abort()</methodname> will be called. This must be treated as a
+variation of <methodname>reset()</methodname>. If the failure is caught by
+a try/catch, and the try/catch is in a loop, the step may run again.
+</simpara>
+</listitem>
+<listitem>
+<simpara><methodname>stop()</methodname> will be called once as
+pipeline execution ends.</simpara>
+</listitem>
+</itemizedlist>
 
-<para>But if a step needs all its inputs before it can run, that’s fine too,
-but it is responsible for buffering them.</para>
+<para>That leaves only a few odds and ends. The
+<methodname>inputSpec()</methodname>,
+<methodname>outputSpec()</methodname>, and
+<methodname>bindingSpec()</methodname> methods allow the step to declare
+what inputs and outputs it has (and their cardinalities) as well as
+the bindings that it requires.</para>
 
-<para>When <code>run</code> returns, all of the step’s output ports
-will be closed automatically.</para>
-</section>
-
-<section xml:id="reset">
-<title>Reset</title>
-<programlisting><![CDATA[def reset()]]></programlisting>
-
-<para>If the step is in a loop, it will be reset between each iteration.
-Steps should not maintain any state across <methodname>reset</methodname> calls:
-flush all cached inputs, return all settings to the defaults that existed
-before <methodname>run</methodname> was called, etc.
-</para>
-
-<para>If a step is in a conditional block, it may be reset several times in
-a row without intervening runs.</para>
-
-<para>A step cannot tell if it will be reset again before it runs, however,
-it can tell if it will run before it is reset again. If any inputs arrive,
-(are <methodname>receive</methodname>d), then the step will be run.</para>
-
-</section>
-
-<section xml:id="teardown">
-<title>Teardown</title>
-<programlisting><![CDATA[def teardown()]]></programlisting>
-
-<para>Teardown is called once when the pipeline execution has finished.</para>
-
-</section>
-
-<section xml:id="compound">
-<title>What about compound step?</title>
-
-<para>They’re a little bit more complicated. I’m still trying to work out
-what’s going to work best.</para>
-</section>
-</section>
-
+<para>The only thing left is to provide some way for the step to return
+results to the pipeline. That’s accomplished with the
+<methodname>setConsumer()</methodname> method. The pipeline engine
+will call <methodname>setConsumer()</methodname> once, before execution
+begins, giving the step a
+<classname xlink:href="/apidocs/com/jafpl/steps/StepDataProvider.html">StepDataProvider</classname>.
+When the running step wishes to send output to the pipeline, it
+calls <methodname>send(port,item)</methodname> on that object.</para>
 </article>
