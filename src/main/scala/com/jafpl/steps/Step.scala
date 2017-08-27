@@ -1,5 +1,7 @@
 package com.jafpl.steps
 
+import com.jafpl.runtime.RuntimeConfiguration
+
 /** An atomic pipeline step.
   *
   * Steps must implement this interface. The step lifecycle is as follows:
@@ -77,8 +79,10 @@ trait Step {
     * The pipeline has been constructed and is going to run. This method is called once
     * before execution begins.
     *
+    * @param config The runtime configuration used by this pipeline
+    *
     */
-  def initialize()
+  def initialize(config: RuntimeConfiguration)
 
   /** Run!
     *

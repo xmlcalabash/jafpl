@@ -75,7 +75,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     if (node.step.isDefined) {
       trace(s"RESET $node", "StepExec")
       try {
-        node.step.get.initialize()
+        node.step.get.initialize(runtime.dynamicContext)
       } catch {
         case cause: Throwable =>
           monitor ! GException(Some(node), cause)

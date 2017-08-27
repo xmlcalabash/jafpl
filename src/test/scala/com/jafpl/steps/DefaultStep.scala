@@ -1,5 +1,7 @@
 package com.jafpl.steps
 
+import com.jafpl.runtime.RuntimeConfiguration
+
 class DefaultStep  extends Step {
   override def inputSpec: PortSpecification = PortSpecification.ANY
   override def outputSpec: PortSpecification = PortSpecification.ANY
@@ -19,7 +21,7 @@ class DefaultStep  extends Step {
     // nop
   }
 
-  override def initialize(): Unit = {
+  override def initialize(config: RuntimeConfiguration): Unit = {
     // nop
   }
 
