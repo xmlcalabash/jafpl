@@ -239,7 +239,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           val card = cardinalities.getOrElse(port, 0L) + 1L
           cardinalities.put(port, card)
           if (node.step.isDefined) {
-            node.step.get.receive(port, message.item)
+            runtime.dynamicContext.deliver(message, node.step.get, port)
           }
         case _ =>
           monitor ! GException(None,

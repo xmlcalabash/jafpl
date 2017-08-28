@@ -1,5 +1,6 @@
 package com.jafpl.steps
 
+import com.jafpl.messages.Metadata
 import com.jafpl.runtime.RuntimeConfiguration
 
 /** An atomic pipeline step.
@@ -71,8 +72,9 @@ trait Step {
     *
     * @param port The input port name.
     * @param item The item.
+    * @param metadata Metadata about the item.
     */
-  def receive(port: String, item: Any)
+  def receive(port: String, item: Any, metadata: Metadata)
 
   /** One time, startup initialization.
     *

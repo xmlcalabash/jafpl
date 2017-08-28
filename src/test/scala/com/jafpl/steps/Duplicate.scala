@@ -1,12 +1,14 @@
 package com.jafpl.steps
 
-class Duplicate(copies: Int) extends DefaultStep {
-  override def inputSpec = PortSpecification.SOURCE
-  override def outputSpec = PortSpecification.RESULTSEQ
+import com.jafpl.messages.Metadata
 
-  override def receive(port: String, item: Any): Unit = {
+class Duplicate(copies: Int) extends DefaultStep {
+  override def inputSpec: PortSpecification = PortSpecification.SOURCE
+  override def outputSpec: PortSpecification = PortSpecification.RESULTSEQ
+
+  override def receive(port: String, item: Any, metadata: Metadata): Unit = {
     for (count <- 1 to copies) {
-      consumer.get.send("result", item)
+      consumer.get.send("result", item, metadata)
     }
   }
 }

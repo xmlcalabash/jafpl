@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.graph.Node
-import com.jafpl.messages.Message
+import com.jafpl.messages.{Message, Metadata}
 import com.jafpl.steps.DataProvider
 import com.jafpl.util.PipelineMessage
 
@@ -21,12 +21,12 @@ class InputProxy(private val monitor: ActorRef,
     _items.clear()
   }
 
-  def send(item: Any): Unit = {
+  def send(item: Any, metadata: Metadata): Unit = {
     item match {
       case msg: Message =>
         _items += msg
       case _ =>
-        _items += new PipelineMessage(item)
+        _items += new PipelineMessage(item, metadata)
     }
   }
 

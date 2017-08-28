@@ -14,7 +14,7 @@ import scala.collection.mutable.ListBuffer
 private[runtime] class ViewportActor(private val monitor: ActorRef,
                                      private val runtime: GraphRuntime,
                                      private val node: ViewportStart) extends StartActor(monitor, runtime, node)  {
-  private val queue = ListBuffer.empty[ViewportItem]
+  private val itemQueue = ListBuffer.empty[ViewportItem]
   private var running = false
   private var sourceClosed = false
   private var received = false
@@ -43,8 +43,8 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
             return
           }
           received = true
-          for (item <- node.composer.decompose(item.item)) {
-            queue += item
+          for (item <- node.composer.decompose(item.item, item.metadata)) {
+            itemQueue += item
           }
         }
       case _ =>
@@ -65,10 +65,10 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
     if (!running && readyToRun && sourceClosed) {
       running = true
 
-      if (queue.nonEmpty) {
-        val item = queue(index)
+      if (itemQueue.nonEmpty) {
+        val item = itemQueue(index)
         val edge = node.outputEdge("source")
-        monitor ! GOutput(node, edge.toPort, new PipelineMessage(item.getItem))
+        monitor ! GOutput(node, edge.toPort, new PipelineMessage(item.getItem, item.getMetadata))
         monitor ! GClose(node, edge.toPort)
 
         trace(s"START Viewport: $node", "Viewport")
@@ -84,7 +84,7 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
   }
 
   protected[runtime] def returnItems(buffer: List[Any]): Unit = {
-    val item = queue(index)
+    val item = itemQueue(index)
     val ibuffer = mutable.ListBuffer.empty[Any]
     for (item <- buffer) {
       item match {
@@ -105,28 +105,19 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
 
   override protected[runtime] def finished(): Unit = {
     if (sourceClosed) {
-      if (queue.isEmpty) {
+      if (itemQueue.isEmpty) {
         monitor ! GClose(node, "result")
         monitor ! GFinished(node)
       } else {
-        if (index >= queue.size) {
-          trace(s"FINISH Viewport: $node $sourceClosed, ${queue.isEmpty}", "Viewport")
+        if (index >= itemQueue.size) {
+          trace(s"FINISH Viewport: $node $sourceClosed, ${itemQueue.isEmpty}", "Viewport")
           // send the transformed result and close the output
           val recomposition = node.composer.recompose()
-          recomposition match {
-            case item: ItemMessage =>
-              monitor ! GOutput(node, "result", item)
-            case item: Message =>
-              monitor ! GException(None,
-                new PipelineException("badrecomp", "Invalid recomposition", node.location))
-              return
-            case _ =>
-              monitor ! GOutput(node, "result", new PipelineMessage(recomposition))
-          }
+          monitor ! GOutput(node, "result", recomposition)
           monitor ! GClose(node, "result")
           monitor ! GFinished(node)
         } else {
-          trace(s"RESET Viewport: $node $sourceClosed, ${queue.isEmpty}", "Viewport")
+          trace(s"RESET Viewport: $node $sourceClosed, ${itemQueue.isEmpty}", "Viewport")
           monitor ! GReset(node)
         }
       }

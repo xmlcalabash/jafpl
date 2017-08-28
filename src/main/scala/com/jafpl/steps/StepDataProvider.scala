@@ -1,5 +1,7 @@
 package com.jafpl.steps
 
+import com.jafpl.messages.Metadata
+
 /** Interface for sending outputs from atomic steps.
   *
   * Atomic step implementations are independent of the graph execution infrastructure.
@@ -14,6 +16,7 @@ trait StepDataProvider extends Provider {
     *
     * @param port The output port.
     * @param item The item.
+    * @param metadata Item metadata.
     */
-  def send(port: String, item: Any): Unit
+  def send(port: String, item: Any, metadata: Metadata): Unit
 }

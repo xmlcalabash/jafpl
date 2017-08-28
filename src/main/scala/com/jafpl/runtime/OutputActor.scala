@@ -18,7 +18,7 @@ private[runtime] class OutputActor(private val monitor: ActorRef,
       case item: ItemMessage =>
         if (consumer.provider.isDefined) {
           trace(s"??CNSM $item", "Consumer")
-          consumer.provider.get.send(item.item)
+          consumer.provider.get.send(item.item, item.metadata)
         } else {
           trace(s"!!CNSM $item", "Consumer")
         }

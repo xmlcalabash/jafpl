@@ -1,16 +1,19 @@
 package com.jafpl.steps
 
 import com.jafpl.exceptions.StepException
+import com.jafpl.messages.{ItemMessage, Metadata}
 
 import scala.collection.mutable.ListBuffer
 
 class StringComposer extends ViewportComposer {
+  var metadata: Metadata = Metadata.BLANK
   val items = ListBuffer.empty[StringViewportItem]
   var suffix = ""
 
-  override def decompose(item: Any): List[ViewportItem] = {
+  override def decompose(item: Any, metadata: Metadata): List[ViewportItem] = {
     item match {
       case stringItem: String =>
+        this.metadata = metadata
         var s = stringItem
         val nextWord = "(\\W*)(\\w+)(.*)".r
         var more = true
@@ -31,7 +34,7 @@ class StringComposer extends ViewportComposer {
     items.toList
   }
 
-  override def recompose(): Any = {
+  override def recompose(): ItemMessage = {
     var wholeItem = ""
     for (item <- items) {
       wholeItem += item.prefix
@@ -40,6 +43,6 @@ class StringComposer extends ViewportComposer {
       }
     }
     wholeItem += suffix
-    wholeItem
+    new ItemMessage(wholeItem, metadata)
   }
 }

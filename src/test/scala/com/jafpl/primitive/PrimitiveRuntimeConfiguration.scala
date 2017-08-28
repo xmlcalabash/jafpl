@@ -1,6 +1,8 @@
 package com.jafpl.primitive
 
+import com.jafpl.messages.ItemMessage
 import com.jafpl.runtime.{ExpressionEvaluator, RuntimeConfiguration}
+import com.jafpl.steps.Step
 
 import scala.collection.mutable
 
@@ -54,4 +56,9 @@ class PrimitiveRuntimeConfiguration(val traceAll: Boolean) extends RuntimeConfig
     }
     timeout
   }
+
+  override def deliver(message: ItemMessage, step: Step, port: String): Unit = {
+    step.receive(port, message.item, message.metadata)
+  }
+
 }

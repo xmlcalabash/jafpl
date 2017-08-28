@@ -1,5 +1,7 @@
 package com.jafpl.steps
 
+import com.jafpl.messages.{ItemMessage, Metadata}
+
 /** Decompose and recompose data for viewport processing.
   *
   * Viewports operate on sub-portions of a resource (some of the children in an XML document,
@@ -28,11 +30,11 @@ trait ViewportComposer {
     * @param item The item to be processed by the viewport.
     * @return A list of sub-portions to process in the viewport.
     */
-  def decompose(item: Any): List[ViewportItem]
+  def decompose(item: Any, metadata: Metadata): List[ViewportItem]
 
   /** Recompose the item.
     *
     * @return The recomposed item.
     */
-  def recompose(): Any
+  def recompose(): ItemMessage
 }

@@ -1,5 +1,6 @@
 package com.jafpl.steps
 
+import com.jafpl.messages.Metadata
 import com.jafpl.runtime.RuntimeConfiguration
 
 class DefaultStep  extends Step {
@@ -17,7 +18,7 @@ class DefaultStep  extends Step {
     this.consumer = Some(consumer)
   }
 
-  override def receive(port: String, item: Any): Unit = {
+  override def receive(port: String, item: Any, metadata: Metadata): Unit = {
     // nop
   }
 

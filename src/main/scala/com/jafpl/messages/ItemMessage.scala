@@ -4,6 +4,6 @@ package com.jafpl.messages
   *
   * @param item The underlying item.
   */
-class ItemMessage(val item: Any) extends Message {
+class ItemMessage(val item: Any, val metadata: Metadata) extends Message {
 
 }
