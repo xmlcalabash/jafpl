@@ -214,15 +214,15 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="DataConsumer.html" title="A data consumer."></a>
-                        <a href="DataConsumer.html" title="A data consumer.">
+                        <a class="trait" href="DataConsumer.html" title="Interface for sending outputs from atomic steps."></a>
+                        <a href="DataConsumer.html" title="Interface for sending outputs from atomic steps.">
                           DataConsumer
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="DataProvider.html" title="A data provider."></a>
-                        <a href="DataProvider.html" title="A data provider.">
-                          DataProvider
+                        <a class="trait" href="DataConsumerProxy.html" title="A data consumer."></a>
+                        <a href="DataConsumerProxy.html" title="A data consumer.">
+                          DataConsumerProxy
                         </a>
                       </li><li class="current-entities indented3">
                         <a class="object" href="PortSpecification$.html" title="Useful default port binding specifications."></a>
@@ -232,21 +232,9 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="Provider.html" title="A data provider."></a>
-                        <a href="Provider.html" title="A data provider.">
-                          Provider
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
                         <a class="trait" href="Step.html" title="An atomic pipeline step."></a>
                         <a href="Step.html" title="An atomic pipeline step.">
                           Step
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
-                        <a class="trait" href="StepDataProvider.html" title="Interface for sending outputs from atomic steps."></a>
-                        <a href="StepDataProvider.html" title="Interface for sending outputs from atomic steps.">
-                          StepDataProvider
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
@@ -359,9 +347,9 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <div id="types" class="types members">
               <h3>Type Members</h3>
               <ol><li name="com.jafpl.steps.BindingProvider" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="BindingProviderextendsProvider"></a><a id="BindingProvider:BindingProvider"></a>
+      <a id="BindingProviderextendsAnyRef"></a><a id="BindingProvider:BindingProvider"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/index.html#BindingProviderextendsProvider" title="Permalink">
+      <a href="../../../com/jafpl/steps/index.html#BindingProviderextendsAnyRef" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -372,10 +360,10 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       <span class="symbol">
         <a title="A data provider." href="BindingProvider.html">
               <span class="name">BindingProvider</span>
-            </a><span class="result"> extends <a href="Provider.html" class="extype" name="com.jafpl.steps.Provider">Provider</a></span>
+            </a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       
-      <p class="shortcomment cmt">A data provider.</p><div class="fullcomment"><div class="comment cmt"><p>A data provider.</p><p>This trait is used to expose the input requirements of a pipeline.</p></div></div>
+      <p class="shortcomment cmt">A data provider.</p><div class="fullcomment"><div class="comment cmt"><p>A data provider.</p><p>This trait is used to expose the input variable requirements of a pipeline.</p></div></div>
     </li><li name="com.jafpl.steps.BindingSpecification" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="BindingSpecificationextendsAnyRef"></a><a id="BindingSpecification:BindingSpecification"></a>
       <span class="permalink">
@@ -400,9 +388,9 @@ they are required. You cannot forbid bindings; steps must ignore &quot;extra&quo
 that might be provided by the pipeline.
 </p></div></div>
     </li><li name="com.jafpl.steps.DataConsumer" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="DataConsumerextendsStepDataProvider"></a><a id="DataConsumer:DataConsumer"></a>
+      <a id="DataConsumerextendsAnyRef"></a><a id="DataConsumer:DataConsumer"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/index.html#DataConsumerextendsStepDataProvider" title="Permalink">
+      <a href="../../../com/jafpl/steps/index.html#DataConsumerextendsAnyRef" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -411,32 +399,32 @@ that might be provided by the pipeline.
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <a title="A data consumer." href="DataConsumer.html">
+        <a title="Interface for sending outputs from atomic steps." href="DataConsumer.html">
               <span class="name">DataConsumer</span>
-            </a><span class="result"> extends <a href="StepDataProvider.html" class="extype" name="com.jafpl.steps.StepDataProvider">StepDataProvider</a></span>
+            </a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Interface for sending outputs from atomic steps.</p><div class="fullcomment"><div class="comment cmt"><p>Interface for sending outputs from atomic steps.</p><p>Atomic step implementations are independent of the graph execution infrastructure.</p><p>Steps call the <code>send</code> method on this object to deliver output.</p></div></div>
+    </li><li name="com.jafpl.steps.DataConsumerProxy" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="DataConsumerProxyextendsAnyRef"></a><a id="DataConsumerProxy:DataConsumerProxy"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/steps/index.html#DataConsumerProxyextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="A data consumer." href="DataConsumerProxy.html">
+              <span class="name">DataConsumerProxy</span>
+            </a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       
       <p class="shortcomment cmt">A data consumer.</p><div class="fullcomment"><div class="comment cmt"><p>A data consumer.</p><p>This class is used to provide outputs from the pipeline. An instance of this class will
 be provided after the runtime is constructed. The user can call <code>setProvider</code> to specify
 where the data should be delivered.</p></div></div>
-    </li><li name="com.jafpl.steps.DataProvider" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="DataProviderextendsProvider"></a><a id="DataProvider:DataProvider"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/steps/index.html#DataProviderextendsProvider" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">trait</span>
-      </span>
-      <span class="symbol">
-        <a title="A data provider." href="DataProvider.html">
-              <span class="name">DataProvider</span>
-            </a><span class="result"> extends <a href="Provider.html" class="extype" name="com.jafpl.steps.Provider">Provider</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">A data provider.</p><div class="fullcomment"><div class="comment cmt"><p>A data provider.</p><p>This trait is used to expose the input requirements of a pipeline.</p></div></div>
     </li><li name="com.jafpl.steps.PortSpecification" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="PortSpecificationextendsAnyRef"></a><a id="PortSpecification:PortSpecification"></a>
       <span class="permalink">
@@ -468,29 +456,10 @@ The pipeline engine will enforce the cardinalities above, you're free to enforce
 cardinalities in the step implementation.</p><p>The special port name &quot;*&quot; may be given to indicate that other, arbitrarily named ports
 are also acceptable.
 </p></div></div>
-    </li><li name="com.jafpl.steps.Provider" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="ProviderextendsAnyRef"></a><a id="Provider:Provider"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/steps/index.html#ProviderextendsAnyRef" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">trait</span>
-      </span>
-      <span class="symbol">
-        <a title="A data provider." href="Provider.html">
-              <span class="name">Provider</span>
-            </a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">A data provider.</p><div class="fullcomment"><div class="comment cmt"><p>A data provider.</p><p>There are two forms of provider, <a href="DataProvider.html" class="extype" name="com.jafpl.steps.DataProvider">com.jafpl.steps.DataProvider</a> and <a href="StepDataProvider.html" class="extype" name="com.jafpl.steps.StepDataProvider">com.jafpl.steps.StepDataProvider</a>.
-This trait is a common ancestor for them both.</p></div></div>
     </li><li name="com.jafpl.steps.Step" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="StepextendsAnyRef"></a><a id="Step:Step"></a>
+      <a id="StepextendsDataConsumer"></a><a id="Step:Step"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/index.html#StepextendsAnyRef" title="Permalink">
+      <a href="../../../com/jafpl/steps/index.html#StepextendsDataConsumer" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -501,7 +470,7 @@ This trait is a common ancestor for them both.</p></div></div>
       <span class="symbol">
         <a title="An atomic pipeline step." href="Step.html">
               <span class="name">Step</span>
-            </a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+            </a><span class="result"> extends <a href="DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></span>
       </span>
       
       <p class="shortcomment cmt">An atomic pipeline step.</p><div class="fullcomment"><div class="comment cmt"><p>An atomic pipeline step.</p><p>Steps must implement this interface. The step lifecycle is as follows:</p><p>1. The <code>setConsumer</code> method will be called. The step must hold onto the consumer object.
@@ -514,24 +483,6 @@ Note, however, that if a step has side effects (writing to disk, interacting wit
 etc.) it is prudent to do so. A step may receive several inputs and then never run if
 some sibling step raised an exception that caused an entire container to fail.
 </p></div></div>
-    </li><li name="com.jafpl.steps.StepDataProvider" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="StepDataProviderextendsProvider"></a><a id="StepDataProvider:StepDataProvider"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/steps/index.html#StepDataProviderextendsProvider" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">trait</span>
-      </span>
-      <span class="symbol">
-        <a title="Interface for sending outputs from atomic steps." href="StepDataProvider.html">
-              <span class="name">StepDataProvider</span>
-            </a><span class="result"> extends <a href="Provider.html" class="extype" name="com.jafpl.steps.Provider">Provider</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">Interface for sending outputs from atomic steps.</p><div class="fullcomment"><div class="comment cmt"><p>Interface for sending outputs from atomic steps.</p><p>Atomic step implementations are independent of the graph execution infrastructure.</p><p>Steps call the <code>send</code> method on this object to deliver output.</p></div></div>
     </li><li name="com.jafpl.steps.ViewportComposer" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="ViewportComposerextendsAnyRef"></a><a id="ViewportComposer:ViewportComposer"></a>
       <span class="permalink">

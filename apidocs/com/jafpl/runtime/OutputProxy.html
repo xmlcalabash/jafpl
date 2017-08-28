@@ -189,7 +189,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">OutputProxy</span><span class="result"> extends <a href="../steps/DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></span>
+        <span class="name">OutputProxy</span><span class="result"> extends <a href="../steps/DataConsumerProxy.html" class="extype" name="com.jafpl.steps.DataConsumerProxy">DataConsumerProxy</a> with <a href="../steps/DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></span>
       </span>
       </h4>
 
@@ -198,7 +198,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><a href="../steps/DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a>, <a href="../steps/StepDataProvider.html" class="extype" name="com.jafpl.steps.StepDataProvider">StepDataProvider</a>, <a href="../steps/Provider.html" class="extype" name="com.jafpl.steps.Provider">Provider</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="../steps/DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a>, <a href="../steps/DataConsumerProxy.html" class="extype" name="com.jafpl.steps.DataConsumerProxy">DataConsumerProxy</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -224,7 +224,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.jafpl.runtime.OutputProxy"><span>OutputProxy</span></li><li class="in" name="com.jafpl.steps.DataConsumer"><span>DataConsumer</span></li><li class="in" name="com.jafpl.steps.StepDataProvider"><span>StepDataProvider</span></li><li class="in" name="com.jafpl.steps.Provider"><span>Provider</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.jafpl.runtime.OutputProxy"><span>OutputProxy</span></li><li class="in" name="com.jafpl.steps.DataConsumer"><span>DataConsumer</span></li><li class="in" name="com.jafpl.steps.DataConsumerProxy"><span>DataConsumerProxy</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -507,9 +507,9 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
     </li><li name="com.jafpl.runtime.OutputProxy#provider" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="provider:Option[com.jafpl.steps.DataProvider]"></a><a id="provider:Option[DataProvider]"></a>
+      <a id="provider:Option[com.jafpl.steps.DataConsumer]"></a><a id="provider:Option[DataConsumer]"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/OutputProxy.html#provider:Option[com.jafpl.steps.DataProvider]" title="Permalink">
+      <a href="../../../com/jafpl/runtime/OutputProxy.html#provider:Option[com.jafpl.steps.DataConsumer]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -518,14 +518,14 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">provider</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="../steps/DataProvider.html" class="extype" name="com.jafpl.steps.DataProvider">DataProvider</a>]</span>
+        <span class="name">provider</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="../steps/DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a>]</span>
       </span>
       
       
-    </li><li name="com.jafpl.runtime.OutputProxy#send" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="send(port:String,item:Any):Unit"></a><a id="send(String,Any):Unit"></a>
+    </li><li name="com.jafpl.runtime.OutputProxy#receive" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="receive(port:String,item:Any,metadata:com.jafpl.messages.Metadata):Unit"></a><a id="receive(String,Any,Metadata):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/OutputProxy.html#send(port:String,item:Any):Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/OutputProxy.html#receive(port:String,item:Any,metadata:com.jafpl.messages.Metadata):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -534,15 +534,15 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">send</span><span class="params">(<span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="item">item: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">receive</span><span class="params">(<span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="item">item: <span class="extype" name="scala.Any">Any</span></span>, <span name="metadata">metadata: <a href="../messages/Metadata.html" class="extype" name="com.jafpl.messages.Metadata">Metadata</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
       <p class="shortcomment cmt">Send output from a step.</p><div class="fullcomment"><div class="comment cmt"><p>Send output from a step.</p><p>Calling this method sends the specified <code>item</code> as an output on the specified <code>port</code>.
-</p></div><dl class="paramcmts block"><dt class="param">port</dt><dd class="cmt"><p>The output port.</p></dd><dt class="param">item</dt><dd class="cmt"><p>The item.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.runtime.OutputProxy">OutputProxy</a> → <a href="../steps/StepDataProvider.html" class="extype" name="com.jafpl.steps.StepDataProvider">StepDataProvider</a></dd></dl></div>
-    </li><li name="com.jafpl.runtime.OutputProxy#setProvider" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="setProvider(provider:com.jafpl.steps.DataProvider):Unit"></a><a id="setProvider(DataProvider):Unit"></a>
+</p></div><dl class="paramcmts block"><dt class="param">port</dt><dd class="cmt"><p>The output port.</p></dd><dt class="param">item</dt><dd class="cmt"><p>The item.</p></dd><dt class="param">metadata</dt><dd class="cmt"><p>Item metadata.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.runtime.OutputProxy">OutputProxy</a> → <a href="../steps/DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></dd></dl></div>
+    </li><li name="com.jafpl.runtime.OutputProxy#setConsumer" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setConsumer(provider:com.jafpl.steps.DataConsumer):Unit"></a><a id="setConsumer(DataConsumer):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/OutputProxy.html#setProvider(provider:com.jafpl.steps.DataProvider):Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/OutputProxy.html#setConsumer(provider:com.jafpl.steps.DataConsumer):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -551,10 +551,10 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">setProvider</span><span class="params">(<span name="provider">provider: <a href="../steps/DataProvider.html" class="extype" name="com.jafpl.steps.DataProvider">DataProvider</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">setConsumer</span><span class="params">(<span name="provider">provider: <a href="../steps/DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.runtime.OutputProxy">OutputProxy</a> → <a href="../steps/DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.runtime.OutputProxy">OutputProxy</a> → <a href="../steps/DataConsumerProxy.html" class="extype" name="com.jafpl.steps.DataConsumerProxy">DataConsumerProxy</a></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
@@ -665,10 +665,8 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <div id="inheritedMembers">
         <div class="parent" name="com.jafpl.steps.DataConsumer">
               <h3>Inherited from <a href="../steps/DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></h3>
-            </div><div class="parent" name="com.jafpl.steps.StepDataProvider">
-              <h3>Inherited from <a href="../steps/StepDataProvider.html" class="extype" name="com.jafpl.steps.StepDataProvider">StepDataProvider</a></h3>
-            </div><div class="parent" name="com.jafpl.steps.Provider">
-              <h3>Inherited from <a href="../steps/Provider.html" class="extype" name="com.jafpl.steps.Provider">Provider</a></h3>
+            </div><div class="parent" name="com.jafpl.steps.DataConsumerProxy">
+              <h3>Inherited from <a href="../steps/DataConsumerProxy.html" class="extype" name="com.jafpl.steps.DataConsumerProxy">DataConsumerProxy</a></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">

@@ -144,15 +144,15 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="DataConsumer.html" title="A data consumer."></a>
-                        <a href="DataConsumer.html" title="A data consumer.">
+                        <a class="trait" href="DataConsumer.html" title="Interface for sending outputs from atomic steps."></a>
+                        <a href="DataConsumer.html" title="Interface for sending outputs from atomic steps.">
                           DataConsumer
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="DataProvider.html" title="A data provider."></a>
-                        <a href="DataProvider.html" title="A data provider.">
-                          DataProvider
+                        <a class="trait" href="DataConsumerProxy.html" title="A data consumer."></a>
+                        <a href="DataConsumerProxy.html" title="A data consumer.">
+                          DataConsumerProxy
                         </a>
                       </li><li class="current-entities indented3">
                         <a class="object" href="PortSpecification$.html" title="Useful default port binding specifications."></a>
@@ -162,21 +162,9 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="Provider.html" title="A data provider."></a>
-                        <a href="Provider.html" title="A data provider.">
-                          Provider
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
                         <a class="trait" href="Step.html" title="An atomic pipeline step."></a>
                         <a href="Step.html" title="An atomic pipeline step.">
                           Step
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
-                        <a class="trait" href="StepDataProvider.html" title="Interface for sending outputs from atomic steps."></a>
-                        <a href="StepDataProvider.html" title="Interface for sending outputs from atomic steps.">
-                          StepDataProvider
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
@@ -291,6 +279,24 @@ larger resource.</p></div><div class="toggleContainer block">
       <p class="shortcomment cmt">The item to process.</p><div class="fullcomment"><div class="comment cmt"><p>The item to process.</p><p>This item should be a sub-resource of the original resource passed to the
 <a href="ViewportComposer.html" class="extype" name="com.jafpl.steps.ViewportComposer">com.jafpl.steps.ViewportComposer</a>.
 </p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The item.</p></dd></dl></div>
+    </li><li name="com.jafpl.steps.ViewportItem#getMetadata" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="getMetadata:com.jafpl.messages.Metadata"></a><a id="getMetadata:Metadata"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/steps/ViewportItem.html#getMetadata:com.jafpl.messages.Metadata" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getMetadata</span><span class="result">: <a href="../messages/Metadata.html" class="extype" name="com.jafpl.messages.Metadata">Metadata</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">Metadata item to process.</p><div class="fullcomment"><div class="comment cmt"><p>Metadata item to process.</p><p>This should be metadata about the corresponding sub-resource of the original resource passed to the
+<a href="ViewportComposer.html" class="extype" name="com.jafpl.steps.ViewportComposer">com.jafpl.steps.ViewportComposer</a>.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The metadata.</p></dd></dl></div>
     </li><li name="com.jafpl.steps.ViewportItem#putItems" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="putItems(items:List[Any]):Unit"></a><a id="putItems(List[Any]):Unit"></a>
       <span class="permalink">

@@ -144,15 +144,15 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="DataConsumer.html" title="A data consumer."></a>
-                        <a href="DataConsumer.html" title="A data consumer.">
+                        <a class="trait" href="DataConsumer.html" title="Interface for sending outputs from atomic steps."></a>
+                        <a href="DataConsumer.html" title="Interface for sending outputs from atomic steps.">
                           DataConsumer
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="DataProvider.html" title="A data provider."></a>
-                        <a href="DataProvider.html" title="A data provider.">
-                          DataProvider
+                        <a class="trait" href="DataConsumerProxy.html" title="A data consumer."></a>
+                        <a href="DataConsumerProxy.html" title="A data consumer.">
+                          DataConsumerProxy
                         </a>
                       </li><li class="current-entities indented3">
                         <a class="object" href="PortSpecification$.html" title="Useful default port binding specifications."></a>
@@ -162,21 +162,9 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="Provider.html" title="A data provider."></a>
-                        <a href="Provider.html" title="A data provider.">
-                          Provider
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
                         <a class="trait" href="Step.html" title="An atomic pipeline step."></a>
                         <a href="Step.html" title="An atomic pipeline step.">
                           Step
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
-                        <a class="trait" href="StepDataProvider.html" title="Interface for sending outputs from atomic steps."></a>
-                        <a href="StepDataProvider.html" title="Interface for sending outputs from atomic steps.">
-                          StepDataProvider
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
@@ -213,16 +201,16 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <span class="name">BindingProvider</span><span class="result"> extends <a href="Provider.html" class="extype" name="com.jafpl.steps.Provider">Provider</a></span>
+        <span class="name">BindingProvider</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A data provider.</p><p>This trait is used to expose the input requirements of a pipeline.</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A data provider.</p><p>This trait is used to expose the input variable requirements of a pipeline.</p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><a href="Provider.html" class="extype" name="com.jafpl.steps.Provider">Provider</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block">
             <span class="toggle">
               Known Subclasses
@@ -253,7 +241,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.jafpl.steps.BindingProvider"><span>BindingProvider</span></li><li class="in" name="com.jafpl.steps.Provider"><span>Provider</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.jafpl.steps.BindingProvider"><span>BindingProvider</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -645,9 +633,7 @@ only be called once.
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="com.jafpl.steps.Provider">
-              <h3>Inherited from <a href="Provider.html" class="extype" name="com.jafpl.steps.Provider">Provider</a></h3>
-            </div><div class="parent" name="scala.AnyRef">
+        <div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>

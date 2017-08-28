@@ -144,15 +144,15 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="DataConsumer.html" title="A data consumer."></a>
-                        <a href="DataConsumer.html" title="A data consumer.">
+                        <a class="trait" href="DataConsumer.html" title="Interface for sending outputs from atomic steps."></a>
+                        <a href="DataConsumer.html" title="Interface for sending outputs from atomic steps.">
                           DataConsumer
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="DataProvider.html" title="A data provider."></a>
-                        <a href="DataProvider.html" title="A data provider.">
-                          DataProvider
+                        <a class="trait" href="DataConsumerProxy.html" title="A data consumer."></a>
+                        <a href="DataConsumerProxy.html" title="A data consumer.">
+                          DataConsumerProxy
                         </a>
                       </li><li class="current-entities indented3">
                         <a class="object" href="PortSpecification$.html" title="Useful default port binding specifications."></a>
@@ -162,21 +162,9 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="Provider.html" title="A data provider."></a>
-                        <a href="Provider.html" title="A data provider.">
-                          Provider
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
                         <a class="trait" href="" title="An atomic pipeline step."></a>
                         <a href="" title="An atomic pipeline step.">
                           Step
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
-                        <a class="trait" href="StepDataProvider.html" title="Interface for sending outputs from atomic steps."></a>
-                        <a href="StepDataProvider.html" title="Interface for sending outputs from atomic steps.">
-                          StepDataProvider
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
@@ -213,7 +201,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <span class="name">Step</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+        <span class="name">Step</span><span class="result"> extends <a href="DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></span>
       </span>
       </h4>
 
@@ -231,7 +219,7 @@ some sibling step raised an exception that caused an entire container to fail.
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -257,7 +245,7 @@ some sibling step raised an exception that caused an entire container to fail.
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.jafpl.steps.Step"><span>Step</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.jafpl.steps.Step"><span>Step</span></li><li class="in" name="com.jafpl.steps.DataConsumer"><span>DataConsumer</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -369,10 +357,10 @@ before execution begins.
       
       <p class="shortcomment cmt">The names of the output ports this step requires.</p><div class="fullcomment"><div class="comment cmt"><p>The names of the output ports this step requires.</p><p>This method returns the names of the output ports that the step requires.
 </p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The list of required port names.</p></dd></dl></div>
-    </li><li name="com.jafpl.steps.Step#receive" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="receive(port:String,item:Any):Unit"></a><a id="receive(String,Any):Unit"></a>
+    </li><li name="com.jafpl.steps.DataConsumer#receive" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="receive(port:String,item:Any,metadata:com.jafpl.messages.Metadata):Unit"></a><a id="receive(String,Any,Metadata):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#receive(port:String,item:Any):Unit" title="Permalink">
+      <a href="../../../com/jafpl/steps/Step.html#receive(port:String,item:Any,metadata:com.jafpl.messages.Metadata):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -381,11 +369,11 @@ before execution begins.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">receive</span><span class="params">(<span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="item">item: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">receive</span><span class="params">(<span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="item">item: <span class="extype" name="scala.Any">Any</span></span>, <span name="metadata">metadata: <a href="../messages/Metadata.html" class="extype" name="com.jafpl.messages.Metadata">Metadata</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <p class="shortcomment cmt">Receive a document.</p><div class="fullcomment"><div class="comment cmt"><p>Receive a document.
-</p></div><dl class="paramcmts block"><dt class="param">port</dt><dd class="cmt"><p>The input port name.</p></dd><dt class="param">item</dt><dd class="cmt"><p>The item.</p></dd></dl></div>
+      <p class="shortcomment cmt">Send output from a step.</p><div class="fullcomment"><div class="comment cmt"><p>Send output from a step.</p><p>Calling this method sends the specified <code>item</code> as an output on the specified <code>port</code>.
+</p></div><dl class="paramcmts block"><dt class="param">port</dt><dd class="cmt"><p>The output port.</p></dd><dt class="param">item</dt><dd class="cmt"><p>The item.</p></dd><dt class="param">metadata</dt><dd class="cmt"><p>Item metadata.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></dd></dl></div>
     </li><li name="com.jafpl.steps.Step#receiveBinding" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="receiveBinding(variable:String,value:Any):Unit"></a><a id="receiveBinding(String,Any):Unit"></a>
       <span class="permalink">
@@ -437,9 +425,9 @@ get yourself ready!</p></div></div>
       
       <p class="shortcomment cmt">Run!</p><div class="fullcomment"><div class="comment cmt"><p>Run!</p><p>All inputs have been recieved, so your deal.</p></div></div>
     </li><li name="com.jafpl.steps.Step#setConsumer" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="setConsumer(consumer:com.jafpl.steps.StepDataProvider):Unit"></a><a id="setConsumer(StepDataProvider):Unit"></a>
+      <a id="setConsumer(consumer:com.jafpl.steps.DataConsumer):Unit"></a><a id="setConsumer(DataConsumer):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/Step.html#setConsumer(consumer:com.jafpl.steps.StepDataProvider):Unit" title="Permalink">
+      <a href="../../../com/jafpl/steps/Step.html#setConsumer(consumer:com.jafpl.steps.DataConsumer):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -448,7 +436,7 @@ get yourself ready!</p></div></div>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">setConsumer</span><span class="params">(<span name="consumer">consumer: <a href="StepDataProvider.html" class="extype" name="com.jafpl.steps.StepDataProvider">StepDataProvider</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">setConsumer</span><span class="params">(<span name="consumer">consumer: <a href="DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
       <p class="shortcomment cmt">Set the consumer for sending output to the pipeline.</p><div class="fullcomment"><div class="comment cmt"><p>Set the consumer for sending output to the pipeline.
@@ -821,7 +809,9 @@ is about to end.
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.AnyRef">
+        <div class="parent" name="com.jafpl.steps.DataConsumer">
+              <h3>Inherited from <a href="DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>

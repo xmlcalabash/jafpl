@@ -248,7 +248,25 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
 
         <div class="values members">
               <h3>Abstract Value Members</h3>
-              <ol><li name="com.jafpl.runtime.RuntimeConfiguration#expressionEvaluator" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+              <ol><li name="com.jafpl.runtime.RuntimeConfiguration#deliver" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="deliver(message:com.jafpl.messages.ItemMessage,consumer:com.jafpl.steps.DataConsumer,port:String):Unit"></a><a id="deliver(ItemMessage,DataConsumer,String):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/RuntimeConfiguration.html#deliver(message:com.jafpl.messages.ItemMessage,consumer:com.jafpl.steps.DataConsumer,port:String):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">deliver</span><span class="params">(<span name="message">message: <a href="../messages/ItemMessage.html" class="extype" name="com.jafpl.messages.ItemMessage">ItemMessage</a></span>, <span name="consumer">consumer: <a href="../steps/DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></span>, <span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">The delivery agent</p><div class="fullcomment"><div class="comment cmt"><p>The delivery agent</p><p>The message is to be delivered to the step. The runtime configuration gets a chance to
+look at the message and may adjust it if necessary.
+</p></div><dl class="paramcmts block"><dt class="param">message</dt><dd class="cmt"><p>The message to be delivered.</p></dd><dt class="param">consumer</dt><dd class="cmt"><p>The step to which it is to be delivered.</p></dd><dt class="param">port</dt><dd class="cmt"><p>The port on which it is to be delivered.</p></dd></dl></div>
+    </li><li name="com.jafpl.runtime.RuntimeConfiguration#expressionEvaluator" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="expressionEvaluator():com.jafpl.runtime.ExpressionEvaluator"></a><a id="expressionEvaluator():ExpressionEvaluator"></a>
       <span class="permalink">
       <a href="../../../com/jafpl/runtime/RuntimeConfiguration.html#expressionEvaluator():com.jafpl.runtime.ExpressionEvaluator" title="Permalink">

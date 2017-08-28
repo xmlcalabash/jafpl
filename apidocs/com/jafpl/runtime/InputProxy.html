@@ -189,7 +189,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">InputProxy</span><span class="result"> extends <a href="../steps/DataProvider.html" class="extype" name="com.jafpl.steps.DataProvider">DataProvider</a></span>
+        <span class="name">InputProxy</span><span class="result"> extends <a href="../steps/DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></span>
       </span>
       </h4>
 
@@ -198,7 +198,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><a href="../steps/DataProvider.html" class="extype" name="com.jafpl.steps.DataProvider">DataProvider</a>, <a href="../steps/Provider.html" class="extype" name="com.jafpl.steps.Provider">Provider</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="../steps/DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -224,7 +224,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.jafpl.runtime.InputProxy"><span>InputProxy</span></li><li class="in" name="com.jafpl.steps.DataProvider"><span>DataProvider</span></li><li class="in" name="com.jafpl.steps.Provider"><span>Provider</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.jafpl.runtime.InputProxy"><span>InputProxy</span></li><li class="in" name="com.jafpl.steps.DataConsumer"><span>DataConsumer</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -388,7 +388,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.jafpl.runtime.InputProxy#close" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="com.jafpl.runtime.InputProxy#close" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="close():Unit"></a>
       <span class="permalink">
       <a href="../../../com/jafpl/runtime/InputProxy.html#close():Unit" title="Permalink">
@@ -403,7 +403,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="name">close</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <p class="shortcomment cmt">Close the provider.</p><div class="fullcomment"><div class="comment cmt"><p>Close the provider.</p><p>This will be called after the last <code>input</code> has been sent.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.runtime.InputProxy">InputProxy</a> → <a href="../steps/DataProvider.html" class="extype" name="com.jafpl.steps.DataProvider">DataProvider</a></dd></dl></div>
+      
     </li><li name="com.jafpl.runtime.InputProxy#closed" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="closed:Boolean"></a>
       <span class="permalink">
@@ -570,10 +570,10 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.jafpl.runtime.InputProxy#send" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="send(item:Any):Unit"></a><a id="send(Any):Unit"></a>
+    </li><li name="com.jafpl.runtime.InputProxy#receive" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="receive(port:String,item:Any,metadata:com.jafpl.messages.Metadata):Unit"></a><a id="receive(String,Any,Metadata):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/InputProxy.html#send(item:Any):Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/InputProxy.html#receive(port:String,item:Any,metadata:com.jafpl.messages.Metadata):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -582,11 +582,11 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">send</span><span class="params">(<span name="item">item: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">receive</span><span class="params">(<span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="item">item: <span class="extype" name="scala.Any">Any</span></span>, <span name="metadata">metadata: <a href="../messages/Metadata.html" class="extype" name="com.jafpl.messages.Metadata">Metadata</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <p class="shortcomment cmt">Provide an input item.</p><div class="fullcomment"><div class="comment cmt"><p>Provide an input item.</p><p>Calling this method sends the specified <code>item</code> as an input.
-</p></div><dl class="paramcmts block"><dt class="param">item</dt><dd class="cmt"><p>The item.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.runtime.InputProxy">InputProxy</a> → <a href="../steps/DataProvider.html" class="extype" name="com.jafpl.steps.DataProvider">DataProvider</a></dd></dl></div>
+      <p class="shortcomment cmt">Send output from a step.</p><div class="fullcomment"><div class="comment cmt"><p>Send output from a step.</p><p>Calling this method sends the specified <code>item</code> as an output on the specified <code>port</code>.
+</p></div><dl class="paramcmts block"><dt class="param">port</dt><dd class="cmt"><p>The output port.</p></dd><dt class="param">item</dt><dd class="cmt"><p>The item.</p></dd><dt class="param">metadata</dt><dd class="cmt"><p>Item metadata.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.runtime.InputProxy">InputProxy</a> → <a href="../steps/DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
@@ -695,10 +695,8 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="com.jafpl.steps.DataProvider">
-              <h3>Inherited from <a href="../steps/DataProvider.html" class="extype" name="com.jafpl.steps.DataProvider">DataProvider</a></h3>
-            </div><div class="parent" name="com.jafpl.steps.Provider">
-              <h3>Inherited from <a href="../steps/Provider.html" class="extype" name="com.jafpl.steps.Provider">Provider</a></h3>
+        <div class="parent" name="com.jafpl.steps.DataConsumer">
+              <h3>Inherited from <a href="../steps/DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">

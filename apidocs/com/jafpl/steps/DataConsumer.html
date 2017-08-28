@@ -144,15 +144,15 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="" title="A data consumer."></a>
-                        <a href="" title="A data consumer.">
+                        <a class="trait" href="" title="Interface for sending outputs from atomic steps."></a>
+                        <a href="" title="Interface for sending outputs from atomic steps.">
                           DataConsumer
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="DataProvider.html" title="A data provider."></a>
-                        <a href="DataProvider.html" title="A data provider.">
-                          DataProvider
+                        <a class="trait" href="DataConsumerProxy.html" title="A data consumer."></a>
+                        <a href="DataConsumerProxy.html" title="A data consumer.">
+                          DataConsumerProxy
                         </a>
                       </li><li class="current-entities indented3">
                         <a class="object" href="PortSpecification$.html" title="Useful default port binding specifications."></a>
@@ -162,21 +162,9 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="Provider.html" title="A data provider."></a>
-                        <a href="Provider.html" title="A data provider.">
-                          Provider
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
                         <a class="trait" href="Step.html" title="An atomic pipeline step."></a>
                         <a href="Step.html" title="An atomic pipeline step.">
                           Step
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
-                        <a class="trait" href="StepDataProvider.html" title="Interface for sending outputs from atomic steps."></a>
-                        <a href="StepDataProvider.html" title="Interface for sending outputs from atomic steps.">
-                          StepDataProvider
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
@@ -213,23 +201,21 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <span class="name">DataConsumer</span><span class="result"> extends <a href="StepDataProvider.html" class="extype" name="com.jafpl.steps.StepDataProvider">StepDataProvider</a></span>
+        <span class="name">DataConsumer</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A data consumer.</p><p>This class is used to provide outputs from the pipeline. An instance of this class will
-be provided after the runtime is constructed. The user can call <code>setProvider</code> to specify
-where the data should be delivered.</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Interface for sending outputs from atomic steps.</p><p>Atomic step implementations are independent of the graph execution infrastructure.</p><p>Steps call the <code>send</code> method on this object to deliver output.</p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><a href="StepDataProvider.html" class="extype" name="com.jafpl.steps.StepDataProvider">StepDataProvider</a>, <a href="Provider.html" class="extype" name="com.jafpl.steps.Provider">Provider</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block">
             <span class="toggle">
               Known Subclasses
             </span>
-            <div class="subClasses hiddenContent"><a href="../runtime/OutputProxy.html" class="extype" name="com.jafpl.runtime.OutputProxy">OutputProxy</a></div>
+            <div class="subClasses hiddenContent"><a href="../runtime/InputProxy.html" class="extype" name="com.jafpl.runtime.InputProxy">InputProxy</a>, <a href="../runtime/OutputProxy.html" class="extype" name="com.jafpl.runtime.OutputProxy">OutputProxy</a>, <a href="Step.html" class="extype" name="com.jafpl.steps.Step">Step</a></div>
           </div></div>
         
 
@@ -255,7 +241,7 @@ where the data should be delivered.</p></div><div class="toggleContainer block">
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.jafpl.steps.DataConsumer"><span>DataConsumer</span></li><li class="in" name="com.jafpl.steps.StepDataProvider"><span>StepDataProvider</span></li><li class="in" name="com.jafpl.steps.Provider"><span>Provider</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.jafpl.steps.DataConsumer"><span>DataConsumer</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -279,10 +265,10 @@ where the data should be delivered.</p></div><div class="toggleContainer block">
 
         <div class="values members">
               <h3>Abstract Value Members</h3>
-              <ol><li name="com.jafpl.steps.StepDataProvider#send" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="send(port:String,item:Any):Unit"></a><a id="send(String,Any):Unit"></a>
+              <ol><li name="com.jafpl.steps.DataConsumer#receive" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="receive(port:String,item:Any,metadata:com.jafpl.messages.Metadata):Unit"></a><a id="receive(String,Any,Metadata):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/DataConsumer.html#send(port:String,item:Any):Unit" title="Permalink">
+      <a href="../../../com/jafpl/steps/DataConsumer.html#receive(port:String,item:Any,metadata:com.jafpl.messages.Metadata):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -291,27 +277,11 @@ where the data should be delivered.</p></div><div class="toggleContainer block">
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">send</span><span class="params">(<span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="item">item: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">receive</span><span class="params">(<span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="item">item: <span class="extype" name="scala.Any">Any</span></span>, <span name="metadata">metadata: <a href="../messages/Metadata.html" class="extype" name="com.jafpl.messages.Metadata">Metadata</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
       <p class="shortcomment cmt">Send output from a step.</p><div class="fullcomment"><div class="comment cmt"><p>Send output from a step.</p><p>Calling this method sends the specified <code>item</code> as an output on the specified <code>port</code>.
-</p></div><dl class="paramcmts block"><dt class="param">port</dt><dd class="cmt"><p>The output port.</p></dd><dt class="param">item</dt><dd class="cmt"><p>The item.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="StepDataProvider.html" class="extype" name="com.jafpl.steps.StepDataProvider">StepDataProvider</a></dd></dl></div>
-    </li><li name="com.jafpl.steps.DataConsumer#setProvider" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="setProvider(provider:com.jafpl.steps.DataProvider):Unit"></a><a id="setProvider(DataProvider):Unit"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/steps/DataConsumer.html#setProvider(provider:com.jafpl.steps.DataProvider):Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">setProvider</span><span class="params">(<span name="provider">provider: <a href="DataProvider.html" class="extype" name="com.jafpl.steps.DataProvider">DataProvider</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      
+</p></div><dl class="paramcmts block"><dt class="param">port</dt><dd class="cmt"><p>The output port.</p></dd><dt class="param">item</dt><dd class="cmt"><p>The item.</p></dd><dt class="param">metadata</dt><dd class="cmt"><p>Item metadata.</p></dd></dl></div>
     </li></ol>
             </div>
 
@@ -662,11 +632,7 @@ where the data should be delivered.</p></div><div class="toggleContainer block">
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="com.jafpl.steps.StepDataProvider">
-              <h3>Inherited from <a href="StepDataProvider.html" class="extype" name="com.jafpl.steps.StepDataProvider">StepDataProvider</a></h3>
-            </div><div class="parent" name="com.jafpl.steps.Provider">
-              <h3>Inherited from <a href="Provider.html" class="extype" name="com.jafpl.steps.Provider">Provider</a></h3>
-            </div><div class="parent" name="scala.AnyRef">
+        <div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>

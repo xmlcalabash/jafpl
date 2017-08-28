@@ -144,15 +144,15 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="DataConsumer.html" title="A data consumer."></a>
-                        <a href="DataConsumer.html" title="A data consumer.">
+                        <a class="trait" href="DataConsumer.html" title="Interface for sending outputs from atomic steps."></a>
+                        <a href="DataConsumer.html" title="Interface for sending outputs from atomic steps.">
                           DataConsumer
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="DataProvider.html" title="A data provider."></a>
-                        <a href="DataProvider.html" title="A data provider.">
-                          DataProvider
+                        <a class="trait" href="DataConsumerProxy.html" title="A data consumer."></a>
+                        <a href="DataConsumerProxy.html" title="A data consumer.">
+                          DataConsumerProxy
                         </a>
                       </li><li class="current-entities indented3">
                         <a class="object" href="PortSpecification$.html" title="Useful default port binding specifications."></a>
@@ -162,21 +162,9 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="Provider.html" title="A data provider."></a>
-                        <a href="Provider.html" title="A data provider.">
-                          Provider
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
                         <a class="trait" href="Step.html" title="An atomic pipeline step."></a>
                         <a href="Step.html" title="An atomic pipeline step.">
                           Step
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
-                        <a class="trait" href="StepDataProvider.html" title="Interface for sending outputs from atomic steps."></a>
-                        <a href="StepDataProvider.html" title="Interface for sending outputs from atomic steps.">
-                          StepDataProvider
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
@@ -282,9 +270,9 @@ reassembles the resource using the transformed portions and returns the resultin
         <div class="values members">
               <h3>Abstract Value Members</h3>
               <ol><li name="com.jafpl.steps.ViewportComposer#decompose" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="decompose(item:Any):List[com.jafpl.steps.ViewportItem]"></a><a id="decompose(Any):List[ViewportItem]"></a>
+      <a id="decompose(item:Any,metadata:com.jafpl.messages.Metadata):List[com.jafpl.steps.ViewportItem]"></a><a id="decompose(Any,Metadata):List[ViewportItem]"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/ViewportComposer.html#decompose(item:Any):List[com.jafpl.steps.ViewportItem]" title="Permalink">
+      <a href="../../../com/jafpl/steps/ViewportComposer.html#decompose(item:Any,metadata:com.jafpl.messages.Metadata):List[com.jafpl.steps.ViewportItem]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -293,15 +281,15 @@ reassembles the resource using the transformed portions and returns the resultin
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">decompose</span><span class="params">(<span name="item">item: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="ViewportItem.html" class="extype" name="com.jafpl.steps.ViewportItem">ViewportItem</a>]</span>
+        <span class="name">decompose</span><span class="params">(<span name="item">item: <span class="extype" name="scala.Any">Any</span></span>, <span name="metadata">metadata: <a href="../messages/Metadata.html" class="extype" name="com.jafpl.messages.Metadata">Metadata</a></span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="ViewportItem.html" class="extype" name="com.jafpl.steps.ViewportItem">ViewportItem</a>]</span>
       </span>
       
       <p class="shortcomment cmt">Decompose the specified item into sub-portions for viewport processing.</p><div class="fullcomment"><div class="comment cmt"><p>Decompose the specified item into sub-portions for viewport processing.
 </p></div><dl class="paramcmts block"><dt class="param">item</dt><dd class="cmt"><p>The item to be processed by the viewport.</p></dd><dt>returns</dt><dd class="cmt"><p>A list of sub-portions to process in the viewport.</p></dd></dl></div>
     </li><li name="com.jafpl.steps.ViewportComposer#recompose" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="recompose():Any"></a>
+      <a id="recompose():com.jafpl.messages.ItemMessage"></a><a id="recompose():ItemMessage"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/ViewportComposer.html#recompose():Any" title="Permalink">
+      <a href="../../../com/jafpl/steps/ViewportComposer.html#recompose():com.jafpl.messages.ItemMessage" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -310,7 +298,7 @@ reassembles the resource using the transformed portions and returns the resultin
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">recompose</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Any">Any</span></span>
+        <span class="name">recompose</span><span class="params">()</span><span class="result">: <a href="../messages/ItemMessage.html" class="extype" name="com.jafpl.messages.ItemMessage">ItemMessage</a></span>
       </span>
       
       <p class="shortcomment cmt">Recompose the item.</p><div class="fullcomment"><div class="comment cmt"><p>Recompose the item.
