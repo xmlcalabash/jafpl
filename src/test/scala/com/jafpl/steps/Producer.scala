@@ -13,10 +13,10 @@ class Producer(val items: List[Any]) extends DefaultStep {
   override def run(): Unit = {
     for (item <- items) {
       item match {
-        case str: String => consumer.get.send("result", item, Metadata.STRING)
-        case num: Int => consumer.get.send("result", item, Metadata.NUMBER)
-        case num: Long => consumer.get.send("result", item, Metadata.NUMBER)
-        case _ => consumer.get.send("result", item, Metadata.BLANK)
+        case str: String => consumer.get.receive("result", item, Metadata.STRING)
+        case num: Int => consumer.get.receive("result", item, Metadata.NUMBER)
+        case num: Long => consumer.get.receive("result", item, Metadata.NUMBER)
+        case _ => consumer.get.receive("result", item, Metadata.BLANK)
       }
     }
   }

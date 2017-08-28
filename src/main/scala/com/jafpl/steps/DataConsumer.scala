@@ -1,12 +1,22 @@
 package com.jafpl.steps
 
-/** A data consumer.
+import com.jafpl.messages.Metadata
+
+/** Interface for sending outputs from atomic steps.
   *
-  * This class is used to provide outputs from the pipeline. An instance of this class will
-  * be provided after the runtime is constructed. The user can call `setProvider` to specify
-  * where the data should be delivered.
+  * Atomic step implementations are independent of the graph execution infrastructure.
+  *
+  * Steps call the `send` method on this object to deliver output.
   *
   */
-trait DataConsumer extends StepDataProvider {
-  def setProvider(provider: DataProvider): Unit
+trait DataConsumer {
+  /** Send output from a step.
+    *
+    * Calling this method sends the specified `item` as an output on the specified `port`.
+    *
+    * @param port The output port.
+    * @param item The item.
+    * @param metadata Item metadata.
+    */
+  def receive(port: String, item: Any, metadata: Metadata): Unit
 }

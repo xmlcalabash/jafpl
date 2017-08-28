@@ -24,7 +24,7 @@ import com.jafpl.runtime.RuntimeConfiguration
   *           bindings.
   *
   */
-trait Step {
+trait Step extends DataConsumer {
   /** The names of the input ports this step requires.
     *
     * This method returns the names of the input ports that the step requires.
@@ -57,7 +57,7 @@ trait Step {
     *
     * @param consumer The consumer.
     */
-  def setConsumer(consumer: StepDataProvider)
+  def setConsumer(consumer: DataConsumer)
 
   /** Receive a binding.
     *
@@ -67,14 +67,6 @@ trait Step {
     * @param value The computed value of the variable.
     */
   def receiveBinding(variable: String, value: Any)
-
-  /** Receive a document.
-    *
-    * @param port The input port name.
-    * @param item The item.
-    * @param metadata Metadata about the item.
-    */
-  def receive(port: String, item: Any, metadata: Metadata)
 
   /** One time, startup initialization.
     *

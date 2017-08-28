@@ -18,7 +18,7 @@ private[runtime] class OutputActor(private val monitor: ActorRef,
       case item: ItemMessage =>
         if (consumer.provider.isDefined) {
           trace(s"??CNSM $item", "Consumer")
-          consumer.provider.get.send(item.item, item.metadata)
+          runtime.dynamicContext.deliver(item, consumer.provider.get, port)
         } else {
           trace(s"!!CNSM $item", "Consumer")
         }
@@ -29,10 +29,6 @@ private[runtime] class OutputActor(private val monitor: ActorRef,
   }
 
   override protected def close(port: String): Unit = {
-    if (consumer.provider.isDefined) {
-      trace(s"??CLOS", "Consumer")
-      consumer.provider.get.close()
-    }
     closed = true
     runIfReady()
   }

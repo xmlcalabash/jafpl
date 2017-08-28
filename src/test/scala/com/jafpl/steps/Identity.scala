@@ -23,6 +23,6 @@ class Identity(allowSeq: Boolean) extends DefaultStep {
   }
 
   override def receive(port: String, item: Any, metadata: Metadata): Unit = {
-    consumer.get.send("result", item, metadata)
+    consumer.get.receive("result", item, metadata)
   }
 }

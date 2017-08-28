@@ -55,7 +55,7 @@ object GraphTest extends App {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     val bc = new BufferConsumer()
-    runtime.outputs("result").setProvider(bc)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     println(bc.items.size)
@@ -88,7 +88,7 @@ object GraphTest extends App {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     val bc = new BufferConsumer()
-    runtime.outputs("result").setProvider(bc)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     println(bc.items.size)
@@ -119,7 +119,7 @@ object GraphTest extends App {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     val bc = new BufferConsumer()
-    runtime.outputs("result").setProvider(bc)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     println(bc.items.size)

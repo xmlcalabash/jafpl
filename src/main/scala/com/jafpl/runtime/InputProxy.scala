@@ -3,7 +3,8 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.graph.Node
 import com.jafpl.messages.{Message, Metadata}
-import com.jafpl.steps.DataProvider
+import com.jafpl.runtime.GraphMonitor.GClose
+import com.jafpl.steps.DataConsumer
 import com.jafpl.util.PipelineMessage
 
 import scala.collection.mutable
@@ -11,7 +12,7 @@ import scala.collection.mutable.ListBuffer
 
 class InputProxy(private val monitor: ActorRef,
                  private val runtime: GraphRuntime,
-                 private val node: Node) extends DataProvider {
+                 private val node: Node) extends DataConsumer {
   var _closed = false
   val _items = mutable.ListBuffer.empty[Message]
 
@@ -21,7 +22,7 @@ class InputProxy(private val monitor: ActorRef,
     _items.clear()
   }
 
-  def send(item: Any, metadata: Metadata): Unit = {
+  def receive(port: String, item: Any, metadata: Metadata): Unit = {
     item match {
       case msg: Message =>
         _items += msg

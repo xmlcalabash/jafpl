@@ -5,16 +5,16 @@ import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.Node
 import com.jafpl.messages.Metadata
 import com.jafpl.runtime.GraphMonitor.GException
-import com.jafpl.steps.{DataConsumer, DataProvider}
+import com.jafpl.steps.{DataConsumerProxy, DataConsumer}
 
 class OutputProxy(private val monitor: ActorRef,
                   private val runtime: GraphRuntime,
-                  private val node: Node) extends DataConsumer  {
-  private var _provider = Option.empty[DataProvider]
+                  private val node: Node) extends DataConsumerProxy with DataConsumer  {
+  private var _provider = Option.empty[DataConsumer]
 
-  def provider: Option[DataProvider] = _provider
+  def provider: Option[DataConsumer] = _provider
 
-  override def setProvider(provider: DataProvider): Unit = {
+  override def setConsumer(provider: DataConsumer): Unit = {
     if (_provider.isDefined) {
       monitor ! GException(None,
         new PipelineException("dupprovider", "Attempt to reset provider.", node.location))
@@ -22,9 +22,9 @@ class OutputProxy(private val monitor: ActorRef,
     _provider = Some(provider)
   }
 
-  override def send(port: String, item: Any, metadata: Metadata): Unit = {
+  override def receive(port: String, item: Any, metadata: Metadata): Unit = {
     if (_provider.isDefined) {
-      _provider.get.send(item, metadata)
+      _provider.get.receive("source", item, metadata)
     }
   }
 }

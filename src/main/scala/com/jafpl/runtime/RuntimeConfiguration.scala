@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import com.jafpl.messages.ItemMessage
-import com.jafpl.steps.Step
+import com.jafpl.steps.{DataConsumer, Step}
 
 /** The runtime configuration for pipeline execution.
   *
@@ -52,8 +52,8 @@ trait RuntimeConfiguration {
     * look at the message and may adjust it if necessary.
     *
     * @param message The message to be delivered.
-    * @param step The step to which it is to be delivered.
+    * @param consumer The step to which it is to be delivered.
     * @param port The port on which it is to be delivered.
     */
-  def deliver(message: ItemMessage, step: Step, port: String)
+  def deliver(message: ItemMessage, consumer: DataConsumer, port: String)
 }

@@ -52,7 +52,7 @@ class BindingSpec extends FlatSpec {
     runtime.bindings("foo").set("Spoon!")
 
     val bc = new BufferConsumer()
-    runtime.outputs("result").setProvider(bc)
+    runtime.outputs("result").setConsumer(bc)
 
     runtime.run()
 
@@ -86,7 +86,7 @@ class BindingSpec extends FlatSpec {
     runtime.bindings("foo").set("Spoon!")
 
     val bc = new BufferConsumer()
-    runtime.outputs("result").setProvider(bc)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     assert(bc.items.size == 1)
@@ -111,7 +111,7 @@ class BindingSpec extends FlatSpec {
     //runtime.bindings("foo").set("Spoon!")
 
     val bc = new BufferConsumer()
-    runtime.outputs("result").setProvider(bc)
+    runtime.outputs("result").setConsumer(bc)
 
     var pass = false
     try {

@@ -10,7 +10,7 @@ class Uppercase extends DefaultStep {
   override def receive(port: String, item: Any, metadata: Metadata): Unit = {
     item match {
       case s: String =>
-        consumer.get.send("result", s.toUpperCase(), Metadata.STRING)
+        consumer.get.receive("result", s.toUpperCase(), Metadata.STRING)
       case _ =>
         throw new StepException("unexpectedtype", "Unexpected input type")
     }

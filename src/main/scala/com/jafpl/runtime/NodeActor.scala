@@ -7,7 +7,7 @@ import com.jafpl.graph.{ContainerEnd, Node}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GStopped}
 import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NGuardResult, NInitialize, NInput, NLoop, NReset, NStart, NStop, NTraceDisable, NTraceEnable, NViewportFinished}
-import com.jafpl.steps.{PortSpecification, Provider}
+import com.jafpl.steps.{PortSpecification, DataConsumer}
 
 import scala.collection.mutable
 
@@ -40,9 +40,9 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   protected var readyToRun = false
   protected val traces = mutable.HashSet.empty[String]
   protected val cardinalities = mutable.HashMap.empty[String, Long]
-  protected var proxy = Option.empty[Provider]
+  protected var proxy = Option.empty[DataConsumer]
 
-  def this(monitor: ActorRef, runtime: GraphRuntime, node: Node, consumer: Provider) {
+  def this(monitor: ActorRef, runtime: GraphRuntime, node: Node, consumer: DataConsumer) {
     this(monitor, runtime, node)
     proxy = Some(consumer)
   }

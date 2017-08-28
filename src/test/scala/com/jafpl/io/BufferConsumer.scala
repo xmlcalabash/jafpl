@@ -1,12 +1,11 @@
 package com.jafpl.io
 
 import com.jafpl.messages.Metadata
-import com.jafpl.steps.DataProvider
+import com.jafpl.steps.DataConsumer
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
-class BufferConsumer extends DataProvider {
+class BufferConsumer extends DataConsumer {
   val _items: mutable.HashMap[Any, Metadata] = mutable.HashMap.empty[Any, Metadata]
 
   def items: List[Any] = _items.keySet.toList
@@ -15,9 +14,7 @@ class BufferConsumer extends DataProvider {
     _items.getOrElse(item, Metadata.BLANK)
   }
 
-  override def send(item: Any, metadata: Metadata): Unit = {
+  override def receive(port: String, item: Any, metadata: Metadata): Unit = {
     _items.put(item, metadata)
   }
-
-  override def close(): Unit = Unit
 }

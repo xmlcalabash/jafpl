@@ -2,11 +2,11 @@ package com.jafpl.runtime
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.jafpl.exceptions.{GraphException, PipelineException}
-import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, LoopEachStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, PipelineStart, Splitter, TryCatchStart, TryStart, LoopUntilStart, ViewportStart, WhenStart, LoopWhileStart}
-import com.jafpl.runtime.GraphMonitor.{GException, GNode, GRun, GWatchdog}
-import com.jafpl.steps.{BindingProvider, DataConsumer, DataProvider}
+import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopUntilStart, LoopWhileStart, PipelineStart, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
+import com.jafpl.runtime.GraphMonitor.{GClose, GException, GNode, GRun, GWatchdog}
+import com.jafpl.steps.{BindingProvider, DataConsumer, DataConsumerProxy}
 import com.jafpl.util.UniqueId
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable
 
@@ -21,7 +21,7 @@ import scala.collection.mutable
   * @param dynamicContext Runtime context information for the execution.
   */
 class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
-  protected[jafpl] val logger = LoggerFactory.getLogger(this.getClass)
+  protected[jafpl] val logger: Logger = LoggerFactory.getLogger(this.getClass)
   private var _system: ActorSystem = _
   private var _monitor: ActorRef = _
   private val sleepInterval = 100
@@ -57,17 +57,17 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
 
   /** A map of the inputs that the pipeline expects.
     *
-    * This mapping from names (strings) to [[com.jafpl.steps.DataProvider]]s is the set of inputs that
+    * This mapping from names (strings) to [[com.jafpl.steps.DataConsumer]]s is the set of inputs that
     * the pipeline expects from the outside world. If you do not provide an input, an
     * empty sequence of items will be provided.
     *
     * @return A map of the expected inputs.
     */
-  def inputs: Map[String, DataProvider] = Map() ++ _graphInputs
+  def inputs: Map[String, DataConsumer] = Map() ++ _graphInputs
 
   /** A map of the variable bindings that the pipeline expects.
     *
-    * This mapping from names (strings) to [[com.jafpl.steps.DataProvider]]s is the set of variable
+    * This mapping from names (strings) to [[com.jafpl.steps.BindingProvider]]s is the set of variable
     * bindings that
     * the pipeline expects from the outside world. If you do not provide an input,
     * the name will be unbound. The result of referring to an unbound variable
@@ -79,13 +79,13 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
 
   /** A map of the outputs that the pipeline produces.
     *
-    * This mapping from names (strings) to [[com.jafpl.steps.DataConsumer]]s is the set of outputs that
+    * This mapping from names (strings) to [[com.jafpl.steps.DataConsumerProxy]]s is the set of outputs that
     * the pipeline. If you do not call the `setProvider` method, the output will be
     * discarded.
     *
     * @return A map of the expected inputs.
     */
-  def outputs: Map[String, DataConsumer] = Map() ++ _graphOutputs
+  def outputs: Map[String, DataConsumerProxy] = Map() ++ _graphOutputs
 
   protected[runtime] def finish(): Unit = {
     _finished = true
@@ -102,6 +102,10 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
     *
     */
   def run(): Unit = {
+    for ((port, proxy) <- inputs) {
+      proxy.asInstanceOf[InputProxy].close()
+    }
+
     if (graph.valid) {
       runInBackground()
       waitForPipeline()
@@ -116,9 +120,6 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
     * To determine if execution has completed, check the `finished` value.
     */
   def runInBackground(): Unit = {
-    for (provider <- inputs.values) {
-      provider.close()
-    }
     for ((name, provider) <- _graphBindings) {
       if (!provider.closed) {
         throw new PipelineException("nobinding", "No binding was provided for " + name, None)

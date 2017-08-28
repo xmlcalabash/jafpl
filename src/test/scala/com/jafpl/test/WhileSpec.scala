@@ -29,7 +29,7 @@ class WhileSpec extends FlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     val bc = new BufferConsumer()
-    runtime.outputs("result").setProvider(bc)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     assert(bc.items.size == 1)
@@ -55,7 +55,7 @@ class WhileSpec extends FlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     val bc = new BufferConsumer()
-    runtime.outputs("result").setProvider(bc)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     assert(bc.items.size == 1)

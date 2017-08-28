@@ -9,8 +9,8 @@ class Decrement() extends DefaultStep {
 
   override def receive(port: String, item: Any, metadata: Metadata): Unit = {
     item match {
-      case num: Long => consumer.get.send("result", num - 1, Metadata.NUMBER)
-      case num: Int => consumer.get.send("result", num - 1, Metadata.NUMBER)
+      case num: Long => consumer.get.receive("result", num - 1, Metadata.NUMBER)
+      case num: Int => consumer.get.receive("result", num - 1, Metadata.NUMBER)
       case _ => throw new StepException("nan", "Decrement input not a number: " + item)
     }
   }

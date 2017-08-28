@@ -2,10 +2,10 @@ package com.jafpl.steps
 
 /** A data provider.
   *
-  * This trait is used to expose the input requirements of a pipeline.
+  * This trait is used to expose the input variable requirements of a pipeline.
   *
   */
-trait BindingProvider extends Provider {
+trait BindingProvider {
   /** Provide the binding.
     *
     * Calling this method sets the value for the binding. This method must

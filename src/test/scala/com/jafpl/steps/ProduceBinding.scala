@@ -12,7 +12,7 @@ class ProduceBinding(varname: String) extends DefaultStep {
 
   override def receiveBinding(varname: String, value: Any): Unit = {
     if (varname == this.varname) {
-      consumer.get.send("result", value, Metadata.BLANK)
+      consumer.get.receive("result", value, Metadata.BLANK)
     }
   }
 }

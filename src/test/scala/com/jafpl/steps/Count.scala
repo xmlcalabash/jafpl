@@ -13,6 +13,6 @@ class Count extends DefaultStep {
   }
 
   override def run(): Unit = {
-    consumer.get.send("result", count, Metadata.BLANK)
+    consumer.get.receive("result", count, Metadata.BLANK)
   }
 }
