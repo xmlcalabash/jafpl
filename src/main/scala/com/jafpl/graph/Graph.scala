@@ -45,7 +45,7 @@ class Graph(listener: Option[ErrorListener]) {
     this(Some(listener))
   }
 
-  private def error(cause: Throwable): Unit = {
+  protected[graph] def error(cause: Throwable): Unit = {
     if (listener.isDefined) {
       if (exception.isEmpty) {
         exception = Some(cause)
@@ -518,6 +518,8 @@ class Graph(listener: Option[ErrorListener]) {
     }
     varnames.toSet
   }
+
+  protected[graph] def edges: List[Edge] = _edges.toList
 
   protected[jafpl] def edgesFrom(node: Node): List[Edge] = {
     val outboundEdges = ListBuffer.empty[Edge]

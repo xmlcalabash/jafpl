@@ -86,7 +86,7 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
   override protected[runtime] def finished(): Unit = {
     val pass = node.tester.test(Some(currentItem.get.item), Some(bindings.toMap))
 
-    trace(s"CHKWHILE condition: $pass", "While")
+    trace(s"CHKWHILE condition: $pass: ${currentItem.get.item}", "While")
 
     if (pass) {
       monitor ! GReset(node)

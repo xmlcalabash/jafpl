@@ -7,6 +7,9 @@ private[jafpl] class ViewportStart(override val graph: Graph,
                                    override val userLabel: Option[String],
                                    val composer: ViewportComposer)
   extends LoopStart(graph, end, userLabel) {
+  private var _outputPort = ""
+
+  def outputPort: String = _outputPort
 
   override def inputsOk(): Boolean = {
     var hasSource = false
@@ -33,7 +36,8 @@ private[jafpl] class ViewportStart(override val graph: Graph,
     for (output <- outputs) {
       if (output != "current") {
         count += 1
-        valid = valid && (count == 1) && (output == "result")
+        _outputPort = output
+        valid = valid && (count == 1)
       }
     }
 

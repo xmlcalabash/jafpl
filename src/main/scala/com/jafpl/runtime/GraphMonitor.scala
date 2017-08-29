@@ -9,7 +9,6 @@ import com.jafpl.graph.{ContainerEnd, Graph, Node}
 import com.jafpl.messages.{ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GAbort, GCatch, GCheckGuard, GClose, GException, GFinished, GFinishedViewport, GGuardResult, GLoop, GNode, GOutput, GReset, GRun, GStart, GStop, GStopped, GTrace, GWatchdog}
 import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NGuardResult, NInitialize, NInput, NLoop, NReset, NStart, NStop, NViewportFinished}
-import com.jafpl.util.PipelineMessage
 
 import scala.collection.mutable
 
@@ -77,6 +76,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
   }
 
   def stopPipeline(): Unit = {
+    trace(s"STOPPING", "X")
     for (node <- unstoppedNodes) {
       actors(node) ! NStop()
     }

@@ -16,9 +16,9 @@ object GraphTest extends App {
   //pw.write(graph.asXML.toString)
   //pw.close()
 
-  runSeven()
+  runEight()
 
-  def runSeven(): Unit = {
+  def runEight(): Unit = {
     val graph = new Graph()
     val bc = new BufferSink()
 
@@ -31,8 +31,8 @@ object GraphTest extends App {
 
     graph.addEdge(prod, "result", viewport, "source")
     graph.addEdge(viewport, "current", uc, "source")
-    graph.addEdge(uc, "result", viewport, "fribble")
-    graph.addEdge(viewport, "fribble", pipeline, "result")
+    graph.addEdge(uc, "result", viewport, "result")
+    graph.addEdge(viewport, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
     graph.close()
@@ -41,6 +41,36 @@ object GraphTest extends App {
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "NOW IS THE TIME; JUST DO IT.")
+
+  }
+
+  def runSeven(): Unit = {
+    val graph = new Graph()
+    val pipeline = graph.addPipeline()
+    val p1       = pipeline.addAtomic(new Producer(List(0)), "p1")
+
+    val comp = new PrimitiveItemComparator()
+
+    val ustep    = pipeline.addUntil(comp)
+    val decr     = ustep.addAtomic(new Decrement(), "decr")
+
+    graph.addEdge(p1, "result", ustep, "source")
+    graph.addEdge(ustep, "current", decr, "source")
+    graph.addEdge(decr, "result", ustep, "test")
+    graph.addEdge(decr, "result", ustep, "result")
+
+    graph.addEdge(ustep, "result", pipeline, "result")
+
+    graph.addOutput(pipeline, "result")
+
+    graph.close()
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+    val bc = new BufferConsumer()
+    runtime.outputs("result").setConsumer(bc)
+    runtime.run()
+
+    println(bc.items)
   }
 
   def runSix(): Unit = {

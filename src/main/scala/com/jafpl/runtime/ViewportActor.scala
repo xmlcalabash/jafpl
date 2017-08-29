@@ -62,19 +62,16 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
   }
 
   private def runIfReady(): Unit = {
+    trace(s"RUNIFRDY $node (running:$running ready:$readyToRun closed:$sourceClosed", "Viewport")
+
     if (!running && readyToRun && sourceClosed) {
       running = true
-
       if (itemQueue.nonEmpty) {
         val item = itemQueue(index)
         val edge = node.outputEdge("current")
         monitor ! GOutput(node, edge.fromPort, new PipelineMessage(item.getItem, item.getMetadata))
         monitor ! GClose(node, edge.fromPort)
-
-        trace(s"START Viewport: $node", "Viewport")
-
         for (child <- node.children) {
-          trace(s"START ...$child (for $node)", "Viewport")
           monitor ! GStart(child)
         }
       } else {
@@ -106,18 +103,18 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
   override protected[runtime] def finished(): Unit = {
     if (sourceClosed) {
       if (itemQueue.isEmpty) {
-        monitor ! GClose(node, "result")
+        monitor ! GClose(node, node.outputPort)
         monitor ! GFinished(node)
       } else {
         if (index >= itemQueue.size) {
-          trace(s"FINISH Viewport: $node $sourceClosed, ${itemQueue.isEmpty}", "Viewport")
+          trace(s"FINISHED $node source:$sourceClosed, queue:${itemQueue.isEmpty}", "Viewport")
           // send the transformed result and close the output
           val recomposition = node.composer.recompose()
-          monitor ! GOutput(node, "result", recomposition)
-          monitor ! GClose(node, "result")
+          trace(s"RECOMP: ${recomposition.item}", "X")
+          monitor ! GOutput(node, node.outputPort, recomposition)
+          monitor ! GClose(node, node.outputPort)
           monitor ! GFinished(node)
         } else {
-          trace(s"RESET Viewport: $node $sourceClosed, ${itemQueue.isEmpty}", "Viewport")
           monitor ! GReset(node)
         }
       }

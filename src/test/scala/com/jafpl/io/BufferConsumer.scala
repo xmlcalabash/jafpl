@@ -6,15 +6,14 @@ import com.jafpl.steps.DataConsumer
 import scala.collection.mutable
 
 class BufferConsumer extends DataConsumer {
-  val _items: mutable.HashMap[Any, Metadata] = mutable.HashMap.empty[Any, Metadata]
+  private val _items = mutable.ListBuffer.empty[Any]
+  private val _metas = mutable.ListBuffer.empty[Metadata]
 
-  def items: List[Any] = _items.keySet.toList
-
-  def metadata(item: Any): Metadata = {
-    _items.getOrElse(item, Metadata.BLANK)
-  }
+  def items: List[Any] = _items.toList
+  def metas: List[Any] = _items.toList
 
   override def receive(port: String, item: Any, metadata: Metadata): Unit = {
-    _items.put(item, metadata)
+    _items += item
+    _metas += metadata
   }
 }

@@ -10,7 +10,7 @@ import scala.collection.mutable.ListBuffer
 private[runtime] class ViewportEndActor(private val monitor: ActorRef,
                                         private val runtime: GraphRuntime,
                                         private val node: ContainerEnd) extends EndActor(monitor, runtime, node)  {
-  val buffer = ListBuffer.empty[ItemMessage]
+  private val buffer = ListBuffer.empty[ItemMessage]
 
   override protected def reset(): Unit = {
     super.reset()
@@ -20,9 +20,7 @@ private[runtime] class ViewportEndActor(private val monitor: ActorRef,
   override protected def input(port: String, msg: Message): Unit = {
     msg match {
       case item: ItemMessage =>
-        if (port == "result") {
-          buffer += item
-        }
+        buffer += item
       case _ => Unit
     }
   }

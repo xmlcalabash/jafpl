@@ -1,5 +1,6 @@
 package com.jafpl.graph
 
+import com.jafpl.exceptions.GraphException
 import com.jafpl.util.ItemTester
 
 private[jafpl] class LoopWhileStart(override val graph: Graph,
@@ -15,7 +16,7 @@ private[jafpl] class LoopWhileStart(override val graph: Graph,
       var valid = true
       for (port <- inputs) {
         if (port != "#bindings" && port != "source") {
-          println("Invalid binding on " + this + ": " + port)
+          graph.error(new GraphException(s"Invalid binding on $this: $port", location))
           valid = false
         }
         hasSource = hasSource || (port == "source")
@@ -26,4 +27,17 @@ private[jafpl] class LoopWhileStart(override val graph: Graph,
     }
   }
 
+  override def outputsOk(): Boolean = {
+    var hasTest = false
+
+    for (port <- end.inputs) {
+      hasTest = hasTest || (port == "test")
+    }
+
+    if (!hasTest) {
+      graph.error(new GraphException(s"While loop must have a 'test' output", location))
+    }
+
+    hasTest
+  }
 }

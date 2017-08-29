@@ -1,5 +1,6 @@
 package com.jafpl.graph
 
+import com.jafpl.exceptions.GraphException
 import com.jafpl.util.ItemComparator
 
 private[jafpl] class LoopUntilStart(override val graph: Graph,
@@ -25,5 +26,20 @@ private[jafpl] class LoopUntilStart(override val graph: Graph,
       true
     }
   }
+
+  override def outputsOk(): Boolean = {
+    var hasTest = false
+
+    for (port <- end.inputs) {
+      hasTest = hasTest || (port == "test")
+    }
+
+    if (!hasTest) {
+      graph.error(new GraphException(s"Until loop must have a 'test' output", location))
+    }
+
+    hasTest
+  }
+
 
 }
