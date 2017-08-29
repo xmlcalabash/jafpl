@@ -1,6 +1,5 @@
 package com.jafpl.test
 
-import com.jafpl.drivers.GraphTest.runtimeConfig
 import com.jafpl.graph.Graph
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
