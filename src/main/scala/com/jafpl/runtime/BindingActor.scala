@@ -17,7 +17,7 @@ private[runtime] class BindingActor(private val monitor: ActorRef,
   }
 
   private def runIfReady(): Unit = {
-    trace(s"RNIFR $binding $readyToRun ${provider.closed}", "StepExec")
+    trace(s"RUNIFRDY $binding ready:$readyToRun closed:${provider.closed}", "StepExec")
 
     if (readyToRun && provider.closed) {
       run()

@@ -3,9 +3,8 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.LoopEachStart
-import com.jafpl.messages.{ItemMessage, Message}
+import com.jafpl.messages.{ItemMessage, Message, Metadata}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
-import com.jafpl.util.PipelineMessage
 
 import scala.collection.mutable.ListBuffer
 
@@ -53,9 +52,9 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
       if (queue.nonEmpty) {
         val item = queue.head
         queue -= item
-        val edge = node.outputEdge("source")
-        monitor ! GOutput(node, edge.toPort, item)
-        monitor ! GClose(node, edge.toPort)
+        val edge = node.outputEdge("current")
+        monitor ! GOutput(node, edge.fromPort, item)
+        monitor ! GClose(node, edge.fromPort)
 
         trace(s"START ForEach: $node", "ForEach")
 

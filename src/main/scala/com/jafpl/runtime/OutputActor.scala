@@ -17,10 +17,10 @@ private[runtime] class OutputActor(private val monitor: ActorRef,
     msg match {
       case item: ItemMessage =>
         if (consumer.provider.isDefined) {
-          trace(s"??CNSM $item", "Consumer")
+          trace(s"DELIVER→ $node.$port → ${consumer.provider.get}.$port", "StepIO")
           runtime.dynamicContext.deliver(item, consumer.provider.get, port)
         } else {
-          trace(s"!!CNSM $item", "Consumer")
+          trace(s"↴DELIVER $node.$port (no consumer)", "StepIO")
         }
       case _ =>
         monitor ! GException(None,
@@ -39,7 +39,7 @@ private[runtime] class OutputActor(private val monitor: ActorRef,
   }
 
   private def runIfReady(): Unit = {
-    trace(s"RNIFR $node $readyToRun ${closed}", "StepExec")
+    trace(s"RUNIFRDY $node ready:$readyToRun closed:$closed", "StepExec")
 
     if (readyToRun && closed) {
       run()

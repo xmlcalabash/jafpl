@@ -21,7 +21,7 @@ class ForEachSpec extends FlatSpec {
     val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(producer, "result", forEach, "source")
-    graph.addEdge(forEach, "source", ident, "source")
+    graph.addEdge(forEach, "current", ident, "source")
     graph.addEdge(ident, "result", forEach, "result")
     graph.addEdge(forEach, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
@@ -51,7 +51,7 @@ class ForEachSpec extends FlatSpec {
     val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(producer, "result", forEach, "source")
-    graph.addEdge(forEach, "source", ident, "source")
+    graph.addEdge(forEach, "current", ident, "source")
     graph.addEdge(ident, "result", forEach, "result")
     graph.addEdge(forEach, "result", count, "source")
     graph.addEdge(count, "result", pipeline, "result")
@@ -82,7 +82,7 @@ class ForEachSpec extends FlatSpec {
     graph.addEdge(count, "result", ident, "source")
 
     graph.addEdge(lprod, "result", forEach, "source")
-    graph.addEdge(forEach, "source", sink, "source")
+    graph.addEdge(forEach, "current", sink, "source")
     graph.addEdge(ident, "result", forEach, "result")
     graph.addEdge(forEach, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")

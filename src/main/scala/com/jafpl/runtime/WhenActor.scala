@@ -46,7 +46,7 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
     }
   }
 
-  override protected def checkGuard(): Unit = {
+  protected[runtime] def checkGuard(): Unit = {
     readyToCheck = true
     checkIfReady()
   }

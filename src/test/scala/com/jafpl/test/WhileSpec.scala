@@ -20,7 +20,7 @@ class WhileSpec extends FlatSpec {
     val decr     = wstep.addAtomic(new Decrement(), "decr")
 
     graph.addEdge(p1, "result", wstep, "source")
-    graph.addEdge(wstep, "source", decr, "source")
+    graph.addEdge(wstep, "current", decr, "source")
     graph.addEdge(decr, "result", wstep, "result")
 
     graph.addEdge(wstep, "result", pipeline, "result")

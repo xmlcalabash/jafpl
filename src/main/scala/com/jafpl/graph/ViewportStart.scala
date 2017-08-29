@@ -31,7 +31,7 @@ private[jafpl] class ViewportStart(override val graph: Graph,
 
     var count = 0
     for (output <- outputs) {
-      if (!inputs.contains(output)) {
+      if (output != "current") {
         count += 1
         valid = valid && (count == 1) && (output == "result")
       }

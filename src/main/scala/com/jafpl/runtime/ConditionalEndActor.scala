@@ -28,34 +28,24 @@ private[runtime] class ConditionalEndActor(private val monitor: ActorRef,
 
   override protected def close(port: String): Unit = {
     openInputs -= port
-    trace(s"check finish for close $port", "xxx")
-    checkFinished()
-  }
-
-  override protected[runtime] def finished(otherNode: Node): Unit = {
-    trace(s"END FINISHED $node / $otherNode", "StepFinished")
-    unfinishedChildren -= otherNode
-    trace(s"check finish for finished $otherNode", "xxx")
     checkFinished()
   }
 
   override protected[runtime] def checkFinished(): Unit = {
-    trace(s"FNIFR $node (${node.start.getOrElse("!START")}) $readyToRun ${openInputs.isEmpty}: ${unfinishedChildren.isEmpty}", "StepFinished")
+    trace(s"FINIFRDY ${node.start.get}/end ready:$readyToRun inputs:${openInputs.isEmpty} children:${unfinishedChildren.isEmpty}", "StepFinished")
     for (child <- unfinishedChildren) {
-      trace(s"!FNSH ...$child", "StepFinished")
+      trace(s"........ $child", "StepFinished")
     }
     if (readyToRun) {
       if (openInputs.isEmpty && unfinishedChildren.isEmpty) {
         for (port <- buffer.keySet) {
           for (item <- buffer(port)) {
-            trace(s"Conditional end actor ${node.start} sends to $port: $item", "StepIO")
             monitor ! GOutput(node.start.get, port, item)
           }
         }
         for (input <- node.inputs) {
           monitor ! GClose(node.start.get, input)
         }
-        trace(s"FINSH $node", "StepFinished")
         monitor ! GFinished(node)
       }
     }

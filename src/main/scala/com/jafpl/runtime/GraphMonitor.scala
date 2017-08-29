@@ -9,6 +9,7 @@ import com.jafpl.graph.{ContainerEnd, Graph, Node}
 import com.jafpl.messages.{ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GAbort, GCatch, GCheckGuard, GClose, GException, GFinished, GFinishedViewport, GGuardResult, GLoop, GNode, GOutput, GReset, GRun, GStart, GStop, GStopped, GTrace, GWatchdog}
 import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NGuardResult, NInitialize, NInput, NLoop, NReset, NStart, NStop, NViewportFinished}
+import com.jafpl.util.PipelineMessage
 
 import scala.collection.mutable
 
@@ -56,12 +57,21 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
     }
   }
 
-  // FIXME: Doing the string interpolation even when the trace won't fire is...silly
+  private def fmtSender(): String = {
+    var str = sender().toString
+    var pos = str.indexOf("/user/")
+    str = str.substring(pos+6)
+    pos = str.indexOf("#")
+    if (pos > 0) {
+      str = str.substring(0, pos)
+    }
+    str
+  }
 
   def watchdog(millis: Long): Unit = {
-    trace(s"WATCH $millis", "Watchdog")
+    trace(s"WATCHDOG $millis", "Watchdog")
     for (node <- unfinishedNodes) {
-      trace(s"----- $node", "Watchdog")
+      trace(s"-------- $node", "Watchdog")
     }
     crashAndBurn(new PipelineException("watchdog", "Watchdog timer expired", None))
   }
@@ -85,7 +95,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
   }
 
   def crashAndBurn(cause: Throwable): Unit = {
-    trace(s"CRASH $cause", "Exceptions")
+    trace(s"CRASHBRN $cause", "Exceptions")
     exception = Some(cause)
     stopPipeline()
   }
@@ -99,88 +109,83 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
 
     case GRun() =>
       lastMessage = Instant.now()
-      trace("RUNGR", "Run")
+      trace("RUNGRAPH", "Run")
       for (node <- graph.nodes) {
-        trace(s"INITL $node", "Run")
+        trace(s"INITLIZE $node", "Run")
         actors(node) ! NInitialize()
         if (node.parent.isEmpty) {
           unfinishedNodes += node
         }
       }
       for (node <- unfinishedNodes) {
-        trace(s"STRTP $node", "Run")
+        trace(s"STARTTOP $node", "Run")
         actors(node) ! NStart()
       }
 
     case GStart(node) =>
       lastMessage = Instant.now()
-      trace(s"START $node", "Run")
+      trace(s"STRTNODE $node", "Run")
       actors(node) ! NStart()
 
     case GAbort(node) =>
       lastMessage = Instant.now()
-      trace(s"ABORT $node", "Run")
+      trace(s"ABRTNODE $node", "Run")
       actors(node) ! NAbort()
 
     case GStop(node) =>
       lastMessage = Instant.now()
-      trace(s"STOPN $node", "Stopping")
+      trace(s"STOPNODE $node", "Stopping")
       actors(node) ! NStop()
 
     case GStopped(node) =>
       lastMessage = Instant.now()
-      trace(s"XXXXX $node", "Stopping")
+      trace(s"STOPPED⯃ $node", "Stopping")
       stoppedStep(node)
 
     case GCatch(node, cause) =>
       lastMessage = Instant.now()
-      trace(s"START $node", "Run")
+      trace(s"STRTCTCH $node", "Run")
       actors(node) ! NCatch(cause)
 
     case GReset(node) =>
       lastMessage = Instant.now()
-      trace(s"RESET $node", "Run")
+      trace(s"RESETNOD $node", "Run")
       actors(node) ! NReset()
 
     case GOutput(node, port, item) =>
       lastMessage = Instant.now()
       if (node.hasOutputEdge(port)) {
-        trace(s"SNDTO $node.$port ($item)", "StepIO")
         val edge = node.outputEdge(port)
+        trace(s"SENDOUT→ $node.$port → ${edge.to}.${edge.toPort} from ${fmtSender()}", "StepIO")
         actors(edge.to) ! NInput(edge.toPort, item)
       } else {
-        trace(s"DROPO $node.$port ($item)", "StepIO")
+        trace(s"DROPOUT↴ $node.$port from ${fmtSender()}", "StepIO")
       }
 
     case GLoop(node, item) =>
       lastMessage = Instant.now()
-      trace(s"LOOPT ($item)", "StepIO")
+      trace(s"LOOPTOP↑ ($item)", "StepIO")
       actors(node) ! NLoop(item)
 
     case GClose(node, port) =>
       lastMessage = Instant.now()
-      trace(s"CLOSE $node.$port", "StepIO")
+      trace(s"CLOSEOUT $node.$port", "StepIO")
       val edge = node.outputEdge(port)
       actors(edge.to) ! NClose(edge.toPort)
 
     case GCheckGuard(node) =>
       lastMessage = Instant.now()
-      trace(s"GUARD $node", "Choose")
+      trace(s"CHKGUARD $node", "Choose")
       actors(node) ! NCheckGuard()
 
     case GGuardResult(when, pass) =>
       lastMessage = Instant.now()
-      trace(s"GRSLT $when: $pass", "Choose")
+      trace(s"GRDRESLT $when: $pass", "Choose")
       actors(when.parent.get) ! NGuardResult(when, pass)
 
     case GFinished(node) =>
       lastMessage = Instant.now()
-      node match {
-        case end: ContainerEnd =>
-          trace(s"FINSH end ${end.start.get}", "Run")
-        case _ =>
-          trace(s"FINSH $node", "Run")
-      }
+      trace(s"FINISHED $node", "Run")
 
       if (unfinishedNodes.contains(node)) {
         unfinishedNodes -= node
@@ -191,58 +196,46 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
 
       node match {
         case end: ContainerEnd =>
-          trace(s"TELLF tell start ${end.start.get} that container finished", "Run")
+          trace(s"TLLSTART $node finished → ${end.start.get}", "Run")
           actors(end.start.get) ! NContainerFinished()
         case _ =>
           if (node.parent.isDefined) {
             val end = node.parent.get.containerEnd
-            trace(s"TELLF tell end ${end.start.get} that $node finished", "Run")
+            trace(s"TLLPARNT $node finished → ${end.start.get}", "Run")
             actors(end) ! NChildFinished(node)
           }
       }
 
     case GFinishedViewport(node, buffer) =>
       lastMessage = Instant.now()
-      node match {
-        case end: ContainerEnd =>
-          trace(s"FINSH end ${end.start.get}", "Run")
-        case _ =>
-          trace(s"FINSH $node", "Run")
-      }
-
-      if (unfinishedNodes.contains(node)) {
-        unfinishedNodes -= node
-        if (unfinishedNodes.isEmpty) {
-          stopPipeline()
-        }
-      }
+      trace(s"FINISHED $node", "Run")
 
       node match {
         case end: ContainerEnd =>
-          trace(s"TELLF tell start ${end.start.get} that container finished", "Run")
+          trace(s"TLLSTART $node finished → ${end.start.get}", "Run")
           actors(end.start.get) ! NViewportFinished(buffer)
         case _ =>
           if (node.parent.isDefined) {
             val end = node.parent.get.containerEnd
-            trace(s"TELLF tell end ${end.start.get} that $node finished", "Run")
+            trace(s"TLLPARNT $node finished → ${end.start.get}", "Run")
             actors(end) ! NChildFinished(node)
           }
       }
 
     case GTrace(event) =>
       lastMessage = Instant.now()
-      trace(s"TRACE $event", "Traces")
+      trace(s"ADDTRACE $event", "Traces")
       traces += event
 
     case GNode(node,actor) =>
       lastMessage = Instant.now()
-      trace(s"ADDND $node", "AddNode")
+      trace(s"+ADDNODE $node", "AddNode")
       actors.put(node, actor)
       unstoppedNodes += node
 
     case GException(node, cause) =>
       lastMessage = Instant.now()
-      trace(s"EXCPT $node $cause", "Exceptions")
+      trace(s"EXCPTION $node $cause", "Exceptions")
 
       if (node.isDefined) {
         actors(node.get) ! NException(cause)
@@ -252,6 +245,6 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
 
     case m: Any =>
       lastMessage = Instant.now()
-      log.error("Unexpected message: {}", m)
+      log.error(s"UNEXPECT $m")
   }
 }

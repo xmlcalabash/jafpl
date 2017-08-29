@@ -34,13 +34,12 @@ private[runtime] class ViewportEndActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def checkFinished(): Unit = {
-    trace(s"FNIFR VE $node (${node.start.getOrElse("!START")}) $readyToRun ${openInputs.isEmpty}: ${unfinishedChildren.isEmpty}", "StepFinished")
+    trace(s"FINIFRDY ${node.start.get}/end ready:$readyToRun inputs:${openInputs.isEmpty} children:${unfinishedChildren.isEmpty}", "StepFinished")
     for (child <- unfinishedChildren) {
-      trace(s"!FNSH ...$child", "StepFinished")
+      trace(s"........ $child", "StepFinished")
     }
     if (readyToRun) {
       if (openInputs.isEmpty && unfinishedChildren.isEmpty) {
-        trace(s"FVPRT $node", "StepFinished")
         monitor ! GFinishedViewport(node, buffer.toList)
       }
     }

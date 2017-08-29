@@ -56,7 +56,7 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
     runIfReady()
   }
 
-  override def loop(item: ItemMessage): Unit = {
+  protected[runtime] def loop(item: ItemMessage): Unit = {
     currentItem = Some(item)
     looped = true
   }
@@ -66,19 +66,15 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
   }
 
   private def runIfReady(): Unit = {
-    trace(s"RUNIFR While: $running $readyToRun ${currentItem.isDefined}", "While")
+    trace(s"RUNIFRDY $node (running:$running ready:$readyToRun current:${currentItem.isDefined}", "While")
     if (!running && readyToRun && currentItem.isDefined) {
       running = true
 
       if (initiallyTrue) {
-        val edge = node.outputEdge("source")
-        monitor ! GOutput(node, edge.toPort, currentItem.get)
-        monitor ! GClose(node, edge.toPort)
-
-        trace(s"START While: $node", "While")
-
+        val edge = node.outputEdge("current")
+        monitor ! GOutput(node, edge.fromPort, currentItem.get)
+        monitor ! GClose(node, edge.fromPort)
         for (child <- node.children) {
-          trace(s"START ...$child (for $node)", "While")
           monitor ! GStart(child)
         }
       } else {
@@ -90,14 +86,11 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
   override protected[runtime] def finished(): Unit = {
     val pass = node.tester.test(Some(currentItem.get.item), Some(bindings.toMap))
 
-    trace(s"TESTE While: " + currentItem.get.item + ": " + pass, "While")
+    trace(s"CHKWHILE condition: $pass", "While")
 
     if (pass) {
-      trace(s"LOOPR While", "While")
-      trace(s"RESET While: $node", "While")
       monitor ! GReset(node)
     } else {
-      trace(s"FINISH While", "While")
       monitor ! GOutput(node, "result", currentItem.get)
       // now close the outputs
       for (output <- node.outputs) {

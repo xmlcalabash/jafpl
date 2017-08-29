@@ -45,8 +45,9 @@ private[runtime] class StartActor(private val monitor: ActorRef,
 
   override protected def input(port: String, item: Message): Unit = {
     val edge = node.outputEdge(port)
+    trace(s"EDGE: $edge", "StepIO")
     trace(s"Start actor $node sends to ${edge.toPort}: $item", "StepIO")
-    monitor ! GOutput(node, edge.toPort, item)
+    monitor ! GOutput(node, edge.fromPort, item)
   }
 
   protected[runtime] def finished(): Unit = {

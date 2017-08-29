@@ -17,7 +17,7 @@ private[runtime] class TryCatchEndActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def finished(otherNode: Node): Unit = {
-    trace(s"END FINISHED ${node.start} / $otherNode", "StepFinished")
+    trace(s"CHILDFIN $otherNode", "StepFinished")
 
     // Only one child of a try-catch will ever run, so if we get called, something succeeded
     // Well. Not if splitters or joiners get called.
@@ -35,12 +35,11 @@ private[runtime] class TryCatchEndActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def checkFinished(): Unit = {
-    trace(s"FNIFR $node (${node.start.getOrElse("!START")}) $readyToRun $branchFinished ${openInputs.isEmpty}", "StepFinished")
+    trace(s"FINIFRDY ${node.start.get}/end ready:$readyToRun inputs:${openInputs.isEmpty} branch:$branchFinished", "StepFinished")
 
     if (!toldStart && branchFinished) {
       // As soon one branch finishes, tell the start that we're done
       toldStart = true
-      trace(s"FINSH $node", "StepFinished")
       monitor ! GFinished(node)
     }
 
@@ -49,7 +48,6 @@ private[runtime] class TryCatchEndActor(private val monitor: ActorRef,
         readyToRun = false // don't run again if some joiner closes
         for (port <- buffer.keySet) {
           for (item <- buffer(port)) {
-            trace(s"Try/catch end actor ${node.start} sends to ${port}: $item", "StepIO")
             monitor ! GOutput(node.start.get, port, item)
           }
         }

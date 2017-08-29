@@ -60,7 +60,7 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
     runIfReady()
   }
 
-  override def loop(item: ItemMessage): Unit = {
+  protected[runtime] def loop(item: ItemMessage): Unit = {
     nextItem = Some(item)
     looped = true
   }
@@ -74,9 +74,9 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
     if (!running && readyToRun && currentItem.isDefined) {
       running = true
 
-      val edge = node.outputEdge("source")
-      monitor ! GOutput(node, edge.toPort, currentItem.get)
-      monitor ! GClose(node, edge.toPort)
+      val edge = node.outputEdge("current")
+      monitor ! GOutput(node, edge.fromPort, currentItem.get)
+      monitor ! GClose(node, edge.fromPort)
 
       trace(s"START UntilFinished: $node", "UntilFinished")
 

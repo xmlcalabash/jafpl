@@ -30,7 +30,7 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
     }
   }
 
-  override protected def guardResult(when: Node, pass: Boolean): Unit = {
+  protected[runtime] def guardResult(when: Node, pass: Boolean): Unit = {
     guards.put(when, Some(pass))
 
     var stillWaiting = false

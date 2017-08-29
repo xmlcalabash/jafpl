@@ -21,7 +21,7 @@ class UntilSpec extends FlatSpec {
     val decr     = ustep.addAtomic(new Decrement(), "decr")
 
     graph.addEdge(p1, "result", ustep, "source")
-    graph.addEdge(ustep, "source", decr, "source")
+    graph.addEdge(ustep, "current", decr, "source")
     graph.addEdge(decr, "result", ustep, "result")
 
     graph.addEdge(ustep, "result", pipeline, "result")

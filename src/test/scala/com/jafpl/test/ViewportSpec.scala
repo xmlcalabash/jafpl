@@ -21,7 +21,7 @@ class ViewportSpec extends FlatSpec {
     val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(prod, "result", viewport, "source")
-    graph.addEdge(viewport, "source", uc, "source")
+    graph.addEdge(viewport, "current", uc, "source")
     graph.addEdge(uc, "result", viewport, "result")
     graph.addEdge(viewport, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
@@ -46,7 +46,7 @@ class ViewportSpec extends FlatSpec {
     val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(prod, "result", viewport, "source")
-    graph.addEdge(viewport, "source", uc, "source")
+    graph.addEdge(viewport, "current", uc, "source")
     graph.addEdge(uc, "result", viewport, "result")
     graph.addEdge(viewport, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")

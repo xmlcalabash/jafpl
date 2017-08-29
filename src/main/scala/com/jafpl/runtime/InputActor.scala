@@ -2,7 +2,9 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.graph.Node
+import com.jafpl.messages.Metadata
 import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput}
+import com.jafpl.util.PipelineMessage
 
 private[runtime] class InputActor(private val monitor: ActorRef,
                                   private val runtime: GraphRuntime,
@@ -16,7 +18,7 @@ private[runtime] class InputActor(private val monitor: ActorRef,
   }
 
   private def runIfReady(): Unit = {
-    trace(s"RNIFR $node $readyToRun ${consumer.closed}", "StepExec")
+    trace(s"RUNIFRDY $node ready:$readyToRun cloesd:${consumer.closed}", "StepExec")
     if (readyToRun && consumer.closed) {
       for (item <- consumer.items) {
         monitor ! GOutput(node, "result", item)

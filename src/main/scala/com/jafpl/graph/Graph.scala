@@ -610,19 +610,7 @@ class Graph(listener: Option[ErrorListener]) {
             }
 
             // It's always ok to drop outputs on the floor.
-            /*
-            map = mutable.HashSet.empty[String] ++ atomic.step.get.outputSpec.ports()
-            for (port <- node.outputs) {
-              if (map.contains(port)) {
-                map -= port
-              }
-            }
-            if (map.nonEmpty) {
-              val port = map.toList.head
-              error(new GraphException(s"Required output '$port' missing: $atomic", node.location))
-            }
-            */
-            
+
             map = mutable.HashSet.empty[String] ++ atomic.step.get.bindingSpec.bindings
             for (varname <- node.bindings) {
               if (map.contains(varname)) {
@@ -634,6 +622,19 @@ class Graph(listener: Option[ErrorListener]) {
               error(new GraphException(s"Required variable binding '$varname' missing: $atomic", node.location))
             }
           }
+        case loop: LoopEachStart =>
+          for (in <- loop.inputs) {
+            if (in != "source") {
+              error(new GraphException(s"LoopEach has incorrect input port: $in", node.location))
+            }
+          }
+          /*
+          for (out <- loop.outputs) {
+            if ((out != "current") && (out != "result")) {
+              error(new GraphException(s"LoopEach has incorrect output port: $out", node.location))
+            }
+          }
+          */
         case _ => Unit
       }
     }
