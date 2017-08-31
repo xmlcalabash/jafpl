@@ -1,6 +1,5 @@
 package com.jafpl.test
 
-import com.jafpl.drivers.GraphTest.runtimeConfig
 import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
