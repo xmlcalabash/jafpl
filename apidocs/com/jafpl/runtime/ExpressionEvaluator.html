@@ -252,9 +252,9 @@ invalid or, in the case of a request for a boolean, if it has no boolean value.<
         <div class="values members">
               <h3>Abstract Value Members</h3>
               <ol><li name="com.jafpl.runtime.ExpressionEvaluator#booleanValue" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="booleanValue(expr:String,context:Option[Any],bindings:Option[Map[String,Any]]):Boolean"></a><a id="booleanValue(String,Option[Any],Option[Map[String,Any]]):Boolean"></a>
+      <a id="booleanValue(expr:String,context:List[Any],bindings:Map[String,Any]):Boolean"></a><a id="booleanValue(String,List[Any],Map[String,Any]):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#booleanValue(expr:String,context:Option[Any],bindings:Option[Map[String,Any]]):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#booleanValue(expr:String,context:List[Any],bindings:Map[String,Any]):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -263,15 +263,15 @@ invalid or, in the case of a request for a boolean, if it has no boolean value.<
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">booleanValue</span><span class="params">(<span name="expr">expr: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="context">context: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>, <span name="bindings">bindings: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Any">Any</span>]]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+        <span class="name">booleanValue</span><span class="params">(<span name="expr">expr: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="context">context: <span class="extype" name="scala.List">List</span>[<span class="extype" name="scala.Any">Any</span>]</span>, <span name="bindings">bindings: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       
       <p class="shortcomment cmt">Evaluate an expression and cast the result to a boolean.</p><div class="fullcomment"><div class="comment cmt"><p>Evaluate an expression and cast the result to a boolean.
 </p></div><dl class="paramcmts block"><dt class="param">expr</dt><dd class="cmt"><p>The expression to evaluate.</p></dd><dt class="param">context</dt><dd class="cmt"><p>An optional, single item that is flowing through the pipeline.</p></dd><dt class="param">bindings</dt><dd class="cmt"><p>Any variable bindings that are provided for the expression.</p></dd><dt>returns</dt><dd class="cmt"><p>The boolean value of the computed expression.</p></dd></dl></div>
     </li><li name="com.jafpl.runtime.ExpressionEvaluator#value" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="value(expr:String,context:Option[Any],bindings:Option[Map[String,Any]]):Any"></a><a id="value(String,Option[Any],Option[Map[String,Any]]):Any"></a>
+      <a id="value(expr:String,context:List[Any],bindings:Map[String,Any]):Any"></a><a id="value(String,List[Any],Map[String,Any]):Any"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#value(expr:String,context:Option[Any],bindings:Option[Map[String,Any]]):Any" title="Permalink">
+      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#value(expr:String,context:List[Any],bindings:Map[String,Any]):Any" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -280,7 +280,7 @@ invalid or, in the case of a request for a boolean, if it has no boolean value.<
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">value</span><span class="params">(<span name="expr">expr: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="context">context: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>, <span name="bindings">bindings: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Any">Any</span>]]</span>)</span><span class="result">: <span class="extype" name="scala.Any">Any</span></span>
+        <span class="name">value</span><span class="params">(<span name="expr">expr: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="context">context: <span class="extype" name="scala.List">List</span>[<span class="extype" name="scala.Any">Any</span>]</span>, <span name="bindings">bindings: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Any">Any</span></span>
       </span>
       
       <p class="shortcomment cmt">Evaluate an expression.</p><div class="fullcomment"><div class="comment cmt"><p>Evaluate an expression.</p><p>The <code>expr</code> is evaluated according to whatever grammar the evaluator supports. The context is
