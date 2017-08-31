@@ -29,10 +29,24 @@ class Binding protected[jafpl] (override val graph: Graph,
   }
 
   private[graph] override def inputsOk(): Boolean = {
-    inputs.isEmpty || ((inputs.size == 1) && inputs.contains("source"))
+    var valid = true
+    for (port <- inputs) {
+      if ((port != "#bindings") && (port != "source")) {
+        valid = false
+        logger.error(s"Invalid input binding on variable: $port")
+      }
+    }
+    valid
   }
 
   private[graph] override def outputsOk(): Boolean = {
-    outputs.isEmpty
+    var valid = true
+    for (port <- outputs) {
+      if (port != "result") {
+        valid = false
+        logger.error(s"Invalid output binding on variable: $port")
+      }
+    }
+    valid
   }
 }

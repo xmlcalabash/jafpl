@@ -7,24 +7,26 @@ import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput}
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 private[runtime] class VariableActor(private val monitor: ActorRef,
                                      private val runtime: GraphRuntime,
                                      private val binding: Binding)
   extends NodeActor(monitor, runtime, binding)  {
-  var exprContext = Option.empty[ItemMessage]
+  var exprContext = ListBuffer.empty[Any]
   val bindings = mutable.HashMap.empty[String, Any]
 
   override protected def input(port: String, msg: Message): Unit = {
     msg match {
       case item: ItemMessage =>
         assert(port == "source")
-        trace(s"BCNXT $item", "Bindings")
-        exprContext = Some(item)
+        trace(s"RECEIVED binding context", "Bindings")
+        exprContext += item.item
       case binding: BindingMessage =>
         assert(port == "#bindings")
-        trace(s"BOUND ${binding.name}=${binding.item}", "Bindings")
+        trace(s"RECVBIND ${binding.name}=${binding.item}", "Bindings")
         bindings.put(binding.name, binding.item)
+        openBindings -= binding.name
       case _ =>
         monitor ! GException(None,
           new PipelineException("badmessage", s"Unexpected message on $msg on $port", binding.location))
@@ -44,10 +46,12 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
       if (sbindings != "") {
         sbindings = " (with " + sbindings + ")"
       }
-      trace(s"CMPUT ${binding.name}=${binding.expression}$sbindings", "Bindings")
+      trace(s"COMPUTE= ${binding.name}=${binding.expression}$sbindings", "Bindings")
     }
 
-    val msg = new BindingMessage(binding.name, binding.expression.get)
+    val answer = runtime.dynamicContext.expressionEvaluator().value(binding.expression.get, exprContext.toList, bindings.toMap)
+
+    val msg = new BindingMessage(binding.name, answer)
     monitor ! GOutput(binding, "result", msg)
     monitor ! GClose(binding, "result")
     monitor ! GFinished(binding)

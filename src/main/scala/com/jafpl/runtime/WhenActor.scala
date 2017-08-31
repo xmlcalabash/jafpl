@@ -7,20 +7,21 @@ import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GException, GGuardResult, GStart}
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 private[runtime] class WhenActor(private val monitor: ActorRef,
                                  private val runtime: GraphRuntime,
                                  private val node: WhenStart) extends StartActor(monitor, runtime, node)  {
   var readyToCheck = false
   var recvContext = false
-  var contextItem = Option.empty[ItemMessage]
+  var contextItem = ListBuffer.empty[Any]
   val bindings = mutable.HashMap.empty[String, Any]
 
   override protected def input(port: String, msg: Message): Unit = {
     msg match {
       case item: ItemMessage =>
         assert(port == "condition")
-        contextItem = Some(item)
+        contextItem += item.item
       case binding: BindingMessage =>
         assert(port == "#bindings")
         bindings.put(binding.name, binding.item)
@@ -53,7 +54,7 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
 
   private def checkIfReady(): Unit = {
     if (readyToCheck && recvContext) {
-      val pass = runtime.dynamicContext.expressionEvaluator().booleanValue(node.testExpr, contextItem, Some(bindings.toMap))
+      val pass = runtime.dynamicContext.expressionEvaluator().booleanValue(node.testExpr, contextItem.toList, bindings.toMap)
       monitor ! GGuardResult(node, pass)
     }
   }

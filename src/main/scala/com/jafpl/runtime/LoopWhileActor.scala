@@ -7,11 +7,12 @@ import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 private[runtime] class LoopWhileActor(private val monitor: ActorRef,
                                       private val runtime: GraphRuntime,
                                       private val node: LoopWhileStart) extends StartActor(monitor, runtime, node)  {
-  var currentItem = Option.empty[ItemMessage]
+  private val currentItem = ListBuffer.empty[ItemMessage]
   var running = false
   var looped = false
   val bindings = mutable.HashMap.empty[String, Any]
@@ -33,18 +34,15 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
   override protected def input(port: String, msg: Message): Unit = {
     msg match {
       case item: ItemMessage =>
-        if (currentItem.isDefined) {
+        if (currentItem.nonEmpty) {
           monitor ! GException(None,
             new PipelineException("noseq", "Sequence not allowed on while", node.location))
           return
         }
-        currentItem = Some(item)
-        val testItem = if (currentItem.isDefined) {
-          Some(currentItem.get.item)
-        } else {
-          None
-        }
-        initiallyTrue = node.tester.test(testItem, Some(bindings.toMap))
+        currentItem += item
+        val testItem = ListBuffer.empty[Any]
+        testItem += currentItem.head.item
+        initiallyTrue = node.tester.test(testItem.toList, bindings.toMap)
         trace(s"INTRU While: $initiallyTrue", "While")
       case item: BindingMessage =>
         bindings.put(item.name, item.item)
@@ -57,7 +55,8 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
   }
 
   protected[runtime] def loop(item: ItemMessage): Unit = {
-    currentItem = Some(item)
+    currentItem.clear()
+    currentItem += item
     looped = true
   }
 
@@ -66,13 +65,13 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
   }
 
   private def runIfReady(): Unit = {
-    trace(s"RUNIFRDY $node (running:$running ready:$readyToRun current:${currentItem.isDefined}", "While")
-    if (!running && readyToRun && currentItem.isDefined) {
+    trace(s"RUNIFRDY $node (running:$running ready:$readyToRun current:${currentItem.nonEmpty}", "While")
+    if (!running && readyToRun && currentItem.nonEmpty) {
       running = true
 
       if (initiallyTrue) {
         val edge = node.outputEdge("current")
-        monitor ! GOutput(node, edge.fromPort, currentItem.get)
+        monitor ! GOutput(node, edge.fromPort, currentItem.head)
         monitor ! GClose(node, edge.fromPort)
         for (child <- node.children) {
           monitor ! GStart(child)
@@ -84,14 +83,16 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def finished(): Unit = {
-    val pass = node.tester.test(Some(currentItem.get.item), Some(bindings.toMap))
+    val testItem = ListBuffer.empty[Any]
+    testItem += currentItem.head.item
+    val pass = node.tester.test(testItem.toList, bindings.toMap)
 
-    trace(s"CHKWHILE condition: $pass: ${currentItem.get.item}", "While")
+    trace(s"CHKWHILE condition: $pass: ${currentItem.head.item}", "While")
 
     if (pass) {
       monitor ! GReset(node)
     } else {
-      monitor ! GOutput(node, "result", currentItem.get)
+      monitor ! GOutput(node, "result", currentItem.head)
       // now close the outputs
       for (output <- node.outputs) {
         if (!node.inputs.contains(output)) {

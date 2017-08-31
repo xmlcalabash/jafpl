@@ -150,7 +150,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   private def runIfReady(): Unit = {
-    trace(s"RUNIFRDY $node (ready:$readyToRun inputs ready:${openInputs.isEmpty} bindings ready:${openBindings.isEmpty}", "StepExec")
+    trace(s"RUNIFRDY $node (ready:$readyToRun inputs:${openInputs.isEmpty} bindings:${openBindings.isEmpty})", "StepExec")
 
     if (readyToRun) {
       if (openInputs.isEmpty && openBindings.isEmpty) {
@@ -160,7 +160,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           trace(s"........ $port open", "StepExec")
         }
         for (varname <- openBindings) {
-          trace(s"........ $varname binding opne", "StepExec")
+          trace(s"........ $varname binding open", "StepExec")
         }
       }
     }

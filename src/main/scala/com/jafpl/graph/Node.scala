@@ -3,6 +3,7 @@ package com.jafpl.graph
 import com.jafpl.exceptions.GraphException
 import com.jafpl.steps.Step
 import com.jafpl.util.UniqueId
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable.ListBuffer
 import scala.xml.UnprefixedAttribute
@@ -20,6 +21,7 @@ import scala.xml.UnprefixedAttribute
 abstract class Node(val graph: Graph,
                                      val step: Option[Step],
                                      val userLabel: Option[String]) {
+  protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
   private var _start: Option[ContainerStart] = None
   private val _name: String = if (userLabel.isDefined) {
     val regex = """([\p{L}_][-\p{L}_\p{N}]*)""".r

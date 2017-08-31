@@ -7,7 +7,7 @@ import com.jafpl.steps.DataConsumer
 import scala.collection.mutable
 
 class PrimitiveRuntimeConfiguration(val traceAll: Boolean) extends RuntimeConfiguration() {
-  private val evaluator = new PrimitiveExpressionEvaluator()
+  private val evaluator = new PrimitiveExpressionEvaluator(this)
   private val enabledTraces = mutable.HashSet.empty[String]
   private val disabledTraces = mutable.HashSet.empty[String]
 

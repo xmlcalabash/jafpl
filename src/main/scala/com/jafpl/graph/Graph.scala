@@ -485,7 +485,7 @@ class Graph(listener: Option[ErrorListener]) {
     for (edge <- _edges) {
       if (edge.to == node) {
         edge match {
-          case bedge: BindingEdge => Unit
+          //case bedge: BindingEdge => Unit
           case _ => ports.add(edge.toPort)
         }
       }
@@ -498,7 +498,7 @@ class Graph(listener: Option[ErrorListener]) {
     for (edge <- _edges) {
       if (edge.from == node) {
         edge match {
-          case bedge: BindingEdge => Unit
+          //case bedge: BindingEdge => Unit
           case _ => ports.add(edge.fromPort)
         }
       }
@@ -630,29 +630,14 @@ class Graph(listener: Option[ErrorListener]) {
               error(new GraphException(s"LoopEach has incorrect input port: $in", node.location))
             }
           }
-          /*
-          for (out <- loop.outputs) {
-            if ((out != "current") && (out != "result")) {
-              error(new GraphException(s"LoopEach has incorrect output port: $out", node.location))
-            }
-          }
-          */
         case _ => Unit
       }
     }
 
     // For every case where an outbound edge has more than one connection,
-    // insert a splitter so that it has only one outbound edge. Note
-    // that there's a little special-casing for the bindings.
+    // insert a splitter so that it has only one outbound edge.
     for (node <- nodes) {
-      val isBindingOutput = node.isInstanceOf[Binding]
-      val ports = if (isBindingOutput) {
-        Set("result")
-      } else {
-        node.outputs
-      }
-
-      for (port <- ports) {
+      for (port <- node.outputs) {
         val edges = edgesFrom(node, port)
         if (edges.length > 1) {
           val splitter = if (node.parent.isDefined) {
@@ -666,10 +651,9 @@ class Graph(listener: Option[ErrorListener]) {
             pl.asInstanceOf[ContainerStart].addSplitter()
           }
 
-          if (isBindingOutput) {
-            addBindingEdge(node.asInstanceOf[Binding], splitter)
-          } else {
-            addEdge(node, port, splitter, "source")
+          node match {
+            case bnode: Binding => addBindingEdge(bnode, splitter)
+            case _ => addEdge(node, port, splitter, "source")
           }
 
           var count = 1

@@ -8,8 +8,4 @@ private[jafpl] class BindingEdge(override val graph: Graph,
   def this(graph: Graph, from: Binding, to: Node) {
     this(graph, from, "result", to)
   }
-
-  override def toString: String = {
-    from + "." + from.name + " => " + to
-  }
 }
