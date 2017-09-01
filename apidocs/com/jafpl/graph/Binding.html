@@ -283,9 +283,9 @@ At runtime, the association is between the name and its computed value.</p><p>Va
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.jafpl.graph.Binding#&lt;init&gt;" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(graph:com.jafpl.graph.Graph,name:String):com.jafpl.graph.Binding"></a><a id="&lt;init&gt;:Binding"></a>
+      <a id="&lt;init&gt;(graph:com.jafpl.graph.Graph,name:String,expression:Option[Any]):com.jafpl.graph.Binding"></a><a id="&lt;init&gt;:Binding"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/Binding.html#&lt;init&gt;(graph:com.jafpl.graph.Graph,name:String):com.jafpl.graph.Binding" title="Permalink">
+      <a href="../../../com/jafpl/graph/Binding.html#&lt;init&gt;(graph:com.jafpl.graph.Graph,name:String,expression:Option[Any]):com.jafpl.graph.Binding" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -294,23 +294,7 @@ At runtime, the association is between the name and its computed value.</p><p>Va
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">Binding</span><span class="params">(<span name="graph">graph: <a href="Graph.html" class="extype" name="com.jafpl.graph.Graph">Graph</a></span>, <span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../index.html" class="extype" name="com.jafpl">com.jafpl</a>] </dd></dl></div>
-    </li><li name="com.jafpl.graph.Binding#&lt;init&gt;" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(graph:com.jafpl.graph.Graph,name:String,expression:Option[String]):com.jafpl.graph.Binding"></a><a id="&lt;init&gt;:Binding"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/graph/Binding.html#&lt;init&gt;(graph:com.jafpl.graph.Graph,name:String,expression:Option[String]):com.jafpl.graph.Binding" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">new</span>
-      </span>
-      <span class="symbol">
-        <span class="name">Binding</span><span class="params">(<span name="graph">graph: <a href="Graph.html" class="extype" name="com.jafpl.graph.Graph">Graph</a></span>, <span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span>
+        <span class="name">Binding</span><span class="params">(<span name="graph">graph: <a href="Graph.html" class="extype" name="com.jafpl.graph.Graph">Graph</a></span>, <span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span>
       </span>
       
       <p class="shortcomment cmt">Use the <code>addBinding()</code> method on <a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">com.jafpl.graph.ContainerStart</a> to construct a binding.</p><div class="fullcomment"><div class="comment cmt"><p>Use the <code>addBinding()</code> method on <a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">com.jafpl.graph.ContainerStart</a> to construct a binding.</p></div><dl class="paramcmts block"><dt class="param">graph</dt><dd class="cmt"><p>The graph into which this node is to be inserted.</p></dd><dt class="param">name</dt><dd class="cmt"><p>The variable's name</p></dd><dt class="param">expression</dt><dd class="cmt"><p>Its initializer expression</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../index.html" class="extype" name="com.jafpl">com.jafpl</a>] </dd></dl></div>
@@ -512,9 +496,9 @@ order, you can impose one by saying that <code>A.dependsOn(B)</code>.
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="com.jafpl.graph.Binding#expression" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="expression:Option[String]"></a>
+      <a id="expression:Option[Any]"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/Binding.html#expression:Option[String]" title="Permalink">
+      <a href="../../../com/jafpl/graph/Binding.html#expression:Option[Any]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -523,7 +507,7 @@ order, you can impose one by saying that <code>A.dependsOn(B)</code>.
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">expression</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+        <span class="name">expression</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>
       </span>
       
       
@@ -711,8 +695,7 @@ node is always appended to the label.</p></div><dl class="attributes block"> <dt
         <span class="name">location</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>
       </span>
       
-      <p class="shortcomment cmt">The node's location.</p><div class="fullcomment"><div class="comment cmt"><p>The node's location.</p><p>The node location will be used for reporting (for example in errors). If no location
-has been provided, <a href="NodeLocation$.html#UNKNOWN:com.jafpl.graph.NodeLocation" class="extmbr" name="com.jafpl.graph.NodeLocation#UNKNOWN">com.jafpl.graph.NodeLocation.UNKNOWN</a> is returned.
+      <p class="shortcomment cmt">The node's location.</p><div class="fullcomment"><div class="comment cmt"><p>The node's location.</p><p>The node location will be used for reporting (for example in errors).
 </p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
     </li><li name="com.jafpl.graph.Node#location_=" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="location_=(loc:com.jafpl.graph.Location):Unit"></a><a id="location_=(Location):Unit"></a>
@@ -826,7 +809,7 @@ has been provided, <a href="NodeLocation$.html#UNKNOWN:com.jafpl.graph.NodeLocat
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../index.html" class="extype" name="com.jafpl">com.jafpl</a>] </dd><dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
-    </li><li name="com.jafpl.graph.Node#outputs" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="com.jafpl.graph.Binding#outputs" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="outputs:Set[String]"></a>
       <span class="permalink">
       <a href="../../../com/jafpl/graph/Binding.html#outputs:Set[String]" title="Permalink">
@@ -842,7 +825,7 @@ has been provided, <a href="NodeLocation$.html#UNKNOWN:com.jafpl.graph.NodeLocat
       </span>
       
       <p class="shortcomment cmt">The names of this step's output ports.</p><div class="fullcomment"><div class="comment cmt"><p>The names of this step's output ports.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The output port names.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The output port names.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.graph.Binding">Binding</a> → <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
     </li><li name="com.jafpl.graph.Node#parent" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="parent:Option[com.jafpl.graph.ContainerStart]"></a><a id="parent:Option[ContainerStart]"></a>
       <span class="permalink">

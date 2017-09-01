@@ -246,9 +246,9 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.jafpl.runtime.GraphRuntime#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(graph:com.jafpl.graph.Graph,dynamicContext:com.jafpl.runtime.RuntimeConfiguration):com.jafpl.runtime.GraphRuntime"></a><a id="&lt;init&gt;:GraphRuntime"></a>
+      <a id="&lt;init&gt;(graph:com.jafpl.graph.Graph,runtime:com.jafpl.runtime.RuntimeConfiguration):com.jafpl.runtime.GraphRuntime"></a><a id="&lt;init&gt;:GraphRuntime"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#&lt;init&gt;(graph:com.jafpl.graph.Graph,dynamicContext:com.jafpl.runtime.RuntimeConfiguration):com.jafpl.runtime.GraphRuntime" title="Permalink">
+      <a href="../../../com/jafpl/runtime/GraphRuntime.html#&lt;init&gt;(graph:com.jafpl.graph.Graph,runtime:com.jafpl.runtime.RuntimeConfiguration):com.jafpl.runtime.GraphRuntime" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -257,10 +257,10 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">GraphRuntime</span><span class="params">(<span name="graph">graph: <a href="../graph/Graph.html" class="extype" name="com.jafpl.graph.Graph">Graph</a></span>, <span name="dynamicContext">dynamicContext: <a href="RuntimeConfiguration.html" class="extype" name="com.jafpl.runtime.RuntimeConfiguration">RuntimeConfiguration</a></span>)</span>
+        <span class="name">GraphRuntime</span><span class="params">(<span name="graph">graph: <a href="../graph/Graph.html" class="extype" name="com.jafpl.graph.Graph">Graph</a></span>, <span name="runtime">runtime: <a href="RuntimeConfiguration.html" class="extype" name="com.jafpl.runtime.RuntimeConfiguration">RuntimeConfiguration</a></span>)</span>
       </span>
       
-      <p class="shortcomment cmt">A graph runtime.</p><div class="fullcomment"><div class="comment cmt"><p>A graph runtime.</p></div><dl class="paramcmts block"><dt class="param">graph</dt><dd class="cmt"><p>The graph to execute.</p></dd><dt class="param">dynamicContext</dt><dd class="cmt"><p>Runtime context information for the execution.</p></dd></dl></div>
+      <p class="shortcomment cmt">A graph runtime.</p><div class="fullcomment"><div class="comment cmt"><p>A graph runtime.</p></div><dl class="paramcmts block"><dt class="param">graph</dt><dd class="cmt"><p>The graph to execute.</p></dd><dt class="param">runtime</dt><dd class="cmt"><p>Runtime context information for the execution.</p></dd></dl></div>
     </li></ol>
             </div>
 
@@ -378,22 +378,6 @@ is undefined.
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.jafpl.runtime.GraphRuntime#dynamicContext" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="dynamicContext:com.jafpl.runtime.RuntimeConfiguration"></a><a id="dynamicContext:RuntimeConfiguration"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#dynamicContext:com.jafpl.runtime.RuntimeConfiguration" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">dynamicContext</span><span class="result">: <a href="RuntimeConfiguration.html" class="extype" name="com.jafpl.runtime.RuntimeConfiguration">RuntimeConfiguration</a></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -714,6 +698,22 @@ discarded.
       <p class="shortcomment cmt">Runs the pipeline.</p><div class="fullcomment"><div class="comment cmt"><p>Runs the pipeline.</p><p>This method starts execution of the pipeline and then returns immediately.
 The pipeline will continue to run in other threads.</p><p>To determine if execution has completed, check the <code>finished</code> value.
 </p></div></div>
+    </li><li name="com.jafpl.runtime.GraphRuntime#runtime" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="runtime:com.jafpl.runtime.RuntimeConfiguration"></a><a id="runtime:RuntimeConfiguration"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/GraphRuntime.html#runtime:com.jafpl.runtime.RuntimeConfiguration" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">runtime</span><span class="result">: <a href="RuntimeConfiguration.html" class="extype" name="com.jafpl.runtime.RuntimeConfiguration">RuntimeConfiguration</a></span>
+      </span>
+      
+      
     </li><li name="com.jafpl.runtime.GraphRuntime#started" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="started:Boolean"></a>
       <span class="permalink">

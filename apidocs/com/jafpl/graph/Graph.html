@@ -675,6 +675,22 @@ ports into which data can be poured before the pipeline is run.
       
       <p class="shortcomment cmt">Adds a pipeline to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a pipeline to the graph.
 </p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The constructed Pipeline object.</p></dd></dl></div>
+    </li><li name="com.jafpl.graph.Graph#addSink" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="addSink():com.jafpl.graph.Sink"></a><a id="addSink():Sink"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addSink():com.jafpl.graph.Sink" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addSink</span><span class="params">()</span><span class="result">: <span class="extype" name="com.jafpl.graph.Sink">Sink</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addSplitter" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="addSplitter():com.jafpl.graph.Splitter"></a><a id="addSplitter():Splitter"></a>
       <span class="permalink">
@@ -742,9 +758,9 @@ ports into which data can be poured before the pipeline is run.
       <p class="shortcomment cmt">Adds an until to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds an until to the graph.
 </p></div><dl class="paramcmts block"><dt class="param">comparator</dt><dd class="cmt"><p>The comparator.</p></dd><dt class="param">label</dt><dd class="cmt"><p>An optional, user-defined label.</p></dd><dt>returns</dt><dd class="cmt"><p>The constructed for-each.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addVariable" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addVariable(name:String,expression:String):com.jafpl.graph.Binding"></a><a id="addVariable(String,String):Binding"></a>
+      <a id="addVariable(name:String,expression:Any):com.jafpl.graph.Binding"></a><a id="addVariable(String,Any):Binding"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addVariable(name:String,expression:String):com.jafpl.graph.Binding" title="Permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addVariable(name:String,expression:Any):com.jafpl.graph.Binding" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -753,7 +769,7 @@ ports into which data can be poured before the pipeline is run.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addVariable</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="Binding.html" class="extype" name="com.jafpl.graph.Binding">Binding</a></span>
+        <span class="name">addVariable</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <a href="Binding.html" class="extype" name="com.jafpl.graph.Binding">Binding</a></span>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
@@ -903,6 +919,22 @@ such exception will be thrown. (All of the exceptions will be sent to the graph 
 if there is one.)</p><p>* After a graph is closed, no changes can be made to it.
 * Only valid graphs can be executed.
 </p></div></div>
+    </li><li name="com.jafpl.graph.Graph#dump" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="dump():Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#dump():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">dump</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Dump all the graph objects to stdout.</p>
     </li><li name="com.jafpl.graph.Graph#edges" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="edges:List[com.jafpl.graph.Edge]"></a><a id="edges:List[Edge]"></a>
       <span class="permalink">
