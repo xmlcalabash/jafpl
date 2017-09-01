@@ -14,18 +14,24 @@ package com.jafpl.graph
   */
 class Binding protected[jafpl] (override val graph: Graph,
                                 val name: String,
-                                val expression: Option[String]) extends Node(graph,None,None) {
-  private var _start: Option[ContainerStart] = None
-  private val _label = s"${name}-$id"
+                                val expression: Option[Any])
+  extends Node(graph, None, None) {
 
-  protected[jafpl] def this(graph: Graph, name: String) {
-    this(graph, name, None)
-  }
+  private var _start: Option[ContainerStart] = None
+  private val _label = s"$name-$id"
 
   override def label: String = _label
 
   override def toString: String = {
     s"{$label}"
+  }
+
+  override def outputs: Set[String] = {
+    if (super.outputs.isEmpty) {
+      Set("result")
+    } else {
+      super.outputs
+    }
   }
 
   private[graph] override def inputsOk(): Boolean = {

@@ -27,7 +27,7 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
   /** The children of this container. */
   def children: List[Node] = _children.toList
 
-  protected[jafpl] def containerEnd = end
+  protected[jafpl] def containerEnd: ContainerEnd = end
 
   private[graph] override def inputsOk(): Boolean = {
     if (inputs.nonEmpty) {
@@ -268,7 +268,7 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     *
     * @return The node added.
     */
-  def addVariable(name: String, expression: String): Binding = {
+  def addVariable(name: String, expression: Any): Binding = {
     val binding = graph.addVariable(name, expression)
     addChild(binding)
     binding
@@ -282,6 +282,12 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
 
   protected[graph] def addJoiner(): Joiner = {
     val node = graph.addJoiner()
+    addChild(node)
+    node
+  }
+
+  protected[graph] def addSink(): Sink = {
+    val node = graph.addSink()
     addChild(node)
     node
   }

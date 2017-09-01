@@ -5,6 +5,6 @@ import com.jafpl.util.ItemTester
 
 class PrimitiveItemTester(runtimeConfig: RuntimeConfiguration, expr: String) extends ItemTester {
   override def test(item: List[Any], bindings: Map[String, Any]): Boolean = {
-    runtimeConfig.expressionEvaluator().booleanValue(expr, item, bindings)
+    runtimeConfig.expressionEvaluator.booleanValue(expr, item, bindings)
   }
 }

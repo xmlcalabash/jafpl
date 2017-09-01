@@ -19,8 +19,8 @@ import scala.xml.UnprefixedAttribute
   * @param userLabel An optional user-defined label.
   */
 abstract class Node(val graph: Graph,
-                                     val step: Option[Step],
-                                     val userLabel: Option[String]) {
+                    val step: Option[Step],
+                    val userLabel: Option[String]) {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
   private var _start: Option[ContainerStart] = None
   private val _name: String = if (userLabel.isDefined) {
@@ -48,8 +48,7 @@ abstract class Node(val graph: Graph,
 
   /** The node's location.
     *
-    * The node location will be used for reporting (for example in errors). If no location
-    * has been provided, [[com.jafpl.graph.NodeLocation.UNKNOWN]] is returned.
+    * The node location will be used for reporting (for example in errors).
     */
   def location: Option[Location] = _loc
 
@@ -185,10 +184,14 @@ abstract class Node(val graph: Graph,
         }
 
         val outlist = ListBuffer.empty[xml.Node]
-        for (edge <- graph.edgesFrom(this, "result")) {
-          outlist += xml.Text("\n")
-          outlist += xml.Text(indent + "  ")
-          outlist += <out-edge output-port={ edge.fromPort } input-port={ edge.toPort } destination={ edge.to.id }></out-edge>
+        for (edge <- graph.edgesFrom(this)) {
+          if (edge.fromPort == "result") {
+            outlist += xml.Text("\n")
+            outlist += xml.Text(indent + "  ")
+            outlist += <out-edge output-port={ edge.fromPort } input-port={ edge.toPort } destination={ edge.to.id }></out-edge>
+          } else {
+            logger.error(s"Binding has output edge named ${edge.fromPort}")
+          }
         }
         outlist += xml.Text("\n" + indent)
         nodes += xml.Text(indent)

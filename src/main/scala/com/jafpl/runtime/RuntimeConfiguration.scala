@@ -16,7 +16,7 @@ trait RuntimeConfiguration {
     *
     * @return The evaluator.
     */
-  def expressionEvaluator(): ExpressionEvaluator
+  def expressionEvaluator: ExpressionEvaluator
 
   /** Enable trace events.
     *

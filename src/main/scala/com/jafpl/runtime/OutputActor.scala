@@ -18,7 +18,7 @@ private[runtime] class OutputActor(private val monitor: ActorRef,
       case item: ItemMessage =>
         if (consumer.provider.isDefined) {
           trace(s"DELIVER→ $node.$port → ${consumer.provider.get}.$port", "StepIO")
-          runtime.dynamicContext.deliver(item, consumer.provider.get, port)
+          runtime.runtime.deliver(item, consumer.provider.get, port)
         } else {
           trace(s"↴DELIVER $node.$port (no consumer)", "StepIO")
         }

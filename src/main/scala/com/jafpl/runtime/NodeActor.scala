@@ -49,7 +49,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def traceEnabled(event: String): Boolean = {
-    traces.contains(event) || runtime.dynamicContext.traceEnabled(event)
+    traces.contains(event) || runtime.runtime.traceEnabled(event)
   }
 
   protected def trace(message: String, event: String): Unit = {
@@ -76,7 +76,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     if (node.step.isDefined) {
       trace(s"INITLIZE $node", "StepExec")
       try {
-        node.step.get.initialize(runtime.dynamicContext)
+        node.step.get.initialize(runtime.runtime)
       } catch {
         case cause: Throwable =>
           monitor ! GException(Some(node), cause)
@@ -243,7 +243,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           cardinalities.put(port, card)
           if (node.step.isDefined) {
             trace(s"DELIVER→ ${node.step.get}.$port", "StepIO")
-            runtime.dynamicContext.deliver(message, node.step.get, port)
+            runtime.runtime.deliver(message, node.step.get, port)
           } else {
             trace(s"↴DELIVER $node (no step)", "StepIO")
           }

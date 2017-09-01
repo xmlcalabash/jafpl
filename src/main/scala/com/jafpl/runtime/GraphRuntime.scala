@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.jafpl.exceptions.{GraphException, PipelineException}
-import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopUntilStart, LoopWhileStart, PipelineStart, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
+import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopUntilStart, LoopWhileStart, PipelineStart, Sink, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GNode, GRun, GWatchdog}
 import com.jafpl.steps.{BindingProvider, DataConsumer, DataConsumerProxy}
 import com.jafpl.util.UniqueId
@@ -18,9 +18,9 @@ import scala.collection.mutable
   *
   * @constructor A graph runtime.
   * @param graph The graph to execute.
-  * @param dynamicContext Runtime context information for the execution.
+  * @param runtime Runtime context information for the execution.
   */
-class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
+class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   protected[jafpl] val logger: Logger = LoggerFactory.getLogger(this.getClass)
   private var _system: ActorSystem = _
   private var _monitor: ActorRef = _
@@ -143,7 +143,7 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
     }
 
     if (!finished) {
-      val watchdog = dynamicContext.watchdogTimeout
+      val watchdog = runtime.watchdogTimeout
       if (watchdog < 0) {
         _monitor ! GException(None,
           new PipelineException("invwatchdog", "The watchdog timer value must have a non-negative value", None))
@@ -181,6 +181,8 @@ class GraphRuntime(val graph: Graph, val dynamicContext: RuntimeConfiguration) {
           _system.actorOf(Props(new JoinerActor(_monitor, this, join)), actorName)
         case buf: Buffer =>
           _system.actorOf(Props(new BufferActor(_monitor, this, buf)), actorName)
+        case sink: Sink =>
+          _system.actorOf(Props(new SinkActor(_monitor, this, sink)), actorName)
         case forEach: LoopEachStart =>
           _system.actorOf(Props(new LoopEachActor(_monitor, this, forEach)), actorName)
         case viewport: ViewportStart =>

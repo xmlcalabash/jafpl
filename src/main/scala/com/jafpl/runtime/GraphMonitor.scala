@@ -47,7 +47,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
   }
 
   protected def trace(level: String, message: String, event: String): Unit = {
-    if (traces.contains(event) || runtime.dynamicContext.traceEnabled(event)) {
+    if (traces.contains(event) || runtime.runtime.traceEnabled(event)) {
       level match {
         case "info" => log.info(message)
         case "debug" => log.debug(message)

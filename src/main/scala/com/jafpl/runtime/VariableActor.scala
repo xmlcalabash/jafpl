@@ -49,7 +49,9 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
       trace(s"COMPUTE= ${binding.name}=${binding.expression}$sbindings", "Bindings")
     }
 
-    val answer = runtime.dynamicContext.expressionEvaluator().value(binding.expression.get, exprContext.toList, bindings.toMap)
+    val expreval = runtime.runtime.expressionEvaluator
+
+    val answer = expreval.value(binding.expression.get, exprContext.toList, bindings.toMap)
 
     val msg = new BindingMessage(binding.name, answer)
     monitor ! GOutput(binding, "result", msg)

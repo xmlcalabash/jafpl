@@ -7,13 +7,19 @@ import org.slf4j.{Logger, LoggerFactory}
 class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends ExpressionEvaluator() {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  override def value(expr: String, context: List[Any], bindings: Map[String,Any]): Any = {
+  override def value(expr: Any, context: List[Any], bindings: Map[String,Any]): Any = {
     if (context.size > 1) {
       throw new PipelineException("badconext", "Context contains more than one item", None)
     }
+
+    val strexpr = expr match {
+      case str: String => str
+      case _ => throw new PipelineException("unexpected", s"Unexpected object as expression value: $expr", None)
+    }
+
     val patn = "(\\S+)\\s*([-+*/])\\s*(\\S+)".r
     val digits = "([0-9]+)".r
-    expr match {
+    strexpr match {
       case patn(left, op, right) =>
         val leftv = left match {
           case digits(num) => num.toLong
@@ -30,21 +36,27 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
           case "/" => leftv / rightv
         }
         if (config.traceEnabled("ExprEval")) {
-          logger.info(s"COMPUTED $expr = $result")
+          logger.info(s"COMPUTED $strexpr = $result")
         }
         result
       case _ =>
-        logger.warn("Expression did not match pattern: returning expression string as value: " + expr)
-        expr
+        logger.warn("Expression did not match pattern: returning expression string as value: " + strexpr)
+        strexpr
     }
   }
 
-  override def booleanValue(expr: String, context: List[Any], bindings: Map[String,Any]): Boolean = {
+  override def booleanValue(expr: Any, context: List[Any], bindings: Map[String,Any]): Boolean = {
     if (context.size > 1) {
       throw new PipelineException("badconext", "Context contains more than one item", None)
     }
+
+    val strexpr = expr match {
+      case str: String => str
+      case _ => throw new PipelineException("unexpected", s"Unexpected object as expression value: $expr", None)
+    }
+
     val patn = ". ([<=>]) ([0-9]+)".r
-    expr match {
+    strexpr match {
       case patn(cond, num) =>
         val value = num.toLong
         if (context.nonEmpty) {
@@ -67,7 +79,7 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
           false
         }
       case _ =>
-        ! ( (expr == "") || (expr == "false") || (expr == "0") )
+        ! ( (strexpr == "") || (strexpr == "false") || (strexpr == "0") )
     }
   }
 }

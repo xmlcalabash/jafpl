@@ -21,7 +21,7 @@ trait ExpressionEvaluator {
     * @param bindings Any variable bindings that are provided for the expression.
     * @return The computed value of the expression.
     */
-  def value(expr: String, context: List[Any], bindings: Map[String,Any]): Any
+  def value(expr: Any, context: List[Any], bindings: Map[String,Any]): Any
 
   /**
     * Evaluate an expression and cast the result to a boolean.
@@ -31,5 +31,5 @@ trait ExpressionEvaluator {
     * @param bindings Any variable bindings that are provided for the expression.
     * @return The boolean value of the computed expression.
     */
-  def booleanValue(expr: String, context: List[Any], bindings: Map[String,Any]): Boolean
+  def booleanValue(expr: Any, context: List[Any], bindings: Map[String,Any]): Boolean
 }

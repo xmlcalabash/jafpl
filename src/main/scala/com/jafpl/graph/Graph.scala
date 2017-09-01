@@ -140,7 +140,7 @@ class Graph(listener: Option[ErrorListener]) {
     */
   def addBinding(name: String): Binding = {
     checkOpen()
-    val binding = new Binding(this, name)
+    val binding = new Binding(this, name, None)
     _nodes += binding
     binding
   }
@@ -345,7 +345,15 @@ class Graph(listener: Option[ErrorListener]) {
     loop.addChild(node)
   }
 
-  protected[graph] def addVariable(name: String, expression: String): Binding = {
+  protected[graph] def addSink(): Sink = {
+    checkOpen()
+
+    val node = new Sink(this)
+    _nodes += node
+    node
+  }
+
+  protected[graph] def addVariable(name: String, expression: Any): Binding = {
     checkOpen()
     val binding = new Binding(this, name, Some(expression))
     _nodes += binding
@@ -630,6 +638,11 @@ class Graph(listener: Option[ErrorListener]) {
               error(new GraphException(s"LoopEach has incorrect input port: $in", node.location))
             }
           }
+        case bind: Binding =>
+          if (edgesFrom(bind).isEmpty) {
+            val sink = bind.parent.get.addSink()
+            addEdge(bind, "result", sink, "result")
+          }
         case _ => Unit
       }
     }
@@ -671,6 +684,17 @@ class Graph(listener: Option[ErrorListener]) {
         }
       }
     }
+
+    // For every case where an outbound edge is unconnected, put a sink on it
+    for (node <- nodes) {
+      for (port <- node.outputs) {
+        val edges = edgesFrom(node, port)
+        if (edges.isEmpty) {
+          println(s"EMPTY OUTPUT $node $port")
+        }
+      }
+    }
+
 
     // For every case where an inbound edge has more than one connection,
     // insert a joiner so that it has only one inbound edge
@@ -900,6 +924,17 @@ class Graph(listener: Option[ErrorListener]) {
   private def checkOpen(): Unit = {
     if (!open) {
       throw new GraphException("Changes cannot be made to a closed graph", None)
+    }
+  }
+
+  /** Dump all the graph objects to stdout.
+    */
+  def dump(): Unit = {
+    for (node <- _nodes) {
+      println(node)
+    }
+    for (edge <- _edges) {
+      println(edge)
     }
   }
 
