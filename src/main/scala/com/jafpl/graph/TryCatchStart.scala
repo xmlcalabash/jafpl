@@ -22,9 +22,17 @@ class TryCatchStart private[jafpl] (override val graph: Graph,
     node
   }
 
-  def addCatch(label: String): CatchStart = addCatch(None, List())
-  def addCatch(label: String, code: String): CatchStart = addCatch(None, List(code))
-  def addCatch(label: String, codes: List[String]): CatchStart = addCatch(None, codes)
+  def addCatch(label: String): CatchStart = addCatch(Some(label), List())
+  def addCatch(label: String, code: String): CatchStart = addCatch(Some(label), List(code))
+  def addCatch(label: String, codes: List[String]): CatchStart = addCatch(Some(label), codes)
+
+  def addFinally(label: Option[String]): FinallyStart = {
+    val node = graph.addFinally(label)
+    addChild(node)
+    node
+  }
+
+  def addFinally(label: String): FinallyStart = addFinally(Some(label))
 
   override def addAtomic(step: Step, label: Option[String]): Node = {
     throw new GraphException("Cannot add Atomic steps to Try/Catch", location)

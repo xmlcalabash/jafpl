@@ -7,8 +7,8 @@ import akka.event.Logging
 import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.{ContainerEnd, Graph, Node}
 import com.jafpl.messages.{ItemMessage, Message}
-import com.jafpl.runtime.GraphMonitor.{GAbort, GAbortExecution, GCatch, GCheckGuard, GClose, GException, GFinished, GFinishedViewport, GGuardResult, GLoop, GNode, GOutput, GReset, GRun, GStart, GStop, GStopped, GTrace, GWatchdog}
-import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NGuardResult, NInitialize, NInput, NLoop, NReset, NStart, NStop, NViewportFinished}
+import com.jafpl.runtime.GraphMonitor.{GAbort, GAbortExecution, GCatch, GCheckGuard, GClose, GException, GFinally, GFinished, GFinishedViewport, GGuardResult, GLoop, GNode, GOutput, GReset, GRun, GRunFinally, GStart, GStop, GStopped, GTrace, GWatchdog}
+import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NFinally, NGuardResult, NInitialize, NInput, NLoop, NReset, NRunFinally, NStart, NStop, NViewportFinished}
 
 import scala.collection.mutable
 
@@ -19,6 +19,8 @@ private[runtime] object GraphMonitor {
   case class GReset(node: Node)
   case class GStart(node: Node)
   case class GCatch(node: Node, cause: Throwable)
+  case class GFinally(node: Node)
+  case class GRunFinally(node: Node, cause: Option[Throwable])
   case class GException(node: Option[Node], cause: Throwable)
   case class GOutput(node: Node, port: String, item: Message)
   case class GLoop(node: Node, item: ItemMessage)
@@ -77,7 +79,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
   }
 
   def stopPipeline(): Unit = {
-    trace(s"STOPPING", "X")
+    trace(s"STOPPING", "Run")
     for (node <- unstoppedNodes) {
       actors(node) ! NStop()
     }
@@ -147,6 +149,16 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
       lastMessage = Instant.now()
       trace(s"STRTCTCH $node", "Run")
       actors(node) ! NCatch(cause)
+
+    case GFinally(node) =>
+      lastMessage = Instant.now()
+      trace(s"TELLFINL $node", "Run")
+      actors(node) ! NFinally()
+
+    case GRunFinally(node, cause) =>
+      lastMessage = Instant.now()
+      trace(s"STRTFINL $node", "Run")
+      actors(node) ! NRunFinally(cause)
 
     case GReset(node) =>
       lastMessage = Instant.now()

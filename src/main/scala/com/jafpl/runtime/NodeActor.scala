@@ -6,7 +6,7 @@ import com.jafpl.exceptions.{PipelineException, StepException}
 import com.jafpl.graph.{ContainerStart, Node}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GStopped}
-import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NGuardResult, NInitialize, NInput, NLoop, NReset, NStart, NStop, NTraceDisable, NTraceEnable, NViewportFinished}
+import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NFinally, NGuardResult, NInitialize, NInput, NLoop, NReset, NRunFinally, NStart, NStop, NTraceDisable, NTraceEnable, NViewportFinished}
 import com.jafpl.steps.{DataConsumer, PortSpecification}
 
 import scala.collection.mutable
@@ -17,6 +17,8 @@ private[runtime] object NodeActor {
   case class NAbort()
   case class NStop()
   case class NCatch(cause: Throwable)
+  case class NFinally()
+  case class NRunFinally(cause: Option[Throwable])
   case class NReset()
   case class NInput(port: String, item: Message)
   case class NLoop(item: ItemMessage)
@@ -73,7 +75,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       openBindings.add(input)
     }
     if (node.step.isDefined) {
-      trace(s"INITLIZE $node", "StepExec")
+      trace(s"INITSTEP $node", "StepExec")
       try {
         node.step.get.initialize(runtime.runtime)
       } catch {
@@ -323,6 +325,26 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         case _ =>
           monitor ! GException(None,
             new PipelineException("notcatch", "Attempt to send exception to something that's not a catch", node.location))
+      }
+
+    case NFinally() =>
+      trace(s"FINALLY $node", "StepMessages")
+      this match {
+        case block: TryCatchActor =>
+          block.runFinally()
+        case _ =>
+          monitor ! GException(None,
+            new PipelineException("nottry", s"Attempt to send finally to something that's not a try/catch: $this", node.location))
+      }
+
+    case NRunFinally(cause) =>
+      trace(s"RUNFINAL $node ($cause)", "StepMessages")
+      this match {
+        case block: FinallyActor =>
+          block.startFinally(cause)
+        case _ =>
+          monitor ! GException(None,
+            new PipelineException("notfinally", "Attempt to send run finally to something that's not a finally", node.location))
       }
 
     case NReset() =>

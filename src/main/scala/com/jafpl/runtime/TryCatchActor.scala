@@ -2,14 +2,16 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
-import com.jafpl.graph.{CatchStart, ContainerStart, Joiner, Node, Splitter, TryStart}
-import com.jafpl.runtime.GraphMonitor.{GAbort, GCatch, GClose, GException, GFinished, GStart}
+import com.jafpl.graph.{CatchStart, ContainerStart, FinallyStart, Joiner, Node, Splitter, TryStart}
+import com.jafpl.runtime.GraphMonitor.{GAbort, GCatch, GClose, GException, GFinished, GRunFinally, GStart}
 
 private[runtime] class TryCatchActor(private val monitor: ActorRef,
                                      private val runtime: GraphRuntime,
                                      private val node: ContainerStart) extends StartActor(monitor, runtime, node) {
   var runningTryBlock = true
   var tryblock: Option[TryStart] = None
+  var finblock: Option[FinallyStart] = None
+  var cause = Option.empty[Throwable]
 
   override protected def start(): Unit = {
     readyToRun = true
@@ -22,13 +24,22 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
           monitor ! GStart(block)
         case block: CatchStart =>
           Unit
+        case block: FinallyStart =>
+          finblock = Some(block)
+          monitor ! GStart(block)
         case _ =>
           monitor ! GStart(child)
       }
     }
   }
 
+  def runFinally(): Unit = {
+    monitor ! GRunFinally(finblock.get, cause)
+  }
+
   def exception(cause: Throwable): Unit = {
+    this.cause = Some(cause)
+
     if (runningTryBlock) {
       runningTryBlock = false
 

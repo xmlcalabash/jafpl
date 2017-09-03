@@ -1,11 +1,11 @@
 package com.jafpl.runtime
 
-import akka.actor.{ActorRef, ActorSystem, Props}
+import akka.actor.{ActorRef, ActorSystem, DeadLetter, Props}
 import com.jafpl.exceptions.{GraphException, PipelineException}
-import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, EmptySource, Graph, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopUntilStart, LoopWhileStart, PipelineStart, Sink, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
-import com.jafpl.runtime.GraphMonitor.{GAbortExecution, GClose, GException, GNode, GRun, GWatchdog}
+import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, EmptySource, FinallyStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopUntilStart, LoopWhileStart, PipelineStart, Sink, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
+import com.jafpl.runtime.GraphMonitor.{GAbortExecution, GException, GNode, GRun, GWatchdog}
 import com.jafpl.steps.{BindingProvider, DataConsumer, DataConsumerProxy}
-import com.jafpl.util.UniqueId
+import com.jafpl.util.{DeadLetterListener, UniqueId}
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable
@@ -182,6 +182,9 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
     _system = ActorSystem("jafpl-com-" + UniqueId.nextId)
     _monitor = _system.actorOf(Props(new GraphMonitor(graph, this)), name = "monitor")
 
+    val listener = _system.actorOf(Props[DeadLetterListener])
+    _system.eventStream.subscribe(listener, classOf[DeadLetter])
+
     for (node <- graph.nodes) {
       var actorName = "_" * (7 - node.id.length) + node.id
 
@@ -210,6 +213,8 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
           _system.actorOf(Props(new StartActor(_monitor, this, trycatch)), actorName)
         case trycatch: CatchStart =>
           _system.actorOf(Props(new CatchActor(_monitor, this, trycatch)), actorName)
+        case fin: FinallyStart =>
+          _system.actorOf(Props(new FinallyActor(_monitor, this, fin)), actorName)
         case pipe: PipelineStart =>
           _system.actorOf(Props(new PipelineActor(_monitor, this, pipe)), actorName)
         case group: GroupStart =>

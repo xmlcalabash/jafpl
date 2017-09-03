@@ -1,19 +1,31 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.graph.{CatchStart, ContainerEnd, Node, TryStart}
-import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput}
+import com.jafpl.graph.{CatchStart, ContainerEnd, FinallyStart, Node, TryStart}
+import com.jafpl.runtime.GraphMonitor.{GClose, GFinally, GFinished, GOutput}
 
 private[runtime] class TryCatchEndActor(private val monitor: ActorRef,
                                         private val runtime: GraphRuntime,
                                         private val node: ContainerEnd) extends ConditionalEndActor(monitor, runtime, node)  {
   private var toldStart = false
   private var branchFinished = false
+  private var ranFinally = false
+  private var finblock = Option.empty[FinallyStart]
 
   override protected def reset(): Unit = {
     super.reset()
+
+    for (child <- unfinishedChildren) {
+      child match {
+        case fin: FinallyStart =>
+          finblock = Some(fin)
+        case _ => Unit
+      }
+    }
+
     toldStart = false
     branchFinished = false
+    ranFinally = finblock.isEmpty
   }
 
   override protected[runtime] def finished(otherNode: Node): Unit = {
@@ -35,12 +47,17 @@ private[runtime] class TryCatchEndActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def checkFinished(): Unit = {
-    trace(s"FINIFRDY ${node.start.get}/end ready:$readyToRun inputs:${openInputs.isEmpty} branch:$branchFinished", "StepFinished")
+    trace(s"FINIFRDY ${node.start.get}/end ready:$readyToRun inputs:${openInputs.isEmpty} branch:$branchFinished fin:$ranFinally", "StepFinished")
 
     if (!toldStart && branchFinished) {
-      // As soon one branch finishes, tell the start that we're done
-      toldStart = true
-      monitor ! GFinished(node)
+      if (ranFinally) {
+        // If one branch has finished, and we've run the finally block, tell start we're done
+        toldStart = true
+        monitor ! GFinished(node)
+      } else {
+        ranFinally = true
+        monitor ! GFinally(node.start.get)
+      }
     }
 
     if (readyToRun) {

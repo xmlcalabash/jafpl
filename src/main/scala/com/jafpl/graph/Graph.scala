@@ -317,6 +317,18 @@ class Graph(listener: Option[ErrorListener]) {
     start
   }
 
+  protected[graph] def addFinally(label: Option[String]): FinallyStart = {
+    checkOpen()
+
+    val end = new ContainerEnd(this)
+    val start = new FinallyStart(this, end, label)
+    end.parent = start
+    end.start = start
+    _nodes += start
+    _nodes += end
+    start
+  }
+
   protected[graph] def addSplitter(): Splitter = {
     checkOpen()
 
@@ -758,7 +770,7 @@ class Graph(listener: Option[ErrorListener]) {
           val start = end.start.get
           for (port <- node.inputs) {
             if (!start.outputs.contains(port)) {
-              println(s"==> $node.$port")
+              logger.debug(s"Output $port on $start unread, adding sink")
               val sink = if (start.parent.isDefined) {
                 start.parent.get.addSink()
               } else {
@@ -791,9 +803,10 @@ class Graph(listener: Option[ErrorListener]) {
           val end = start.containerEnd
           for (port <- start.outputs) {
             val skipCatchErrors = start.isInstanceOf[CatchStart] && (port == "errors")
+            val skipFinallyErrors = start.isInstanceOf[FinallyStart] && (port == "errors")
             val skipLoopCurrent = start.isInstanceOf[LoopStart] && (port == "current")
             val edges = edgesTo(node, port)
-            if (edges.isEmpty && !skipCatchErrors && !skipLoopCurrent) {
+            if (edges.isEmpty && !skipCatchErrors && !skipFinallyErrors && !skipLoopCurrent) {
               val iedges = edgesTo(end, port)
               if (iedges.isEmpty) {
                 logger.debug(s"Adding empty source to feed output $start.$port")
