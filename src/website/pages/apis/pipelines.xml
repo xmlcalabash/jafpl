@@ -58,7 +58,7 @@ is a primitive stub implementation. It does the bare minimum required.</para>
 </callout>
 <callout arearefs="x.runtime">
 <para>A
-<classname xlink:href="/apidocs/com/jafpl/runtime/GraphRuntime.html">Runtime</classname>
+<classname xlink:href="/apidocs/com/jafpl/runtime/GraphRuntime.html">GraphRuntime</classname>
 can actually evaluate the pipeline.</para>
 </callout>
 <callout arearefs="x.run">
@@ -101,7 +101,7 @@ pipeline just drops the output on the floor.</para>
 <para>Data flow involves both producers and consumers. Let’s introduce a consumer
 step. The <classname>Consumer</classname> will read an arbitrary number of items
 on it’s input “source” port. When it runs, it will print them on the console. It
-produces no output. <xref linkend="example3"/> uses both the producer and
+produces no output. The <xref linkend="example3"/> pipeline uses both the producer and
 the consumer.</para>
 
 <example xml:id="example3">
@@ -131,7 +131,7 @@ the “source” port of <code>consumer</code>.</para>
 the canonical “Hello, world” message.</para>
 
 <para>The <classname>Identity</classname> step simply copies its input to its output,
-so it’s always safe to add them. Let’s make our pipeline a few steps longer.</para>
+so it’s always safe to add them to a flow. Let’s make our pipeline a few steps longer.</para>
 
 <example xml:id="example4">
 <title>Longer producer/consumer pipeline</title>
@@ -162,7 +162,7 @@ they are connected.</para>
 “b” <coref linkend="x.linkb"/>, then “a” <coref linkend="x.linka"/>, then
 “consumer”.</para>
 
-<para>Let’s do something transformative this time. Pipelines to do
+<para>Let’s do something transformative this time. Pipelines that do
 nothing more than copy their inputs around aren’t very interesting.
 The <classname>Uppercase</classname> step takes a single string input
 on its “source” port and returns only the words in the string, shifted
@@ -188,7 +188,7 @@ but we’ll come back to that.)</para>
 
 <para>If you run this pipeline, it produces “HELLO WORLD”.</para>
 
-<para>What happens if you change the produce so that it actually produces
+<para>What happens if you change the producer so that it actually produces
 a sequence? (Feel free to got try it out!)</para>
 
 <para>The answer is, an error. The uppercase step does not accept a sequence,
@@ -211,7 +211,7 @@ its input.</para>
   val consumer = pipeline.addAtomic(new Consumer(), "consumer")
 
   graph.addEdge(producer, "result", loop, "source") <co xml:id="x.edge2"/>
-  graph.addEdge(loop, "source", upper, "source")    <co xml:id="x.edge3"/>
+  graph.addEdge(loop, "current", upper, "source")   <co xml:id="x.edge3"/>
   graph.addEdge(upper, "result", loop, "result")    <co xml:id="x.edge4"/>
   graph.addEdge(loop, "result", consumer, "source") <co xml:id="x.edge5"/>
 
@@ -230,13 +230,13 @@ its input.</para>
 </callout>
 <callout arearefs="x.edge2">
 <para>The producer output is connected to the loop. A for-each loop has a single
-input port, source.
+input port, <code>source</code>.
 </para>
 </callout>
 <callout arearefs="x.edge3">
-<para>From <emphasis>inside</emphasis> the loop, reading from the loop source
-reads the current input document in the loop. This is connected to the source
-for the upper step.
+<para>From <emphasis>inside</emphasis> the loop, reading from the
+loop’s <code>current</code> port reads the current input document in
+the loop. This is connected to the source for the upper step.
 </para>
 </callout>
 <callout arearefs="x.edge4">

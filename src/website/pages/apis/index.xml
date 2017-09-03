@@ -16,7 +16,8 @@ container), inputs, outputs, variable bindings, and edges.</para>
 edges between them. An edge is a connection between an “output port”
 on a “source” node and an “input port” on a “destination” node. The edges
 are arbitrary; asserting that an edge exists between two ports creates
-the ports if necessary.</para>
+the ports if necessary. (Some steps impose constraints on the ports that
+can be used, those constraints are enforced.)</para>
 
 <para>For more information, see the description of
 <link xlink:href="pipelines">the pipeline library API</link>,

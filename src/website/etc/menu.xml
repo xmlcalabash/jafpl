@@ -17,6 +17,7 @@
     <ul>
       <li><a href="/apis">Overview</a></li>
       <li id="pipelineapis"><a href="/apis/pipelines">Pipeline APIs</a></li>
+      <li id="vocabulary"><a href="/apis/vocabulary">Step Vocabulary</a></li>
       <li id="stepapis"><a href="/apis/steps">Step APIs</a></li>
       <li id="apidocs"><a href="/apidocs">API Docs</a></li>
     </ul>

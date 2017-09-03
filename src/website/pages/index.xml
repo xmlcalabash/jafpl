@@ -53,7 +53,8 @@ these are “containers”. The following containers are supported:</para>
 <varlistentry><term>Iteration</term>
 <listitem>
 <simpara>Several flavors of iteration are supported: iteration over a sequence,
-iteration while a condition is true, and iteration to a fixed point.
+iteration while a condition is true, and iteration to a fixed point, iteration
+a specific number of times.
 </simpara>
 </listitem>
 </varlistentry>
@@ -72,7 +73,7 @@ a user-specified condition.
 </simpara>
 </listitem>
 </varlistentry>
-<varlistentry><term>Try/catch error handling</term>
+<varlistentry><term>Try/catch/finally error handling</term>
 <listitem>
 <simpara>Step implementations may encounter errors and raise exceptions.
 A try/catch block gives the pipeline author an opportunity to catch those

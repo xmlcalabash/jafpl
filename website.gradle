@@ -77,6 +77,7 @@ def pages = [
              'pages/pipelines/index',
              'pages/apis/index',
              'pages/apis/pipelines',
+             'pages/apis/vocabulary',
              'pages/apis/steps'
             ]
 
