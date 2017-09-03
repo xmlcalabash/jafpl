@@ -1,15 +1,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>APIs</title><meta charset="utf-8" /><meta name="generator" content="DocBook XSL 2.0 Stylesheets V2.0.20" /><link rel="stylesheet" type="text/css" href="http://cdn.docbook.org/release/2.0.20/resources/css/default.css" /><link rel="stylesheet" type="text/css" href="/css/docbook.css" /><link rel="stylesheet" type="text/css" href="/css/tabs.css" /><link rel="stylesheet" type="text/css" href="/css/website.css" /><link href="http://fonts.googleapis.com/css?family=Rambla" rel="stylesheet" type="text/css" /><script type="text/javascript" src="http://cdn.docbook.org/release/2.0.20/resources/js/dbmodnizr.js"></script><link href="http://cdn.docbook.org/release/2.0.20/resources/css/prism.css" rel="stylesheet" type="text/css" /><link href="http://cdn.docbook.org/release/2.0.20/resources/css/db-prism.css" rel="stylesheet" type="text/css" /></head><body><div class="header">
 <h1>JA<em>F</em>  PL</h1>
-</div><div class="navset" id="nav"><div class="hd"><ul><li id="home"><a href="/"><em>Home</em></a></li><li id="pipelines"><a href="/pipelines"><em>Pipelines</em></a></li><li id="apis" class="on" title="selected"><a href="/apis"><strong><em>APIs</em></strong></a></li></ul></div><div class="bd"><ul><li class="on first "><a href="/apis">Overview</a></li><li id="pipelineapis" class="  "><a href="/apis/pipelines">Pipeline APIs</a></li><li id="stepapis" class="  "><a href="/apis/steps">Step APIs</a></li><li id="apidocs" class="  last"><a href="/apidocs">API Docs</a></li></ul></div></div><article class="article"><h1>APIs</h1><p>At the level of this library, you must construct a graph using the
+</div><div class="navset" id="nav"><div class="hd"><ul><li id="home"><a href="/"><em>Home</em></a></li><li id="pipelines"><a href="/pipelines"><em>Pipelines</em></a></li><li id="apis" class="on" title="selected"><a href="/apis"><strong><em>APIs</em></strong></a></li></ul></div><div class="bd"><ul><li class="on first "><a href="/apis">Overview</a></li><li id="pipelineapis" class="  "><a href="/apis/pipelines">Pipeline APIs</a></li><li id="vocabulary" class="  "><a href="/apis/vocabulary">Step Vocabulary</a></li><li id="stepapis" class="  "><a href="/apis/steps">Step APIs</a></li><li id="apidocs" class="  last"><a href="/apidocs">API Docs</a></li></ul></div></div><article class="article"><h1>APIs</h1><p>At the level of this library, you must construct a graph using the
 underlying APIs. There’s no “pipeline language” support.
 Broadly speaking, there are atomic steps, containers, pipelines (the top-most
 container), inputs, outputs, variable bindings, and edges.</p><p>You can construct any graph that you like with these nodes and
 edges between them. An edge is a connection between an “output port”
 on a “source” node and an “input port” on a “destination” node. The edges
 are arbitrary; asserting that an edge exists between two ports creates
-the ports if necessary.</p><p>For more information, see the description of
+the ports if necessary. (Some steps impose constraints on the ports that
+can be used, those constraints are enforced.)</p><p>For more information, see the description of
 <a href="pipelines">the pipeline library API</a>,
 <a href="steps">the step API</a>, or go straight to
 the <a href="/apidocs">API Docs</a>, if you prefer.</p><footer><p>Copyright © 2016 Norman Walsh. See
       <a href="https://github.com/ndw/jafpl/blob/master/LICENSE.md">LICENSE</a>.
-      Last updated on 25 Aug 2017 at 08:29a.m. GMT-05:00 by Norman Walsh</p></footer></article><script src="http://cdn.docbook.org/release/2.0.20/resources/js/prism.js"></script></body></html>
+      Last updated on 03 Sep 2017 at 03:19p.m. GMT-05:00 by Norman Walsh</p></footer></article><script src="http://cdn.docbook.org/release/2.0.20/resources/js/prism.js"></script></body></html>

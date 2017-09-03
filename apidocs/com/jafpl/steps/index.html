@@ -225,6 +225,12 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                           DataConsumerProxy
                         </a>
                       </li><li class="current-entities indented3">
+                        <span class="separator"></span>
+                        <a class="trait" href="DataProvider.html" title="Interface for sending external data to a pipeline."></a>
+                        <a href="DataProvider.html" title="Interface for sending external data to a pipeline.">
+                          DataProvider
+                        </a>
+                      </li><li class="current-entities indented3">
                         <a class="object" href="PortSpecification$.html" title="Useful default port binding specifications."></a>
                         <a class="class" href="PortSpecification.html" title="Specify the valid bindings for step inputs or outputs"></a>
                         <a href="PortSpecification.html" title="Specify the valid bindings for step inputs or outputs">
@@ -404,7 +410,7 @@ that might be provided by the pipeline.
             </a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       
-      <p class="shortcomment cmt">Interface for sending outputs from atomic steps.</p><div class="fullcomment"><div class="comment cmt"><p>Interface for sending outputs from atomic steps.</p><p>Atomic step implementations are independent of the graph execution infrastructure.</p><p>Steps call the <code>send</code> method on this object to deliver output.</p></div></div>
+      <p class="shortcomment cmt">Interface for sending outputs from atomic steps.</p><div class="fullcomment"><div class="comment cmt"><p>Interface for sending outputs from atomic steps.</p><p>Atomic step implementations are independent of the graph execution infrastructure.</p><p>Steps call the <code>receive</code> method on this object to deliver output.</p></div></div>
     </li><li name="com.jafpl.steps.DataConsumerProxy" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="DataConsumerProxyextendsAnyRef"></a><a id="DataConsumerProxy:DataConsumerProxy"></a>
       <span class="permalink">
@@ -425,6 +431,26 @@ that might be provided by the pipeline.
       <p class="shortcomment cmt">A data consumer.</p><div class="fullcomment"><div class="comment cmt"><p>A data consumer.</p><p>This class is used to provide outputs from the pipeline. An instance of this class will
 be provided after the runtime is constructed. The user can call <code>setProvider</code> to specify
 where the data should be delivered.</p></div></div>
+    </li><li name="com.jafpl.steps.DataProvider" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="DataProviderextendsAnyRef"></a><a id="DataProvider:DataProvider"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/steps/index.html#DataProviderextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="Interface for sending external data to a pipeline." href="DataProvider.html">
+              <span class="name">DataProvider</span>
+            </a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Interface for sending external data to a pipeline.</p><div class="fullcomment"><div class="comment cmt"><p>Interface for sending external data to a pipeline.</p><p>Call the <code>send</code> method on this object to deliver data.</p><p>(This really exists just to simplify the interface to the pipeline. There's a simple
+proxy that sends provided data to an appropriate consumer.)
+</p></div></div>
     </li><li name="com.jafpl.steps.PortSpecification" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="PortSpecificationextendsAnyRef"></a><a id="PortSpecification:PortSpecification"></a>
       <span class="permalink">

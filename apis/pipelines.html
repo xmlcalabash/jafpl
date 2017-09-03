@@ -1,6 +1,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Pipeline APIs</title><meta charset="utf-8" /><meta name="generator" content="DocBook XSL 2.0 Stylesheets V2.0.20" /><link rel="stylesheet" type="text/css" href="http://cdn.docbook.org/release/2.0.20/resources/css/default.css" /><link rel="stylesheet" type="text/css" href="/css/docbook.css" /><link rel="stylesheet" type="text/css" href="/css/tabs.css" /><link rel="stylesheet" type="text/css" href="/css/website.css" /><link href="http://fonts.googleapis.com/css?family=Rambla" rel="stylesheet" type="text/css" /><script type="text/javascript" src="http://cdn.docbook.org/release/2.0.20/resources/js/dbmodnizr.js"></script><link href="http://cdn.docbook.org/release/2.0.20/resources/css/prism.css" rel="stylesheet" type="text/css" /><link href="http://cdn.docbook.org/release/2.0.20/resources/css/db-prism.css" rel="stylesheet" type="text/css" /></head><body><div class="header">
 <h1>JA<em>F</em>  PL</h1>
-</div><div class="navset" id="nav"><div class="hd"><ul><li id="home"><a href="/"><em>Home</em></a></li><li id="pipelines"><a href="/pipelines"><em>Pipelines</em></a></li><li id="apis" class="on" title="selected"><a href="/apis"><strong><em>APIs</em></strong></a></li></ul></div><div class="bd"><ul><li class=" first "><a href="/apis">Overview</a></li><li id="pipelineapis" class="on  "><a href="/apis/pipelines">Pipeline APIs</a></li><li id="stepapis" class="  "><a href="/apis/steps">Step APIs</a></li><li id="apidocs" class="  last"><a href="/apidocs">API Docs</a></li></ul></div></div><article class="article"><h1>Pipeline APIs</h1><p>Pipelines are constructed using a straightfoward JVM API. The examples
+</div><div class="navset" id="nav"><div class="hd"><ul><li id="home"><a href="/"><em>Home</em></a></li><li id="pipelines"><a href="/pipelines"><em>Pipelines</em></a></li><li id="apis" class="on" title="selected"><a href="/apis"><strong><em>APIs</em></strong></a></li></ul></div><div class="bd"><ul><li class=" first "><a href="/apis">Overview</a></li><li id="pipelineapis" class="on  "><a href="/apis/pipelines">Pipeline APIs</a></li><li id="vocabulary" class="  "><a href="/apis/vocabulary">Step Vocabulary</a></li><li id="stepapis" class="  "><a href="/apis/steps">Step APIs</a></li><li id="apidocs" class="  last"><a href="/apidocs">API Docs</a></li></ul></div></div><article class="article"><h1>Pipeline APIs</h1><p>Pipelines are constructed using a straightfoward JVM API. The examples
 below are in Scala, but I believe they’ll work from Java as well. And probably
 any other JVM language.</p><p>All of the examples that follow are available in the
 <span class="package">com.jafpldemo.examples</span> package at
@@ -23,7 +23,7 @@ The
 <code class="classname"><a href="/apidocs/com/jafpl/runtime/RuntimeConfiguration.html">PrimitiveRuntimeConfiguration</a></code>,
 as it’s name implies,
 is a primitive stub implementation. It does the bare minimum required.</p></dd><dt class="callout"><a href="#x.runtime" class="callout-link"><span data-number="5" class="callout-bug callout-bug-unicode">❺</span></a> </dt><dd><p>A
-<code class="classname"><a href="/apidocs/com/jafpl/runtime/GraphRuntime.html">Runtime</a></code>
+<code class="classname"><a href="/apidocs/com/jafpl/runtime/GraphRuntime.html">GraphRuntime</a></code>
 can actually evaluate the pipeline.</p></dd><dt class="callout"><a href="#x.run" class="callout-link"><span data-number="6" class="callout-bug callout-bug-unicode">❻</span></a> </dt><dd><p>And
 <code class="methodname"><a href="/apidocs/com/jafpl/runtime/GraphRuntime.html#run():Unit">run</a></code>
 runs it, unsurprisingly.</p></dd></dl></div><p>Of course, this pipeline does nothing, so it’s not very interesting.
@@ -46,7 +46,7 @@ but because the output of the producer step isn’t connected to anything, the
 pipeline just drops the output on the floor.</p><p>Data flow involves both producers and consumers. Let’s introduce a consumer
 step. The <code class="classname">Consumer</code> will read an arbitrary number of items
 on it’s input “source” port. When it runs, it will print them on the console. It
-produces no output. <a href="#example3">Producer/consumer pipeline</a> uses both the producer and
+produces no output. The <a href="#example3">Producer/consumer pipeline</a> pipeline uses both the producer and
 the consumer.</p><figure id="example3" class="example-wrapper"><div class="title">Example 3. Producer/consumer pipeline</div><div class="example"><pre class="programlisting language-scala"><code>  val config = new PrimitiveRuntimeConfiguration()
   val graph  = new Graph()
 
@@ -65,7 +65,7 @@ The
 a directed edge from the “result” port of <code class="code">producer</code> <em>to</em>
 the “source” port of <code class="code">consumer</code>.</p><p>If you run <em>this</em> pipeline, you’ll finally get some output:
 the canonical “Hello, world” message.</p><p>The <code class="classname">Identity</code> step simply copies its input to its output,
-so it’s always safe to add them. Let’s make our pipeline a few steps longer.</p><figure id="example4" class="example-wrapper"><div class="title">Example 4. Longer producer/consumer pipeline</div><div class="example"><pre class="programlisting language-scala"><code>  val config = new PrimitiveRuntimeConfiguration()
+so it’s always safe to add them to a flow. Let’s make our pipeline a few steps longer.</p><figure id="example4" class="example-wrapper"><div class="title">Example 4. Longer producer/consumer pipeline</div><div class="example"><pre class="programlisting language-scala"><code>  val config = new PrimitiveRuntimeConfiguration()
   val graph  = new Graph()
 
   val pipeline = graph.addPipeline("pipeline")
@@ -85,7 +85,7 @@ to the pipeline; the edges connect the other way around. The order in which
 siblings steps run is determined entirely and exclusively by the ways in which
 they are connected.</p><p>In this pipeline, “producer” runs first, then
 “b” <a name="x.linkb" id="x.linkb"></a><span data-number="3" class="callout-bug callout-bug-unicode">❸</span>, then “a” <a name="x.linka" id="x.linka"></a><span data-number="4" class="callout-bug callout-bug-unicode">❹</span>, then
-“consumer”.</p><p>Let’s do something transformative this time. Pipelines to do
+“consumer”.</p><p>Let’s do something transformative this time. Pipelines that do
 nothing more than copy their inputs around aren’t very interesting.
 The <code class="classname">Uppercase</code> step takes a single string input
 on its “source” port and returns only the words in the string, shifted
@@ -102,7 +102,7 @@ but we’ll come back to that.)</p><figure id="example5" class="example-wrapper"
   graph.addEdge(upper, "result", consumer, "source")
 
   val runtime = new GraphRuntime(graph, config)
-  runtime.run()</code></pre></div></figure><p>If you run this pipeline, it produces “HELLO WORLD”.</p><p>What happens if you change the produce so that it actually produces
+  runtime.run()</code></pre></div></figure><p>If you run this pipeline, it produces “HELLO WORLD”.</p><p>What happens if you change the producer so that it actually produces
 a sequence? (Feel free to got try it out!)</p><p>The answer is, an error. The uppercase step does not accept a sequence,
 so the pipeline will generate an error as soon as the second input arrives on
 its input.</p><p>The way to work around that is with a loop.</p><figure id="example6" class="example-wrapper"><div class="title">Example 6. Uppercase loop pipeline</div><div class="example"><pre class="programlisting language-scala"><code>  val config = new PrimitiveRuntimeConfiguration()
@@ -117,7 +117,7 @@ its input.</p><p>The way to work around that is with a loop.</p><figure id="exam
   val consumer = pipeline.addAtomic(new Consumer(), "consumer")
 
   graph.addEdge(producer, "result", loop, "source") <a name="x.edge2" id="x.edge2"></a><span data-number="3" class="callout-bug callout-bug-unicode">❸</span>
-  graph.addEdge(loop, "source", upper, "source")    <a name="x.edge3" id="x.edge3"></a><span data-number="4" class="callout-bug callout-bug-unicode">❹</span>
+  graph.addEdge(loop, "current", upper, "source")   <a name="x.edge3" id="x.edge3"></a><span data-number="4" class="callout-bug callout-bug-unicode">❹</span>
   graph.addEdge(upper, "result", loop, "result")    <a name="x.edge4" id="x.edge4"></a><span data-number="5" class="callout-bug callout-bug-unicode">❺</span>
   graph.addEdge(loop, "result", consumer, "source") <a name="x.edge5" id="x.edge5"></a><span data-number="6" class="callout-bug callout-bug-unicode">❻</span>
 
@@ -125,10 +125,10 @@ its input.</p><p>The way to work around that is with a loop.</p><figure id="exam
   runtime.run()</code></pre></div></figure><div class="calloutlist"><dl><dt class="callout"><a href="#x.loop" class="callout-link"><span data-number="1" class="callout-bug callout-bug-unicode">❶</span></a> </dt><dd><p>A loop container is created in the pipeline.
 </p></dd><dt class="callout"><a href="#x.loopup" class="callout-link"><span data-number="2" class="callout-bug callout-bug-unicode">❷</span></a> </dt><dd><p>The upper step is added to the loop container, not directly to the pipeline.
 </p></dd><dt class="callout"><a href="#x.edge2" class="callout-link"><span data-number="3" class="callout-bug callout-bug-unicode">❸</span></a> </dt><dd><p>The producer output is connected to the loop. A for-each loop has a single
-input port, source.
-</p></dd><dt class="callout"><a href="#x.edge3" class="callout-link"><span data-number="4" class="callout-bug callout-bug-unicode">❹</span></a> </dt><dd><p>From <em>inside</em> the loop, reading from the loop source
-reads the current input document in the loop. This is connected to the source
-for the upper step.
+input port, <code class="code">source</code>.
+</p></dd><dt class="callout"><a href="#x.edge3" class="callout-link"><span data-number="4" class="callout-bug callout-bug-unicode">❹</span></a> </dt><dd><p>From <em>inside</em> the loop, reading from the
+loop’s <code class="code">current</code> port reads the current input document in
+the loop. This is connected to the source for the upper step.
 </p></dd><dt class="callout"><a href="#x.edge4" class="callout-link"><span data-number="5" class="callout-bug callout-bug-unicode">❺</span></a> </dt><dd><p>The upper output is connected to the loop result port.
 </p></dd><dt class="callout"><a href="#x.edge5" class="callout-link"><span data-number="6" class="callout-bug callout-bug-unicode">❻</span></a> </dt><dd><p>The loop result is connected to the consumer.
 </p></dd></dl></div><p>If you run this pipeline, it produces “HELLO”, “THERE”, and “WORLD”.</p><p>As a final example for the moment, let’s look at how we could use the
@@ -160,4 +160,4 @@ its input string. Each of those words is processed by the subpipeline in the vie
 engine. You can use it to process parts of strings, JSON keys, arrays, XML
 documents, columns in CSV files, whatever you can implement.</p><footer><p>Copyright © 2016 Norman Walsh. See
       <a href="https://github.com/ndw/jafpl/blob/master/LICENSE.md">LICENSE</a>.
-      Last updated on 25 Aug 2017 at 08:29a.m. GMT-05:00 by Norman Walsh</p></footer></article><script src="http://cdn.docbook.org/release/2.0.20/resources/js/prism.js"></script></body></html>
+      Last updated on 03 Sep 2017 at 03:19p.m. GMT-05:00 by Norman Walsh</p></footer></article><script src="http://cdn.docbook.org/release/2.0.20/resources/js/prism.js"></script></body></html>

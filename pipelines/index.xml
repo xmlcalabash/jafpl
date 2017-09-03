@@ -7,10 +7,15 @@
   <title>Pipelines</title>
 </info>
 
-<para>A pipeline is an acyclic directed graph; a data flow graph describing
+<para>A pipeline is an acyclic directed graph, a data flow graph describing
 how a set of inputs is processed to produce outputs. Processing occurs at nodes
-in the graph, data flows along the edges.
-</para>
+in the graph, data flows along the edges. The simplest nodes are atomic steps: they take
+input, perform some operation, and produce output. From the perspective of the pipeline,
+these are black boxes.</para>
+
+<para>JAFPL also provides several mechanisms for constructing
+compound steps from other steps. These “containers” then become nodes in the
+graph that contains them.</para>
 
 <para>There are only a few inviolable constraints on the graph:</para>
 
@@ -19,9 +24,10 @@ in the graph, data flows along the edges.
 <link xlink:href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">DAG</link>.
 </simpara>
 </listitem>
-<listitem><simpara>Edges can’t cross from inside a container to outside the
-container (the children of a container are invisible to the siblings of the
-container).
+<listitem><simpara>Edges can’t cross from inside a container to
+outside the container (the children of a container are invisible to
+the siblings of the container). Crossing the other direction is
+allowed, the children can see their “aunts” and “uncles”.
 </simpara>
 </listitem>
 <listitem><simpara>If steps declare required inputs,
@@ -33,9 +39,10 @@ those must have edges connected to them.
 </listitem>
 </orderedlist>
 
-<para>Every port in JAFPL is read by exactly one step and exactly one step writes to every
-input port. If the graph described by your edges multiplexes access to
-any port, a “splitter” or “joiner” step will be inserted as appropriate.</para>
+<para>Every output port in JAFPL is read by exactly one step and
+exactly one step writes to every input port. If the graph described by
+your edges multiplexes access to any port, a “splitter” or “joiner”
+step will be inserted as appropriate.</para>
 
 <para>In other words, this graph never happens:</para>
 
@@ -61,16 +68,22 @@ work of the step.</para>
 
 <para>The graph is executed with the <link
 xlink:href="http://akka.io/">Akka</link> framework. Actors are created
-to manage each node. All steps “start” at the same time and execute in
-parallel (to the extent that the graph allows for parallelism, of
-course). When the last step reports that it is finished, execution
-finishes.</para>
+to manage each node. With a few exceptions (conditionals and “catch”
+containers, for example), all steps “start” at the same time and
+execute in parallel (to the extent that the graph allows for
+parallelism, of course). When the last step reports that it is
+finished, execution finishes.</para>
 
 <para>The actors know the topology of the graph. Any step that has no
-inputs can run immediately. Steps that have inputs, can’t run until
+inputs can run immediately. Steps that have inputs can’t run until
 all of their inputs have been provided. Inputs pass between the steps
-as messages. Consider the simple, linear pipeline at the beginning of
-this document.</para>
+as messages. Consider a simple, linear pipeline:</para>
+
+<mediaobject>
+<imageobject>
+<imagedata fileref="byhand-1.svg"/>
+</imageobject>
+</mediaobject>
 
 <para>When execution begins, “Do Something” can’t run because
 it’s waiting for input from the “outside”. “Do Something Else” can’t

@@ -1,31 +1,36 @@
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Pipelines</title><meta charset="utf-8" /><meta name="generator" content="DocBook XSL 2.0 Stylesheets V2.0.20" /><link rel="stylesheet" type="text/css" href="http://cdn.docbook.org/release/2.0.20/resources/css/default.css" /><link rel="stylesheet" type="text/css" href="/css/docbook.css" /><link rel="stylesheet" type="text/css" href="/css/tabs.css" /><link rel="stylesheet" type="text/css" href="/css/website.css" /><link href="http://fonts.googleapis.com/css?family=Rambla" rel="stylesheet" type="text/css" /><script type="text/javascript" src="http://cdn.docbook.org/release/2.0.20/resources/js/dbmodnizr.js"></script><link href="http://cdn.docbook.org/release/2.0.20/resources/css/prism.css" rel="stylesheet" type="text/css" /><link href="http://cdn.docbook.org/release/2.0.20/resources/css/db-prism.css" rel="stylesheet" type="text/css" /></head><body><div class="header">
 <h1>JA<em>F</em>  PL</h1>
-</div><div class="navset" id="nav"><div class="hd"><ul><li id="home"><a href="/"><em>Home</em></a></li><li id="pipelines" class="on" title="selected"><a href="/pipelines"><strong><em>Pipelines</em></strong></a></li><li id="apis"><a href="/apis"><em>APIs</em></a></li></ul></div><div class="bd"><ul><li class="on first last"><a href="/pipelines">Overview</a></li></ul></div></div><article class="article"><h1>Pipelines</h1><p>A pipeline is an acyclic directed graph; a data flow graph describing
+</div><div class="navset" id="nav"><div class="hd"><ul><li id="home"><a href="/"><em>Home</em></a></li><li id="pipelines" class="on" title="selected"><a href="/pipelines"><strong><em>Pipelines</em></strong></a></li><li id="apis"><a href="/apis"><em>APIs</em></a></li></ul></div><div class="bd"><ul><li class="on first last"><a href="/pipelines">Overview</a></li></ul></div></div><article class="article"><h1>Pipelines</h1><p>A pipeline is an acyclic directed graph, a data flow graph describing
 how a set of inputs is processed to produce outputs. Processing occurs at nodes
-in the graph, data flows along the edges.
-</p><p>There are only a few inviolable constraints on the graph:</p><div class="orderedlist"><ol style="list-style: decimal;"><li><p>No loops. It’s a
+in the graph, data flows along the edges. The simplest nodes are atomic steps: they take
+input, perform some operation, and produce output. From the perspective of the pipeline,
+these are black boxes.</p><p>JAFPL also provides several mechanisms for constructing
+compound steps from other steps. These “containers” then become nodes in the
+graph that contains them.</p><p>There are only a few inviolable constraints on the graph:</p><div class="orderedlist"><ol style="list-style: decimal;"><li><p>No loops. It’s a
 <a href="https://en.wikipedia.org/wiki/Directed_acyclic_graph">DAG</a>.
-</p></li><li><p>Edges can’t cross from inside a container to outside the
-container (the children of a container are invisible to the siblings of the
-container).
+</p></li><li><p>Edges can’t cross from inside a container to
+outside the container (the children of a container are invisible to
+the siblings of the container). Crossing the other direction is
+allowed, the children can see their “aunts” and “uncles”.
 </p></li><li><p>If steps declare required inputs,
 those must have edges connected to them.
 </p></li><li><p>Edges can only connect nodes in the same graph.
-</p></li></ol></div><p>Every port in JAFPL is read by exactly one step and exactly one step writes to every
-input port. If the graph described by your edges multiplexes access to
-any port, a “splitter” or “joiner” step will be inserted as appropriate.</p><p>In other words, this graph never happens:</p><div id="pipelines.7" class="mediaobject"><img src="figure0.svg" /></div><p>If you attempt to construct that graph, the library will automatically
-restructure it so that this graph is constructed:</p><div id="pipelines.9" class="mediaobject"><img src="figure1.svg" /></div><p>You must provide an
+</p></li></ol></div><p>Every output port in JAFPL is read by exactly one step and
+exactly one step writes to every input port. If the graph described by
+your edges multiplexes access to any port, a “splitter” or “joiner”
+step will be inserted as appropriate.</p><p>In other words, this graph never happens:</p><div id="pipelines.8" class="mediaobject"><img src="figure0.svg" /></div><p>If you attempt to construct that graph, the library will automatically
+restructure it so that this graph is constructed:</p><div id="pipelines.10" class="mediaobject"><img src="figure1.svg" /></div><p>You must provide an
 <a href="../apis/steps">implementation class</a> for every atomic node that you
 construct. That’s the class that will be called upon to perform the
 work of the step.</p><p>The graph is executed with the <a href="http://akka.io/">Akka</a> framework. Actors are created
-to manage each node. All steps “start” at the same time and execute in
-parallel (to the extent that the graph allows for parallelism, of
-course). When the last step reports that it is finished, execution
-finishes.</p><p>The actors know the topology of the graph. Any step that has no
-inputs can run immediately. Steps that have inputs, can’t run until
+to manage each node. With a few exceptions (conditionals and “catch”
+containers, for example), all steps “start” at the same time and
+execute in parallel (to the extent that the graph allows for
+parallelism, of course). When the last step reports that it is
+finished, execution finishes.</p><p>The actors know the topology of the graph. Any step that has no
+inputs can run immediately. Steps that have inputs can’t run until
 all of their inputs have been provided. Inputs pass between the steps
-as messages. Consider the simple, linear pipeline at the beginning of
-this document.</p><p>When execution begins, “Do Something” can’t run because
+as messages. Consider a simple, linear pipeline:</p><div id="pipelines.14" class="mediaobject"><img src="byhand-1.svg" /></div><p>When execution begins, “Do Something” can’t run because
 it’s waiting for input from the “outside”. “Do Something Else” can’t
 run because it’s waiting for input from “Do Something.” The process
 that is running the pipeline pours an arbitrary number of documents
@@ -58,7 +63,7 @@ how arithmetic works, it demonstrates some of the features.</p><p>Consider the e
 think of arithmetic as a pipeline, but the expressions <code class="code">(1+2)</code>
 and <code class="code">(3+4+5)</code> are independent and could be executed in parallel.
 In other words, it’s possible to construct
-a pipeline to evaluate this expression:</p><div id="pipelines.20" class="mediaobject"><img src="pipe1.svg" /></div><p>The “Literal” steps are atomic steps that provide numbers. For
+a pipeline to evaluate this expression:</p><div id="pipelines.22" class="mediaobject"><img src="pipe1.svg" /></div><p>The “Literal” steps are atomic steps that provide numbers. For
 convenience, they’re labled “number-<em class="replaceable"><code>n</code></em>” for
 the number “n”. These are simple atomic steps with no inputs and a
 single output. When they run, they produce the corresponding number on
@@ -73,9 +78,9 @@ The additions can also proceed in parallel. Then the multiplication computes
 the final sum, “36”, which is output and printed by the demo.</p><p>To see what happens when inputs are required, consider this
 expression: “<code class="code">(1+2)*$foo</code>”. Here <code class="code">$foo</code> is an
 additional input to the expression. Steps have inputs and outputs and
-(almost) nothing else.</p><div id="pipelines.25" class="mediaobject"><img src="pipe2.svg" /></div><p>All atomic steps work basically the same way. There’s also a provision for declaring
+(almost) nothing else.</p><div id="pipelines.27" class="mediaobject"><img src="pipe2.svg" /></div><p>All atomic steps work basically the same way. There’s also a provision for declaring
 a dependency edge between two nodes that aren’t connected by data flow. The semantics
 of the dependency are that the <em>dependent</em> step will not be run
 before the step it <em>depends on</em> has finished.</p><footer><p>Copyright © 2016 Norman Walsh. See
       <a href="https://github.com/ndw/jafpl/blob/master/LICENSE.md">LICENSE</a>.
-      Last updated on 25 Aug 2017 at 08:29a.m. GMT-05:00 by Norman Walsh</p></footer></article><script src="http://cdn.docbook.org/release/2.0.20/resources/js/prism.js"></script></body></html>
+      Last updated on 03 Sep 2017 at 03:19p.m. GMT-05:00 by Norman Walsh</p></footer></article><script src="http://cdn.docbook.org/release/2.0.20/resources/js/prism.js"></script></body></html>

@@ -1,0 +1,41 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Step Vocabulary</title><meta charset="utf-8" /><meta name="generator" content="DocBook XSL 2.0 Stylesheets V2.0.20" /><link rel="stylesheet" type="text/css" href="http://cdn.docbook.org/release/2.0.20/resources/css/default.css" /><link rel="stylesheet" type="text/css" href="/css/docbook.css" /><link rel="stylesheet" type="text/css" href="/css/tabs.css" /><link rel="stylesheet" type="text/css" href="/css/website.css" /><link href="http://fonts.googleapis.com/css?family=Rambla" rel="stylesheet" type="text/css" /><script type="text/javascript" src="http://cdn.docbook.org/release/2.0.20/resources/js/dbmodnizr.js"></script><link href="http://cdn.docbook.org/release/2.0.20/resources/css/prism.css" rel="stylesheet" type="text/css" /><link href="http://cdn.docbook.org/release/2.0.20/resources/css/db-prism.css" rel="stylesheet" type="text/css" /></head><body><div class="header">
+<h1>JA<em>F</em>  PL</h1>
+</div><div class="navset" id="nav"><div class="hd"><ul><li id="home"><a href="/"><em>Home</em></a></li><li id="pipelines"><a href="/pipelines"><em>Pipelines</em></a></li><li id="apis" class="on" title="selected"><a href="/apis"><strong><em>APIs</em></strong></a></li></ul></div><div class="bd"><ul><li class=" first "><a href="/apis">Overview</a></li><li id="pipelineapis" class="  "><a href="/apis/pipelines">Pipeline APIs</a></li><li id="vocabulary" class="on  "><a href="/apis/vocabulary">Step Vocabulary</a></li><li id="stepapis" class="  "><a href="/apis/steps">Step APIs</a></li><li id="apidocs" class="  last"><a href="/apidocs">API Docs</a></li></ul></div></div><div class="inline-toc"><span class="toc"><span class="item">§ <a href="#pipeline">The pipeline</a>   </span><span class="item">§ <a href="#group">group</a>   </span><span class="item">§ <a href="#choose">choose/when</a>   </span><span class="item">§ <a href="#try">try/catch/finally</a>   </span><span class="item">§ <a href="#for-each">For-each loop</a>   </span><span class="item">§ <a href="#for">For loop</a>   </span><span class="item">§ <a href="#while">while loop</a>   </span><span class="item">§ <a href="#until">until loop</a>   </span><span class="item">§ <a href="#viewport">viewport</a>   </span></span></div><article class="article"><h1>Step Vocabulary</h1><p>The vocabulary of atomic steps is effectively unbounded; anything that
+implements
+<a href="steps">the step API</a> can be used as an atomic step.
+The vocabulary of compound steps, or containers, is limited to what the current
+version of JAFPL provides.</p><section id="pipeline" class="section"><div class="section-titlepage"><h2>The pipeline</h2></div><p>The <code class="code">pipeline</code> is the top-most object in your graph.
+You can bind an arbitrary number of external inputs, outputs, and
+options to it.</p></section><section id="group" class="section"><div class="section-titlepage"><h2>group</h2></div><p>A <code class="code">group</code> is simply a container. It has no special
+semantics.</p></section><section id="choose" class="section"><div class="section-titlepage"><h2>choose/when</h2></div><p>The <code class="code">choose</code> object takes one or more
+<code class="code">when</code> objects. Each <code class="code">when</code> object has a guard
+condition, “test”. When the <code class="code">choose</code> runs, each
+<code class="code">when</code>’s test is evaluated in turn (in the order that they
+were added to the choose). The first <code class="code">when</code> for which the
+effective boolean value of the test is “true” is run. No other
+<code class="code">when</code> runs. It is an error if no <code class="code">when</code>
+matches, so make sure you put a “true” condition at the end.</p></section><section id="try" class="section"><div class="section-titlepage"><h2>try/catch/finally</h2></div><p>The <code class="code">try-catch</code> object takes a <code class="code">try</code>
+object, zero or more <code class="code">catch</code> objects, and, optoinally,
+<code class="code">finally</code> object. Evaluation of the <code class="code">try</code> is
+attempted. If that fails, its output is discarded and one of the
+<code class="code">catch</code> branches is selected and run. In either case, the
+<code class="code">finally</code> runs after the try/catch is otherwise finished.</p></section><section id="for-each" class="section"><div class="section-titlepage"><h2>For-each loop</h2></div><p>A <code class="code">for-each</code> loop iterates over a sequence of documents,
+applying processing to each one.</p></section><section id="for" class="section"><div class="section-titlepage"><h2>For loop</h2></div><p>A <code class="code">for</code> loop iterates a fixed number of times. (You
+specify the start, which defaults to 1, the limit, and the increment,
+which also defaults to 1).</p></section><section id="while" class="section"><div class="section-titlepage"><h2>while loop</h2></div><p>A <code class="code">while</code> loop takes a single document and a tester.
+If testing the document returns true, the loop is evaluated once. The tested
+document appears on the “current” port of the loop. The
+body of the loop must write exactly one document to the “test” output
+port of the loop. When the loop finishes, the document written to “test”
+is tested again. Iteration continues until the test returns false.</p></section><section id="until" class="section"><div class="section-titlepage"><h2>until loop</h2></div><p>An <code class="code">until</code> loop takes a document and a comparator.
+The body of the loop is evaluated once using the input document as the
+“current” document. The body of the loop must write exactly one
+document to the “test” output port of the loop. When the loop finishes,
+the comparator is passed the original document and the processed document.
+If it returns true, the process begins again with the processed document.
+</p></section><section id="viewport" class="section"><div class="section-titlepage"><h2>viewport</h2></div><p>A <code class="code">viewport</code> decomposes a document into a series of fragments.
+How the fragment are constructed is determined by the implementation. Each fragment
+is processed by the pipeline that the viewport contains. The result of processing
+each fragment is used to stitch the orginal document back together.</p></section><footer><p>Copyright © 2016 Norman Walsh. See
+      <a href="https://github.com/ndw/jafpl/blob/master/LICENSE.md">LICENSE</a>.
+      Last updated on 03 Sep 2017 at 03:19p.m. GMT-05:00 by Norman Walsh</p></footer></article><script src="http://cdn.docbook.org/release/2.0.20/resources/js/prism.js"></script></body></html>

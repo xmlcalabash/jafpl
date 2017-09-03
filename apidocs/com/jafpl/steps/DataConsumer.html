@@ -155,6 +155,12 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                           DataConsumerProxy
                         </a>
                       </li><li class="current-entities indented3">
+                        <span class="separator"></span>
+                        <a class="trait" href="DataProvider.html" title="Interface for sending external data to a pipeline."></a>
+                        <a href="DataProvider.html" title="Interface for sending external data to a pipeline.">
+                          DataProvider
+                        </a>
+                      </li><li class="current-entities indented3">
                         <a class="object" href="PortSpecification$.html" title="Useful default port binding specifications."></a>
                         <a class="class" href="PortSpecification.html" title="Specify the valid bindings for step inputs or outputs"></a>
                         <a href="PortSpecification.html" title="Specify the valid bindings for step inputs or outputs">
@@ -206,7 +212,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Interface for sending outputs from atomic steps.</p><p>Atomic step implementations are independent of the graph execution infrastructure.</p><p>Steps call the <code>send</code> method on this object to deliver output.</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Interface for sending outputs from atomic steps.</p><p>Atomic step implementations are independent of the graph execution infrastructure.</p><p>Steps call the <code>receive</code> method on this object to deliver output.</p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
