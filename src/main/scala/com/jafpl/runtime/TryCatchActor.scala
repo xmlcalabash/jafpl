@@ -17,14 +17,13 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
 
     for (child <- node.children) {
       child match {
-        case join: Joiner =>
-          monitor ! GStart(join)
-        case split: Splitter =>
-          monitor ! GStart(split)
         case block: TryStart =>
           tryblock = Some(block)
           monitor ! GStart(block)
-        case _ => Unit
+        case block: CatchStart =>
+          Unit
+        case _ =>
+          monitor ! GStart(child)
       }
     }
   }

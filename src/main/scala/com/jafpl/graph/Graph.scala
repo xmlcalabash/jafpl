@@ -353,6 +353,14 @@ class Graph(listener: Option[ErrorListener]) {
     node
   }
 
+  protected[graph] def addEmptySource(): EmptySource = {
+    checkOpen()
+
+    val node = new EmptySource(this)
+    _nodes += node
+    node
+  }
+
   protected[graph] def addVariable(name: String, expression: Any): Binding = {
     checkOpen()
     val binding = new Binding(this, name, Some(expression))
@@ -385,9 +393,13 @@ class Graph(listener: Option[ErrorListener]) {
   def addEdge(from: Node, fromName: String, to: Node, toName: String): Unit = {
     checkOpen()
 
-    if (_nodes.contains(from) && _nodes.contains(to)) {
-      // If `from` is a child of `to`, then we really mean to write to the *end*
-      // of the container, not the beginning
+    // If from and two aren't in the same graph...
+    if (! (_nodes.contains(from) && _nodes.contains(to))) {
+      error(new GraphException(s"Cannot add edge. $from and $to are in different graphs.", from.location))
+      return
+    }
+
+    if (true) {
       val ancestor = commonAncestor(from, to)
       if (ancestor.isDefined && ancestor.get == to) {
         // println(s"patch $from/$to to ${to.asInstanceOf[ContainerStart].containerEnd} for $from.$fromName")
@@ -398,7 +410,28 @@ class Graph(listener: Option[ErrorListener]) {
         _edges += edge
       }
     } else {
-      error(new GraphException(s"Cannot add edge. $from and $to are in different graphs.", from.location))
+      // If `from` is a child of `to`, then we really mean to write to the end of the container
+      val ancestor = commonAncestor(from, to)
+      if (ancestor.isDefined && ancestor.get == to) {
+        val edge = new Edge(this, from, fromName, to.asInstanceOf[ContainerStart].containerEnd, toName)
+        _edges += edge
+      } else {
+        // If `from` isn't a container or if `to` is a child of from, then read from the start
+        from match {
+          case start: ContainerStart =>
+            if (ancestor.isDefined && ancestor.get == from) {
+              val edge = new Edge(this, from, fromName, to, toName)
+              _edges += edge
+            } else {
+              // Otherwise, read from the end
+              val edge = new Edge(this, start.containerEnd, fromName, to, toName)
+              _edges += edge
+            }
+          case _ =>
+            val edge = new Edge(this, from, fromName, to, toName)
+            _edges += edge
+        }
+      }
     }
   }
 
@@ -548,9 +581,11 @@ class Graph(listener: Option[ErrorListener]) {
       }
     }
 
+    /*
     if (outboundEdges.isEmpty) {
       error(new GraphException(s"Node $node has no output port $port", node.location))
     }
+    */
 
     outboundEdges.toList
   }
@@ -572,9 +607,11 @@ class Graph(listener: Option[ErrorListener]) {
       }
     }
 
+    /*
     if (inboundEdges.isEmpty) {
       error(new GraphException(s"Node $node has no input port $port", node.location))
     }
+    */
 
     inboundEdges.toList
   }
@@ -653,16 +690,34 @@ class Graph(listener: Option[ErrorListener]) {
       for (port <- node.outputs) {
         val edges = edgesFrom(node, port)
         if (edges.length > 1) {
-          val splitter = if (node.parent.isDefined) {
-            node.parent.get.addSplitter()
-          } else {
-            // Stick it in the pipeline
-            var pl = edges.head.to
-            while (pl.parent.isDefined) {
-              pl = pl.parent.get
-            }
-            pl.asInstanceOf[ContainerStart].addSplitter()
+          logger.debug(s"$node.$port read by multiple steps; adding splitter")
+          // Work out what container should contain the splitter
+          var container = Option.empty[ContainerStart]
+          node match {
+            case start: ContainerStart =>
+              var input = false
+              for (iport <- start.inputs) {
+                input = input || (iport == port)
+              }
+              if (input) {
+                container = Some(start)
+              }
+            case _ => Unit
           }
+          if (container.isEmpty) {
+            if (node.parent.isDefined) {
+              container = node.parent
+            } else {
+              // Stick it in the pipeline
+              var pl = edges.head.to
+              while (pl.parent.isDefined) {
+                pl = pl.parent.get
+              }
+              container = Some(pl.asInstanceOf[ContainerStart])
+            }
+          }
+
+          val splitter = container.get.addSplitter()
 
           node match {
             case bnode: Binding => addBindingEdge(bnode, splitter)
@@ -685,16 +740,71 @@ class Graph(listener: Option[ErrorListener]) {
       }
     }
 
-    // For every case where an outbound edge is unconnected, put a sink on it
+    // Put sinks on unread outputs
     for (node <- nodes) {
-      for (port <- node.outputs) {
-        val edges = edgesFrom(node, port)
-        if (edges.isEmpty) {
-          println(s"EMPTY OUTPUT $node $port")
-        }
+      node match {
+        case start: ContainerStart =>
+          for (port <- node.inputs) {
+            val skipLoopSource = start.isInstanceOf[LoopStart] && (port == "source")
+            val skipWhenCondition = start.isInstanceOf[WhenStart] && (port == "condition")
+            val edges = edgesFrom(node, port)
+            if (edges.isEmpty && !skipLoopSource && !skipWhenCondition) {
+              logger.debug(s"Input $port on $start unread, adding sink")
+              val sink = start.addSink()
+              addEdge(node, port, sink, "source")
+            }
+          }
+        case end: ContainerEnd =>
+          val start = end.start.get
+          for (port <- node.inputs) {
+            if (!start.outputs.contains(port)) {
+              println(s"==> $node.$port")
+              val sink = if (start.parent.isDefined) {
+                start.parent.get.addSink()
+              } else {
+                start.addSink()
+              }
+              addEdge(start, port, sink, "source")
+            }
+          }
+        case atomic: AtomicNode =>
+          if (atomic.step.isDefined) {
+            for (port <- atomic.step.get.outputSpec.ports()) {
+              val edges = edgesFrom(node, port)
+              if (edges.isEmpty) {
+                logger.debug(s"Output $port on $atomic unread, adding sink")
+                val start = atomic.parent.get
+                val sink = start.addSink()
+                addEdge(node, port, sink, "source")
+              }
+            }
+          }
+        case _ =>
       }
     }
 
+    // If container outputs are read, but nothing writes to them,
+    // stick in an EmptySource
+    for (node <- nodes) {
+      node match {
+        case start: ContainerStart =>
+          val end = start.containerEnd
+          for (port <- start.outputs) {
+            val skipCatchErrors = start.isInstanceOf[CatchStart] && (port == "errors")
+            val skipLoopCurrent = start.isInstanceOf[LoopStart] && (port == "current")
+            val edges = edgesTo(node, port)
+            if (edges.isEmpty && !skipCatchErrors && !skipLoopCurrent) {
+              val iedges = edgesTo(end, port)
+              if (iedges.isEmpty) {
+                logger.debug(s"Adding empty source to feed output $start.$port")
+                val source = start.addEmptySource()
+                addEdge(source, "result", end, port)
+              }
+            }
+          }
+        case _ => Unit
+      }
+    }
 
     // For every case where an inbound edge has more than one connection,
     // insert a joiner so that it has only one inbound edge
@@ -823,11 +933,32 @@ class Graph(listener: Option[ErrorListener]) {
       if (ancestor.isDefined) {
         val d1 = depth(ancestor.get, edge.from)
         val d2 = depth(ancestor.get, edge.to)
-        if (d1 > d2) {
-          _valid = false
-          var from = usefulAncestor(edge.from)
-          var to = usefulAncestor(edge.to)
-          error(new GraphException(s"Attempting to read from inside a container: $from -> $to", to.location))
+        if (true) {
+          if (d1 > d2) {
+            _valid = false
+            var from = usefulAncestor(edge.from)
+            var to = usefulAncestor(edge.to)
+            error(new GraphException(s"Attempting to read from inside a container: $from -> $to ($d1, $d2)", to.location))
+          }
+        } else {
+          if (d1 > d2) {
+            // Check the special case of reading from the end of a container
+            edge.from match {
+              case end: ContainerEnd =>
+                val d1prime = depth(ancestor.get, end.start.get)
+                if (d1prime > d2) {
+                  _valid = false
+                  var from = usefulAncestor(edge.from)
+                  var to = usefulAncestor(edge.to)
+                  error(new GraphException(s"Attempting to read from inside a container: $from -> $to ($d1, $d2)", to.location))
+                }
+              case _ =>
+                _valid = false
+                var from = usefulAncestor(edge.from)
+                var to = usefulAncestor(edge.to)
+                error(new GraphException(s"Attempting to read from inside a container: $from -> $to ($d1, $d2)", to.location))
+            }
+          }
         }
       }
     }

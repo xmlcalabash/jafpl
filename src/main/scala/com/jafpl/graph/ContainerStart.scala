@@ -292,6 +292,12 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     node
   }
 
+  protected[graph] def addEmptySource(): EmptySource = {
+    val node = graph.addEmptySource()
+    addChild(node)
+    node
+  }
+
   override protected[graph] def dumpChildren(depth: Int): xml.Node = {
     val indent = " " * depth
     val nodes = ListBuffer.empty[xml.Node]

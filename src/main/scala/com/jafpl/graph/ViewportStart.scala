@@ -32,15 +32,15 @@ private[jafpl] class ViewportStart(override val graph: Graph,
   override def outputsOk(): Boolean = {
     var valid = true
 
+    // A viewport can have only two outputs: current and result
     var count = 0
     for (output <- outputs) {
       if (output != "current") {
         count += 1
         _outputPort = output
-        valid = valid && (count == 1)
       }
     }
 
-    valid
+    valid && (count == 1)
   }
 }

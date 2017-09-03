@@ -3,12 +3,11 @@ package com.jafpl.runtime
 import akka.actor.{Actor, ActorRef}
 import akka.event.Logging
 import com.jafpl.exceptions.{PipelineException, StepException}
-import com.jafpl.graph.Node
+import com.jafpl.graph.{ContainerStart, Node}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GStopped}
 import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NGuardResult, NInitialize, NInput, NLoop, NReset, NStart, NStop, NTraceDisable, NTraceEnable, NViewportFinished}
 import com.jafpl.steps.{DataConsumer, PortSpecification}
-import com.jafpl.util.PipelineMessage
 
 import scala.collection.mutable
 
@@ -193,15 +192,31 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           threwException = true
           monitor ! GException(Some(node), cause)
       }
+
+      if (!threwException) {
+        for (output <- node.outputs) {
+          monitor ! GClose(node, output)
+        }
+        monitor ! GFinished(node)
+      }
     } else {
       trace(s"RUN____  $node", "StepExec")
-    }
-
-    if (!threwException) {
-      for (output <- node.outputs) {
-        monitor ! GClose(node, output)
+      node match {
+        case start: ContainerStart =>
+          // Close all our "input" ports so that children reading them can run
+          for (output <- node.outputs) {
+            if (node.inputs.contains(output)) {
+              monitor ! GClose(node, output)
+            }
+          }
+          // Don't finish, we'll do that when our container end says all the children have finished
+        case _ =>
+          // For everything else, we must be atomic so we're done.
+          for (output <- node.outputs) {
+            monitor ! GClose(node, output)
+          }
+          monitor ! GFinished(node)
       }
-      monitor ! GFinished(node)
     }
   }
 

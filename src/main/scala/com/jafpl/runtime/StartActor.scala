@@ -3,7 +3,7 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.graph.ContainerStart
 import com.jafpl.messages.Message
-import com.jafpl.runtime.GraphMonitor.{GAbort, GFinished, GOutput, GReset, GStart, GStop, GStopped}
+import com.jafpl.runtime.GraphMonitor.{GAbort, GClose, GFinished, GOutput, GReset, GStart, GStop, GStopped}
 
 private[runtime] class StartActor(private val monitor: ActorRef,
                                   private val runtime: GraphRuntime,
@@ -51,6 +51,9 @@ private[runtime] class StartActor(private val monitor: ActorRef,
   }
 
   protected[runtime] def finished(): Unit = {
+    for (output <- node.outputs) {
+      monitor ! GClose(node, output)
+    }
     monitor ! GFinished(node)
   }
 }

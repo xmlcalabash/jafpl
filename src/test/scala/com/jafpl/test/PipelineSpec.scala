@@ -11,7 +11,9 @@ import org.scalatest.FlatSpec
 class PipelineSpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
-  "Pipelines " should " allow multiple inputs" in {
+  behavior of "A pipeline"
+
+  it should "allow multiple inputs" in {
     val graph = new Graph()
 
     val pipeline  = graph.addPipeline()
@@ -40,7 +42,7 @@ class PipelineSpec extends FlatSpec {
 
   }
 
-  "Pipelines " should " allow multiple outputs" in {
+  it should "allow multiple outputs" in {
     val graph = new Graph()
 
     val pipeline  = graph.addPipeline()
@@ -68,4 +70,89 @@ class PipelineSpec extends FlatSpec {
     assert(bc2.items.size == 1)
     assert(bc2.items.head == "TWO")
   }
+
+  it should "allow unread inputs" in {
+    val graph = new Graph()
+
+    val pipeline  = graph.addPipeline()
+    val p1        = pipeline.addAtomic(new Producer(List("doc1")), "p1")
+    val ident     = pipeline.addAtomic(new Identity(), "ident")
+
+    graph.addEdge(p1, "result", ident, "source")
+    graph.addEdge(ident, "result", pipeline, "result")
+
+    graph.addOutput(pipeline, "result")
+    graph.addInput(pipeline, "source")
+
+    graph.close()
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+    val bc = new BufferConsumer()
+    runtime.outputs("result").setConsumer(bc)
+    runtime.run()
+
+    assert(bc.items.size == 1)
+    assert(bc.items.head == "doc1")
+  }
+
+  it should "allow unread outputs" in {
+    val graph = new Graph()
+
+    val pipeline  = graph.addPipeline()
+    val p1        = pipeline.addAtomic(new Producer(List("doc1")), "p1")
+    val p2        = pipeline.addAtomic(new Producer(List("doc2")), "p1")
+    val ident     = pipeline.addAtomic(new Identity(), "ident")
+
+    graph.addEdge(p1, "result", ident, "source")
+    graph.addEdge(p2, "result", pipeline, "fred")
+    graph.addEdge(ident, "result", pipeline, "result")
+
+    graph.addOutput(pipeline, "result")
+
+    graph.close()
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+    val bc = new BufferConsumer()
+    runtime.outputs("result").setConsumer(bc)
+    runtime.run()
+
+    assert(bc.items.size == 1)
+    assert(bc.items.head == "doc1")
+  }
+
+  it should " be abortable" in {
+    val graph = new Graph()
+
+    val pipeline  = graph.addPipeline()
+    val p1        = pipeline.addAtomic(new Producer(List("doc1")), "p1")
+    val p2        = pipeline.addAtomic(new Producer(List("doc2")), "p1")
+    val ident     = pipeline.addAtomic(new Identity(), "ident")
+
+    graph.addEdge(p1, "result", ident, "source")
+    graph.addEdge(p2, "result", pipeline, "fred")
+    graph.addEdge(ident, "result", pipeline, "result")
+
+    graph.addOutput(pipeline, "result")
+
+    graph.close()
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+    val bc = new BufferConsumer()
+    runtime.outputs("result").setConsumer(bc)
+
+    var pass = true
+    try {
+      // This will throw an exception because there's no "fred" output
+      val bc2 = new BufferConsumer()
+      runtime.outputs("fred").setConsumer(bc2)
+      runtime.run()
+      pass = false
+    } catch {
+      case t: Throwable =>
+        runtime.stop()
+    }
+
+    assert(pass)
+  }
+
 }

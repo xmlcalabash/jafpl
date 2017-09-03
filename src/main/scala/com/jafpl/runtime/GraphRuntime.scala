@@ -2,8 +2,8 @@ package com.jafpl.runtime
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.jafpl.exceptions.{GraphException, PipelineException}
-import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopUntilStart, LoopWhileStart, PipelineStart, Sink, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
-import com.jafpl.runtime.GraphMonitor.{GClose, GException, GNode, GRun, GWatchdog}
+import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, EmptySource, Graph, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopUntilStart, LoopWhileStart, PipelineStart, Sink, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
+import com.jafpl.runtime.GraphMonitor.{GAbortExecution, GClose, GException, GNode, GRun, GWatchdog}
 import com.jafpl.steps.{BindingProvider, DataConsumer, DataConsumerProxy}
 import com.jafpl.util.UniqueId
 import org.slf4j.{Logger, LoggerFactory}
@@ -15,6 +15,9 @@ import scala.collection.mutable
   * The graph runtime executes a pipeline.
   *
   * If the specified graph is open, it will be closed. If it is not valid, an exception is thrown.
+  *
+  * Constructing the runtime builds the network of Akka actors. If for some reason you decide not
+  * to run the pipeline, you must call `stop` to tear it down.
   *
   * @constructor A graph runtime.
   * @param graph The graph to execute.
@@ -141,7 +144,10 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
       _exception = Some(new PipelineException("notstarted", "Pipeline execution has not started", None))
       throw _exception.get
     }
+    waitForTeardown()
+  }
 
+  private def waitForTeardown(): Unit = {
     if (!finished) {
       val watchdog = runtime.watchdogTimeout
       if (watchdog < 0) {
@@ -167,6 +173,11 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
     }
   }
 
+  def stop(): Unit = {
+    _monitor ! GAbortExecution()
+    waitForTeardown()
+  }
+
   private def makeActors(): Unit = {
     _system = ActorSystem("jafpl-com-" + UniqueId.nextId)
     _monitor = _system.actorOf(Props(new GraphMonitor(graph, this)), name = "monitor")
@@ -183,6 +194,8 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
           _system.actorOf(Props(new BufferActor(_monitor, this, buf)), actorName)
         case sink: Sink =>
           _system.actorOf(Props(new SinkActor(_monitor, this, sink)), actorName)
+        case source: EmptySource =>
+          _system.actorOf(Props(new EmptySourceActor(_monitor, this, source)), actorName)
         case forEach: LoopEachStart =>
           _system.actorOf(Props(new LoopEachActor(_monitor, this, forEach)), actorName)
         case viewport: ViewportStart =>
