@@ -162,6 +162,12 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
+                        <a class="class" href="FinallyStart.html" title="The catch block of a try catch."></a>
+                        <a href="FinallyStart.html" title="The catch block of a try catch.">
+                          FinallyStart
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
                         <a class="class" href="" title="A pipeline graph."></a>
                         <a href="" title="A pipeline graph.">
                           Graph
@@ -539,6 +545,55 @@ errors or unexpected results may occur.</p><p>The following conditions are error
 but steps outside a container cannot &quot;see&quot; the steps inside a container directly. Instead,
 the inner steps must provide outputs through their container.
 </p></div><dl class="paramcmts block"><dt class="param">from</dt><dd class="cmt"><p>The source node, the one that will be sending output.</p></dd><dt class="param">fromName</dt><dd class="cmt"><p>The name of the output port on the source node.</p></dd><dt class="param">to</dt><dd class="cmt"><p>The destination node, the one that will be receiving input.</p></dd><dt class="param">toName</dt><dd class="cmt"><p>The name of the input port on the destination node.</p></dd></dl></div>
+    </li><li name="com.jafpl.graph.Graph#addEmptySource" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="addEmptySource():com.jafpl.graph.EmptySource"></a><a id="addEmptySource():EmptySource"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addEmptySource():com.jafpl.graph.EmptySource" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addEmptySource</span><span class="params">()</span><span class="result">: <span class="extype" name="com.jafpl.graph.EmptySource">EmptySource</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
+    </li><li name="com.jafpl.graph.Graph#addFinally" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="addFinally(label:Option[String]):com.jafpl.graph.FinallyStart"></a><a id="addFinally(Option[String]):FinallyStart"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addFinally(label:Option[String]):com.jafpl.graph.FinallyStart" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addFinally</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="FinallyStart.html" class="extype" name="com.jafpl.graph.FinallyStart">FinallyStart</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
+    </li><li name="com.jafpl.graph.Graph#addFor" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="addFor(label:Option[String],countFrom:Long,countTo:Long,countBy:Long):com.jafpl.graph.LoopForStart"></a><a id="addFor(Option[String],Long,Long,Long):LoopForStart"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addFor(label:Option[String],countFrom:Long,countTo:Long,countBy:Long):com.jafpl.graph.LoopForStart" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addFor</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="countFrom">countFrom: <span class="extype" name="scala.Long">Long</span></span>, <span name="countTo">countTo: <span class="extype" name="scala.Long">Long</span></span>, <span name="countBy">countBy: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.LoopForStart">LoopForStart</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Adds a for-loop to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a for-loop to the graph.
+</p></div><dl class="paramcmts block"><dt class="param">label</dt><dd class="cmt"><p>An optional, user-defined label.</p></dd><dt>returns</dt><dd class="cmt"><p>The constructed for-each.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addForEach" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="addForEach(label:Option[String]):com.jafpl.graph.LoopEachStart"></a><a id="addForEach(Option[String]):LoopEachStart"></a>
       <span class="permalink">

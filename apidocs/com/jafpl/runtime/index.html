@@ -354,7 +354,8 @@ invalid or, in the case of a request for a boolean, if it has no boolean value.<
             </a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       
-      <p class="shortcomment cmt">Execute a pipeline.</p><div class="fullcomment"><div class="comment cmt"><p>Execute a pipeline.</p><p>The graph runtime executes a pipeline.</p><p>If the specified graph is open, it will be closed. If it is not valid, an exception is thrown.
+      <p class="shortcomment cmt">Execute a pipeline.</p><div class="fullcomment"><div class="comment cmt"><p>Execute a pipeline.</p><p>The graph runtime executes a pipeline.</p><p>If the specified graph is open, it will be closed. If it is not valid, an exception is thrown.</p><p>Constructing the runtime builds the network of Akka actors. If for some reason you decide not
+to run the pipeline, you must call <code>stop</code> to tear it down.
 </p></div></div>
     </li><li name="com.jafpl.runtime.InputProxy" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="InputProxyextendsDataConsumer"></a><a id="InputProxy:InputProxy"></a>

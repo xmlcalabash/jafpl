@@ -194,7 +194,8 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Execute a pipeline.</p><p>The graph runtime executes a pipeline.</p><p>If the specified graph is open, it will be closed. If it is not valid, an exception is thrown.
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Execute a pipeline.</p><p>The graph runtime executes a pipeline.</p><p>If the specified graph is open, it will be closed. If it is not valid, an exception is thrown.</p><p>Constructing the runtime builds the network of Akka actors. If for some reason you decide not
+to run the pipeline, you must call <code>stop</code> to tear it down.
 </p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
@@ -730,6 +731,22 @@ The pipeline will continue to run in other threads.</p><p>To determine if execut
       </span>
       
       <p class="shortcomment cmt">Returns true if the pipeline execution has started.</p>
+    </li><li name="com.jafpl.runtime.GraphRuntime#stop" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="stop():Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/GraphRuntime.html#stop():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">stop</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
