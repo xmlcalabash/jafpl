@@ -12,12 +12,21 @@
 <xsl:output method="text" encoding="utf-8" indent="yes"/>
 <xsl:strip-space elements="*"/>
 
+<xsl:param name="digraph" select="()"/>
+
 <!-- ============================================================ -->
 
 <xsl:template match="/">
   <xsl:variable name="gv" as="element(dot:digraph)">
     <xsl:apply-templates/>
   </xsl:variable>
+
+  <xsl:if test="exists($digraph)">
+    <xsl:result-document method="xml" href="{$digraph}">
+      <xsl:sequence select="$gv"/>
+    </xsl:result-document>
+  </xsl:if>
+
   <xsl:apply-templates select="$gv" mode="gv2dot"/>
 </xsl:template>
 
@@ -210,7 +219,16 @@
       <xsl:value-of select="concat(g:id($node/../..),'-I-',$node/@input-port)"/>
     </xsl:when>
     <xsl:when test="$node/self::g:out-edge">
-      <xsl:value-of select="concat(g:id($node/../..),'-O-',$node/@output-port)"/>
+      <xsl:variable name="oport" select="$node/@output-port"/>
+      <xsl:choose>
+        <xsl:when test="$node/../../self::g:container
+                        and $node/../../g:inputs/g:in-edge[@input-port = $oport]">
+          <xsl:value-of select="g:id($node/../../g:inputs/g:in-edge[@input-port = $oport])"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat(g:id($node/../..),'-O-',$node/@output-port)"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:when>
     <xsl:otherwise>
       <xsl:message terminate="yes">ID of <xsl:sequence select="$node"/></xsl:message>
