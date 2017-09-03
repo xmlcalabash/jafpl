@@ -15,6 +15,7 @@ private[jafpl] class ContainerEnd(override val graph: Graph) extends Node(graph,
         throw new GraphException("End of " + this + " is this: " + node, location)
       }
       _start = Some(node)
+      internal_name = node.internal_name + "_end"
     } else {
       throw new GraphException("Start of " + this + " is already defined: " + _start.get, location)
     }

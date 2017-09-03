@@ -23,7 +23,7 @@ abstract class Node(val graph: Graph,
                     val userLabel: Option[String]) {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
   private var _start: Option[ContainerStart] = None
-  private val _name: String = if (userLabel.isDefined) {
+  private var _name: String = if (userLabel.isDefined) {
     val regex = """([\p{L}_][-\p{L}_\p{N}]*)""".r
     userLabel.get match {
       case regex(lbl) => lbl
@@ -43,7 +43,6 @@ abstract class Node(val graph: Graph,
     */
   val id: String = UniqueId.nextId.toString
 
-  private val _label = s"${_name}-$id"
   private var _loc = Option.empty[Location]
 
   /** The node's location.
@@ -62,7 +61,12 @@ abstract class Node(val graph: Graph,
     * node is always appended to the label.
     *
     */
-  def label: String = _label
+  def label: String = s"${_name}-$id"
+
+  protected[graph] def internal_name: String = _name
+  protected[graph] def internal_name_=(newname: String): Unit = {
+    _name = newname
+  }
 
   /** Add a dependency edge.
     *
