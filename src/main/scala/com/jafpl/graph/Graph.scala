@@ -258,6 +258,24 @@ class Graph(listener: Option[ErrorListener]) {
     start
   }
 
+  /** Adds a for-loop to the graph.
+    *
+    * @param label An optional, user-defined label.
+    * @return The constructed for-each.
+    */
+  protected[graph] def addFor(label: Option[String], countFrom: Long, countTo: Long, countBy: Long): LoopForStart = {
+    checkOpen()
+
+    val end = new ContainerEnd(this)
+    val start = new LoopForStart(this, end, label, countFrom, countTo, countBy)
+    end.parent = start
+    end.start = start
+    _nodes += start
+    _nodes += end
+
+    start
+  }
+
   /** Adds a viewport to the graph.
     *
     * @param composer The viewport composer.
@@ -769,7 +787,8 @@ class Graph(listener: Option[ErrorListener]) {
         case end: ContainerEnd =>
           val start = end.start.get
           for (port <- node.inputs) {
-            if (!start.outputs.contains(port)) {
+            val skipLoopTest = start.isInstanceOf[LoopStart] && (port == "test")
+            if (!start.outputs.contains(port) && !skipLoopTest) {
               logger.debug(s"Output $port on $start unread, adding sink")
               val sink = if (start.parent.isDefined) {
                 start.parent.get.addSink()
@@ -1075,7 +1094,11 @@ class Graph(listener: Option[ErrorListener]) {
     */
   def dump(): Unit = {
     for (node <- _nodes) {
-      println(node)
+      if (node.parent.isDefined) {
+        println(s"$node (${node.parent.get}")
+      } else {
+        println(s"$node")
+      }
     }
     for (edge <- _edges) {
       println(edge)

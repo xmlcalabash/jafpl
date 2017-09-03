@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.{ActorRef, ActorSystem, DeadLetter, Props}
 import com.jafpl.exceptions.{GraphException, PipelineException}
-import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, EmptySource, FinallyStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopUntilStart, LoopWhileStart, PipelineStart, Sink, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
+import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, EmptySource, FinallyStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopForStart, LoopUntilStart, LoopWhileStart, PipelineStart, Sink, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
 import com.jafpl.runtime.GraphMonitor.{GAbortExecution, GException, GNode, GRun, GWatchdog}
 import com.jafpl.steps.{BindingProvider, DataConsumer, DataConsumerProxy}
 import com.jafpl.util.{DeadLetterListener, UniqueId}
@@ -207,6 +207,8 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
           _system.actorOf(Props(new ChooseActor(_monitor, this, choose)), actorName)
         case when: WhenStart =>
           _system.actorOf(Props(new WhenActor(_monitor, this, when)), actorName)
+        case forLoop: LoopForStart =>
+          _system.actorOf(Props(new LoopForActor(_monitor, this, forLoop)), actorName)
         case trycatch: TryCatchStart =>
           _system.actorOf(Props(new TryCatchActor(_monitor, this, trycatch)), actorName)
         case trycatch: TryStart =>

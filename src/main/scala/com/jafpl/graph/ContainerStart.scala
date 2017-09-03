@@ -150,6 +150,35 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     node
   }
 
+  /** Add a new for-loop container to this container.
+    *
+    * @return The node added.
+    */
+  def addFor(countTo: Long): LoopForStart = addFor(None, 1, countTo, 1)
+
+  /** Add a new for-loop container to this container.
+    *
+    * @param label A user-defined label.
+    * @return The node added.
+    */
+  def addFor(label: String, countTo: Long): LoopForStart = addFor(Some(label), 1, countTo, 1)
+
+  def addFor(countFrom: Long, countTo: Long): LoopForStart = addFor(None, countFrom, countTo, 1)
+  def addFor(label: String, countFrom: Long, countTo: Long): LoopForStart = addFor(Some(label), countFrom, countTo, 1)
+  def addFor(countFrom: Long, countTo: Long, countBy: Long): LoopForStart = addFor(None, countFrom, countTo, countBy)
+  def addFor(label: String, countFrom: Long, countTo: Long, countBy: Long): LoopForStart = addFor(Some(label), countFrom, countTo, countBy)
+
+  /** Add a new for-loop container to this container.
+    *
+    * @param label An optional, user-defined label.
+    * @return The node added.
+    */
+  def addFor(label: Option[String], countFrom: Long, countTo: Long, countBy: Long): LoopForStart = {
+    val node = graph.addFor(label, countFrom, countTo, countBy)
+    addChild(node)
+    node
+  }
+
   /** Add a new while container to this container.
     *
     * @param tester The test evaluator.
