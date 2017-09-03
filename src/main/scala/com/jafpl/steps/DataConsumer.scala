@@ -6,7 +6,7 @@ import com.jafpl.messages.Metadata
   *
   * Atomic step implementations are independent of the graph execution infrastructure.
   *
-  * Steps call the `send` method on this object to deliver output.
+  * Steps call the `receive` method on this object to deliver output.
   *
   */
 trait DataConsumer {

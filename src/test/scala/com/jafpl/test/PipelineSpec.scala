@@ -28,8 +28,8 @@ class PipelineSpec extends FlatSpec {
     graph.addOutput(pipeline, "result")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
-    runtime.inputs("source1").receive("source1", "Hello", Metadata.BLANK)
-    runtime.inputs("source2").receive("source", "World", Metadata.BLANK)
+    runtime.inputs("source1").send("Hello", Metadata.BLANK)
+    runtime.inputs("source2").send("World", Metadata.BLANK)
 
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)

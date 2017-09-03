@@ -4,7 +4,7 @@ import akka.actor.{ActorRef, ActorSystem, DeadLetter, Props}
 import com.jafpl.exceptions.{GraphException, PipelineException}
 import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, EmptySource, FinallyStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopForStart, LoopUntilStart, LoopWhileStart, PipelineStart, Sink, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
 import com.jafpl.runtime.GraphMonitor.{GAbortExecution, GException, GNode, GRun, GWatchdog}
-import com.jafpl.steps.{BindingProvider, DataConsumer, DataConsumerProxy}
+import com.jafpl.steps.{BindingProvider, DataConsumerProxy, DataProvider}
 import com.jafpl.util.{DeadLetterListener, UniqueId}
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -66,7 +66,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
     *
     * @return A map of the expected inputs.
     */
-  def inputs: Map[String, DataConsumer] = Map() ++ _graphInputs
+  def inputs: Map[String, DataProvider] = Map() ++ _graphInputs
 
   /** A map of the variable bindings that the pipeline expects.
     *

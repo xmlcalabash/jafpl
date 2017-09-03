@@ -25,7 +25,7 @@ class BindingSpec extends FlatSpec {
     graph.close()
     val runtime = new GraphRuntime(graph, runtimeConfig)
 
-    runtime.inputs("source").receive("foo", "Hello, World", Metadata.STRING)
+    runtime.inputs("source").send("Hello, World", Metadata.STRING)
 
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
