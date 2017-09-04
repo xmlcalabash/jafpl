@@ -917,9 +917,9 @@ class Graph(listener: Option[ErrorListener]) {
         val fromCard = edge.from.step.get.outputSpec.cardinality(edge.fromPort)
         val toCard = edge.to.step.get.inputSpec.cardinality(edge.toPort)
         if (fromCard.isEmpty) {
-          logger.warn(s"Step ${edge.from.step.get} has no output port named ${edge.fromPort}")
+          logger.debug(s"Step ${edge.from.step.get} has no output port named ${edge.fromPort}")
         } else if (toCard.isEmpty) {
-          logger.warn(s"Step ${edge.to.step.get} has no input port named ${edge.toPort}")
+          logger.debug(s"Step ${edge.to.step.get} has no input port named ${edge.toPort}")
         } else {
           if ((fromCard.get == "1") || (toCard.get == "*") || (fromCard.get == toCard.get)) {
             // nop; this is bound to be fine.
