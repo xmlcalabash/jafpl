@@ -1,5 +1,6 @@
 package com.jafpl.steps
 
+import com.jafpl.graph.Location
 import com.jafpl.messages.Metadata
 import com.jafpl.runtime.RuntimeConfiguration
 
@@ -58,6 +59,16 @@ trait Step extends DataConsumer {
     * @param consumer The consumer.
     */
   def setConsumer(consumer: DataConsumer)
+
+  /** Set the location associated with this step.
+    *
+    * Many pipelines are constructed from an external, declarative description. In the event
+    * that constructing or running the pipeline results in an error, authors will be greatly
+    * relieved if the source of their error can be pinpointed exactly.
+    *
+    * @param location The location associated with this step.
+    */
+  def setLocation(location: Location)
 
   /** Receive a binding.
     *

@@ -1,9 +1,12 @@
 package com.jafpl.steps
 
+import com.jafpl.graph.Location
 import com.jafpl.messages.Metadata
 import com.jafpl.runtime.RuntimeConfiguration
 
 class DefaultStep  extends Step {
+  protected var location = Option.empty[Location]
+
   override def inputSpec: PortSpecification = PortSpecification.ANY
   override def outputSpec: PortSpecification = PortSpecification.ANY
   override def bindingSpec: BindingSpecification = BindingSpecification.ANY
@@ -16,6 +19,10 @@ class DefaultStep  extends Step {
 
   override def setConsumer(consumer: DataConsumer): Unit = {
     this.consumer = Some(consumer)
+  }
+
+  override def setLocation(location: Location): Unit = {
+    this.location = Some(location)
   }
 
   override def receive(port: String, item: Any, metadata: Metadata): Unit = {
