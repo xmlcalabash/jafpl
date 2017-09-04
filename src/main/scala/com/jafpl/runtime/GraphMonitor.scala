@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import java.time.{Duration, Instant}
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Actor, ActorRef, PoisonPill}
 import akka.event.Logging
 import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.{ContainerEnd, Graph, Node}
@@ -81,14 +81,16 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
   def stopPipeline(): Unit = {
     trace(s"STOPPING", "Run")
     for (node <- unstoppedNodes) {
-      actors(node) ! NStop()
+      if (node.parent.isEmpty) {
+        actors(node) ! NStop()
+      }
     }
   }
 
   def stoppedStep(node: Node): Unit = {
     unstoppedNodes -= node
+    actors(node) ! PoisonPill
     if (unstoppedNodes.isEmpty) {
-      context.system.terminate()
       if (exception.isDefined) {
         runtime.finish(exception.get)
       } else {

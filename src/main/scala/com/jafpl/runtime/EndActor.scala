@@ -3,7 +3,7 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.graph.{ContainerEnd, Node}
 import com.jafpl.messages.Message
-import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput}
+import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput, GStop}
 
 import scala.collection.mutable
 

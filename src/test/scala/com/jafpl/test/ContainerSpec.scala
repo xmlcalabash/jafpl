@@ -9,7 +9,7 @@ import com.jafpl.steps.{Identity, Producer}
 import org.scalatest.FlatSpec
 
 class ContainerSpec extends FlatSpec {
-  var runtimeConfig = new PrimitiveRuntimeConfiguration()
+  var runtimeConfig = new PrimitiveRuntimeConfiguration(true)
 
   "Containers " should " allow unread inputs" in {
     val graph = new Graph()

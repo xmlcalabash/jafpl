@@ -30,6 +30,7 @@ private[runtime] class StartActor(private val monitor: ActorRef,
       trace(s"STOPC ... $child (for $node)", "Stopping")
       monitor ! GStop(child)
     }
+    monitor ! GStop(node.containerEnd)
     monitor ! GStopped(node)
   }
 

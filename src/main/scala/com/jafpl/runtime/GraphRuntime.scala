@@ -4,6 +4,7 @@ import akka.actor.{ActorRef, ActorSystem, DeadLetter, Props}
 import com.jafpl.exceptions.{GraphException, PipelineException}
 import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, EmptySource, FinallyStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopForStart, LoopUntilStart, LoopWhileStart, PipelineStart, Sink, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
 import com.jafpl.runtime.GraphMonitor.{GAbortExecution, GException, GNode, GRun, GWatchdog}
+import com.jafpl.runtime.Reaper.WatchMe
 import com.jafpl.steps.{BindingProvider, DataConsumerProxy, DataProvider}
 import com.jafpl.util.{DeadLetterListener, UniqueId}
 import org.slf4j.{Logger, LoggerFactory}
@@ -27,6 +28,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   protected[jafpl] val logger: Logger = LoggerFactory.getLogger(this.getClass)
   private var _system: ActorSystem = _
   private var _monitor: ActorRef = _
+  private var reaper: ActorRef = _
   private val sleepInterval = 100
   private var _started = false
   private var _finished = false
@@ -95,8 +97,8 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   }
 
   protected[runtime] def finish(cause: Throwable): Unit = {
-    finish()
     _exception = Some(cause)
+    finish()
   }
 
   /** Runs the pipeline.
@@ -181,6 +183,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   private def makeActors(): Unit = {
     _system = ActorSystem("jafpl-com-" + UniqueId.nextId)
     _monitor = _system.actorOf(Props(new GraphMonitor(graph, this)), name = "monitor")
+    reaper = _system.actorOf(Props(new Reaper(runtime)), name = "reaper")
 
     val listener = _system.actorOf(Props[DeadLetterListener])
     _system.eventStream.subscribe(listener, classOf[DeadLetter])
@@ -286,6 +289,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
           throw new PipelineException("unexpected", s"Unexpected step type: $node", node.location)
       }
 
+      reaper ! WatchMe(actor)
       _monitor ! GNode(node, actor)
     }
   }
