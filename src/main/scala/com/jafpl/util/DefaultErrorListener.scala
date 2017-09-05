@@ -11,12 +11,20 @@ class DefaultErrorListener extends ErrorListener {
     msg("error", cause.getMessage, location)
   }
 
+  override def error(cause: Throwable): Unit = {
+    error(cause, None)
+  }
+
   override def warning(message: String, location: Option[Location]): Unit = {
     msg("warn", message, location)
   }
 
   override def warning(cause: Throwable, location: Option[Location]): Unit = {
     msg("warn", cause.getMessage, location)
+  }
+
+  override def warning(cause: Throwable): Unit = {
+    warning(cause, None)
   }
 
   override def info(message: String, location: Option[Location]): Unit = {
