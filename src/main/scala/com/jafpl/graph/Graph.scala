@@ -1,8 +1,9 @@
 package com.jafpl.graph
 
+import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.{GraphException, PipelineException}
 import com.jafpl.steps.{Step, ViewportComposer}
-import com.jafpl.util.{ErrorListener, ItemComparator, ItemTester, UniqueId}
+import com.jafpl.util.{ItemComparator, ItemTester, UniqueId}
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable
@@ -29,7 +30,7 @@ import scala.collection.mutable.ListBuffer
   * @constructor A pipeline graph.
   *
   */
-class Graph(listener: Option[ErrorListener]) {
+class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[jafpl] val logger: Logger = LoggerFactory.getLogger(this.getClass)
   private val _nodes = ListBuffer.empty[Node]
   private val _edges = ListBuffer.empty[Edge]
@@ -37,30 +38,18 @@ class Graph(listener: Option[ErrorListener]) {
   private var _valid = false
   private var exception = Option.empty[Throwable]
 
-  def this() {
-    this(None)
-  }
-
-  def this(listener: ErrorListener) {
-    this(Some(listener))
-  }
-
   protected[graph] def error(cause: Throwable): Unit = {
-    if (listener.isDefined) {
-      if (exception.isEmpty) {
-        exception = Some(cause)
-      }
+    if (exception.isEmpty) {
+      exception = Some(cause)
+    }
 
-      cause match {
-        case err: GraphException =>
-          listener.get.error(err, err.location)
-        case err: PipelineException =>
-          listener.get.error(err, err.location)
-        case _ =>
-          listener.get.error(cause, None)
-      }
-    } else {
-      throw cause
+    cause match {
+      case err: GraphException =>
+        jafpl.errorListener.error(err, err.location)
+      case err: PipelineException =>
+        jafpl.errorListener.error(err, err.location)
+      case _ =>
+        jafpl.errorListener.error(cause, None)
     }
   }
 
@@ -668,6 +657,11 @@ class Graph(listener: Option[ErrorListener]) {
     if (!open) {
       return // let's treat this as harmless
     }
+
+    if (exception.isDefined) {
+      throw exception.get
+    }
+
     _valid = true
 
     // Make sure all the required edges exist

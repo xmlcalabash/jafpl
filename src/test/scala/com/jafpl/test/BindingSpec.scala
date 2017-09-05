@@ -1,5 +1,6 @@
 package com.jafpl.test
 
+import com.jafpl.config.Jafpl
 import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
 import com.jafpl.messages.Metadata
@@ -12,7 +13,7 @@ class BindingSpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "An external document binding " should " be consumable" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline = graph.addPipeline()
     val ident    = pipeline.addAtomic(new Identity(), "ident")
@@ -37,7 +38,7 @@ class BindingSpec extends FlatSpec {
   }
 
   "An unbound external document binding " should " provides no documents" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline = graph.addPipeline()
     val ident    = pipeline.addAtomic(new Identity(), "ident")
@@ -63,7 +64,7 @@ class BindingSpec extends FlatSpec {
   "A variable binding " should " be available" in {
     var bc = new BufferSink()
 
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
 
     val binding  = pipeline.addVariable("x", "twelve")
@@ -85,7 +86,7 @@ class BindingSpec extends FlatSpec {
   }
 
   "An external variable binding " should " be consumable" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val binding  = graph.addBinding("foo")
     val pipeline = graph.addPipeline()
@@ -111,7 +112,7 @@ class BindingSpec extends FlatSpec {
   }
 
   "Reading an external variable binding twice " should " work" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val binding  = graph.addBinding("foo")
     val pipeline = graph.addPipeline()
@@ -144,7 +145,7 @@ class BindingSpec extends FlatSpec {
   }
 
   "Leaving an external variable binding unbound " should " be an error" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val binding  = graph.addBinding("foo")
     val pipeline = graph.addPipeline()

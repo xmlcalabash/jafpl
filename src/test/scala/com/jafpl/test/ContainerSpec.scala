@@ -1,5 +1,6 @@
 package com.jafpl.test
 
+import com.jafpl.config.Jafpl
 import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
 import com.jafpl.messages.Metadata
@@ -12,7 +13,7 @@ class ContainerSpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration(true)
 
   "Containers " should " allow unread inputs" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline  = graph.addPipeline()
     val p1        = pipeline.addAtomic(new Producer(List("doc1")), "p1")
@@ -40,7 +41,7 @@ class ContainerSpec extends FlatSpec {
   }
 
   "Containers " should " allow unread outputs" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline  = graph.addPipeline()
     val group     = pipeline.addGroup("group")

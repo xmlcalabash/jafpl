@@ -1,5 +1,6 @@
 package com.jafpl.test
 
+import com.jafpl.config.Jafpl
 import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
 import com.jafpl.messages.Metadata
@@ -13,7 +14,7 @@ class ProvidersSpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration(false)
 
   "Pipeline providers " should " should provide input and consume output" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline = graph.addPipeline(None)
     val ident = pipeline.addAtomic(new Identity(), "ident")

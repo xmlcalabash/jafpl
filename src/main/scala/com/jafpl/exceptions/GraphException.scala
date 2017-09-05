@@ -11,6 +11,8 @@ import com.jafpl.graph.Location
   * @param msg A message that describes the exception condition.
   */
 class GraphException(val msg: String, val location: Option[Location]) extends RuntimeException {
+  override def getMessage: String = msg
+
   override def toString: String = {
     var str = ""
 

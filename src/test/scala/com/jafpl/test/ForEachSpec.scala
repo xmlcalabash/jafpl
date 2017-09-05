@@ -1,5 +1,6 @@
 package com.jafpl.test
 
+import com.jafpl.config.Jafpl
 import com.jafpl.graph.Graph
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
@@ -10,7 +11,7 @@ class ForEachSpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "A for-each " should " iterate" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline = graph.addPipeline()
     val producer = pipeline.addAtomic(new Producer(List("1", "2", "3")), "producer")
@@ -38,7 +39,7 @@ class ForEachSpec extends FlatSpec {
   }
 
   "A for-each with three inputs " should " output 3 documents" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline = graph.addPipeline()
     val producer = pipeline.addAtomic(new Producer(List("1", "2", "3")), "producer")
@@ -65,7 +66,7 @@ class ForEachSpec extends FlatSpec {
   }
 
   "Inputs that cross a for-each " should " be buffered" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline = graph.addPipeline()
     val cprod    = pipeline.addAtomic(new Producer(List("1", "2", "3", "4")), "count_producer")
@@ -97,7 +98,7 @@ class ForEachSpec extends FlatSpec {
   }
 
   "A for-each with no input " should " produce no output" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline = graph.addPipeline()
     val producer = pipeline.addAtomic(new Producer(List()), "producer")

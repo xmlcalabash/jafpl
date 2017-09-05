@@ -1,5 +1,6 @@
 package com.jafpl.test
 
+import com.jafpl.config.Jafpl
 import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
@@ -13,7 +14,7 @@ class ForLoopSpec extends FlatSpec {
   behavior of "A for-loop"
 
   it should "iterate up" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline("mypipe")
     val forloop  = pipeline.addFor("loop", 1, 10)
     val ident = forloop.addAtomic(new Identity(), "ident")
@@ -40,7 +41,7 @@ class ForLoopSpec extends FlatSpec {
   }
 
   it should "iterate down" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline("mypipe")
     val forloop  = pipeline.addFor("loop", 20, 1, -2)
     val ident = forloop.addAtomic(new Identity(), "ident")

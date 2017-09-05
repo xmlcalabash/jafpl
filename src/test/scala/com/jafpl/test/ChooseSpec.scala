@@ -1,5 +1,6 @@
 package com.jafpl.test
 
+import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.GraphException
 import com.jafpl.graph.Graph
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
@@ -11,7 +12,7 @@ class ChooseSpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "Only a when " should " should be allowed in a choose" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline = graph.addPipeline(None)
     val choose = pipeline.addChoose("choose")
@@ -41,7 +42,7 @@ class ChooseSpec extends FlatSpec {
   }
 
   "A pipeline with choose first " should " choose the first" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline = graph.addPipeline(None)
     val producer = pipeline.addAtomic(new Producer(List("SomeDocument")), "producer")
@@ -75,7 +76,7 @@ class ChooseSpec extends FlatSpec {
   }
 
   "A pipeline with choose second " should " choose the second" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline = graph.addPipeline(None)
     val producer = pipeline.addAtomic(new Producer(List("SomeDocument")), "producer")
@@ -109,7 +110,7 @@ class ChooseSpec extends FlatSpec {
   }
 
   "A pipeline with choose both " should " choose the first" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline = graph.addPipeline(None)
     val producer = pipeline.addAtomic(new Producer(List("SomeDocument")), "producer")
@@ -143,7 +144,7 @@ class ChooseSpec extends FlatSpec {
   }
 
   "A pipeline with choose neither " should " choose neither" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline = graph.addPipeline(None)
     val producer = pipeline.addAtomic(new Producer(List("SomeDocument")), "producer")

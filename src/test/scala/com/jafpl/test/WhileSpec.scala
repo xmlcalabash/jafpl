@@ -1,5 +1,6 @@
 package com.jafpl.test
 
+import com.jafpl.config.Jafpl
 import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.{PrimitiveItemTester, PrimitiveRuntimeConfiguration}
@@ -11,7 +12,7 @@ class WhileSpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "A while " should " iterate until finished" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List(7)), "p1")
 
@@ -39,7 +40,7 @@ class WhileSpec extends FlatSpec {
   }
 
   "A while " should " not run without a test" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List(7)), "p1")
 
@@ -66,7 +67,7 @@ class WhileSpec extends FlatSpec {
   }
 
   "A while " should " not iterate at all if it's condition is initially false" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List(0)), "p1")
 
@@ -93,7 +94,7 @@ class WhileSpec extends FlatSpec {
   }
 
   "A while " should " be able to have multiple outputs" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List(3)), "p1")
 

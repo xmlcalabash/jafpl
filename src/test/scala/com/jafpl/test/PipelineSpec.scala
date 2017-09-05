@@ -1,5 +1,6 @@
 package com.jafpl.test
 
+import com.jafpl.config.Jafpl
 import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
 import com.jafpl.messages.Metadata
@@ -10,11 +11,12 @@ import org.scalatest.FlatSpec
 
 class PipelineSpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
+  var jafpl = Jafpl.newInstance()
 
   behavior of "A pipeline"
 
   it should "allow multiple inputs" in {
-    val graph = new Graph()
+    val graph    = jafpl.newGraph()
 
     val pipeline  = graph.addPipeline()
     val ident     = pipeline.addAtomic(new Identity(), "ident")
@@ -43,7 +45,7 @@ class PipelineSpec extends FlatSpec {
   }
 
   it should "allow multiple outputs" in {
-    val graph = new Graph()
+    val graph    = jafpl.newGraph()
 
     val pipeline  = graph.addPipeline()
     val producer1 = pipeline.addAtomic(new Producer("ONE"), "producer1")
@@ -72,7 +74,7 @@ class PipelineSpec extends FlatSpec {
   }
 
   it should "allow unread inputs" in {
-    val graph = new Graph()
+    val graph = jafpl.newGraph()
 
     val pipeline  = graph.addPipeline()
     val p1        = pipeline.addAtomic(new Producer(List("doc1")), "p1")
@@ -96,7 +98,7 @@ class PipelineSpec extends FlatSpec {
   }
 
   it should "allow unread outputs" in {
-    val graph = new Graph()
+    val graph = jafpl.newGraph()
 
     val pipeline  = graph.addPipeline()
     val p1        = pipeline.addAtomic(new Producer(List("doc1")), "p1")
@@ -121,7 +123,7 @@ class PipelineSpec extends FlatSpec {
   }
 
   it should " be abortable" in {
-    val graph = new Graph()
+    val graph = jafpl.newGraph()
 
     val pipeline  = graph.addPipeline()
     val p1        = pipeline.addAtomic(new Producer(List("doc1")), "p1")

@@ -1,5 +1,6 @@
 package com.jafpl.test
 
+import com.jafpl.config.Jafpl
 import com.jafpl.graph.Graph
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
@@ -10,7 +11,7 @@ class CardinalitySpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "Incorrect input cardinalities " should " cause the pipeline to fail" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
     val pipeline = graph.addPipeline()
@@ -34,7 +35,7 @@ class CardinalitySpec extends FlatSpec {
   }
 
   "Incorrect output cardinalities " should " cause the pipeline to fail" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
     val pipeline = graph.addPipeline()

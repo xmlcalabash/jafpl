@@ -1,5 +1,6 @@
 package com.jafpl.test
 
+import com.jafpl.config.Jafpl
 import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.{PrimitiveItemComparator, PrimitiveRuntimeConfiguration}
@@ -11,7 +12,7 @@ class UntilSpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "An until " should " iterate until finished" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List(7)), "p1")
 
@@ -40,7 +41,7 @@ class UntilSpec extends FlatSpec {
   }
 
   "An until " should " require a test" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List(7)), "p1")
 
@@ -68,7 +69,7 @@ class UntilSpec extends FlatSpec {
   }
 
   "An until " should " iterate at least once" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List(0)), "p1")
 

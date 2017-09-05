@@ -35,7 +35,7 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
   }
 
   override protected def run(): Unit = {
-    if (traceEnabled("Bindings")) {
+    if (runtime.traceEventManager.traceEnabled("Bindings")) {
       var sbindings = ""
       for (name <- bindings.keySet) {
         if (sbindings != "") {

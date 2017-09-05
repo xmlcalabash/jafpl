@@ -1,5 +1,6 @@
 package com.jafpl.test
 
+import com.jafpl.config.Jafpl
 import com.jafpl.graph.Graph
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
@@ -10,7 +11,7 @@ class SimplestPipelineSpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "The almost simplest possible pipeline " should " run" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
     val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "doc")
     val sink = pipeline.addAtomic(new Sink(), "sink")
@@ -22,7 +23,7 @@ class SimplestPipelineSpec extends FlatSpec {
   }
 
   "A pipeline with splits and joins " should " run" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
     val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
     val ident1 = pipeline.addAtomic(new Identity(), "ident1")
@@ -40,7 +41,7 @@ class SimplestPipelineSpec extends FlatSpec {
   }
 
   "A dependency " should " determine step order" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
     val pipeline = graph.addPipeline()
@@ -63,7 +64,7 @@ class SimplestPipelineSpec extends FlatSpec {
   }
 
   "Multiple dependencies to the same step " should " be allowed" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
     val pipeline = graph.addPipeline()

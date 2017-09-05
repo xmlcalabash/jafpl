@@ -41,7 +41,6 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
   protected val unfinishedNodes = mutable.HashSet.empty[Node]
   protected val unstoppedNodes = mutable.HashSet.empty[Node]
   private val actors = mutable.HashMap.empty[Node, ActorRef]
-  private val traces = mutable.HashSet.empty[String]
   private var lastMessage = Instant.now()
   private var exception: Option[Throwable] = None
 
@@ -50,7 +49,8 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
   }
 
   protected def trace(level: String, message: String, event: String): Unit = {
-    if (traces.contains(event) || runtime.runtime.traceEnabled(event)) {
+    // We don't use the traceEventManager.trace() call because we want to use the Akka logger
+    if (runtime.traceEventManager.traceEnabled(event)) {
       level match {
         case "info" => log.info(message)
         case "debug" => log.debug(message)
@@ -240,7 +240,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
     case GTrace(event) =>
       lastMessage = Instant.now()
       trace(s"ADDTRACE $event", "Traces")
-      traces += event
+      runtime.traceEventManager.enableTrace(event)
 
     case GNode(node,actor) =>
       lastMessage = Instant.now()

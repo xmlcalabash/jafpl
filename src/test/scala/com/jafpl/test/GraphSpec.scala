@@ -1,7 +1,7 @@
 package com.jafpl.test
 
+import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.GraphException
-import com.jafpl.graph.Graph
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.steps.{Identity, Producer, Sink}
 import org.scalatest.FlatSpec
@@ -10,7 +10,7 @@ class GraphSpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "A simple graph " should " compile" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline = graph.addPipeline()
     val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
@@ -29,7 +29,7 @@ class GraphSpec extends FlatSpec {
   }
 
   "Containers " should " be able to read from nodes outside them" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline = graph.addPipeline()
     val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
@@ -47,7 +47,7 @@ class GraphSpec extends FlatSpec {
   }
 
   "Steps " should " not be able to read from nodes inside containers" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline = graph.addPipeline()
     val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
@@ -74,8 +74,9 @@ class GraphSpec extends FlatSpec {
   }
 
   "Nodes " should " be from the same graph" in {
-    val graph1 = new Graph()
-    val graph2 = new Graph()
+    val jafpl     = Jafpl.newInstance()
+    val graph1    = jafpl.newGraph()
+    val graph2    = jafpl.newGraph()
 
     val pipeline1 = graph1.addPipeline()
     val ident1 = pipeline1.addAtomic(new Identity(), "ident1")
@@ -86,6 +87,7 @@ class GraphSpec extends FlatSpec {
     var pass = false
     try {
       graph1.addEdge(ident1, "result", ident2, "source")
+      graph1.close()
     } catch {
       case eg: GraphException => pass = true
     }
@@ -94,7 +96,7 @@ class GraphSpec extends FlatSpec {
   }
 
   "A closed graph " should " not be updatable" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline = graph.addPipeline()
     val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
@@ -121,7 +123,7 @@ class GraphSpec extends FlatSpec {
   }
 
   "No loops " should " be allowed" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline = graph.addPipeline()
     val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")

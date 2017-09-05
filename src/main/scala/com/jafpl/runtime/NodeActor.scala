@@ -40,7 +40,6 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   protected val openInputs = mutable.HashSet.empty[String]
   protected val openBindings = mutable.HashSet.empty[String]
   protected var readyToRun = false
-  protected val traces = mutable.HashSet.empty[String]
   protected val cardinalities = mutable.HashMap.empty[String, Long]
   protected var proxy = Option.empty[DataConsumer]
 
@@ -49,16 +48,13 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     proxy = Some(consumer)
   }
 
-  protected def traceEnabled(event: String): Boolean = {
-    traces.contains(event) || runtime.runtime.traceEnabled(event)
-  }
-
   protected def trace(message: String, event: String): Unit = {
     trace("info", message, event)
   }
 
   protected def trace(level: String, message: String, event: String): Unit = {
-    if (traceEnabled(event)) {
+    // We don't use the traceEventManager.trace() call because we want to use the Akka logger
+    if (runtime.traceEventManager.traceEnabled(event)) {
       level match {
         case "info" => log.info(message)
         case "debug" => log.debug(message)
@@ -415,11 +411,11 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
 
     case NTraceEnable(event) =>
       trace(s"TRACEADD $event", "Traces")
-      traces += event
+      runtime.traceEventManager.enableTrace(event)
 
     case NTraceDisable(event) =>
       trace(s"TRACERMV $event", "Traces")
-      traces -= event
+      runtime.traceEventManager.disableTrace(event)
 
     case m: Any =>
       log.error(s"Unexpected message: $m")

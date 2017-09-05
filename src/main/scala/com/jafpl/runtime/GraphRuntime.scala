@@ -6,7 +6,7 @@ import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, Co
 import com.jafpl.runtime.GraphMonitor.{GAbortExecution, GException, GNode, GRun, GWatchdog}
 import com.jafpl.runtime.Reaper.WatchMe
 import com.jafpl.steps.{BindingProvider, DataConsumerProxy, DataProvider}
-import com.jafpl.util.{DeadLetterListener, UniqueId}
+import com.jafpl.util.{DeadLetterListener, DefaultTraceEventManager, TraceEventManager, UniqueId}
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable
@@ -36,6 +36,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   private var _graphInputs = mutable.HashMap.empty[String, InputProxy]
   private var _graphBindings = mutable.HashMap.empty[String, BindingProxy]
   private var _graphOutputs = mutable.HashMap.empty[String, OutputProxy]
+  private var _traceEventManager: TraceEventManager = new DefaultTraceEventManager()
 
   graph.close()
 
@@ -44,6 +45,11 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   }
 
   makeActors()
+
+  def traceEventManager: TraceEventManager = _traceEventManager
+  def traceEventManager_=(manager: TraceEventManager): Unit = {
+    _traceEventManager = manager
+  }
 
   /** Returns true if the pipeline execution has started.
     */

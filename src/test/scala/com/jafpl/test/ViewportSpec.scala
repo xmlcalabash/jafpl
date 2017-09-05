@@ -1,5 +1,6 @@
 package com.jafpl.test
 
+import com.jafpl.config.Jafpl
 import com.jafpl.graph.Graph
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
@@ -10,7 +11,7 @@ class ViewportSpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "A viewport " should " do what a viewport does" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
     val pipeline = graph.addPipeline()
@@ -35,7 +36,7 @@ class ViewportSpec extends FlatSpec {
   }
 
   "A viewport " should " be able to have any output port name" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
     val pipeline = graph.addPipeline()
@@ -60,7 +61,7 @@ class ViewportSpec extends FlatSpec {
   }
 
   "A viewport with no input " should " produce no output" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
     val pipeline = graph.addPipeline()

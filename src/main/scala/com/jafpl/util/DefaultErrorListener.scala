@@ -24,27 +24,23 @@ class DefaultErrorListener extends ErrorListener {
   }
 
   private def msg(level: String, message: String, location: Option[Location]): Unit = {
-    var prefix = ""
+    var line = ""
 
-    print(level)
-    prefix = ":"
-
+    line += level
     if (location.isDefined) {
       val loc = location.get
       if (loc.uri.isDefined) {
-        print(loc.uri.get)
-        prefix = ":"
+        line += ":" + loc.uri.get
       }
       if (loc.line.isDefined) {
-        print(prefix, loc.line.get)
-        prefix = ":"
+        line += ":" + loc.line.get
       }
       if (loc.column.isDefined) {
-        print(prefix, loc.column.get)
-        prefix = ":"
+        line += ":" + loc.column.get
       }
     }
+    line += ":" + message
 
-    println(prefix, message)
+    println(line)
   }
 }

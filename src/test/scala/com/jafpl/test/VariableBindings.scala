@@ -1,5 +1,6 @@
 package com.jafpl.test
 
+import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
@@ -12,7 +13,7 @@ class VariableBindings extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "A variable binding " should " work" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
 
     val bind     = pipeline.addVariable("fred", "some value")
@@ -35,7 +36,7 @@ class VariableBindings extends FlatSpec {
   }
 
   "A variable binding provided by the runtime " should " also work" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
 
     val bind     = graph.addBinding("fred")
@@ -61,7 +62,7 @@ class VariableBindings extends FlatSpec {
   }
 
   "An unbound variable " should " cause an exception" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
 
     val bind     = graph.addBinding("fred")
@@ -91,7 +92,7 @@ class VariableBindings extends FlatSpec {
   }
 
   "Intermediate variables " should " be computed" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
 
     val bind     = graph.addBinding("a")

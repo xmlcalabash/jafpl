@@ -1,5 +1,6 @@
 package com.jafpl.test
 
+import com.jafpl.config.Jafpl
 import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
@@ -15,7 +16,7 @@ class TryCatchSpec extends FlatSpec {
   it should "succeed if the try branch succeeds" in {
     val bc = new BufferSink()
 
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List("doc1")), "p1")
     val p2       = pipeline.addAtomic(new Producer(List("doc2")), "p2")
@@ -55,7 +56,7 @@ class TryCatchSpec extends FlatSpec {
   it should "run the catch that matches the error code" in {
     val bc = new BufferSink()
 
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List("doc1")), "p1")
     val p2       = pipeline.addAtomic(new Producer(List("doc2")), "p2")
@@ -95,7 +96,7 @@ class TryCatchSpec extends FlatSpec {
   it should "run the generic catch if no codes match" in {
     val bc = new BufferSink()
 
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List("doc1")), "p1")
     val p2       = pipeline.addAtomic(new Producer(List("doc2")), "p2")
@@ -135,7 +136,7 @@ class TryCatchSpec extends FlatSpec {
   it should " fail if no catches match" in {
     val bc = new BufferSink()
 
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List("doc1")), "p1")
     val p2       = pipeline.addAtomic(new Producer(List("doc2")), "p2")
@@ -177,7 +178,7 @@ class TryCatchSpec extends FlatSpec {
   }
 
   it should "run the finally when the try succeeds" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List("doc1")), "p1")
     val p2       = pipeline.addAtomic(new Producer(List("doc2")), "p2")
@@ -234,7 +235,7 @@ class TryCatchSpec extends FlatSpec {
   }
 
   it should "run the finally after catching an error" in {
-    val graph = new Graph()
+    val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
     val p1       = pipeline.addAtomic(new Producer(List("doc1")), "p1")
     val p2       = pipeline.addAtomic(new Producer(List("doc2")), "p2")
