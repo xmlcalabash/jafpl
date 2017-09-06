@@ -11,9 +11,11 @@ import org.scalatest.FlatSpec
 
 class ContainerSpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration(true)
+  val jafpl = Jafpl.newInstance()
+  jafpl.traceEventManager.traceEnabled("ALL")
 
   "Containers " should " allow unread inputs" in {
-    val graph    = Jafpl.newInstance().newGraph()
+    val graph     = jafpl.newGraph()
 
     val pipeline  = graph.addPipeline()
     val p1        = pipeline.addAtomic(new Producer(List("doc1")), "p1")
@@ -41,7 +43,7 @@ class ContainerSpec extends FlatSpec {
   }
 
   "Containers " should " allow unread outputs" in {
-    val graph    = Jafpl.newInstance().newGraph()
+    val graph     = jafpl.newGraph()
 
     val pipeline  = graph.addPipeline()
     val group     = pipeline.addGroup("group")
