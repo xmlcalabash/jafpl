@@ -9,7 +9,7 @@ import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.ProduceBinding
 import org.scalatest.FlatSpec
 
-class VariableBindings extends FlatSpec {
+class VariableBindingSpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "A variable binding " should " work" in {

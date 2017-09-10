@@ -1,6 +1,6 @@
 package com.jafpl.steps
 
-import com.jafpl.messages.Metadata
+import com.jafpl.messages.{Message, Metadata}
 
 /** Interface for sending outputs from atomic steps.
   *
@@ -12,11 +12,10 @@ import com.jafpl.messages.Metadata
 trait DataConsumer {
   /** Send output from a step.
     *
-    * Calling this method sends the specified `item` as an output on the specified `port`.
+    * Calling this method sends the specified `message` on the specified `port`.
     *
     * @param port The output port.
-    * @param item The item.
-    * @param metadata Item metadata.
+    * @param message The message.
     */
-  def receive(port: String, item: Any, metadata: Metadata): Unit
+  def receive(port: String, message: Message): Unit
 }

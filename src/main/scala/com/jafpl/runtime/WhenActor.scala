@@ -14,17 +14,17 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
                                  private val node: WhenStart) extends StartActor(monitor, runtime, node)  {
   var readyToCheck = false
   var recvContext = false
-  var contextItem = ListBuffer.empty[Any]
-  val bindings = mutable.HashMap.empty[String, Any]
+  var contextItem = ListBuffer.empty[Message]
+  val bindings = mutable.HashMap.empty[String, Message]
 
   override protected def input(port: String, msg: Message): Unit = {
     msg match {
       case item: ItemMessage =>
         assert(port == "condition")
-        contextItem += item.item
+        contextItem += item
       case binding: BindingMessage =>
         assert(port == "#bindings")
-        bindings.put(binding.name, binding.item)
+        bindings.put(binding.name, binding)
       case _ =>
         monitor ! GException(None,
           new PipelineException("badmessage", s"Unexpected message on $port", node.location))

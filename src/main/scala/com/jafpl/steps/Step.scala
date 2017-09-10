@@ -1,7 +1,7 @@
 package com.jafpl.steps
 
 import com.jafpl.graph.Location
-import com.jafpl.messages.Metadata
+import com.jafpl.messages.{BindingMessage, Metadata}
 import com.jafpl.runtime.RuntimeConfiguration
 
 /** An atomic pipeline step.
@@ -74,10 +74,9 @@ trait Step extends DataConsumer {
     *
     * Receive a variable binding from the pipeline.
     *
-    * @param variable The name of the variable.
-    * @param value The computed value of the variable.
+    * @param message The binding message.
     */
-  def receiveBinding(variable: String, value: Any)
+  def receiveBinding(message: BindingMessage)
 
   /** One time, startup initialization.
     *

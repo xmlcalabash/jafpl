@@ -1,6 +1,6 @@
 package com.jafpl.steps
 
-import com.jafpl.messages.Metadata
+import com.jafpl.messages.{Message, Metadata}
 
 /** Interface for sending external data to a pipeline.
   *
@@ -12,10 +12,9 @@ import com.jafpl.messages.Metadata
 trait DataProvider {
   /** Send data to a pipeline.
     *
-    * Calling this method sends the specified `item` as an output on the specified `port`.
+    * Calling this method sends the specified `message` on the specified `port`.
     *
-    * @param item The item.
-    * @param metadata Item metadata.
+    * @param message The message.
     */
-  def send(item: Any, metadata: Metadata): Unit
+  def send(message: Message): Unit
 }

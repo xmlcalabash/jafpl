@@ -3,10 +3,9 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.ViewportStart
-import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
+import com.jafpl.messages.{BindingMessage, ItemMessage, Message, PipelineMessage}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
 import com.jafpl.steps.ViewportItem
-import com.jafpl.util.PipelineMessage
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -43,7 +42,7 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
             return
           }
           received = true
-          for (item <- node.composer.decompose(item.item, item.metadata)) {
+          for (item <- node.composer.decompose(item)) {
             itemQueue += item
           }
         }
@@ -110,7 +109,7 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
           trace(s"FINISHED $node source:$sourceClosed, queue:${itemQueue.isEmpty}", "Viewport")
           // send the transformed result and close the output
           val recomposition = node.composer.recompose()
-          trace(s"RECOMP: ${recomposition.item}", "X")
+          trace(s"RECOMP: $recomposition", "X")
           monitor ! GOutput(node, node.outputPort, recomposition)
           monitor ! GClose(node, node.outputPort)
           monitor ! GFinished(node)

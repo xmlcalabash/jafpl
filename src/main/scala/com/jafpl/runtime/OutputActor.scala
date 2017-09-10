@@ -24,7 +24,7 @@ private[runtime] class OutputActor(private val monitor: ActorRef,
         }
       case _ =>
         monitor ! GException(None,
-          new PipelineException("badmessage", "Unexpected message $msg on $port", node.location))
+          new PipelineException("badmessage", s"Unexpected message $msg on $port", node.location))
     }
   }
 

@@ -3,9 +3,9 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.Node
-import com.jafpl.messages.Metadata
+import com.jafpl.messages.{Message, Metadata}
 import com.jafpl.runtime.GraphMonitor.GException
-import com.jafpl.steps.{DataConsumerProxy, DataConsumer}
+import com.jafpl.steps.{DataConsumer, DataConsumerProxy}
 
 class OutputProxy(private val monitor: ActorRef,
                   private val runtime: GraphRuntime,
@@ -22,9 +22,9 @@ class OutputProxy(private val monitor: ActorRef,
     _provider = Some(provider)
   }
 
-  override def receive(port: String, item: Any, metadata: Metadata): Unit = {
+  override def receive(port: String, message: Message): Unit = {
     if (_provider.isDefined) {
-      _provider.get.receive("source", item, metadata)
+      _provider.get.receive("source", message)
     }
   }
 }

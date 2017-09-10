@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.graph.Binding
-import com.jafpl.messages.BindingMessage
+import com.jafpl.messages.{BindingMessage, ItemMessage, Metadata}
 import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput}
 
 private[runtime] class BindingActor(private val monitor: ActorRef,
@@ -25,7 +25,7 @@ private[runtime] class BindingActor(private val monitor: ActorRef,
   }
 
   override protected def run(): Unit = {
-    val msg = new BindingMessage(binding.name, provider.value.get)
+    val msg = new BindingMessage(binding.name, new ItemMessage(provider.value.get, Metadata.ANY))
     monitor ! GOutput(binding, "result", msg)
     monitor ! GClose(binding, "result")
     monitor ! GFinished(binding)

@@ -29,9 +29,9 @@ class DefaultTraceEventManager() extends TraceEventManager {
       }
 
       if (enable) {
-        enabledTraces += event
+        enableTrace(event)
       } else {
-        disabledTraces += event
+        disableTrace(event)
       }
     }
   }

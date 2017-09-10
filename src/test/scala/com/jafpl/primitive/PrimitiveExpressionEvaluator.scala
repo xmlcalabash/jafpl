@@ -1,13 +1,14 @@
 package com.jafpl.primitive
 
 import com.jafpl.exceptions.PipelineException
+import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.{ExpressionEvaluator, RuntimeConfiguration}
 import org.slf4j.{Logger, LoggerFactory}
 
 class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends ExpressionEvaluator() {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
-  override def value(expr: Any, context: List[Any], bindings: Map[String,Any]): Any = {
+  override def value(expr: Any, context: List[Message], bindings: Map[String,Message]): Any = {
     if (context.size > 1) {
       throw new PipelineException("badconext", "Context contains more than one item", None)
     }
@@ -23,11 +24,11 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
       case patn(left, op, right) =>
         val leftv = left match {
           case digits(num) => num.toLong
-          case _ => bindings(left).toString.toLong
+          case _ => numberFromBinding(bindings(left))
         }
         val rightv = right match {
           case digits(num) => num.toLong
-          case _ => bindings(right).toString.toLong
+          case _ => numberFromBinding(bindings(right))
         }
         val result = op match {
           case "-" => leftv - rightv
@@ -45,7 +46,16 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
     }
   }
 
-  override def booleanValue(expr: Any, context: List[Any], bindings: Map[String,Any]): Boolean = {
+  private def numberFromBinding(message: Message): Long = {
+    message match {
+      case item: ItemMessage =>
+        item.item.toString.toLong
+      case _ =>
+        throw new IllegalArgumentException("Binding message is not a number")
+    }
+  }
+
+  override def booleanValue(expr: Any, context: List[Message], bindings: Map[String,Message]): Boolean = {
     if (context.size > 1) {
       throw new PipelineException("badconext", "Context contains more than one item", None)
     }
@@ -61,17 +71,21 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
         val value = num.toLong
         if (context.nonEmpty) {
           context.head match {
-            case cnum: Long =>
-              cond match {
-                case "<" => cnum < value
-                case ">" => cnum > value
-                case _ => cnum == value
-              }
-            case cnum: Int =>
-              cond match {
-                case "<" => cnum < value
-                case ">" => cnum > value
-                case _ => cnum == value
+            case item: ItemMessage =>
+              item.item match {
+                case cnum: Long =>
+                  cond match {
+                    case "<" => cnum < value
+                    case ">" => cnum > value
+                    case _ => cnum == value
+                  }
+                case cnum: Int =>
+                  cond match {
+                    case "<" => cnum < value
+                    case ">" => cnum > value
+                    case _ => cnum == value
+                  }
+                case _ => false
               }
             case _ => false
           }

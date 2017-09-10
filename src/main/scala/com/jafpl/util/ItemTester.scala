@@ -1,5 +1,7 @@
 package com.jafpl.util
 
+import com.jafpl.messages.Message
+
 trait ItemTester {
-  def test(item: List[Any], bindings: Map[String,Any]): Boolean
+  def test(item: List[Message], bindings: Map[String,Message]): Boolean
 }

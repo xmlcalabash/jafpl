@@ -1,6 +1,6 @@
 package com.jafpl.primitive
 
-import com.jafpl.messages.ItemMessage
+import com.jafpl.messages.Message
 import com.jafpl.runtime.{ExpressionEvaluator, RuntimeConfiguration}
 import com.jafpl.steps.DataConsumer
 
@@ -57,8 +57,8 @@ class PrimitiveRuntimeConfiguration(val traceAll: Boolean) extends RuntimeConfig
     timeout
   }
 
-  override def deliver(message: ItemMessage, consumer: DataConsumer, port: String): Unit = {
-    consumer.receive(port, message.item, message.metadata)
+  override def deliver(message: Message, consumer: DataConsumer, port: String): Unit = {
+    consumer.receive(port, message)
   }
 
 }

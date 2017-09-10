@@ -1,7 +1,5 @@
 package com.jafpl.steps
 
-import scala.collection.immutable
-
 /** Useful default binding specifications.
   *
   */
@@ -23,5 +21,5 @@ object BindingSpecification {
   * @constructor A binding specification.
   * @param bindings A set of the names of required bindings.
   */
-class BindingSpecification(val bindings: immutable.Set[String]) {
+class BindingSpecification(val bindings: Set[String]) {
 }

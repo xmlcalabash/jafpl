@@ -1,7 +1,7 @@
 package com.jafpl.messages
 
-private[jafpl] class BindingMessage(val name: String, val item: Any) extends Message {
+class BindingMessage(val name: String, val message: Message) extends Message {
   override def toString: String = {
-    "${name=" + name + "=" + item + "}"
+    "${name=" + name + "=" + message + "}"
   }
 }

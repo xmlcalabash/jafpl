@@ -1,6 +1,6 @@
 package com.jafpl.steps
 
-import com.jafpl.messages.Metadata
+import com.jafpl.messages.BindingMessage
 import org.slf4j.{Logger, LoggerFactory}
 
 class ProduceBinding(varname: String) extends DefaultStep {
@@ -10,9 +10,9 @@ class ProduceBinding(varname: String) extends DefaultStep {
   override def outputSpec: PortSpecification = PortSpecification.RESULT
   override def bindingSpec = new BindingSpecification(Set(varname))
 
-  override def receiveBinding(varname: String, value: Any): Unit = {
-    if (varname == this.varname) {
-      consumer.get.receive("result", value, Metadata.BLANK)
+  override def receiveBinding(message: BindingMessage): Unit = {
+    if (varname == message.name) {
+      consumer.get.receive("result", message.message)
     }
   }
 }

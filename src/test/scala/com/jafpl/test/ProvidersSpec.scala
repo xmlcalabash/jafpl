@@ -3,7 +3,7 @@ package com.jafpl.test
 import com.jafpl.config.Jafpl
 import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
-import com.jafpl.messages.Metadata
+import com.jafpl.messages.{ItemMessage, Metadata}
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.Identity
@@ -29,7 +29,7 @@ class ProvidersSpec extends FlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
 
-    runtime.inputs("source").send(PIPELINEDATA, Metadata.BLANK)
+    runtime.inputs("source").send(new ItemMessage(PIPELINEDATA, Metadata.BLANK))
 
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)

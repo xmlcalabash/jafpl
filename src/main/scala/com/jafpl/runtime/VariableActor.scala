@@ -3,7 +3,7 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.Binding
-import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
+import com.jafpl.messages.{BindingMessage, ItemMessage, Message, Metadata}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput}
 
 import scala.collection.mutable
@@ -13,19 +13,19 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
                                      private val runtime: GraphRuntime,
                                      private val binding: Binding)
   extends NodeActor(monitor, runtime, binding)  {
-  var exprContext = ListBuffer.empty[Any]
-  val bindings = mutable.HashMap.empty[String, Any]
+  var exprContext = ListBuffer.empty[Message]
+  val bindings = mutable.HashMap.empty[String, Message]
 
   override protected def input(port: String, msg: Message): Unit = {
     msg match {
       case item: ItemMessage =>
         assert(port == "source")
         trace(s"RECEIVED binding context", "Bindings")
-        exprContext += item.item
+        exprContext += item
       case binding: BindingMessage =>
         assert(port == "#bindings")
-        trace(s"RECVBIND ${binding.name}=${binding.item}", "Bindings")
-        bindings.put(binding.name, binding.item)
+        trace(s"RECVBIND ${binding.name}=${binding.message}", "Bindings")
+        bindings.put(binding.name, binding.message)
         openBindings -= binding.name
       case _ =>
         monitor ! GException(None,
@@ -53,7 +53,7 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
 
     val answer = expreval.value(binding.expression.get, exprContext.toList, bindings.toMap)
 
-    val msg = new BindingMessage(binding.name, answer)
+    val msg = new BindingMessage(binding.name, new ItemMessage(answer, Metadata.ANY))
     monitor ! GOutput(binding, "result", msg)
     monitor ! GClose(binding, "result")
     monitor ! GFinished(binding)

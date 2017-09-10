@@ -1,6 +1,6 @@
 package com.jafpl.steps
 
-import com.jafpl.messages.Metadata
+import com.jafpl.messages.{Message, Metadata}
 
 class Identity(allowSeq: Boolean) extends DefaultStep {
   def this() {
@@ -22,7 +22,7 @@ class Identity(allowSeq: Boolean) extends DefaultStep {
     }
   }
 
-  override def receive(port: String, item: Any, metadata: Metadata): Unit = {
-    consumer.get.receive("result", item, metadata)
+  override def receive(port: String, message: Message): Unit = {
+    consumer.get.receive("result", message)
   }
 }

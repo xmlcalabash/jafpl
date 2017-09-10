@@ -1,6 +1,6 @@
 package com.jafpl.steps
 
-import com.jafpl.messages.Metadata
+import com.jafpl.messages.{ItemMessage, Metadata}
 
 class Producer(val items: List[Any]) extends DefaultStep {
   def this(str: Any) {
@@ -13,10 +13,10 @@ class Producer(val items: List[Any]) extends DefaultStep {
   override def run(): Unit = {
     for (item <- items) {
       item match {
-        case str: String => consumer.get.receive("result", item, Metadata.STRING)
-        case num: Int => consumer.get.receive("result", item, Metadata.NUMBER)
-        case num: Long => consumer.get.receive("result", item, Metadata.NUMBER)
-        case _ => consumer.get.receive("result", item, Metadata.BLANK)
+        case str: String => consumer.get.receive("result", new ItemMessage(item, Metadata.STRING))
+        case num: Int => consumer.get.receive("result", new ItemMessage(item, Metadata.NUMBER))
+        case num: Long => consumer.get.receive("result", new ItemMessage(item, Metadata.NUMBER))
+        case _ => consumer.get.receive("result", new ItemMessage(item, Metadata.BLANK))
       }
     }
   }

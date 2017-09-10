@@ -1,6 +1,6 @@
 package com.jafpl.steps
 
-import com.jafpl.messages.Metadata
+import com.jafpl.messages.{ItemMessage, Message, Metadata}
 
 import scala.collection.mutable.ListBuffer
 
@@ -9,9 +9,13 @@ class BufferSink() extends DefaultStep {
 
   def items: List[Any] = _items.toList
 
-  override def receive(port: String, item: Any, metadata: Metadata): Unit = {
-    super.receive(port, item, metadata)
-    _items += item
+  override def receive(port: String, message: Message): Unit = {
+    super.receive(port, message)
+    message match {
+      case item: ItemMessage =>
+        _items += item.item
+      case _ => Unit
+    }
   }
 
   def dumpBuffers(): Unit = {

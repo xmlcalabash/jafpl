@@ -238,10 +238,10 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       item match {
         case binding: BindingMessage =>
           if (node.step.isDefined) {
-            trace(s"→BINDING $node: ${binding.name}=${binding.item}", "Bindings")
-            node.step.get.receiveBinding(binding.name, binding.item)
+            trace(s"→BINDING $node: ${binding.name}=${binding.message}", "Bindings")
+            node.step.get.receiveBinding(binding)
           } else {
-            trace(s"↴BINDING $node: ${binding.name}=${binding.item} (no step)", "Bindings")
+            trace(s"↴BINDING $node: ${binding.name}=${binding.message} (no step)", "Bindings")
           }
           openBindings -= binding.name
         case _ =>

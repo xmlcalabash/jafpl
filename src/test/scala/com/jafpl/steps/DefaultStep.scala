@@ -1,7 +1,7 @@
 package com.jafpl.steps
 
 import com.jafpl.graph.Location
-import com.jafpl.messages.Metadata
+import com.jafpl.messages.{BindingMessage, Message}
 import com.jafpl.runtime.RuntimeConfiguration
 
 class DefaultStep  extends Step {
@@ -11,7 +11,7 @@ class DefaultStep  extends Step {
   override def outputSpec: PortSpecification = PortSpecification.ANY
   override def bindingSpec: BindingSpecification = BindingSpecification.ANY
 
-  override def receiveBinding(variable: String, value: Any): Unit = {
+  override def receiveBinding(message: BindingMessage): Unit = {
     // nop
   }
 
@@ -25,7 +25,7 @@ class DefaultStep  extends Step {
     this.location = Some(location)
   }
 
-  override def receive(port: String, item: Any, metadata: Metadata): Unit = {
+  override def receive(port: String, message: Message): Unit = {
     // nop
   }
 

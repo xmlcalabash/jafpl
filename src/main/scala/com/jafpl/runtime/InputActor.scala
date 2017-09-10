@@ -2,9 +2,8 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.graph.Node
-import com.jafpl.messages.Metadata
+import com.jafpl.messages.{Metadata, PipelineMessage}
 import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput}
-import com.jafpl.util.PipelineMessage
 
 private[runtime] class InputActor(private val monitor: ActorRef,
                                   private val runtime: GraphRuntime,

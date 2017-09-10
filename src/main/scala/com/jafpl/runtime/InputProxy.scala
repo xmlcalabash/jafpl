@@ -2,9 +2,8 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.graph.Node
-import com.jafpl.messages.{Message, Metadata}
+import com.jafpl.messages.{Message, Metadata, PipelineMessage}
 import com.jafpl.steps.{DataConsumer, DataProvider}
-import com.jafpl.util.PipelineMessage
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -21,18 +20,13 @@ class InputProxy(private val monitor: ActorRef,
     _items.clear()
   }
 
-  override def send(item: Any, metadata: Metadata): Unit = {
+  override def send(message: Message): Unit = {
     // In fact the port name is irrelevant in the input proxy case...which is the whole point of send()!
-    receive("source", item, metadata)
+    receive("source", message)
   }
 
-  def receive(port: String, item: Any, metadata: Metadata): Unit = {
-    item match {
-      case msg: Message =>
-        _items += msg
-      case _ =>
-        _items += new PipelineMessage(item, metadata)
-    }
+  def receive(port: String, message: Message): Unit = {
+    _items += message
   }
 
   def close(): Unit = {

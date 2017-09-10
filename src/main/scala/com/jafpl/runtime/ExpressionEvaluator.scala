@@ -1,5 +1,7 @@
 package com.jafpl.runtime
 
+import com.jafpl.messages.Message
+
 /** Evaluate expressions (for variable bindings and the alternatives in a choose).
   *
   * The expression evaluator is responsible for taking the string form of an expression and evaluating it.
@@ -21,7 +23,7 @@ trait ExpressionEvaluator {
     * @param bindings Any variable bindings that are provided for the expression.
     * @return The computed value of the expression.
     */
-  def value(expr: Any, context: List[Any], bindings: Map[String,Any]): Any
+  def value(expr: Any, context: List[Message], bindings: Map[String,Message]): Any
 
   /**
     * Evaluate an expression and cast the result to a boolean.
@@ -31,5 +33,5 @@ trait ExpressionEvaluator {
     * @param bindings Any variable bindings that are provided for the expression.
     * @return The boolean value of the computed expression.
     */
-  def booleanValue(expr: Any, context: List[Any], bindings: Map[String,Any]): Boolean
+  def booleanValue(expr: Any, context: List[Message], bindings: Map[String,Message]): Boolean
 }

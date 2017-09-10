@@ -17,7 +17,7 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
   var nextItem = Option.empty[ItemMessage]
   var running = false
   var looped = false
-  val bindings = mutable.HashMap.empty[String, Any]
+  val bindings = mutable.HashMap.empty[String, Message]
 
   override protected def start(): Unit = {
     readyToRun = true
@@ -50,7 +50,7 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
     } else if (port == "#bindings") {
       item match {
         case msg: BindingMessage =>
-          bindings.put(msg.name, msg.item)
+          bindings.put(msg.name, msg)
         case _ =>
           monitor ! GException(None,
             new PipelineException("badmessage", s"Unexpected message on $port: $item", node.location))

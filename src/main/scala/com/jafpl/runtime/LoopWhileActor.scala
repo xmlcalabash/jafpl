@@ -15,7 +15,7 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
   private val currentItem = ListBuffer.empty[ItemMessage]
   var running = false
   var looped = false
-  val bindings = mutable.HashMap.empty[String, Any]
+  val bindings = mutable.HashMap.empty[String, Message]
   var initiallyTrue = true
 
   override protected def start(): Unit = {
@@ -40,12 +40,12 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
           return
         }
         currentItem += item
-        val testItem = ListBuffer.empty[Any]
-        testItem += currentItem.head.item
+        val testItem = ListBuffer.empty[Message]
+        testItem += currentItem.head
         initiallyTrue = node.tester.test(testItem.toList, bindings.toMap)
         trace(s"INTRU While: $initiallyTrue", "While")
       case item: BindingMessage =>
-        bindings.put(item.name, item.item)
+        bindings.put(item.name, item)
       case _ =>
         monitor ! GException(None,
           new PipelineException("badmessage", s"Unexpected message on $port", node.location))
@@ -83,11 +83,11 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def finished(): Unit = {
-    val testItem = ListBuffer.empty[Any]
-    testItem += currentItem.head.item
+    val testItem = ListBuffer.empty[Message]
+    testItem += currentItem.head
     val pass = node.tester.test(testItem.toList, bindings.toMap)
 
-    trace(s"CHKWHILE condition: $pass: ${currentItem.head.item}", "While")
+    trace(s"CHKWHILE condition: $pass: ${currentItem.head}", "While")
 
     if (pass) {
       monitor ! GReset(node)
