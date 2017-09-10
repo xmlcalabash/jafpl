@@ -274,9 +274,9 @@ proxy that sends provided data to an appropriate consumer.)
         <div class="values members">
               <h3>Abstract Value Members</h3>
               <ol><li name="com.jafpl.steps.DataProvider#send" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="send(item:Any,metadata:com.jafpl.messages.Metadata):Unit"></a><a id="send(Any,Metadata):Unit"></a>
+      <a id="send(message:com.jafpl.messages.Message):Unit"></a><a id="send(Message):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/DataProvider.html#send(item:Any,metadata:com.jafpl.messages.Metadata):Unit" title="Permalink">
+      <a href="../../../com/jafpl/steps/DataProvider.html#send(message:com.jafpl.messages.Message):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -285,11 +285,11 @@ proxy that sends provided data to an appropriate consumer.)
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">send</span><span class="params">(<span name="item">item: <span class="extype" name="scala.Any">Any</span></span>, <span name="metadata">metadata: <a href="../messages/Metadata.html" class="extype" name="com.jafpl.messages.Metadata">Metadata</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">send</span><span class="params">(<span name="message">message: <a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <p class="shortcomment cmt">Send data to a pipeline.</p><div class="fullcomment"><div class="comment cmt"><p>Send data to a pipeline.</p><p>Calling this method sends the specified <code>item</code> as an output on the specified <code>port</code>.
-</p></div><dl class="paramcmts block"><dt class="param">item</dt><dd class="cmt"><p>The item.</p></dd><dt class="param">metadata</dt><dd class="cmt"><p>Item metadata.</p></dd></dl></div>
+      <p class="shortcomment cmt">Send data to a pipeline.</p><div class="fullcomment"><div class="comment cmt"><p>Send data to a pipeline.</p><p>Calling this method sends the specified <code>message</code> on the specified <code>port</code>.
+</p></div><dl class="paramcmts block"><dt class="param">message</dt><dd class="cmt"><p>The message.</p></dd></dl></div>
     </li></ol>
             </div>
 
