@@ -16,8 +16,8 @@ class ChooseStart private[jafpl] (override val graph: Graph,
                                   override val userLabel: Option[String])
   extends ContainerStart(graph, end, userLabel) {
 
-  def addWhen(expression: String, label: String): WhenStart = addWhen(expression, Some(label))
-  def addWhen(expression: String, label: Option[String]): WhenStart = {
+  def addWhen(expression: Any, label: String): WhenStart = addWhen(expression, Some(label))
+  def addWhen(expression: Any, label: Option[String]): WhenStart = {
     val node = graph.addWhen(expression, label)
     addChild(node)
     node

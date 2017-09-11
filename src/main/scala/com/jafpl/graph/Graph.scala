@@ -182,7 +182,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     start
   }
 
-  protected[graph] def addWhen(expression: String, label: Option[String]): WhenStart = {
+  protected[graph] def addWhen(expression: Any, label: Option[String]): WhenStart = {
     checkOpen()
 
     val end = new ContainerEnd(this)
@@ -703,6 +703,13 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
           if (edgesFrom(bind).isEmpty) {
             val sink = bind.parent.get.addSink()
             addEdge(bind, "result", sink, "result")
+          }
+        case when: WhenStart =>
+          if (edgesTo(when, "condition").isEmpty) {
+            val choose = when.parent.get
+            val gparent = choose.parent.get
+            val empty = gparent.addEmptySource()
+            addEdge(empty, "result", when, "condition")
           }
         case _ => Unit
       }

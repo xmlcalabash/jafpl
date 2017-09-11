@@ -54,7 +54,8 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
 
   private def checkIfReady(): Unit = {
     if (readyToCheck && recvContext) {
-      val pass = runtime.runtime.expressionEvaluator.booleanValue(node.testExpr, contextItem.toList, bindings.toMap)
+      val eval = runtime.runtime.expressionEvaluator.newInstance()
+      val pass = eval.booleanValue(node.testExpr, contextItem.toList, bindings.toMap)
       monitor ! GGuardResult(node, pass)
     }
   }

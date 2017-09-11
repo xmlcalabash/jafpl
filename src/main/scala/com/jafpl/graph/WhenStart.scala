@@ -3,7 +3,7 @@ package com.jafpl.graph
 private[jafpl] class WhenStart(override val graph: Graph,
                                override protected val end: ContainerEnd,
                                override val userLabel: Option[String],
-                               val testExpr: String)
+                               val testExpr: Any)
   extends ContainerStart(graph, end, userLabel) {
 
   override def inputsOk(): Boolean = {

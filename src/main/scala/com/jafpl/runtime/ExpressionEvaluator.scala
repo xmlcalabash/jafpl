@@ -13,6 +13,15 @@ import com.jafpl.messages.Message
   *
   */
 trait ExpressionEvaluator {
+  /** Obtain a new instance of the expression evaluator.
+    *
+    * If the evalauator is reentrant then it can simply return itself. However, if it has local state,
+    * then it must return a new instance ready to evaluate an expression.
+    *
+    * @return An instance of itself.
+    */
+  def newInstance(): ExpressionEvaluator
+
   /** Evaluate an expression.
     *
     * The `expr` is evaluated according to whatever grammar the evaluator supports. The context is

@@ -49,8 +49,7 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
       trace(s"COMPUTE= ${binding.name}=${binding.expression}$sbindings", "Bindings")
     }
 
-    val expreval = runtime.runtime.expressionEvaluator
-
+    val expreval = runtime.runtime.expressionEvaluator.newInstance()
     val answer = expreval.value(binding.expression.get, exprContext.toList, bindings.toMap)
 
     val msg = new BindingMessage(binding.name, new ItemMessage(answer, Metadata.ANY))

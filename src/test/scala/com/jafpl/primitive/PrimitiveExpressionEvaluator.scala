@@ -1,12 +1,16 @@
 package com.jafpl.primitive
 
 import com.jafpl.exceptions.PipelineException
-import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
+import com.jafpl.messages.{ItemMessage, Message}
 import com.jafpl.runtime.{ExpressionEvaluator, RuntimeConfiguration}
 import org.slf4j.{Logger, LoggerFactory}
 
 class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends ExpressionEvaluator() {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
+  override def newInstance(): PrimitiveExpressionEvaluator = {
+    new PrimitiveExpressionEvaluator(config)
+  }
 
   override def value(expr: Any, context: List[Message], bindings: Map[String,Message]): Any = {
     if (context.size > 1) {
