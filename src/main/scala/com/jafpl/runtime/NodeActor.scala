@@ -191,8 +191,10 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           monitor ! GException(Some(node), cause)
       }
 
+      trace(s"Ran $node: $threwException", "StepExec")
       if (!threwException) {
         for (output <- node.outputs) {
+          trace(s"Closing $output for $node", "StepExec")
           monitor ! GClose(node, output)
         }
         monitor ! GFinished(node)
