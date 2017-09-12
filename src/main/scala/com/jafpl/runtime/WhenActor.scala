@@ -12,10 +12,9 @@ import scala.collection.mutable.ListBuffer
 private[runtime] class WhenActor(private val monitor: ActorRef,
                                  private val runtime: GraphRuntime,
                                  private val node: WhenStart) extends StartActor(monitor, runtime, node)  {
-  var readyToCheck = false
-  var recvContext = false
-  var contextItem = ListBuffer.empty[Message]
-  val bindings = mutable.HashMap.empty[String, Message]
+  private var readyToCheck = false
+  private var contextItem = ListBuffer.empty[Message]
+  private val bindings = mutable.HashMap.empty[String, Message]
 
   override protected def input(port: String, msg: Message): Unit = {
     msg match {
@@ -24,6 +23,7 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
         contextItem += item
       case binding: BindingMessage =>
         assert(port == "#bindings")
+        trace(s"$node received binding for ${binding.name}", "Bindings")
         bindings.put(binding.name, binding)
       case _ =>
         monitor ! GException(None,
@@ -33,14 +33,13 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
   }
 
   override protected def close(port: String): Unit = {
+    trace(s"$node closed $port", "StepIO")
     super.close(port)
-    if (port == "condition") {
-      recvContext = true
-    }
     checkIfReady()
   }
 
   override protected def start(): Unit = {
+    trace(s"$node started", "StepExec")
     readyToRun = true
     for (child <- node.children) {
       monitor ! GStart(child)
@@ -48,12 +47,14 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
   }
 
   protected[runtime] def checkGuard(): Unit = {
+    trace(s"$node checkGuard", "StepExec")
     readyToCheck = true
     checkIfReady()
   }
 
   private def checkIfReady(): Unit = {
-    if (readyToCheck && recvContext) {
+    trace(s"$node checkIfReady: ready:$readyToCheck inputs:${openInputs.isEmpty}", "StepExec")
+    if (readyToCheck && openInputs.isEmpty) {
       val eval = runtime.runtime.expressionEvaluator.newInstance()
       val pass = eval.booleanValue(node.testExpr, contextItem.toList, bindings.toMap)
       monitor ! GGuardResult(node, pass)
