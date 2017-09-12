@@ -24,7 +24,7 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
       case binding: BindingMessage =>
         assert(port == "#bindings")
         trace(s"$node received binding for ${binding.name}", "Bindings")
-        bindings.put(binding.name, binding)
+        bindings.put(binding.name, binding.message)
       case _ =>
         monitor ! GException(None,
           new PipelineException("badmessage", s"Unexpected message on $port", node.location))
