@@ -778,8 +778,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
           for (port <- node.inputs) {
             val skipLoopSource = start.isInstanceOf[LoopStart] && (port == "source")
             val skipWhenCondition = start.isInstanceOf[WhenStart] && (port == "condition")
+            val skipWhenBindings = start.isInstanceOf[WhenStart] && (port == "#bindings")
             val edges = edgesFrom(node, port)
-            if (edges.isEmpty && !skipLoopSource && !skipWhenCondition) {
+            if (edges.isEmpty && !skipLoopSource && !skipWhenCondition && ! skipWhenBindings) {
               logger.debug(s"Input $port on $start unread, adding sink")
               val sink = start.addSink()
               addEdge(node, port, sink, "source")
