@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.graph.{ContainerStart, Joiner, Node, Splitter}
+import com.jafpl.graph.{ContainerStart, Joiner, Node, Sink, Splitter}
 import com.jafpl.runtime.GraphMonitor.{GAbort, GCheckGuard, GClose, GStart}
 
 import scala.collection.mutable
@@ -22,6 +22,8 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
           monitor ! GStart(join)
         case split: Splitter =>
           monitor ! GStart(split)
+        case sink: Sink =>
+          monitor ! GStart(sink)
         case _ =>
           guards.put(child, None)
           stopped.put(child, None)
@@ -44,6 +46,7 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
         child match {
           case join: Joiner => Unit
           case split: Splitter => Unit
+          case sink: Sink => Unit
           case _ =>
             val guard = guards(child)
             stillWaiting = stillWaiting || guard.isEmpty
@@ -64,6 +67,7 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
           child match {
             case join: Joiner => Unit
             case split: Splitter => Unit
+            case sink: Sink => Unit
             case _ =>
               val fin = stopped(child)
               if (fin.isEmpty) {
@@ -83,6 +87,7 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
             child match {
               case join: Joiner => Unit
               case split: Splitter => Unit
+              case sink: Sink => Unit
               case _ =>
                 val fin = stopped(child)
                 if (fin.isEmpty) {
