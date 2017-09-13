@@ -389,7 +389,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           when.checkGuard()
         case _ =>
           monitor ! GException(None,
-            new PipelineException("badguard", "Attempted to check guard on something that isn't a when", node.location))
+            new PipelineException("badguard", "Attempted to check guard on something that isn't a when: " + this, node.location))
       }
 
     case NGuardResult(when, pass) =>
