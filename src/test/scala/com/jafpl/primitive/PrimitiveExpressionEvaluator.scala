@@ -1,7 +1,7 @@
 package com.jafpl.primitive
 
 import com.jafpl.exceptions.PipelineException
-import com.jafpl.messages.{ItemMessage, Message}
+import com.jafpl.messages.{ItemMessage, Message, Metadata}
 import com.jafpl.runtime.{ExpressionEvaluator, RuntimeConfiguration}
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -12,7 +12,7 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
     new PrimitiveExpressionEvaluator(config)
   }
 
-  override def value(expr: Any, context: List[Message], bindings: Map[String,Message]): Any = {
+  override def value(expr: Any, context: List[Message], bindings: Map[String,Message]): Message = {
     if (context.size > 1) {
       throw new PipelineException("badconext", "Context contains more than one item", None)
     }
@@ -43,10 +43,10 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
         if (config.traceEnabled("ExprEval")) {
           logger.info(s"COMPUTED $strexpr = $result")
         }
-        result
+        new ItemMessage(result, Metadata.NUMBER)
       case _ =>
         logger.warn("Expression did not match pattern: returning expression string as value: " + strexpr)
-        strexpr
+        new ItemMessage(strexpr, Metadata.STRING)
     }
   }
 

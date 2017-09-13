@@ -32,7 +32,7 @@ trait ExpressionEvaluator {
     * @param bindings Any variable bindings that are provided for the expression.
     * @return The computed value of the expression.
     */
-  def value(expr: Any, context: List[Message], bindings: Map[String,Message]): Any
+  def value(expr: Any, context: List[Message], bindings: Map[String,Message]): Message
 
   /**
     * Evaluate an expression and cast the result to a boolean.
