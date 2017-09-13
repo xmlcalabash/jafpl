@@ -49,12 +49,17 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
       trace(s"COMPUTE= ${binding.name}=${binding.expression}$sbindings", "Bindings")
     }
 
-    val expreval = runtime.runtime.expressionEvaluator.newInstance()
-    val answer = expreval.value(binding.expression.get, exprContext.toList, bindings.toMap)
+    try {
+      val expreval = runtime.runtime.expressionEvaluator.newInstance()
+      val answer = expreval.value(binding.expression.get, exprContext.toList, bindings.toMap)
 
-    val msg = new BindingMessage(binding.name, new ItemMessage(answer, Metadata.ANY))
-    monitor ! GOutput(binding, "result", msg)
-    monitor ! GClose(binding, "result")
-    monitor ! GFinished(binding)
+      val msg = new BindingMessage(binding.name, answer)
+      monitor ! GOutput(binding, "result", msg)
+      monitor ! GClose(binding, "result")
+      monitor ! GFinished(binding)
+    } catch {
+      case t: Throwable =>
+        monitor ! GException(Some(binding), t)
+    }
   }
 }
