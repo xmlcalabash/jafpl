@@ -16,15 +16,15 @@ class TryCatchStart private[jafpl] (override val graph: Graph,
     node
   }
 
-  def addCatch(label: Option[String], codes: List[String]): CatchStart = {
+  def addCatch(label: Option[String], codes: List[Any]): CatchStart = {
     val node = graph.addCatch(label, codes)
     addChild(node)
     node
   }
 
   def addCatch(label: String): CatchStart = addCatch(Some(label), List())
-  def addCatch(label: String, code: String): CatchStart = addCatch(Some(label), List(code))
-  def addCatch(label: String, codes: List[String]): CatchStart = addCatch(Some(label), codes)
+  def addCatch(label: String, code: Any): CatchStart = addCatch(Some(label), List(code))
+  def addCatch(label: String, codes: List[Any]): CatchStart = addCatch(Some(label), codes)
 
   def addFinally(label: Option[String]): FinallyStart = {
     val node = graph.addFinally(label)

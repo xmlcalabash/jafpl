@@ -312,7 +312,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     start
   }
 
-  protected[graph] def addCatch(label: Option[String], codes: List[String]): CatchStart = {
+  protected[graph] def addCatch(label: Option[String], codes: List[Any]): CatchStart = {
     checkOpen()
 
     val end = new ContainerEnd(this)
@@ -701,7 +701,12 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
           }
         case bind: Binding =>
           if (edgesFrom(bind).isEmpty) {
-            val sink = bind.parent.get.addSink()
+            val sink = if (bind.parent.isDefined) {
+              bind.parent.get.addSink()
+            } else {
+              // This is a top-level binding that's unread...
+              this.addSink()
+            }
             addEdge(bind, "result", sink, "result")
           }
         case when: WhenStart =>

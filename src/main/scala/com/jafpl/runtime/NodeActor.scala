@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.{Actor, ActorRef}
 import akka.event.Logging
-import com.jafpl.exceptions.{PipelineException, StepException}
+import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.{ContainerStart, Node}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GStopped}
@@ -182,10 +182,9 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           }
         }
       } catch {
-        case stepex: StepException =>
+        case pipeex: PipelineException =>
           threwException = true
-          monitor ! GException(Some(node),
-            new PipelineException(stepex.code, stepex.message, node.location, stepex.cause, stepex.data))
+          monitor ! GException(Some(node), pipeex)
         case cause: Throwable =>
           threwException = true
           monitor ! GException(Some(node), cause)

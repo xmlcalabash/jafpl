@@ -45,7 +45,7 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
 
       monitor ! GAbort(tryblock.get)
 
-      var code: Option[String] = None
+      var code: Option[Any] = None
       cause match {
         case pe: PipelineException =>
           code = Some(pe.code)
@@ -61,7 +61,14 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
             if (useCatch.isDefined) {
               stopUnselectedBranch(catchBlock)
             } else {
-              if (catchBlock.codes.isEmpty || (code.isDefined && catchBlock.codes.contains(code.get))) {
+              var codeMatches = catchBlock.codes.isEmpty
+              if (code.isDefined) {
+                for (catchCode <- catchBlock.codes) {
+                  codeMatches = codeMatches || (code.get == catchCode)
+                }
+              }
+
+              if (codeMatches) {
                 useCatch = Some(catchBlock)
               } else {
                 stopUnselectedBranch(catchBlock)

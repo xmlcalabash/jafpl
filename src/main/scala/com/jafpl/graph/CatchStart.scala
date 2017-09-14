@@ -12,6 +12,6 @@ package com.jafpl.graph
 class CatchStart private[jafpl] (override val graph: Graph,
                                  override protected val end: ContainerEnd,
                                  override val userLabel: Option[String],
-                                 val codes: List[String])
+                                 val codes: List[Any])
   extends ContainerStart(graph, end, userLabel) {
 }

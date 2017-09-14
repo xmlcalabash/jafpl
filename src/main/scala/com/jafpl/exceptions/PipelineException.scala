@@ -6,35 +6,46 @@ import com.jafpl.graph.Location
   *
   * @constructor A pipeline exception.
   * @param code An error code (can be caught by catch steps).
-  * @param message An explanatory message.
-  * @param location The proximate location of the cause of the exception
-  * @param cause The underlying exception, if there was one.
-  * @param data Arbitrary data that the step would like to communicate to a catch.
   */
-class PipelineException(val code: String,
-                        val message: String,
-                        val location: Option[Location],
-                        val cause: Option[Throwable],
-                        val data: Option[Any])
-  extends Throwable {
+class PipelineException(val code: Any) extends Throwable {
+  protected var _message = Option.empty[String]
+  protected var _location = Option.empty[Location]
+  protected var _cause = Option.empty[Throwable]
+
+  def message: Option[String] = _message
+  def location: Option[Location] = _location
+  def cause: Option[Throwable] = _cause
 
   /** String representation */
   override def toString: String = {
-    "PipelineException(" + code + "," + message + ")"
+    "PipelineException(" + code + "," + message.getOrElse("???") + ")"
+  }
+
+  /** Alternate constructor with no message, cause or data. */
+  def this(code: Any, location: Option[Location]) {
+    this(code)
+    _location = location
   }
 
   /** Alternate constructor with no cause or data. */
   def this(code: String, message: String, location: Option[Location]) {
-    this(code, message, location, None, None)
+    this(code)
+    _message = Some(message)
+    _location = location
   }
 
   /** Alternate constructor with no cause or data. */
   def this(code: String, message: String, location: Location) {
-    this(code, message, Some(location), None, None)
+    this(code)
+    _message = Some(message)
+    _location = Some(location)
   }
 
   /** Alternate constructor with no data. */
   def this(code: String, message: String, location: Location, cause: Throwable) {
-    this(code, message, Some(location), Some(cause), None)
+    this(code)
+    _message = Some(message)
+    _location = Some(location)
+    _cause = Some(cause)
   }
 }

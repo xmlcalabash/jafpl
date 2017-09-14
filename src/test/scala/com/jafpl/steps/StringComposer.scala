@@ -1,14 +1,19 @@
 package com.jafpl.steps
 
-import com.jafpl.exceptions.StepException
+import com.jafpl.exceptions.PipelineException
+import com.jafpl.graph.Location
 import com.jafpl.messages.{ItemMessage, Message, Metadata}
 
 import scala.collection.mutable.ListBuffer
 
-class StringComposer extends ViewportComposer {
+class StringComposer(location: Option[Location]) extends ViewportComposer {
   private var metadata: Metadata = Metadata.BLANK
   private val items = ListBuffer.empty[StringViewportItem]
   private var suffix = ""
+
+  def this() {
+    this(None)
+  }
 
   override def decompose(message: Message): List[ViewportItem] = {
     message match {
@@ -29,9 +34,9 @@ class StringComposer extends ViewportComposer {
                   more = false
               }
             }
-          case _ => throw new StepException("UnexpectedType", s"Unexpected item type: $imsg.item")
+          case _ => throw new PipelineException("UnexpectedType", s"Unexpected item type: $imsg.item", location)
         }
-      case _ => throw new StepException("UnexpectedMsg", s"Unexpected message type: $message")
+      case _ => throw new PipelineException("UnexpectedMsg", s"Unexpected message type: $message", location)
     }
 
     items.toList
