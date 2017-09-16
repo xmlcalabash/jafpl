@@ -172,7 +172,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
       if (node.hasOutputEdge(port)) {
         val edge = node.outputEdge(port)
         trace(s"SENDOUT→ $node.$port → ${edge.to}.${edge.toPort} from ${fmtSender()}", "StepIO")
-        actors(edge.to) ! NInput(edge.toPort, item)
+        actors(edge.to) ! NInput(node, port, edge.toPort, item)
       } else {
         trace(s"DROPOUT↴ $node.$port from ${fmtSender()}", "StepIO")
       }

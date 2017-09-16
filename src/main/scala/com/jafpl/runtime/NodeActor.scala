@@ -20,7 +20,7 @@ private[runtime] object NodeActor {
   case class NFinally()
   case class NRunFinally(cause: Option[Throwable])
   case class NReset()
-  case class NInput(port: String, item: Message)
+  case class NInput(from: Node, fromPort: String, toPort: String, item: Message)
   case class NLoop(item: ItemMessage)
   case class NClose(port: String)
   case class NChildFinished(otherNode: Node)
@@ -234,7 +234,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     runIfReady()
   }
 
-  protected def input(port: String, item: Message): Unit = {
+  protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
     if (port == "#bindings") {
       item match {
         case binding: BindingMessage =>
@@ -257,7 +257,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           cardinalities.put(port, card)
           if (node.step.isDefined) {
             trace(s"DELIVER→ ${node.step.get}.$port", "StepIO")
-            runtime.runtime.deliver(message, node.step.get, port)
+            runtime.runtime.deliver(from.id, fromPort, message, node.step.get, port)
           } else {
             trace(s"↴DELIVER $node (no step)", "StepIO")
           }
@@ -283,9 +283,9 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       trace(s"INITLIZE $node", "StepMessages")
       initialize()
 
-    case NInput(port, item) =>
+    case NInput(from, fromPort, port, item) =>
       trace(s"→RECEIVE $node.$port from ${fmtSender()}", "StepIO")
-      input(port, item)
+      input(from, fromPort, port, item)
 
     case NLoop(item) =>
       trace(s"LOOPSTRT $item", "StepIO")

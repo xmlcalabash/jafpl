@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.graph.ContainerEnd
+import com.jafpl.graph.{ContainerEnd, Node}
 import com.jafpl.messages.{ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.GFinishedViewport
 
@@ -17,7 +17,7 @@ private[runtime] class ViewportEndActor(private val monitor: ActorRef,
     buffer.clear()
   }
 
-  override protected def input(port: String, msg: Message): Unit = {
+  override protected def input(from: Node, fromPort: String, port: String, msg: Message): Unit = {
     msg match {
       case item: ItemMessage =>
         buffer += item

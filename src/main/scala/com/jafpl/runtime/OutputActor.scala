@@ -13,18 +13,18 @@ private[runtime] class OutputActor(private val monitor: ActorRef,
   extends NodeActor(monitor, runtime, node, consumer) {
   private var closed = false
 
-  override protected def input(port: String, msg: Message): Unit = {
-    msg match {
+  override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
+    item match {
       case item: ItemMessage =>
         if (consumer.provider.isDefined) {
           trace(s"DELIVER→ $node.$port → ${consumer.provider.get}.$port", "StepIO")
-          runtime.runtime.deliver(item, consumer.provider.get, port)
+          runtime.runtime.deliver(from.id, fromPort, item, consumer.provider.get, port)
         } else {
           trace(s"↴DELIVER $node.$port (no consumer)", "StepIO")
         }
       case _ =>
         monitor ! GException(None,
-          new PipelineException("badmessage", s"Unexpected message $msg on $port", node.location))
+          PipelineException.BADMESSAGE(s"Unexpected message $item on $port", node.location))
     }
   }
 

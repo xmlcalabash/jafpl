@@ -2,22 +2,30 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
-import com.jafpl.graph.WhenStart
+import com.jafpl.graph.{Node, WhenStart}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GException, GGuardResult, GStart}
+import com.jafpl.steps.DataConsumer
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 private[runtime] class WhenActor(private val monitor: ActorRef,
                                  private val runtime: GraphRuntime,
-                                 private val node: WhenStart) extends StartActor(monitor, runtime, node)  {
+                                 private val node: WhenStart)
+  extends StartActor(monitor, runtime, node) with DataConsumer {
+
   private var readyToCheck = false
   private var contextItem = ListBuffer.empty[Message]
   private val bindings = mutable.HashMap.empty[String, Message]
 
-  override protected def input(port: String, msg: Message): Unit = {
-    msg match {
+  override protected def input(from: Node, fromPort: String, port: String, msg: Message): Unit = {
+    runtime.runtime.deliver(from.id, fromPort, msg, this, port)
+  }
+
+  override def id: String = node.id
+  override def receive(port: String, item: Message): Unit = {
+    item match {
       case item: ItemMessage =>
         assert(port == "condition")
         contextItem += item

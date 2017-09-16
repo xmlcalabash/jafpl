@@ -2,17 +2,19 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
-import com.jafpl.graph.ViewportStart
+import com.jafpl.graph.{Node, ViewportStart}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message, PipelineMessage}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
-import com.jafpl.steps.ViewportItem
+import com.jafpl.steps.{DataConsumer, ViewportItem}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 private[runtime] class ViewportActor(private val monitor: ActorRef,
                                      private val runtime: GraphRuntime,
-                                     private val node: ViewportStart) extends StartActor(monitor, runtime, node)  {
+                                     private val node: ViewportStart)
+  extends StartActor(monitor, runtime, node) with DataConsumer {
+
   private val itemQueue = ListBuffer.empty[ViewportItem]
   private var running = false
   private var sourceClosed = false
@@ -31,7 +33,12 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
     runIfReady()
   }
 
-  override protected def input(port: String, msg: Message): Unit = {
+  override protected def input(from: Node, fromPort: String, port: String, msg: Message): Unit = {
+    runtime.runtime.deliver(from.id, fromPort, msg, this, port)
+  }
+
+  override def id: String = node.id
+  override def receive(port: String, msg: Message): Unit = {
     msg match {
       case binding: BindingMessage => Unit
       case item: ItemMessage =>

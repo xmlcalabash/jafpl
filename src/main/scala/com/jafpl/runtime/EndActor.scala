@@ -25,7 +25,7 @@ private[runtime] class EndActor(private val monitor: ActorRef,
     readyToRun = true
   }
 
-  override protected def input(port: String, item: Message): Unit = {
+  override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
     // Container ends are special, they copy input they receive on "X" to the
     // output named "X" on the container start.
     monitor ! GOutput(node.start.get, port, item)

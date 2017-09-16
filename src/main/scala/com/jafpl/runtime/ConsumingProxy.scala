@@ -14,6 +14,8 @@ private[runtime] class ConsumingProxy(private val monitor: ActorRef,
                                       private val node: Node) extends DataConsumer {
   protected val cardinalities = mutable.HashMap.empty[String, Long]
 
+  override def id: String = node.id
+
   override def receive(port: String, message: Message): Unit = {
     val card = cardinalities.getOrElse(port, 0L) + 1L
     cardinalities.put(port, card)

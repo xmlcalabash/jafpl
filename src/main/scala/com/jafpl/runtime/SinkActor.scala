@@ -1,18 +1,24 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.graph.Sink
+import com.jafpl.graph.{Node, Sink}
 import com.jafpl.messages.Message
 import com.jafpl.runtime.GraphMonitor.GFinished
+import com.jafpl.steps.DataConsumer
 
 private[runtime] class SinkActor(private val monitor: ActorRef,
                                  private val runtime: GraphRuntime,
                                  private val node: Sink)
-  extends NodeActor(monitor, runtime, node)  {
+  extends NodeActor(monitor, runtime, node) with DataConsumer {
 
   var hasBeenReset = false
 
-  override protected def input(port: String, item: Message): Unit = {
+  override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
+    runtime.runtime.deliver(from.id, fromPort, item, this, port)
+  }
+
+  override def id: String = node.id
+  override def receive(port: String, item: Message): Unit = {
     // Oops, I dropped it on the floor
   }
 

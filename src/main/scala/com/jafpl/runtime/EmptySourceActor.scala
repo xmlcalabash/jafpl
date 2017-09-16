@@ -1,7 +1,8 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.graph.EmptySource
+import com.jafpl.exceptions.PipelineException
+import com.jafpl.graph.{EmptySource, Node}
 import com.jafpl.messages.Message
 import com.jafpl.runtime.GraphMonitor.{GClose, GFinished}
 
@@ -12,8 +13,8 @@ private[runtime] class EmptySourceActor(private val monitor: ActorRef,
 
   var hasBeenReset = false
 
-  override protected def input(port: String, item: Message): Unit = {
-    // This oughta never happen
+  override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
+    throw PipelineException.INTERNALERR(s"EmptySource received input: $from.$fromPort -> $port: $item", node.location)
   }
 
   override protected def reset(): Unit = {

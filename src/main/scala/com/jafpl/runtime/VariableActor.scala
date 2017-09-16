@@ -2,9 +2,10 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
-import com.jafpl.graph.Binding
+import com.jafpl.graph.{Binding, Node}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message, Metadata}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput}
+import com.jafpl.steps.DataConsumer
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -12,12 +13,17 @@ import scala.collection.mutable.ListBuffer
 private[runtime] class VariableActor(private val monitor: ActorRef,
                                      private val runtime: GraphRuntime,
                                      private val binding: Binding)
-  extends NodeActor(monitor, runtime, binding)  {
-  var exprContext = ListBuffer.empty[Message]
-  val bindings = mutable.HashMap.empty[String, Message]
+  extends NodeActor(monitor, runtime, binding) with DataConsumer {
+  private var exprContext = ListBuffer.empty[Message]
+  private val bindings = mutable.HashMap.empty[String, Message]
 
-  override protected def input(port: String, msg: Message): Unit = {
-    msg match {
+  override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
+    runtime.runtime.deliver(from.id, fromPort, item, this, port)
+  }
+
+  override def id: String = binding.id
+  override def receive(port: String, item: Message): Unit = {
+    item match {
       case item: ItemMessage =>
         assert(port == "source")
         trace(s"RECEIVED binding context", "Bindings")
@@ -29,7 +35,7 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
         openBindings -= binding.name
       case _ =>
         monitor ! GException(None,
-          new PipelineException("badmessage", s"Unexpected message on $msg on $port", binding.location))
+          new PipelineException("badmessage", s"Unexpected message on $item on $port", binding.location))
         return
     }
   }

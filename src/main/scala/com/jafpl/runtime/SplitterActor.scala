@@ -2,20 +2,26 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
-import com.jafpl.graph.{Edge, Splitter}
+import com.jafpl.graph.{Edge, Node, Splitter}
 import com.jafpl.messages.{BindingMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GException, GOutput}
+import com.jafpl.steps.DataConsumer
 
 import scala.collection.mutable.ListBuffer
 
 private[runtime] class SplitterActor(private val monitor: ActorRef,
                                      private val runtime: GraphRuntime,
                                      private val node: Splitter)
-  extends NodeActor(monitor, runtime, node)  {
+  extends NodeActor(monitor, runtime, node) with DataConsumer {
 
   var edges: Option[ListBuffer[Edge]] = None
 
-  override protected def input(port: String, item: Message): Unit = {
+  override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
+    runtime.runtime.deliver(from.id, fromPort, item, this, port)
+  }
+
+  override def id: String = node.id
+  override def receive(port: String, item: Message): Unit = {
     // Cache the edges for a small amount of efficiency
     if (edges.isEmpty) {
       val outbound = ListBuffer.empty[Edge]

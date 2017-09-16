@@ -2,16 +2,17 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
-import com.jafpl.graph.LoopUntilStart
+import com.jafpl.graph.{LoopUntilStart, Node}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
+import com.jafpl.steps.DataConsumer
 
 import scala.collection.mutable
 
 private[runtime] class LoopUntilActor(private val monitor: ActorRef,
                                       private val runtime: GraphRuntime,
                                       private val node: LoopUntilStart)
-  extends StartActor(monitor, runtime, node)  {
+  extends StartActor(monitor, runtime, node) with DataConsumer {
 
   var currentItem = Option.empty[ItemMessage]
   var nextItem = Option.empty[ItemMessage]
@@ -32,7 +33,12 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
     runIfReady()
   }
 
-  override protected def input(port: String, item: Message): Unit = {
+  override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
+    runtime.runtime.deliver(from.id, fromPort, item, this, port)
+  }
+
+  override def id: String = node.id
+  override def receive(port: String, item: Message): Unit = {
     if (port == "source") {
       item match {
         case message: ItemMessage =>

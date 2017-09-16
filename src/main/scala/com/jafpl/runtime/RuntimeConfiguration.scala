@@ -55,5 +55,5 @@ trait RuntimeConfiguration {
     * @param consumer The step to which it is to be delivered.
     * @param port The port on which it is to be delivered.
     */
-  def deliver(message: Message, consumer: DataConsumer, port: String)
+  def deliver(fromId: String, fromPort: String, message: Message, consumer: DataConsumer, port: String)
 }

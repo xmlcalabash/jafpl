@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
-import com.jafpl.graph.ContainerEnd
+import com.jafpl.graph.{ContainerEnd, Node}
 import com.jafpl.messages.{ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GException, GLoop, GOutput}
 
@@ -31,7 +31,7 @@ private[runtime] class LoopUntilEndActor(private val monitor: ActorRef,
     readyToRun = true
   }
 
-  override protected def input(port: String, msg: Message): Unit = {
+  override protected def input(from: Node, fromPort: String, port: String, msg: Message): Unit = {
     if (port == "test") {
       // A loop sends it's output back to the start.
       msg match {

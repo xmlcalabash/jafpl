@@ -18,7 +18,7 @@ private[runtime] class ConditionalEndActor(private val monitor: ActorRef,
     buffer.clear()
   }
 
-  override protected def input(port: String, item: Message): Unit = {
+  override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
     // Buffer everything in case it all goes bang
     if (!buffer.contains(port)) {
       buffer.put(port, ListBuffer.empty[Message])

@@ -2,11 +2,14 @@ package com.jafpl.steps
 
 import com.jafpl.exceptions.PipelineException
 import com.jafpl.messages.{ItemMessage, Message, Metadata}
+import com.jafpl.util.UniqueId
 
 class Decrement() extends DefaultStep {
+  private val _id = UniqueId.nextId.toString
   override def inputSpec: PortSpecification = PortSpecification.SOURCE
   override def outputSpec: PortSpecification = PortSpecification.RESULT
 
+  override def id: String = _id
   override def receive(port: String, message: Message): Unit = {
     message match {
       case item: ItemMessage =>

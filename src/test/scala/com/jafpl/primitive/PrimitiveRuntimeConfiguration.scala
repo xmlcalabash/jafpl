@@ -38,7 +38,7 @@ class PrimitiveRuntimeConfiguration(val traceAll: Boolean) extends RuntimeConfig
     }
   }
 
-  override def expressionEvaluator(): ExpressionEvaluator = evaluator
+  override def expressionEvaluator: ExpressionEvaluator = evaluator
 
   override def traceEnabled(trace: String): Boolean = {
     if (enabledTraces.contains("ALL")) {
@@ -57,7 +57,7 @@ class PrimitiveRuntimeConfiguration(val traceAll: Boolean) extends RuntimeConfig
     timeout
   }
 
-  override def deliver(message: Message, consumer: DataConsumer, port: String): Unit = {
+  override def deliver(from: String, fromPort: String, message: Message, consumer: DataConsumer, port: String): Unit = {
     consumer.receive(port, message)
   }
 

@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
-import com.jafpl.graph.LoopForStart
+import com.jafpl.graph.{LoopForStart, Node}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message, Metadata}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
 
@@ -36,8 +36,8 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
     runIfReady()
   }
 
-  override protected def input(port: String, msg: Message): Unit = {
-    throw new PipelineException("noinput", "No input is expected on a for-loop", node.location)
+  override protected def input(from: Node, fromPort: String, port: String, msg: Message): Unit = {
+    throw PipelineException.INTERNALERR(s"No input is expected on a for loop; input arrived on $port", node.location)
   }
 
   protected[runtime] def loop(item: ItemMessage): Unit = {

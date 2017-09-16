@@ -2,16 +2,17 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
-import com.jafpl.graph.LoopEachStart
+import com.jafpl.graph.{LoopEachStart, Node}
 import com.jafpl.messages.{ItemMessage, Message, Metadata}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
+import com.jafpl.steps.DataConsumer
 
 import scala.collection.mutable.ListBuffer
 
 private[runtime] class LoopEachActor(private val monitor: ActorRef,
                                      private val runtime: GraphRuntime,
                                      private val node: LoopEachStart)
-  extends StartActor(monitor, runtime, node)  {
+  extends StartActor(monitor, runtime, node) with DataConsumer {
 
   private val queue = ListBuffer.empty[ItemMessage]
   private var running = false
@@ -29,7 +30,12 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
     runIfReady()
   }
 
-  override protected def input(port: String, item: Message): Unit = {
+  override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
+    runtime.runtime.deliver(from.id, fromPort, item, this, port)
+  }
+
+  override def id: String = node.id
+  override def receive(port: String, item: Message): Unit = {
     item match {
       case message: ItemMessage =>
         queue += message
@@ -39,6 +45,7 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
     }
     runIfReady()
   }
+
 
   override protected def close(port: String): Unit = {
     sourceClosed = true

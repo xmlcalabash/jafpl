@@ -2,6 +2,11 @@ package com.jafpl.exceptions
 
 import com.jafpl.graph.Location
 
+object PipelineException {
+  def INTERNALERR(msg: String, location: Option[Location]): PipelineException = new PipelineException("INTERNALERR", msg, location)
+  def BADMESSAGE(msg: String, location: Option[Location]): PipelineException = new PipelineException("BADMESSAGE", msg, location)
+}
+
 /** An exception raised during pipeline evaluation.
   *
   * @constructor A pipeline exception.
@@ -19,6 +24,12 @@ class PipelineException(val code: Any) extends Throwable {
   /** String representation */
   override def toString: String = {
     "PipelineException(" + code + "," + message.getOrElse("???") + ")"
+  }
+
+  /** Alternate constructor with no location, cause or data. */
+  def this(code: Any, message: String) {
+    this(code)
+    _message = Some(message)
   }
 
   /** Alternate constructor with no message, cause or data. */
