@@ -27,7 +27,9 @@ abstract class Node(val graph: Graph,
     val regex = """([\p{L}_][-\p{L}_\p{N}]*)""".r
     userLabel.get match {
       case regex(lbl) => lbl
-      case _ => throw new GraphException(s"Invalid label: ${userLabel.get}", location)
+      case _ =>
+        // Explicitly None here because location hasn't been initialized yet
+        throw new GraphException(s"Invalid label: ${userLabel.get}", None)
     }
   } else {
     var name = super.toString.split('.').last
