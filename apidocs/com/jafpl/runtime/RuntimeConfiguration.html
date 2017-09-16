@@ -255,9 +255,9 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <div class="values members">
               <h3>Abstract Value Members</h3>
               <ol><li name="com.jafpl.runtime.RuntimeConfiguration#deliver" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="deliver(message:com.jafpl.messages.Message,consumer:com.jafpl.steps.DataConsumer,port:String):Unit"></a><a id="deliver(Message,DataConsumer,String):Unit"></a>
+      <a id="deliver(fromId:String,fromPort:String,message:com.jafpl.messages.Message,consumer:com.jafpl.steps.DataConsumer,port:String):Unit"></a><a id="deliver(String,String,Message,DataConsumer,String):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/RuntimeConfiguration.html#deliver(message:com.jafpl.messages.Message,consumer:com.jafpl.steps.DataConsumer,port:String):Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/RuntimeConfiguration.html#deliver(fromId:String,fromPort:String,message:com.jafpl.messages.Message,consumer:com.jafpl.steps.DataConsumer,port:String):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -266,7 +266,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">deliver</span><span class="params">(<span name="message">message: <a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a></span>, <span name="consumer">consumer: <a href="../steps/DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></span>, <span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">deliver</span><span class="params">(<span name="fromId">fromId: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="fromPort">fromPort: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="message">message: <a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a></span>, <span name="consumer">consumer: <a href="../steps/DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></span>, <span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
       <p class="shortcomment cmt">The delivery agent</p><div class="fullcomment"><div class="comment cmt"><p>The delivery agent</p><p>The message is to be delivered to the step. The runtime configuration gets a chance to

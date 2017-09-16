@@ -137,16 +137,10 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                           GraphException
                         </a>
                       </li><li class="current-entities indented3">
-                        <span class="separator"></span>
+                        <a class="object" href="PipelineException$.html" title=""></a>
                         <a class="class" href="" title="An exception raised during pipeline evaluation."></a>
                         <a href="" title="An exception raised during pipeline evaluation.">
                           PipelineException
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
-                        <a class="class" href="StepException.html" title="An exception raised during step evaluation."></a>
-                        <a href="StepException.html" title="An exception raised during step evaluation.">
-                          StepException
                         </a>
                       </li>
               </ul>
@@ -155,14 +149,16 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
           <div id="content">
             <body class="class type">
       <div id="definition">
-        <div class="big-circle class">c</div>
+        <a href="PipelineException$.html" title="See companion object"><div class="big-circle class-companion-object">c</div></a>
         <p id="owner"><a href="../../index.html" class="extype" name="com">com</a>.<a href="../index.html" class="extype" name="com.jafpl">jafpl</a>.<a href="index.html" class="extype" name="com.jafpl.exceptions">exceptions</a></p>
-        <h1>PipelineException<span class="permalink">
+        <h1><a href="PipelineException$.html" title="See companion object">PipelineException</a><span class="permalink">
       <a href="../../../com/jafpl/exceptions/PipelineException.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
-        <h3><span class="morelinks"></span></h3>
+        <h3><span class="morelinks"><div>
+            Companion <a href="PipelineException$.html" title="See companion object">object PipelineException</a>
+          </div></span></h3>
       </div>
 
       <h4 id="signature" class="signature">
@@ -275,10 +271,10 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       </span>
       
       <p class="shortcomment cmt">Alternate constructor with no cause or data.</p>
-    </li><li name="com.jafpl.exceptions.PipelineException#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(code:String,message:String,location:Option[com.jafpl.graph.Location],cause:Option[Throwable],data:Option[Any]):com.jafpl.exceptions.PipelineException"></a><a id="&lt;init&gt;:PipelineException"></a>
+    </li><li name="com.jafpl.exceptions.PipelineException#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(code:Any,location:Option[com.jafpl.graph.Location]):com.jafpl.exceptions.PipelineException"></a><a id="&lt;init&gt;:PipelineException"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#&lt;init&gt;(code:String,message:String,location:Option[com.jafpl.graph.Location],cause:Option[Throwable],data:Option[Any]):com.jafpl.exceptions.PipelineException" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/PipelineException.html#&lt;init&gt;(code:Any,location:Option[com.jafpl.graph.Location]):com.jafpl.exceptions.PipelineException" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -287,10 +283,42 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">PipelineException</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="message">message: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="location">location: <span class="extype" name="scala.Option">Option</span>[<a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>, <span name="cause">cause: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Throwable">Throwable</span>]</span>, <span name="data">data: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span>
+        <span class="name">PipelineException</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Any">Any</span></span>, <span name="location">location: <span class="extype" name="scala.Option">Option</span>[<a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>)</span>
       </span>
       
-      <p class="shortcomment cmt">A pipeline exception.</p><div class="fullcomment"><div class="comment cmt"><p>A pipeline exception.</p></div><dl class="paramcmts block"><dt class="param">code</dt><dd class="cmt"><p>An error code (can be caught by catch steps).</p></dd><dt class="param">message</dt><dd class="cmt"><p>An explanatory message.</p></dd><dt class="param">location</dt><dd class="cmt"><p>The proximate location of the cause of the exception</p></dd><dt class="param">cause</dt><dd class="cmt"><p>The underlying exception, if there was one.</p></dd><dt class="param">data</dt><dd class="cmt"><p>Arbitrary data that the step would like to communicate to a catch.</p></dd></dl></div>
+      <p class="shortcomment cmt">Alternate constructor with no message, cause or data.</p>
+    </li><li name="com.jafpl.exceptions.PipelineException#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(code:Any,message:String):com.jafpl.exceptions.PipelineException"></a><a id="&lt;init&gt;:PipelineException"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/exceptions/PipelineException.html#&lt;init&gt;(code:Any,message:String):com.jafpl.exceptions.PipelineException" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">PipelineException</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Any">Any</span></span>, <span name="message">message: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
+      </span>
+      
+      <p class="shortcomment cmt">Alternate constructor with no location, cause or data.</p>
+    </li><li name="com.jafpl.exceptions.PipelineException#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(code:Any):com.jafpl.exceptions.PipelineException"></a><a id="&lt;init&gt;:PipelineException"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/exceptions/PipelineException.html#&lt;init&gt;(code:Any):com.jafpl.exceptions.PipelineException" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">PipelineException</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Any">Any</span></span>)</span>
+      </span>
+      
+      <p class="shortcomment cmt">A pipeline exception.</p><div class="fullcomment"><div class="comment cmt"><p>A pipeline exception.</p></div><dl class="paramcmts block"><dt class="param">code</dt><dd class="cmt"><p>An error code (can be caught by catch steps).</p></dd></dl></div>
     </li></ol>
             </div>
 
@@ -349,6 +377,54 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.jafpl.exceptions.PipelineException#_cause" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="_cause:Option[Throwable]"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/exceptions/PipelineException.html#_cause:Option[Throwable]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">_cause</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Throwable">Throwable</span>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+    </li><li name="com.jafpl.exceptions.PipelineException#_location" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="_location:Option[com.jafpl.graph.Location]"></a><a id="_location:Option[Location]"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/exceptions/PipelineException.html#_location:Option[com.jafpl.graph.Location]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">_location</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+    </li><li name="com.jafpl.exceptions.PipelineException#_message" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="_message:Option[String]"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/exceptions/PipelineException.html#_message:Option[String]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">_message</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="java.lang.Throwable#addSuppressed" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="addSuppressed(x$1:Throwable):Unit"></a><a id="addSuppressed(Throwable):Unit"></a>
       <span class="permalink">
@@ -390,7 +466,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">val</span>
+        <span class="kind">def</span>
       </span>
       <span class="symbol">
         <span class="name">cause</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Throwable">Throwable</span>]</span>
@@ -420,9 +496,9 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
               
         </dd></dl></div>
     </li><li name="com.jafpl.exceptions.PipelineException#code" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="code:String"></a>
+      <a id="code:Any"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#code:String" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/PipelineException.html#code:Any" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -431,23 +507,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">code</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
-      </span>
-      
-      
-    </li><li name="com.jafpl.exceptions.PipelineException#data" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="data:Option[Any]"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#data:Option[Any]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">data</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>
+        <span class="name">code</span><span class="result">: <span class="extype" name="scala.Any">Any</span></span>
       </span>
       
       
@@ -674,7 +734,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">val</span>
+        <span class="kind">def</span>
       </span>
       <span class="symbol">
         <span class="name">location</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>
@@ -682,18 +742,18 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       
       
     </li><li name="com.jafpl.exceptions.PipelineException#message" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="message:String"></a>
+      <a id="message:Option[String]"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#message:String" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/PipelineException.html#message:Option[String]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">val</span>
+        <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">message</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+        <span class="name">message</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
       </span>
       
       
