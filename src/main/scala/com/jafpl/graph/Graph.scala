@@ -33,7 +33,7 @@ import scala.collection.mutable.ListBuffer
 class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[jafpl] val logger: Logger = LoggerFactory.getLogger(this.getClass)
   private val _nodes = ListBuffer.empty[Node]
-  private val _edges = ListBuffer.empty[Edge]
+  private val _edges = ListBuffer.empty[Edge] // The order of edges in this list is significant
   private var open = true
   private var _valid = false
   private var exception = Option.empty[Throwable]
@@ -344,10 +344,10 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     node
   }
 
-  protected[graph] def addJoiner(): Joiner = {
+  protected[graph] def addJoiner(ordered: Boolean): Joiner = {
     checkOpen()
 
-    val node = new Joiner(this)
+    val node = new Joiner(this, ordered)
     _nodes += node
     node
   }
@@ -410,6 +410,14 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     * @param toName The name of the input port on the destination node.
     */
   def addEdge(from: Node, fromName: String, to: Node, toName: String): Unit = {
+    addEdge(from, fromName, to, toName, ordered=false)
+  }
+
+  def addOrderedEdge(from: Node, fromName: String, to: Node, toName: String): Unit = {
+    addEdge(from, fromName, to, toName, ordered=true)
+  }
+
+  private def addEdge(from: Node, fromName: String, to: Node, toName: String, ordered: Boolean): Unit = {
     checkOpen()
 
     // If from and two aren't in the same graph...
@@ -422,32 +430,32 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       val ancestor = commonAncestor(from, to)
       if (ancestor.isDefined && ancestor.get == to) {
         // println(s"patch $from/$to to ${to.asInstanceOf[ContainerStart].containerEnd} for $from.$fromName")
-        val edge = new Edge(this, from, fromName, to.asInstanceOf[ContainerStart].containerEnd, toName)
+        val edge = new Edge(this, from, fromName, to.asInstanceOf[ContainerStart].containerEnd, toName, ordered)
         _edges += edge
       } else {
-        val edge = new Edge(this, from, fromName, to, toName)
+        val edge = new Edge(this, from, fromName, to, toName, ordered)
         _edges += edge
       }
     } else {
       // If `from` is a child of `to`, then we really mean to write to the end of the container
       val ancestor = commonAncestor(from, to)
       if (ancestor.isDefined && ancestor.get == to) {
-        val edge = new Edge(this, from, fromName, to.asInstanceOf[ContainerStart].containerEnd, toName)
+        val edge = new Edge(this, from, fromName, to.asInstanceOf[ContainerStart].containerEnd, toName, ordered)
         _edges += edge
       } else {
         // If `from` isn't a container or if `to` is a child of from, then read from the start
         from match {
           case start: ContainerStart =>
             if (ancestor.isDefined && ancestor.get == from) {
-              val edge = new Edge(this, from, fromName, to, toName)
+              val edge = new Edge(this, from, fromName, to, toName, ordered)
               _edges += edge
             } else {
               // Otherwise, read from the end
-              val edge = new Edge(this, start.containerEnd, fromName, to, toName)
+              val edge = new Edge(this, start.containerEnd, fromName, to, toName, ordered)
               _edges += edge
             }
           case _ =>
-            val edge = new Edge(this, from, fromName, to, toName)
+            val edge = new Edge(this, from, fromName, to, toName, ordered)
             _edges += edge
         }
       }
@@ -851,16 +859,21 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       for (port <- node.inputs) {
         val edges = edgesTo(node, port)
         if (edges.length > 1) {
+          var ordered = false
+          for (edge <- edges) {
+            ordered = ordered || edge.ordered
+          }
+
           val joiner = if (node.parent.isDefined) {
-            node.parent.get.addJoiner()
+            node.parent.get.addJoiner(ordered)
           } else {
-            addJoiner()
+            addJoiner(ordered)
           }
           addEdge(joiner, "result", node, port)
           var count = 1
           for (edge <- edges) {
             val iport = "source_" + count
-            addEdge(edge.from, edge.fromPort, joiner, iport)
+            addEdge(edge.from, edge.fromPort, joiner, iport, ordered=edge.ordered)
             count += 1
           }
 

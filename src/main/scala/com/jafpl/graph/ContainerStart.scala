@@ -309,8 +309,8 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     node
   }
 
-  protected[graph] def addJoiner(): Joiner = {
-    val node = graph.addJoiner()
+  protected[graph] def addJoiner(ordered: Boolean): Joiner = {
+    val node = graph.addJoiner(ordered)
     addChild(node)
     node
   }
