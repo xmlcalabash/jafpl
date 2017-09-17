@@ -18,10 +18,17 @@
 
 <xsl:template match="/">
   <xsl:variable name="gv" as="element(dot:digraph)">
-    <xsl:apply-templates/>
+    <xsl:choose>
+      <xsl:when test="/dot:digraph">
+        <xsl:sequence select="/dot:digraph"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:variable>
 
-  <xsl:if test="exists($digraph)">
+  <xsl:if test="exists($digraph) and not(/dot:digraph)">
     <xsl:result-document method="xml" href="{$digraph}">
       <xsl:sequence select="$gv"/>
     </xsl:result-document>

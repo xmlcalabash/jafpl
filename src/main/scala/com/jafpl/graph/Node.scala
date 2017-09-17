@@ -138,22 +138,35 @@ abstract class Node(val graph: Graph,
     val nodes = ListBuffer.empty[xml.Node]
     nodes += xml.Text("\n")
 
-    if (inputs.nonEmpty || bindings.nonEmpty) {
-      val inlist = ListBuffer.empty[xml.Node]
-      for (input <- inputs) {
-        for (edge <- graph.edgesTo(this, input)) {
-          inlist += xml.Text("\n")
-          inlist += xml.Text(indent + "  ")
-          inlist += <in-edge source={ edge.from.id } output-port={ edge.fromPort } input-port={ edge.toPort }></in-edge>
-        }
+    val inlist = ListBuffer.empty[xml.Node]
+    for (input <- inputs) {
+      for (edge <- graph.edgesTo(this, input)) {
+        inlist += xml.Text("\n")
+        inlist += xml.Text(indent + "  ")
+        inlist += <in-edge source={ edge.from.id } output-port={ edge.fromPort } input-port={ edge.toPort }></in-edge>
       }
-      if (bindings.nonEmpty) {
-        for (edge <- graph.edgesTo(this, "#bindings")) {
-          inlist += xml.Text("\n")
-          inlist += xml.Text(indent + "  ")
-          inlist += <in-edge source={ edge.from.id } output-port={ edge.fromPort } input-port={ edge.toPort }></in-edge>
-        }
+    }
+    if (bindings.nonEmpty) {
+      for (edge <- graph.edgesTo(this, "#bindings")) {
+        inlist += xml.Text("\n")
+        inlist += xml.Text(indent + "  ")
+        inlist += <in-edge source={ edge.from.id } output-port={ edge.fromPort } input-port={ edge.toPort }></in-edge>
       }
+    }
+
+    this match {
+      case start: CatchStart =>
+        inlist += xml.Text("\n")
+        inlist += xml.Text(indent + "  ")
+        inlist += <in-edge input-port="errors"></in-edge>
+      case start: LoopStart =>
+        inlist += xml.Text("\n")
+        inlist += xml.Text(indent + "  ")
+        inlist += <in-edge input-port="current"></in-edge>
+      case _ => Unit
+    }
+
+    if (inlist.nonEmpty) {
       inlist += xml.Text("\n" + indent)
       nodes += xml.Text(indent)
       nodes += <inputs>{ inlist }</inputs>
