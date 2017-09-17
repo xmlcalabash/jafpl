@@ -615,9 +615,9 @@ the inner steps must provide outputs through their container.
 ports into which data can be poured before the pipeline is run.
 </p></div><dl class="paramcmts block"><dt class="param">node</dt><dd class="cmt"><p>The node that needs the input.</p></dd><dt class="param">port</dt><dd class="cmt"><p>The port that needs the input.</p></dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addJoiner" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addJoiner():com.jafpl.graph.Joiner"></a><a id="addJoiner():Joiner"></a>
+      <a id="addJoiner(ordered:Boolean):com.jafpl.graph.Joiner"></a><a id="addJoiner(Boolean):Joiner"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addJoiner():com.jafpl.graph.Joiner" title="Permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addJoiner(ordered:Boolean):com.jafpl.graph.Joiner" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -626,10 +626,26 @@ ports into which data can be poured before the pipeline is run.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addJoiner</span><span class="params">()</span><span class="result">: <span class="extype" name="com.jafpl.graph.Joiner">Joiner</span></span>
+        <span class="name">addJoiner</span><span class="params">(<span name="ordered">ordered: <span class="extype" name="scala.Boolean">Boolean</span></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.Joiner">Joiner</span></span>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
+    </li><li name="com.jafpl.graph.Graph#addOrderedEdge" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="addOrderedEdge(from:com.jafpl.graph.Node,fromName:String,to:com.jafpl.graph.Node,toName:String):Unit"></a><a id="addOrderedEdge(Node,String,Node,String):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addOrderedEdge(from:com.jafpl.graph.Node,fromName:String,to:com.jafpl.graph.Node,toName:String):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addOrderedEdge</span><span class="params">(<span name="from">from: <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></span>, <span name="fromName">fromName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="to">to: <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></span>, <span name="toName">toName: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      
     </li><li name="com.jafpl.graph.Graph#addOutput" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="addOutput(node:com.jafpl.graph.Node,port:String):Unit"></a><a id="addOutput(Node,String):Unit"></a>
       <span class="permalink">
