@@ -24,13 +24,7 @@ abstract class Node(val graph: Graph,
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
   private var _start: Option[ContainerStart] = None
   private var _name: String = if (userLabel.isDefined) {
-    val regex = """([\p{L}_][-\p{L}_\p{N}]*)""".r
-    userLabel.get match {
-      case regex(lbl) => lbl
-      case _ =>
-        // Explicitly None here because location hasn't been initialized yet
-        throw new GraphException(s"Invalid label: ${userLabel.get}", None)
-    }
+    userLabel.get
   } else {
     var name = super.toString.split('.').last
     if (name.indexOf('@') > 0) {
