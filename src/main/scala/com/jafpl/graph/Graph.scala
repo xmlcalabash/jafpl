@@ -895,10 +895,11 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       node match {
         case start: ContainerStart =>
           val end = start.containerEnd
+
           for (port <- start.outputs) {
-            val skipCatchErrors = start.isInstanceOf[CatchStart] && (port == "errors")
+            val skipCatchErrors   = start.isInstanceOf[CatchStart] && (port == "errors")
             val skipFinallyErrors = start.isInstanceOf[FinallyStart] && (port == "errors")
-            val skipLoopCurrent = start.isInstanceOf[LoopStart] && (port == "current")
+            val skipLoopCurrent   = start.isInstanceOf[LoopStart] && (port == "current")
             val edges = edgesTo(node, port)
             if (edges.isEmpty && !skipCatchErrors && !skipFinallyErrors && !skipLoopCurrent) {
               val iedges = edgesTo(end, port)
@@ -909,6 +910,35 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
               }
             }
           }
+
+          // If nothing reads from the loop's current port, stick in a sink
+          node match {
+            case start: LoopStart =>
+              val edges = edgesFrom(node, "current")
+              if (edges.isEmpty) {
+                logger.debug(s"Adding sink to consume $start.current")
+                val sink = start.addSink()
+                addEdge(node, "current", sink, "source")
+              }
+              /* I'm not convinced that reading from the error port is implemented correclty yet
+            case start: CatchStart =>
+              val edges = edgesFrom(node, "error")
+              if (edges.isEmpty) {
+                logger.debug(s"Adding sink to consume $start.error")
+                val sink = start.addSink()
+                addEdge(node, "current", sink, "source")
+              }
+            case start: FinallyStart =>
+              val edges = edgesFrom(node, "error")
+              if (edges.isEmpty) {
+                logger.debug(s"Adding sink to consume $start.error")
+                val sink = start.addSink()
+                addEdge(node, "current", sink, "source")
+              }
+              */
+            case _ => Unit
+          }
+
         case _ => Unit
       }
     }
