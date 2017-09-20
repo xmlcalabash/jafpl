@@ -79,6 +79,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   def addPipeline(label: Option[String]): PipelineStart = {
     checkOpen()
 
+    logger.debug("addPipeline {}", label.getOrElse("ANONYMOUS"))
+
     val end = new ContainerEnd(this)
     val start = new PipelineStart(this, end, label)
     end.parent = start
@@ -99,6 +101,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   def addInput(node: Node, port: String): Unit = {
     checkOpen()
 
+    logger.debug(s"addInput $node.$port")
+
     val reqdInput = new GraphInput(this, port)
     _nodes += reqdInput
     addEdge(reqdInput, "result", node, port)
@@ -113,6 +117,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     */
   def addOutput(node: Node, port: String): Unit = {
     checkOpen()
+
+    logger.debug(s"addOutput $node.$port")
 
     val reqdOutput = new GraphOutput(this, port)
     _nodes += reqdOutput
@@ -129,6 +135,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     */
   def addBinding(name: String): Binding = {
     checkOpen()
+
+    logger.debug("addBinding {}", name)
+
     val binding = new Binding(this, name, None)
     _nodes += binding
     binding
@@ -143,6 +152,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addAtomic(step: Step, label: Option[String]): Node = {
     checkOpen()
 
+    val dlabel = label.getOrElse("")
+    logger.debug(s"addAtomic $step, $dlabel")
+
     val node = new AtomicNode(this, Some(step), label)
     _nodes += node
     node
@@ -155,6 +167,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     */
   protected[graph] def addGroup(label: Option[String]): ContainerStart = {
     checkOpen()
+
+    val dlabel = label.getOrElse("")
+    logger.debug(s"addGroup $dlabel")
 
     val end = new ContainerEnd(this)
     val start = new GroupStart(this, end, label)
@@ -173,6 +188,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addChoose(label: Option[String]): ChooseStart = {
     checkOpen()
 
+    logger.debug("addChoose {}", label.getOrElse("ANONYMOUS"))
+
     val end = new ContainerEnd(this)
     val start = new ChooseStart(this, end, label)
     end.parent = start
@@ -184,6 +201,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
   protected[graph] def addWhen(expression: Any, label: Option[String]): WhenStart = {
     checkOpen()
+
+    logger.debug("addWhen {} {}", label.getOrElse("ANONYMOUS"), expression)
 
     val end = new ContainerEnd(this)
     val start = new WhenStart(this, end, label, expression)
@@ -201,6 +220,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     */
   protected[graph] def addForEach(label: Option[String]): LoopEachStart = {
     checkOpen()
+
+    logger.debug("addForEach {}", label.getOrElse("ANONYMOUS"))
 
     val end = new ContainerEnd(this)
     val start = new LoopEachStart(this, end, label)
@@ -220,6 +241,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addWhile(tester: ItemTester, label: Option[String]): LoopWhileStart = {
     checkOpen()
 
+    logger.debug("addWhile {}", label.getOrElse("ANONYMOUS"))
+
     val end = new ContainerEnd(this)
     val start = new LoopWhileStart(this, end, label, tester)
     end.parent = start
@@ -238,6 +261,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addUntil(comparator: ItemComparator, label: Option[String]): LoopUntilStart = {
     checkOpen()
 
+    logger.debug("addUntil {}", label.getOrElse("ANONYMOUS"))
+
     val end = new ContainerEnd(this)
     val start = new LoopUntilStart(this, end, label, comparator)
     end.parent = start
@@ -254,6 +279,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     */
   protected[graph] def addFor(label: Option[String], countFrom: Long, countTo: Long, countBy: Long): LoopForStart = {
     checkOpen()
+
+    logger.debug("addFor {}", label.getOrElse("ANONYMOUS"))
 
     val end = new ContainerEnd(this)
     val start = new LoopForStart(this, end, label, countFrom, countTo, countBy)
@@ -274,6 +301,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addViewport(composer: ViewportComposer, label: Option[String]): ViewportStart = {
     checkOpen()
 
+    logger.debug("addViewport {}", label.getOrElse("ANONYMOUS"))
+
     val end = new ContainerEnd(this)
     val start = new ViewportStart(this, end, label, composer)
     end.parent = start
@@ -291,6 +320,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addTryCatch(label: Option[String]): TryCatchStart = {
     checkOpen()
 
+    logger.debug("addTryCatch {}", label.getOrElse("ANONYMOUS"))
+
     val end = new ContainerEnd(this)
     val start = new TryCatchStart(this, end, label)
     end.parent = start
@@ -302,6 +333,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
   protected[graph] def addTry(label: Option[String]): TryStart = {
     checkOpen()
+
+    logger.debug("addTry {}", label.getOrElse("ANONYMOUS"))
 
     val end = new ContainerEnd(this)
     val start = new TryStart(this, end, label)
@@ -315,6 +348,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addCatch(label: Option[String], codes: List[Any]): CatchStart = {
     checkOpen()
 
+    val dlabel = label.getOrElse("")
+    logger.debug(s"addCatch $dlabel $codes")
+
     val end = new ContainerEnd(this)
     val start = new CatchStart(this, end, label, codes)
     end.parent = start
@@ -326,6 +362,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
   protected[graph] def addFinally(label: Option[String]): FinallyStart = {
     checkOpen()
+
+    logger.debug("addFinally {}", label.getOrElse("ANONYMOUS"))
 
     val end = new ContainerEnd(this)
     val start = new FinallyStart(this, end, label)
@@ -339,6 +377,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addSplitter(): Splitter = {
     checkOpen()
 
+    logger.debug("addSplitter")
+
     val node = new Splitter(this)
     _nodes += node
     node
@@ -347,6 +387,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addJoiner(ordered: Boolean): Joiner = {
     checkOpen()
 
+    logger.debug("addJoiner")
+
     val node = new Joiner(this, ordered)
     _nodes += node
     node
@@ -354,6 +396,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
   private def addBuffer(loop: ContainerStart, edge: Edge): Unit = {
     checkOpen()
+
+    logger.debug("addBuffer")
 
     val node = new Buffer(this)
     _nodes += node
@@ -367,6 +411,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addSink(): Sink = {
     checkOpen()
 
+    logger.debug("addSink")
+
     val node = new Sink(this)
     _nodes += node
     node
@@ -375,6 +421,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addEmptySource(): EmptySource = {
     checkOpen()
 
+    logger.debug("addEmptySource")
+
     val node = new EmptySource(this)
     _nodes += node
     node
@@ -382,6 +430,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
   protected[graph] def addVariable(name: String, expression: Any): Binding = {
     checkOpen()
+
+    logger.debug("addVariable {} {}", name, expression)
+
     val binding = new Binding(this, name, Some(expression))
     _nodes += binding
     binding
@@ -419,6 +470,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
   private def addEdge(from: Node, fromName: String, to: Node, toName: String, ordered: Boolean): Unit = {
     checkOpen()
+
+    logger.debug("addEdge {}.{} -> {}.{}", from, fromName, to, toName)
 
     // If from and two aren't in the same graph...
     if (! (_nodes.contains(from) && _nodes.contains(to))) {
@@ -469,6 +522,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     */
   def addBindingEdge(varname: String, to: Node): Unit = {
     checkOpen()
+
+    logger.debug(s"addBindingEdge $varname $to")
 
     // Find the variable
     val binding = findInScopeBinding(varname, to)
@@ -525,6 +580,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   def addBindingEdge(from: Binding, to: Node): Unit = {
     checkOpen()
 
+    logger.debug(s"addBindingEdge $from -> $to")
+
     if (_nodes.contains(from) && _nodes.contains(to)) {
       val edge = new BindingEdge(this, from, to)
       _edges += edge
@@ -535,6 +592,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
   protected[graph] def addDependsEdge(from: Node, to: Node): Unit = {
     checkOpen()
+
+    logger.debug(s"addDependsEdge $from -> $to")
 
     if (_nodes.contains(from) && _nodes.contains(to)) {
       val depid = UniqueId.nextId
@@ -707,6 +766,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
               error(new GraphException(s"LoopEach has incorrect input port: $in", node.location))
             }
           }
+
         case bind: Binding =>
           if (edgesFrom(bind).isEmpty) {
             val sink = if (bind.parent.isDefined) {
