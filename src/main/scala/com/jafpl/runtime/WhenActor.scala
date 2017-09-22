@@ -64,7 +64,7 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
     trace(s"$node checkIfReady: ready:$readyToCheck inputs:${openInputs.isEmpty}", "StepExec")
     if (readyToCheck && openInputs.isEmpty) {
       val eval = runtime.runtime.expressionEvaluator.newInstance()
-      val pass = eval.booleanValue(node.testExpr, contextItem.toList, bindings.toMap)
+      val pass = eval.booleanValue(node.testExpr, contextItem.toList, bindings.toMap, None)
       monitor ! GGuardResult(node, pass)
     }
   }

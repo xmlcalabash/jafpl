@@ -138,7 +138,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
     logger.debug("addBinding {}", name)
 
-    val binding = new Binding(this, name, None)
+    val binding = new Binding(this, name)
     _nodes += binding
     binding
   }
@@ -428,12 +428,12 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     node
   }
 
-  protected[graph] def addVariable(name: String, expression: Any): Binding = {
+  protected[graph] def addVariable(name: String, expression: Any, options: Option[Any]): Binding = {
     checkOpen()
 
     logger.debug("addVariable {} {}", name, expression)
 
-    val binding = new Binding(this, name, Some(expression))
+    val binding = new Binding(this, name, Some(expression), options)
     _nodes += binding
     binding
   }

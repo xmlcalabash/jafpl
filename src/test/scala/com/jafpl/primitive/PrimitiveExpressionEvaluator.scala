@@ -12,7 +12,7 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
     new PrimitiveExpressionEvaluator(config)
   }
 
-  override def value(expr: Any, context: List[Message], bindings: Map[String,Message]): Message = {
+  override def value(expr: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Message = {
     if (context.size > 1) {
       throw new PipelineException("badconext", "Context contains more than one item", None)
     }
@@ -59,7 +59,7 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
     }
   }
 
-  override def booleanValue(expr: Any, context: List[Message], bindings: Map[String,Message]): Boolean = {
+  override def booleanValue(expr: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Boolean = {
     if (context.size > 1) {
       throw new PipelineException("badconext", "Context contains more than one item", None)
     }
