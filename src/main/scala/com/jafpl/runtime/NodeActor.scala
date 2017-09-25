@@ -235,37 +235,38 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    if (port == "#bindings") {
-      item match {
-        case binding: BindingMessage =>
-          if (node.step.isDefined) {
-            trace(s"→BINDING $node: ${binding.name}=${binding.message}", "Bindings")
-            node.step.get.receiveBinding(binding)
-          } else {
-            trace(s"↴BINDING $node: ${binding.name}=${binding.message} (no step)", "Bindings")
-          }
-          openBindings -= binding.name
-        case _ =>
-          monitor ! GException(None,
-            new PipelineException("badbinding", s"Unexpected message $item on #bindings port", node.location))
-          return
+    try {
+      if (port == "#bindings") {
+        item match {
+          case binding: BindingMessage =>
+            if (node.step.isDefined) {
+              trace(s"→BINDING $node: ${binding.name}=${binding.message}", "Bindings")
+              node.step.get.receiveBinding(binding)
+            } else {
+              trace(s"↴BINDING $node: ${binding.name}=${binding.message} (no step)", "Bindings")
+            }
+            openBindings -= binding.name
+          case _ =>
+            throw new PipelineException("badbinding", s"Unexpected message $item on #bindings port", node.location)
+        }
+      } else {
+        item match {
+          case message: ItemMessage =>
+            val card = cardinalities.getOrElse(port, 0L) + 1L
+            cardinalities.put(port, card)
+            if (node.step.isDefined) {
+              trace(s"DELIVER→ ${node.step.get}.$port", "StepIO")
+              runtime.runtime.deliver(from.id, fromPort, message, node.step.get, port)
+            } else {
+              trace(s"↴DELIVER $node (no step)", "StepIO")
+            }
+          case _ =>
+            throw new PipelineException("badmessage", s"Unexpected message $item on port $port", node.location)
+        }
       }
-    } else {
-      item match {
-        case message: ItemMessage =>
-          val card = cardinalities.getOrElse(port, 0L) + 1L
-          cardinalities.put(port, card)
-          if (node.step.isDefined) {
-            trace(s"DELIVER→ ${node.step.get}.$port", "StepIO")
-            runtime.runtime.deliver(from.id, fromPort, message, node.step.get, port)
-          } else {
-            trace(s"↴DELIVER $node (no step)", "StepIO")
-          }
-        case _ =>
-          monitor ! GException(None,
-            new PipelineException("badmessage", s"Unexpected message $item on port $port", node.location))
-          return
-      }
+    } catch {
+      case t: Throwable =>
+        monitor ! GException(None, t)
     }
   }
 
