@@ -10,6 +10,7 @@ import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished,
 import com.jafpl.steps.{DataConsumer, PortSpecification}
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 private[runtime] object NodeActor {
   case class NInitialize()
@@ -39,6 +40,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   protected val log = Logging(context.system, this)
   protected val openInputs = mutable.HashSet.empty[String]
   protected val openBindings = mutable.HashSet.empty[String]
+  protected val bufferedInput = ListBuffer.empty[InputBuffer]
   protected var readyToRun = false
   protected val cardinalities = mutable.HashMap.empty[String, Long]
   protected var proxy = Option.empty[DataConsumer]
@@ -84,6 +86,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   protected def reset(): Unit = {
     readyToRun = false
     openInputs.clear()
+    bufferedInput.clear()
     for (input <- node.inputs) {
       openInputs.add(input)
     }
@@ -231,10 +234,23 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       }
     }
     openInputs -= port
+
+    if (port == "#bindings" && bufferedInput.nonEmpty) {
+      for (buf <- bufferedInput) {
+        input(buf.from, buf.fromPort, buf.port, buf.item)
+      }
+      bufferedInput.clear()
+    }
+
     runIfReady()
   }
 
   protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
+    if (port != "#bindings" && openInputs.contains("#bindings")) {
+      bufferedInput += new InputBuffer(from, fromPort, port, item)
+      return
+    }
+
     try {
       if (port == "#bindings") {
         item match {
@@ -422,4 +438,8 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     case m: Any =>
       log.error(s"Unexpected message: $m")
   }
+
+  class InputBuffer(val from: Node, val fromPort: String, val port: String, val item: Message) {
+  }
+
 }
