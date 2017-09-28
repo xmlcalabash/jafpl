@@ -12,7 +12,11 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
     new PrimitiveExpressionEvaluator(config)
   }
 
-  override def value(expr: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Message = {
+  override def value(expr: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): List[Message] = {
+    List(singletonValue(expr, context, bindings, options))
+  }
+
+  override def singletonValue(expr: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Message = {
     if (context.size > 1) {
       throw new PipelineException("badconext", "Context contains more than one item", None)
     }
