@@ -61,6 +61,7 @@ class VariableBindingSpec extends FlatSpec {
     assert(bc.items.head == "hello world")
   }
 
+  /* FIXME: this should only cause a failure if there's a reference to the unbound variable.
   "An unbound variable " should " cause an exception" in {
     val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
@@ -90,7 +91,8 @@ class VariableBindingSpec extends FlatSpec {
 
     assert(pass)
   }
-
+  */
+  
   "Intermediate variables " should " be computed" in {
     val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
