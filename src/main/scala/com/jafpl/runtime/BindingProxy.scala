@@ -18,9 +18,18 @@ class BindingProxy(private val monitor: ActorRef,
   def set(item: Any): Unit = {
     if (closed) {
       monitor ! GException(None,
-        new PipelineException("bindingclosed", s"Attempt to change closed binding: ${binding.name}", binding.location))
+        new PipelineException("bindingclosed", s"Attempt to change a closed binding: ${binding.name}", binding.location))
     } else {
       _value = Some(item)
+      _closed = true
+    }
+  }
+
+  def close(): Unit = {
+    if (closed) {
+      monitor ! GException(None,
+        new PipelineException("bindingclosed", s"Attempt to close a closed binding: ${binding.name}", binding.location))
+    } else {
       _closed = true
     }
   }

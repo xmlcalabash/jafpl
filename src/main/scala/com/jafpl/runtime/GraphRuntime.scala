@@ -133,6 +133,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   def runInBackground(): Unit = {
     for ((name, provider) <- _graphBindings) {
       if (!provider.closed) {
+        provider.close()
         logger.debug("No binding provided for " + name)
       }
     }

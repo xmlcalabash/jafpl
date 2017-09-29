@@ -32,7 +32,6 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
         assert(port == "#bindings")
         trace(s"RECVBIND ${binding.name}=${binding.message}", "Bindings")
         bindings.put(binding.name, binding.message)
-        openBindings -= binding.name
       case _ =>
         monitor ! GException(None,
           new PipelineException("badmessage", s"Unexpected message on $item on $port", binding.location))

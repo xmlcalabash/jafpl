@@ -61,15 +61,15 @@ class VariableBindingSpec extends FlatSpec {
     assert(bc.items.head == "hello world")
   }
 
-  /* FIXME: this should only cause a failure if there's a reference to the unbound variable.
-  "An unbound variable " should " cause an exception" in {
+  "An unreferenced unbound variable " should " be fine" in {
     val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
 
-    val bind     = graph.addBinding("fred")
-    val prodbind = pipeline.addAtomic(new ProduceBinding("fred"), "pb")
+    val bind_a   = graph.addBinding("a")
+    val bind_b   = graph.addBinding("b")
+    val prodbind = pipeline.addAtomic(new ProduceBinding("a"), "pb")
 
-    graph.addBindingEdge(bind, prodbind)
+    graph.addBindingEdge(bind_a, prodbind)
     graph.addEdge(prodbind, "result", pipeline, "result")
 
     graph.addOutput(pipeline, "result")
@@ -77,6 +77,41 @@ class VariableBindingSpec extends FlatSpec {
     graph.close()
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.bindings("a").set("0")
+    val bc = new BufferConsumer()
+    runtime.outputs("result").setConsumer(bc)
+
+    var pass = true
+    try {
+      runtime.run()
+    } catch {
+      case t: Throwable =>
+        println(t)
+        pass = false
+    }
+
+    assert(pass)
+  }
+
+  "An referenced unbound variable " should " cause an exception" in {
+    val graph    = Jafpl.newInstance().newGraph()
+    val pipeline = graph.addPipeline()
+
+    val bind      = graph.addBinding("a")
+    val sum       = pipeline.addVariable("sum", "a + 0")
+
+    val prodbind  = pipeline.addAtomic(new ProduceBinding("sum"), "pb")
+
+    graph.addBindingEdge(bind, sum)
+    graph.addBindingEdge(sum, prodbind)
+    graph.addEdge(prodbind, "result", pipeline, "result")
+
+    graph.addOutput(pipeline, "result")
+
+    graph.close()
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
 
@@ -85,14 +120,13 @@ class VariableBindingSpec extends FlatSpec {
       runtime.run()
     } catch {
       case err: PipelineException =>
-        pass = err.code == "nobinding"
+        pass = (err.code == "nobinding")
       case _: Throwable => Unit
     }
 
     assert(pass)
   }
-  */
-  
+
   "Intermediate variables " should " be computed" in {
     val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
@@ -127,5 +161,4 @@ class VariableBindingSpec extends FlatSpec {
     assert(bc.items.size == 1)
     assert(bc.items.head == 5)
   }
-
 }

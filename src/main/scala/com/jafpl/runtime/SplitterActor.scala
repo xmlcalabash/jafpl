@@ -40,8 +40,7 @@ private[runtime] class SplitterActor(private val monitor: ActorRef,
 
     if (port == "#bindings") {
       item match {
-        case binding: BindingMessage =>
-          openBindings -= binding.name
+        case binding: BindingMessage => Unit
         case _ =>
           monitor ! GException(None,
             new PipelineException("badbinding", "Unexpected item on #bindings port", node.location))

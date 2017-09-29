@@ -32,11 +32,21 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
       case patn(left, op, right) =>
         val leftv = left match {
           case digits(num) => num.toLong
-          case _ => numberFromBinding(bindings(left))
+          case _ =>
+            if (bindings.contains(left)) {
+              numberFromBinding(bindings(left))
+            } else {
+              throw new PipelineException("nobinding", "No binding for " + left)
+            }
         }
         val rightv = right match {
           case digits(num) => num.toLong
-          case _ => numberFromBinding(bindings(right))
+          case _ =>
+            if (bindings.contains(right)) {
+              numberFromBinding(bindings(right))
+            } else {
+              throw new PipelineException("nobinding", "No binding for " + right)
+            }
         }
         val result = op match {
           case "-" => leftv - rightv

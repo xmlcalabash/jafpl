@@ -39,7 +39,6 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
                                  private val node: Node) extends Actor {
   protected val log = Logging(context.system, this)
   protected val openInputs = mutable.HashSet.empty[String]
-  protected val openBindings = mutable.HashSet.empty[String]
   protected val bufferedInput = ListBuffer.empty[InputBuffer]
   protected var readyToRun = false
   protected val cardinalities = mutable.HashMap.empty[String, Long]
@@ -69,9 +68,6 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     for (input <- node.inputs) {
       openInputs.add(input)
     }
-    for (input <- node.bindings) {
-      openBindings.add(input)
-    }
     if (node.step.isDefined) {
       trace(s"INITSTEP $node", "StepExec")
       try {
@@ -89,10 +85,6 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     bufferedInput.clear()
     for (input <- node.inputs) {
       openInputs.add(input)
-    }
-    openBindings.clear()
-    for (input <- node.bindings) {
-      openBindings.add(input)
     }
     cardinalities.clear()
     if (proxy.isDefined) {
@@ -150,17 +142,14 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   private def runIfReady(): Unit = {
-    trace(s"RUNIFRDY $node (ready:$readyToRun inputs:${openInputs.isEmpty} bindings:${openBindings.isEmpty})", "StepExec")
+    trace(s"RUNIFRDY $node (ready:$readyToRun inputs:${openInputs.isEmpty})", "StepExec")
 
     if (readyToRun) {
-      if (openInputs.isEmpty && openBindings.isEmpty) {
+      if (openInputs.isEmpty) {
         run()
       } else {
         for (port <- openInputs) {
           trace(s"........ $port open", "StepExec")
-        }
-        for (varname <- openBindings) {
-          trace(s"........ $varname binding open", "StepExec")
         }
       }
     }
@@ -261,7 +250,6 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
             } else {
               trace(s"↴BINDING $node: ${binding.name}=${binding.message} (no step)", "Bindings")
             }
-            openBindings -= binding.name
           case _ =>
             throw new PipelineException("badbinding", s"Unexpected message $item on #bindings port", node.location)
         }

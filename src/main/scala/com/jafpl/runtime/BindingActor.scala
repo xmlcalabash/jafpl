@@ -17,7 +17,7 @@ private[runtime] class BindingActor(private val monitor: ActorRef,
   }
 
   private def runIfReady(): Unit = {
-    trace(s"RUNIFRDY $binding ready:$readyToRun closed:${provider.closed}", "StepExec")
+    trace(s"RUNIFRDY $binding ready:$readyToRun closed:${provider.closed})", "StepExec")
 
     if (readyToRun && provider.closed) {
       run()
@@ -25,8 +25,10 @@ private[runtime] class BindingActor(private val monitor: ActorRef,
   }
 
   override protected def run(): Unit = {
-    val msg = new BindingMessage(binding.name, new ItemMessage(provider.value.get, Metadata.ANY))
-    monitor ! GOutput(binding, "result", msg)
+    if (provider.value.isDefined) {
+      val msg = new BindingMessage(binding.name, new ItemMessage(provider.value.get, Metadata.ANY))
+      monitor ! GOutput(binding, "result", msg)
+    }
     monitor ! GClose(binding, "result")
     monitor ! GFinished(binding)
   }
