@@ -26,10 +26,11 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
       case _ => throw new PipelineException("unexpected", s"Unexpected object as expression value: $expr", None)
     }
 
-    val patn = "(\\S+)\\s*([-+*/])\\s*(\\S+)".r
+    val addPatn = "(\\S+)\\s*([-+*/])\\s*(\\S+)".r
+    val numPatn = "(\\S+)".r
     val digits = "([0-9]+)".r
     strexpr match {
-      case patn(left, op, right) =>
+      case addPatn(left, op, right) =>
         val leftv = left match {
           case digits(num) => num.toLong
           case _ =>
@@ -58,6 +59,14 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
           logger.info(s"COMPUTED $strexpr = $result")
         }
         new ItemMessage(result, Metadata.NUMBER)
+      case numPatn(num) =>
+        num match {
+          case digits(dnum) =>
+            new ItemMessage(dnum.toLong, Metadata.NUMBER)
+          case _ =>
+            logger.warn("Expression did not match pattern: returning expression string as value: " + strexpr)
+            new ItemMessage(strexpr, Metadata.STRING)
+        }
       case _ =>
         logger.warn("Expression did not match pattern: returning expression string as value: " + strexpr)
         new ItemMessage(strexpr, Metadata.STRING)
