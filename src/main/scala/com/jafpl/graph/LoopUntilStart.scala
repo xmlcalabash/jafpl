@@ -40,6 +40,4 @@ private[jafpl] class LoopUntilStart(override val graph: Graph,
 
     hasTest
   }
-
-
 }
