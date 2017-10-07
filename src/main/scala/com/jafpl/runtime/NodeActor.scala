@@ -39,7 +39,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
                                  private val node: Node) extends Actor {
   protected val log = Logging(context.system, this)
   protected val openInputs = mutable.HashSet.empty[String]
-  protected val bufferedInput = ListBuffer.empty[InputBuffer]
+  protected val bufferedInput: ListBuffer[InputBuffer] = ListBuffer.empty[InputBuffer]
   protected var readyToRun = false
   protected val cardinalities = mutable.HashMap.empty[String, Long]
   protected var proxy = Option.empty[DataConsumer]
@@ -159,6 +159,10 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     readyToRun = false
     var threwException = false
 
+    for (inj <- node.stepInjectables) {
+      inj.beforeRun()
+    }
+
     if (node.step.isDefined) {
       trace(s"RUNSTEP  $node", "StepExec")
       try {
@@ -189,6 +193,9 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           monitor ! GClose(node, output)
         }
         monitor ! GFinished(node)
+        for (inj <- node.stepInjectables) {
+          inj.afterRun()
+        }
       }
     } else {
       trace(s"RUN____  $node", "StepExec")
@@ -244,6 +251,12 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       if (port == "#bindings") {
         item match {
           case binding: BindingMessage =>
+            for (inj <- node.inputInjectables ++ node.outputInjectables) {
+              inj.receiveBinding(binding)
+            }
+            for (inj <- node.stepInjectables) {
+              inj.receiveBinding(binding)
+            }
             if (node.step.isDefined) {
               trace(s"→BINDING $node: ${binding.name}=${binding.message}", "Bindings")
               node.step.get.receiveBinding(binding)
@@ -256,11 +269,16 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       } else {
         item match {
           case message: ItemMessage =>
+            for (inj <- node.inputInjectables) {
+              if (inj.port == port) {
+                inj.run(message)
+              }
+            }
             val card = cardinalities.getOrElse(port, 0L) + 1L
             cardinalities.put(port, card)
             if (node.step.isDefined) {
               trace(s"DELIVER→ ${node.step.get}.$port", "StepIO")
-              runtime.runtime.deliver(from.id, fromPort, message, node.step.get, port)
+              node.step.get.receive(port, message)
             } else {
               trace(s"↴DELIVER $node (no step)", "StepIO")
             }

@@ -1,6 +1,7 @@
 package com.jafpl.graph
 
 import com.jafpl.exceptions.GraphException
+import com.jafpl.injection.{PortInjectable, StepInjectable}
 import com.jafpl.steps.Step
 import com.jafpl.util.UniqueId
 import org.slf4j.{Logger, LoggerFactory}
@@ -22,6 +23,9 @@ abstract class Node(val graph: Graph,
                     val step: Option[Step],
                     val userLabel: Option[String]) {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  protected[jafpl] val inputInjectables: ListBuffer[PortInjectable] = ListBuffer.empty[PortInjectable]
+  protected[jafpl] val outputInjectables: ListBuffer[PortInjectable] = ListBuffer.empty[PortInjectable]
+  protected[jafpl] val stepInjectables: ListBuffer[StepInjectable] = ListBuffer.empty[StepInjectable]
   private var _start: Option[ContainerStart] = None
   private var _name: String = if (userLabel.isDefined) {
     userLabel.get
@@ -122,6 +126,16 @@ abstract class Node(val graph: Graph,
     } else {
       throw new GraphException("Parent of " + this + " is already defined: " + _start.get, location)
     }
+  }
+
+  def addInputInjectable(injectable: PortInjectable): Unit = {
+    inputInjectables += injectable
+  }
+  def addOutputInjectable(injectable: PortInjectable): Unit = {
+    outputInjectables += injectable
+  }
+  def addStepInjectable(injectable: StepInjectable): Unit = {
+    stepInjectables += injectable
   }
 
   /** A string representation of this node. */

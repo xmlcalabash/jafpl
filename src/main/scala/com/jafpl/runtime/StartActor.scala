@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.graph.{ContainerStart, Node}
-import com.jafpl.messages.Message
+import com.jafpl.messages.{BindingMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GAbort, GClose, GFinished, GOutput, GReset, GStart, GStop, GStopped}
 
 private[runtime] class StartActor(private val monitor: ActorRef,
@@ -45,9 +45,21 @@ private[runtime] class StartActor(private val monitor: ActorRef,
   }
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    val edge = node.outputEdge(port)
-    trace(s"Start actor $node sends to ${edge.toPort}: $item", "StepIO")
-    monitor ! GOutput(node, edge.fromPort, item)
+    // Bindings on compound steps are only ever for injectables
+    if (port == "#bindings") {
+      for (inj <- node.stepInjectables) {
+        item match {
+          case binding: BindingMessage =>
+            inj.receiveBinding(binding)
+          case _ =>
+            throw new RuntimeException("FIXME: bang")
+        }
+      }
+    } else {
+      val edge = node.outputEdge(port)
+      trace(s"Start actor $node sends to ${edge.toPort}: $item", "StepIO")
+      monitor ! GOutput(node, edge.fromPort, item)
+    }
   }
 
   protected[runtime] def finished(): Unit = {
@@ -55,5 +67,8 @@ private[runtime] class StartActor(private val monitor: ActorRef,
       monitor ! GClose(node, output)
     }
     monitor ! GFinished(node)
+    for (inj <- node.stepInjectables) {
+      inj.afterRun()
+    }
   }
 }

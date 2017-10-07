@@ -169,6 +169,17 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
 
     case GOutput(node, port, item) =>
       lastMessage = Instant.now()
+
+      item match {
+        case msg: ItemMessage =>
+          for (inj <- node.outputInjectables) {
+            if (inj.port == port) {
+              inj.run(msg)
+            }
+          }
+        case _ => Unit
+      }
+
       if (node.hasOutputEdge(port)) {
         val edge = node.outputEdge(port)
         trace(s"SENDOUT→ $node.$port → ${edge.to}.${edge.toPort} from ${fmtSender()}", "StepIO")
