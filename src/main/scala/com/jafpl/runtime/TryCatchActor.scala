@@ -14,7 +14,7 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
   var cause = Option.empty[Throwable]
 
   override protected def start(): Unit = {
-    readyToRun = true
+    commonStart()
     runningTryBlock = true
 
     for (child <- node.children) {
@@ -112,5 +112,6 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
     }
 
     monitor ! GFinished(node)
+    commonFinished()
   }
 }

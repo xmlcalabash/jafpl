@@ -9,7 +9,7 @@ private[runtime] class FinallyActor(private val monitor: ActorRef,
                                     private val runtime: GraphRuntime,
                                     private val node: ContainerStart) extends StartActor(monitor, runtime, node)  {
   override protected def start(): Unit = {
-    readyToRun = false
+    commonStart()
   }
 
   def startFinally(cause: Option[Throwable]) {

@@ -19,7 +19,7 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
   private var sourceClosed = false
 
   override protected def start(): Unit = {
-    readyToRun = true
+    commonStart()
     runIfReady()
   }
 
@@ -45,7 +45,6 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
     }
     runIfReady()
   }
-
 
   override protected def close(port: String): Unit = {
     sourceClosed = true
@@ -85,6 +84,7 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
         }
       }
       monitor ! GFinished(node)
+      commonFinished()
     } else {
       trace(s"RESET ForEach: $node $sourceClosed, ${queue.isEmpty}", "ForEach")
       monitor ! GReset(node)

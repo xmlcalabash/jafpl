@@ -8,9 +8,21 @@ import com.jafpl.runtime.GraphMonitor.{GAbort, GClose, GFinished, GOutput, GRese
 private[runtime] class StartActor(private val monitor: ActorRef,
                                   private val runtime: GraphRuntime,
                                   private val node: ContainerStart) extends NodeActor(monitor, runtime, node)  {
-  override protected def start(): Unit = {
+  protected def commonStart(): Unit = {
     readyToRun = true
+    for (inj <- node.stepInjectables) {
+      inj.beforeRun()
+    }
+  }
 
+  protected def commonFinished(): Unit = {
+    for (inj <- node.stepInjectables) {
+      inj.afterRun()
+    }
+  }
+
+  override protected def start(): Unit = {
+    commonStart()
     for (child <- node.children) {
       trace(s"START ... $child (for $node)", "Run")
       monitor ! GStart(child)
@@ -67,8 +79,6 @@ private[runtime] class StartActor(private val monitor: ActorRef,
       monitor ! GClose(node, output)
     }
     monitor ! GFinished(node)
-    for (inj <- node.stepInjectables) {
-      inj.afterRun()
-    }
+    commonFinished()
   }
 }

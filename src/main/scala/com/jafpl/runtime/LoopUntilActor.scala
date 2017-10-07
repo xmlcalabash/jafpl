@@ -21,7 +21,7 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
   val bindings = mutable.HashMap.empty[String, Message]
 
   override protected def start(): Unit = {
-    readyToRun = true
+    commonStart()
     runIfReady()
   }
 
@@ -108,6 +108,7 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
         }
       }
       monitor ! GFinished(node)
+      commonFinished()
     } else {
       trace(s"LOOPR UntilFinished", "UntilFinished")
       trace(s"RESET UntilFinished: $node", "UntilFinished")

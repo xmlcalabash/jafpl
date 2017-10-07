@@ -47,8 +47,7 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
   }
 
   override protected def start(): Unit = {
-    trace(s"$node started", "StepExec")
-    readyToRun = true
+    commonStart()
     for (child <- node.children) {
       monitor ! GStart(child)
     }

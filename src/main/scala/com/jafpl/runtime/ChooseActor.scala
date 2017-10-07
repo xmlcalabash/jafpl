@@ -14,7 +14,7 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
   val stopped = mutable.HashMap.empty[Node, Option[Boolean]]
 
   override protected def start(): Unit = {
-    readyToRun = true
+    commonStart()
 
     for (child <- node.children) {
       child match {

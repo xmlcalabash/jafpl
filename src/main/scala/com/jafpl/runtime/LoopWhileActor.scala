@@ -22,7 +22,7 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
   var initiallyTrue = true
 
   override protected def start(): Unit = {
-    readyToRun = true
+    commonStart()
     runIfReady()
   }
 
@@ -108,6 +108,7 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
         }
       }
       monitor ! GFinished(node)
+      commonFinished()
     }
   }
 }

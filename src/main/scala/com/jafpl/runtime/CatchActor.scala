@@ -9,7 +9,7 @@ private[runtime] class CatchActor(private val monitor: ActorRef,
                                   private val runtime: GraphRuntime,
                                   private val node: ContainerStart) extends StartActor(monitor, runtime, node)  {
   protected[runtime] def start(cause: Throwable): Unit = {
-    readyToRun = true
+    commonStart()
 
     // If there's anyone reading from the errors port, send them the exception
     for (output <- node.outputs) {

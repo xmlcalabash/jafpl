@@ -20,11 +20,7 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
   val bindings = mutable.HashMap.empty[String, Any]
 
   override protected def start(): Unit = {
-    for (child <- node.children) {
-      trace(s"........ HASCHILD $child", "ForLoop")
-    }
-
-    readyToRun = true
+    commonStart()
     runIfReady()
   }
 
@@ -101,6 +97,7 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
         }
       }
       monitor ! GFinished(node)
+      commonFinished()
     }
   }
 }

@@ -22,7 +22,7 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
   private var index = 0
 
   override protected def start(): Unit = {
-    readyToRun = true
+    commonStart()
     runIfReady()
   }
 
@@ -111,6 +111,7 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
       if (itemQueue.isEmpty) {
         monitor ! GClose(node, node.outputPort)
         monitor ! GFinished(node)
+        commonFinished()
       } else {
         if (index >= itemQueue.size) {
           trace(s"FINISHED $node source:$sourceClosed, queue:${itemQueue.isEmpty}", "Viewport")
