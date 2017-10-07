@@ -17,7 +17,7 @@ private[runtime] class BufferActor(private val monitor: ActorRef,
   private var buffer = ListBuffer.empty[Message]
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    runtime.runtime.deliver(from.id, fromPort, item, this, port)
+    receive(port, item)
   }
 
   override def id: String = node.id

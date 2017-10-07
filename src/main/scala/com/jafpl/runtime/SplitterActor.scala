@@ -17,7 +17,7 @@ private[runtime] class SplitterActor(private val monitor: ActorRef,
   var edges: Option[ListBuffer[Edge]] = None
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    runtime.runtime.deliver(from.id, fromPort, item, this, port)
+    receive(port, item)
   }
 
   override def id: String = node.id

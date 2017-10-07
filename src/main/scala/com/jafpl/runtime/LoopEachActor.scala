@@ -31,7 +31,7 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
   }
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    runtime.runtime.deliver(from.id, fromPort, item, this, port)
+    receive(port, item)
   }
 
   override def id: String = node.id

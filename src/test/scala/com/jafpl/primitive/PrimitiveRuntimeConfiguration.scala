@@ -56,9 +56,4 @@ class PrimitiveRuntimeConfiguration(val traceAll: Boolean) extends RuntimeConfig
     }
     timeout
   }
-
-  override def deliver(from: String, fromPort: String, message: Message, consumer: DataConsumer, port: String): Unit = {
-    consumer.receive(port, message)
-  }
-
 }

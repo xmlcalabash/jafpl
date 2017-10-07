@@ -45,15 +45,4 @@ trait RuntimeConfiguration {
     */
 
   def watchdogTimeout: Long
-
-  /** The delivery agent
-    *
-    * The message is to be delivered to the step. The runtime configuration gets a chance to
-    * look at the message and may adjust it if necessary.
-    *
-    * @param message The message to be delivered.
-    * @param consumer The step to which it is to be delivered.
-    * @param port The port on which it is to be delivered.
-    */
-  def deliver(fromId: String, fromPort: String, message: Message, consumer: DataConsumer, port: String)
 }

@@ -18,7 +18,7 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
   private val bindings = mutable.HashMap.empty[String, Message]
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    runtime.runtime.deliver(from.id, fromPort, item, this, port)
+    receive(port, item)
   }
 
   override def id: String = binding.id

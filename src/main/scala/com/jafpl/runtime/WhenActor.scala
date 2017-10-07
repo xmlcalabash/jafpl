@@ -20,7 +20,7 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
   private val bindings = mutable.HashMap.empty[String, Message]
 
   override protected def input(from: Node, fromPort: String, port: String, msg: Message): Unit = {
-    runtime.runtime.deliver(from.id, fromPort, msg, this, port)
+    receive(port, msg)
   }
 
   override def id: String = node.id
