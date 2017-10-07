@@ -36,6 +36,7 @@ private[runtime] class LoopWhileEndActor(private val monitor: ActorRef,
       // A loop sends it's output back to the start.
       msg match {
         case message: ItemMessage =>
+          finished = false
           monitor ! GLoop(node.start.get, message)
         case _ =>
           monitor ! GException(None,

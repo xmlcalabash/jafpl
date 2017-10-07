@@ -11,6 +11,7 @@ private[runtime] class EndActor(private val monitor: ActorRef,
                               private val runtime: GraphRuntime,
                               private val node: ContainerEnd) extends NodeActor(monitor, runtime, node)  {
   protected val unfinishedChildren = mutable.HashSet.empty[Node]
+  protected var finished = false
 
   override protected def initialize(): Unit = {
     super.initialize()
@@ -23,6 +24,7 @@ private[runtime] class EndActor(private val monitor: ActorRef,
       unfinishedChildren.add(child)
     }
     readyToRun = true
+    finished = false
   }
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
@@ -52,8 +54,9 @@ private[runtime] class EndActor(private val monitor: ActorRef,
     for (child <- unfinishedChildren) {
       trace(s"........ $child", "StepFinished")
     }
-    if (readyToRun) {
+    if (readyToRun && !finished) {
       if (openInputs.isEmpty && unfinishedChildren.isEmpty) {
+        finished = true
         monitor ! GFinished(node)
       }
     }
