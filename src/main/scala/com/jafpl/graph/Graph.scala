@@ -736,7 +736,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       node match {
         case atomic: AtomicNode =>
           if (atomic.step.isDefined) {
-            var map = mutable.HashSet.empty[String] ++ atomic.step.get.inputSpec.ports()
+            var map = mutable.HashSet.empty[String] ++ atomic.step.get.inputSpec.ports
             for (port <- node.inputs) {
               if (map.contains(port)) {
                 map -= port
@@ -875,7 +875,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
           }
         case atomic: AtomicNode =>
           if (atomic.step.isDefined) {
-            for (port <- atomic.step.get.outputSpec.ports()) {
+            for (port <- atomic.step.get.outputSpec.ports) {
               val edges = edgesFrom(node, port)
               if (edges.isEmpty) {
                 logger.debug(s"Output $port on $atomic unread, adding sink")

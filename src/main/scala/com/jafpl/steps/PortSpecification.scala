@@ -66,7 +66,7 @@ class PortSpecification(spec: immutable.Map[String,String]) {
     *
     * @return
     */
-  def ports(): Set[String] = {
+  def ports: Set[String] = {
     val plist = mutable.HashSet.empty[String]
     for (port <- spec.keySet) {
       if (port != "*") {
