@@ -219,29 +219,41 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def close(port: String): Unit = {
-    if (node.step.isDefined && node.step.get.inputSpec != PortSpecification.ANY
-        && !port.startsWith("#")) {
-      try {
-        node.step.get.inputSpec.checkCardinality(port, cardinalities.getOrElse(port, 0L))
-      } catch {
-        case cause: Throwable =>
-          monitor ! GException(Some(node), cause)
-        case _: Throwable => Unit
-      }
-    }
     openInputs -= port
-
     if (port == "#bindings" && bufferedInput.nonEmpty) {
       for (buf <- bufferedInput) {
         input(buf.from, buf.fromPort, buf.port, buf.item)
       }
       bufferedInput.clear()
     }
+    trace(s"Closing $port for $node", "Cardinalities")
+
+    // We buffer inputs so that all #bindings are delivered before all other documents
+    // That means we can't check cardinalities on close, we have to wait until any
+    // buffered documents have been sent. The simplest rules seems to be: check
+    // cardinalities after all ports are closed.
+    if (openInputs.isEmpty && node.step.isDefined) {
+      if (node.step.get.inputSpec != PortSpecification.ANY) {
+        for (port <- node.step.get.inputSpec.ports) {
+          if (port != "*") {
+            try {
+              trace(s"Check cardinality of $port for $node", "Cardinalities")
+              node.step.get.inputSpec.checkCardinality(port, cardinalities.getOrElse(port, 0L))
+            } catch {
+              case cause: Throwable =>
+                monitor ! GException(Some(node), cause)
+              case _: Throwable => Unit
+            }
+          }
+        }
+      }
+    }
 
     runIfReady()
   }
 
   protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
+    trace(s"Receiving input on $port for $node", "Cardinalities")
     if (port != "#bindings" && openInputs.contains("#bindings")) {
       bufferedInput += new InputBuffer(from, fromPort, port, item)
       return
@@ -275,6 +287,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
               }
             }
             val card = cardinalities.getOrElse(port, 0L) + 1L
+            trace(s"Wrote to $port for $node: $card", "Cardinalities")
             cardinalities.put(port, card)
             if (node.step.isDefined) {
               trace(s"DELIVER→ ${node.step.get}.$port", "StepIO")
