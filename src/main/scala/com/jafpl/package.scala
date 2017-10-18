@@ -1,5 +1,9 @@
 package com.jafpl
 
+/** Jafpl configuration */
+package object config {
+}
+
 /** Exceptions thrown. */
 package object exceptions {
 }
