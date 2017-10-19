@@ -56,7 +56,7 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
 
     try {
       val expreval = runtime.runtime.expressionEvaluator.newInstance()
-      val answer = expreval.singletonValue(binding.expression.get, exprContext.toList, bindings.toMap, binding.options)
+      val answer = expreval.value(binding.expression.get, exprContext.toList, bindings.toMap, binding.options)
 
       val msg = new BindingMessage(binding.name, answer)
       monitor ! GOutput(binding, "result", msg)
