@@ -28,12 +28,12 @@ trait ExpressionEvaluator {
     * an item from the pipeline. The bindings are variable bindings from the pipeline.
     *
     * @param expr The expression to evaluate.
-    * @param context An optional, single item that is flowing through the pipeline.
+    * @param context The expression context.
     * @param bindings Any variable bindings that are provided for the expression.
     * @param options Any additional options that should be considered by the evaluator
     * @return The computed value of the expression.
     */
-  def value(expr: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): List[Message]
+  def value(expr: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Message
 
   /** Evaluate an expression that is expected to return a single value.
     *
@@ -41,7 +41,7 @@ trait ExpressionEvaluator {
     * an item from the pipeline. The bindings are variable bindings from the pipeline.
     *
     * @param expr The expression to evaluate.
-    * @param context An optional, single item that is flowing through the pipeline.
+    * @param context The expression context.
     * @param bindings Any variable bindings that are provided for the expression.
     * @param options Any additional options that should be considered by the evaluator
     * @return The computed value of the expression.
@@ -52,7 +52,7 @@ trait ExpressionEvaluator {
     * Evaluate an expression and cast the result to a boolean.
     *
     * @param expr The expression to evaluate.
-    * @param context An optional, single item that is flowing through the pipeline.
+    * @param context The expression context.
     * @param bindings Any variable bindings that are provided for the expression.
     * @param options Any additional options that should be considered by the evaluator
     * @return The boolean value of the computed expression.
