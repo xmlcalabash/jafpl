@@ -12,8 +12,8 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
     new PrimitiveExpressionEvaluator(config)
   }
 
-  override def value(expr: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): List[Message] = {
-    List(singletonValue(expr, context, bindings, options))
+  override def value(expr: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Message = {
+    singletonValue(expr, context, bindings, options)
   }
 
   override def singletonValue(expr: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Message = {
