@@ -1,7 +1,7 @@
 name := "jafpl"
 
 organization := "com.jafpl"
-version      := "0.0.30"
+version      := "0.0.36"
 scalaVersion := "2.12.3"
 
 resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
@@ -25,7 +25,8 @@ libraryDependencies ++= Seq(
 // needs them. I should figure out how to parameterize the location...
 target in Compile in doc := baseDirectory.value / "build/pages/apidocs"
 scalacOptions in (Compile, doc) ++= Seq(
-  "-doc-root-content", baseDirectory.value+"/docs/apidocs/root.md"
+  "-doc-root-content", baseDirectory.value+"/docs/apidocs/root.md",
+  "-no-link-warnings"
 )
 
 publishTo := Some(Resolver.file("file",
