@@ -17,8 +17,13 @@ class PipelineException(val code: Any) extends Throwable {
   protected var _location = Option.empty[Location]
   protected var _cause = Option.empty[Throwable]
 
+  /** The exception message, if there was one. */
   def message: Option[String] = _message
+
+  /** The location, if there was one. */
   def location: Option[Location] = _location
+
+  /** The cause, if this exception wraps a deeper exception. */
   def cause: Option[Throwable] = _cause
 
   /** String representation */

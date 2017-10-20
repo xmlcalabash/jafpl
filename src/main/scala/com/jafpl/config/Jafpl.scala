@@ -20,7 +20,7 @@ object Jafpl {
     * is instantiated.
     *
     * A new Jafpl instance is the instantiated and passed to the configurer. After configuration,
-    * the instance is "[[com.jafpl.config.Jafpl.close()]]ed".
+    * the instance is closed; attempting to update the properties will raise an exception.
     *
     * @return Your new, configured pipeline instance.
     */

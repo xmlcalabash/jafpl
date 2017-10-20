@@ -1,6 +1,6 @@
 package com.jafpl.graph
 
-/** A looping containre.
+/** A looping container.
   *
   * Loops need buffers when they read from steps outside the loop.
   *
