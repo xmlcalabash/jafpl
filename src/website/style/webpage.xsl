@@ -210,19 +210,15 @@ C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9
 <xsl:function name="f:mediaobject-href" as="xs:string">
   <xsl:param name="filename" as="xs:string"/>
 
-  <!-- just throw away the path -->
-  <xsl:value-of select="tokenize($filename, '/')[last()]"/>
-
-<!--
   <xsl:choose>
-    <xsl:when test="starts-with($filename, '/')">
-      <xsl:value-of select="substring-after($filename, '/pages/')"/>
+    <xsl:when test="starts-with($filename, 'http:') or starts-with($filename, 'https:')">
+      <xsl:value-of select="$filename"/>
     </xsl:when>
     <xsl:otherwise>
-      <xsl:value-of select="$filename"/>
+      <!-- just throw away the path -->
+      <xsl:value-of select="tokenize($filename, '/')[last()]"/>
     </xsl:otherwise>
   </xsl:choose>
--->
 </xsl:function>
 
 </xsl:stylesheet>
