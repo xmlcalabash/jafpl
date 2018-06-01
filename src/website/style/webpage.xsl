@@ -153,27 +153,27 @@ C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9
     <xsl:apply-templates/>
 
     <xsl:call-template name="t:process-footnotes"/>
-
-    <footer>
-      <xsl:variable name="gitfn" select="substring-after(base-uri(/), $gitlog/@root)"/>
-      <xsl:variable name="commit" select="($gitlog/r:commit[r:file = $gitfn])[1]"/>
-      <xsl:variable name="cdate" select="$commit/r:date"/>
-      <xsl:variable name="committer" select="substring-before($commit/r:committer, ' &lt;')"/>
-
-      <p>Copyright © 2016, 2017 Norman Walsh. See
-      <a href="https://github.com/ndw/jafpl/blob/master/LICENSE.md">LICENSE</a>.
-      <xsl:if test="exists($cdate)">
-        <xsl:variable name="date" select="$cdate cast as xs:dateTime"/>
-        <xsl:text>Last updated on </xsl:text>
-        <xsl:value-of select="format-dateTime($date, '[D01] [MNn,*-3] [Y0001]')"/>
-        <xsl:text> at </xsl:text>
-        <xsl:value-of select="format-dateTime($date, '[h01]:[m01][P] [z]')"/>
-        <xsl:text> by </xsl:text>
-        <xsl:value-of select="$committer"/>
-      </xsl:if>
-      </p>
-    </footer>
   </article>
+
+  <footer>
+    <xsl:variable name="gitfn" select="substring-after(base-uri(/), $gitlog/@root)"/>
+    <xsl:variable name="commit" select="($gitlog/r:commit[r:file = $gitfn])[1]"/>
+    <xsl:variable name="cdate" select="$commit/r:date"/>
+    <xsl:variable name="committer" select="substring-before($commit/r:committer, ' &lt;')"/>
+
+    <p>Copyright © 2016, 2017, 2018 Norman Walsh. See
+    <a href="https://github.com/ndw/jafpl/blob/master/LICENSE.md">LICENSE</a>.
+    <xsl:if test="exists($cdate)">
+      <xsl:variable name="date" select="$cdate cast as xs:dateTime"/>
+      <xsl:text>Last updated on </xsl:text>
+      <xsl:value-of select="format-dateTime($date, '[D01] [MNn,*-3] [Y0001]')"/>
+      <xsl:text> at </xsl:text>
+      <xsl:value-of select="format-dateTime($date, '[h01]:[m01][P] [z]')"/>
+      <xsl:text> by </xsl:text>
+      <xsl:value-of select="$committer"/>
+    </xsl:if>
+    </p>
+  </footer>
 </xsl:template>
 
 <xsl:template match="element()" mode="to-xhtml">
