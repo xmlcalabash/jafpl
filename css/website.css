@@ -8,6 +8,16 @@ body {
     padding-left: 0;
     padding-right: 0;
     padding-top: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+body > * {
+    flex: 1;
+}
+
+body > article {
+    flex: 100;
 }
 
 h1 {
@@ -66,8 +76,8 @@ article {
     border-left: 1px solid #999;
     border-right: 1px solid #999;
     border-top: 1px solid #999;
-    padding-left: 10px;
-    padding-right: 140px;
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 .subscribe {
@@ -78,9 +88,8 @@ footer {
     border-top: solid #AAAAAA 1pt;
     color: #555555;
     font-size: 9pt;
-    margin-bottom: 0.5in;
+    margin-bottom: 1rem;
     padding-top: 4px;
-    position: absolute;
     text-align: center;
     visibility: visible;
 }

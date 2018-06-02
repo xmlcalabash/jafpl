@@ -18,7 +18,7 @@ those must have edges connected to them.
 </p></li></ol></div><p>Every output port in JAFPL is read by exactly one step and
 exactly one step writes to every input port. If the graph described by
 your edges multiplexes access to any port, a “splitter” or “joiner”
-step will be inserted as appropriate.</p><p>In other words, this graph never happens:</p><div id="pipelines.8" class="mediaobject"><img src="figure0.svg" /></div><p>If you attempt to construct that graph, the library will automatically
+step will be inserted automatically as appropriate.</p><p>In other words, this graph never happens:</p><div id="pipelines.8" class="mediaobject"><img src="figure0.svg" /></div><p>If you attempt to construct that graph, the library will automatically
 restructure it so that this graph is constructed:</p><div id="pipelines.10" class="mediaobject"><img src="figure1.svg" /></div><p>You must provide an
 <a href="../apis/steps">implementation class</a> for every atomic node that you
 construct. That’s the class that will be called upon to perform the
@@ -48,11 +48,9 @@ every step has run, the pipeline is finished. The process running the
 pipeline can collect its results from the output port(s).</p><p>In practice, there are a number of subtleties here. Loops have
 to buffer inputs so that they’re available to each iteration. A choose
 must make sure that <em>none</em> of the steps in any of its
-branches run before a specific branch is selected. Etc.</p><p>This library will amend the graph and introduce additional steps as
-necessary to hide all of this complexity from the user. Let’s look at
-a larger example. I plan to use this library as the core of
-my new XProc implementation, but if you aren’t familiar with XProc
-(and odds are, you’re not), that’s not going to be very intuitive.
+branches run before a specific branch is selected. Etc.</p><p>This library amends the graph and introduces additional steps as
+necessary to hide all of this complexity. Let’s look at
+a larger example.
 </p><p>To illustrate how things work, a small repository of demonstration
 pipelines is provided at
 <a href="https://github.com/ndw/jafpl-demo">https://github.com/ndw/jafpl-demo</a>. One of the larger
@@ -81,6 +79,6 @@ additional input to the expression. Steps have inputs and outputs and
 (almost) nothing else.</p><div id="pipelines.27" class="mediaobject"><img src="pipe2.svg" /></div><p>All atomic steps work basically the same way. There’s also a provision for declaring
 a dependency edge between two nodes that aren’t connected by data flow. The semantics
 of the dependency are that the <em>dependent</em> step will not be run
-before the step it <em>depends on</em> has finished.</p><footer><p>Copyright © 2016, 2017 Norman Walsh. See
-      <a href="https://github.com/ndw/jafpl/blob/master/LICENSE.md">LICENSE</a>.
-      Last updated on 10 Sep 2017 at 10:47a.m. GMT+01:00 by Norman Walsh</p></footer></article><script src="http://cdn.docbook.org/release/2.0.20/resources/js/prism.js"></script></body></html>
+before the step it <em>depends on</em> has finished.</p></article><footer><p>Copyright © 2016, 2017, 2018 Norman Walsh. See
+    <a href="https://github.com/ndw/jafpl/blob/master/LICENSE.md">LICENSE</a>.
+    Last updated on 01 Jun 2018 at 07:26p.m. GMT-05:00 by Norman Walsh</p></footer><script src="http://cdn.docbook.org/release/2.0.20/resources/js/prism.js"></script></body></html>

@@ -1,39 +1,41 @@
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>JAFPL.com</title><meta charset="utf-8" /><meta name="generator" content="DocBook XSL 2.0 Stylesheets V2.0.20" /><link rel="stylesheet" type="text/css" href="http://cdn.docbook.org/release/2.0.20/resources/css/default.css" /><link rel="stylesheet" type="text/css" href="/css/docbook.css" /><link rel="stylesheet" type="text/css" href="/css/tabs.css" /><link rel="stylesheet" type="text/css" href="/css/website.css" /><link href="http://fonts.googleapis.com/css?family=Rambla" rel="stylesheet" type="text/css" /><script type="text/javascript" src="http://cdn.docbook.org/release/2.0.20/resources/js/dbmodnizr.js"></script><link href="http://cdn.docbook.org/release/2.0.20/resources/css/prism.css" rel="stylesheet" type="text/css" /><link href="http://cdn.docbook.org/release/2.0.20/resources/css/db-prism.css" rel="stylesheet" type="text/css" /><script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script><script src="/js/jafpl.js"></script></head><body><div class="header">
 <h1>JA<em>F</em>  PL</h1>
-</div><div class="navset" id="nav"><div class="hd"><ul><li id="home" class="on" title="selected"><a href="/"><strong><em>Home</em></strong></a></li><li id="pipelines"><a href="/pipelines"><em>Pipelines</em></a></li><li id="apis"><a href="/apis"><em>APIs</em></a></li></ul></div><div class="bd"><ul><li class="on first "><a href="/">Overview</a></li><li id="contact" class="  last"><a href="/contact">Contact us</a></li></ul></div></div><div class="inline-toc"><span class="toc"><span class="item">§ <a href="#what">What is it?</a>   </span><span class="item">§ <a href="#where">Where is it?</a>   </span><span class="item">§ <a href="#whatsnext">What’s next?</a>   </span><span class="item">§ <a href="#whatif">What if I want a …?</a>   </span></span></div><article class="article"><h1>Just another <em id="fine">fine</em> pipeline language<a href="https://github.com/ndw/jafpl" class="github-corner"><svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a></h1><p>This project is the core runtime for a general purpose pipeline
-processor. It’s the heart of <em class="citetitle">XML Calabash V2.x</em>,
-but there is <em>nothing</em> XML-centric about the pipeline
-processor.</p><p><em class="citetitle">XML Calabash V2.x</em> hasn’t been released
-yet. This processor hasn’t been released in any official sense either.
-YMMV. Here there be dragons. Etc.</p><section id="what" class="section"><div class="section-titlepage"><h2>What is it?</h2></div><p>This is a JVM library for evaluating pipelines composed of
-arbitrary steps.</p><p>For the purpose of this discussion, a pipeline is a directed,
-acyclic graph. Each node in the graph represents some kind of
-processing. The edges between the nodes are how the data flows through
-the pipeline.</p><div id="what.4" class="mediaobject"><img src="byhand-1.svg" /></div><p>This library doesn’t care what each node does and it
-doesn’t care what kind of data flows between nodes. You construct a
+</div><div class="navset" id="nav"><div class="hd"><ul><li id="home" class="on" title="selected"><a href="/"><strong><em>Home</em></strong></a></li><li id="pipelines"><a href="/pipelines"><em>Pipelines</em></a></li><li id="apis"><a href="/apis"><em>APIs</em></a></li></ul></div><div class="bd"><ul><li class="on first "><a href="/">Overview</a></li><li id="contact" class="  last"><a href="/contact">Contact us</a></li></ul></div></div><div class="inline-toc"><span class="toc"><span class="item">§ <a href="#how">Getting started</a>   </span><span class="item">§ <a href="#what">What is it?</a>   </span><span class="item">§ <a href="#where">Where is it?</a>   </span><span class="item">§ <a href="#whatsnext">What’s next?</a>   </span><span class="item">§ <a href="#whatif">What if I want a …?</a>   </span></span></div><article class="article"><h1>Just another <em id="fine">fine</em> pipeline language<a href="https://github.com/ndw/jafpl" class="github-corner"><svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a></h1><p>This project is in an early, alpha state.
+YMMV. Here there be dragons. Etc.</p><section id="how" class="section"><div class="section-titlepage"><h2>Getting started</h2></div><p>If you’re new to JAFPL, begin by reading the overview on this page.
+then read about <a href="/pipelines/">pipelines</a>. To become
+familiar with the APIs provided by this project, read the
+<a href="/apis/">APIs</a> pages.</p><p>If you find errors in this documentation, or if you think there
+are parts that are unclear or simply missing, please
+<a href="https://github.com/ndw/jafpl/issues">file an issue</a>
+to let us know.</p></section><section id="what" class="section"><div class="section-titlepage"><h2>What is it?</h2></div><p>This project is a JVM library for evaluating arbitrary data flow
+graphs or “pipelines”. The nodes, or “steps”, in the graph are
+operations. The edges are how data flows between steps. A step
+takes its inputs, performs some arbitrary computation, and produces
+its outputs.</p><p>A simple, two step pipeline might be visualized with boxes and
+arrows.</p><div id="what.4" class="mediaobject"><img src="byhand-1.svg" /></div><p>This library doesn’t care what each step does and it
+doesn’t care what kind of data flows between steps. You construct a
 graph with edges. You pour data in at the top, stuff happens, data
-pours out the bottom.</p><p>Each node is a “<code class="code">step</code>”. Steps are where “stuff happens”.
-Many steps can be implemented as atomic units of work
-(henceforth “atomic steps”), but some naturally operate on subgraphs,
-these are “containers”. The following containers are supported:</p><div class="variablelist"><dl><dt><span class="term">Groups</span></dt><dd><p>A group is a lexical container, it has no additional semantics.
-</p></dd><dt><span class="term">Iteration</span></dt><dd><p>Several flavors of iteration are supported: iteration over a sequence,
-iteration while a condition is true, and iteration to a fixed point, iteration
-a specific number of times.
-</p></dd><dt><span class="term">Viewports</span></dt><dd><p>A viewport operates on subsections of its input. For example, on
-specified keys in a JSON object or on specified descendants in an XML document.
-But equally, it could operate on regions of an image or lines of a text file.
-</p></dd><dt><span class="term">Conditionals</span></dt><dd><p>A conditional selects one of a set of possible subpipelines, based on
-a user-specified condition.
-</p></dd><dt><span class="term">Try/catch/finally error handling</span></dt><dd><p>Step implementations may encounter errors and raise exceptions.
-A try/catch block gives the pipeline author an opportunity to catch those
-errors and react accordingly.
-</p></dd><dt><span class="term"></span></dt><dd><p>
+pours out the bottom.</p><p>Many steps are atomic in nature, they are “black boxes” of
+computation, but some naturally operate on subgraphs, these are
+“containers”. The following containers are supported:</p><div class="variablelist"><dl><dt><span class="term">Groups</span></dt><dd><p>A group is the simplest possible container. It’s vacuous,
+providing no additional semantics.
+</p></dd><dt><span class="term">Iteration</span></dt><dd><p>Several flavors of iteration container are supported:
+iteration over a sequence, iteration while a condition is true,
+iteration to a fixed point, and iteration a specific number of times.
+</p></dd><dt><span class="term">Viewports</span></dt><dd><p>A viewport operates on subsections of its input, for example,
+on the values of specific keys in a JSON object or on specified
+descendants in an XML document. But equally, it could operate on
+regions of an image or lines of a text file.
+</p></dd><dt><span class="term">Conditionals</span></dt><dd><p>A conditional selects one of a set of possible subpipelines,
+based on a condition evaluated at runtime.
+</p></dd><dt><span class="term">Try/catch/finally error handling</span></dt><dd><p>Step implementations may encounter errors and raise
+exceptions. A try/catch container gives the pipeline author an
+opportunity to catch those errors and react accordingly.
 </p></dd></dl></div><p>It would be nice to generalize the abstraction of “container” to the
 point where a small number of primitives in the core library could be used to
-build arbitrary containers. So far, that goal seems elusive.</p></section><section id="where" class="section"><div class="section-titlepage"><h2>Where is it?</h2></div><p><span class="inlinemediaobject"><img src="https://travis-ci.org/ndw/jafpl.svg?branch=master" /></span></p><p>It’s <a href="https://github.com/ndw/jafpl">on GitHub</a>.
-</p></section><section id="whatsnext" class="section"><div class="section-titlepage"><h2>What’s next?</h2></div><p>Continued development. Work on <em class="citetitle">XML Calabash V2.x</em>,
-of course. But I’m interested in other pipeline applications, if you’ve got
-one.</p></section><section id="whatif" class="section"><div class="section-titlepage"><h2>What if I want a …?</h2></div><p>Just <a href="https://github.com/ndw/jafpl/issues">file an issue</a>,
-man, that’s all I got.</p></section><footer><p>Copyright © 2016, 2017 Norman Walsh. See
-      <a href="https://github.com/ndw/jafpl/blob/master/LICENSE.md">LICENSE</a>.
-      Last updated on 13 Sep 2017 at 01:41p.m. GMT+01:00 by Norman Walsh</p></footer></article><script src="http://cdn.docbook.org/release/2.0.20/resources/js/prism.js"></script></body></html>
+build arbitrary containers. So far, that goal seems elusive.</p></section><section id="where" class="section"><div class="section-titlepage"><h2>Where is it?</h2></div><p>It’s <a href="https://github.com/ndw/jafpl">on GitHub</a>.
+</p><p><span class="inlinemediaobject"><img src="https://travis-ci.org/ndw/jafpl.svg?branch=master" /></span></p></section><section id="whatsnext" class="section"><div class="section-titlepage"><h2>What’s next?</h2></div><p>Continued development. If you have pipeline applications, I’d like to hear
+about them.</p></section><section id="whatif" class="section"><div class="section-titlepage"><h2>What if I want a …?</h2></div><p>Just <a href="https://github.com/ndw/jafpl/issues">file an issue</a>,
+man, that’s all I got.</p></section></article><footer><p>Copyright © 2016, 2017, 2018 Norman Walsh. See
+    <a href="https://github.com/ndw/jafpl/blob/master/LICENSE.md">LICENSE</a>.
+    Last updated on 01 Jun 2018 at 07:26p.m. GMT-05:00 by Norman Walsh</p></footer><script src="http://cdn.docbook.org/release/2.0.20/resources/js/prism.js"></script></body></html>

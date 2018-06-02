@@ -1,40 +1,44 @@
 <html xmlns="http://www.w3.org/1999/xhtml"><head><title>Step APIs</title><meta charset="utf-8" /><meta name="generator" content="DocBook XSL 2.0 Stylesheets V2.0.20" /><link rel="stylesheet" type="text/css" href="http://cdn.docbook.org/release/2.0.20/resources/css/default.css" /><link rel="stylesheet" type="text/css" href="/css/docbook.css" /><link rel="stylesheet" type="text/css" href="/css/tabs.css" /><link rel="stylesheet" type="text/css" href="/css/website.css" /><link href="http://fonts.googleapis.com/css?family=Rambla" rel="stylesheet" type="text/css" /><script type="text/javascript" src="http://cdn.docbook.org/release/2.0.20/resources/js/dbmodnizr.js"></script><link href="http://cdn.docbook.org/release/2.0.20/resources/css/prism.css" rel="stylesheet" type="text/css" /><link href="http://cdn.docbook.org/release/2.0.20/resources/css/db-prism.css" rel="stylesheet" type="text/css" /></head><body><div class="header">
 <h1>JA<em>F</em>  PL</h1>
-</div><div class="navset" id="nav"><div class="hd"><ul><li id="home"><a href="/"><em>Home</em></a></li><li id="pipelines"><a href="/pipelines"><em>Pipelines</em></a></li><li id="apis" class="on" title="selected"><a href="/apis"><strong><em>APIs</em></strong></a></li></ul></div><div class="bd"><ul><li class=" first "><a href="/apis">Overview</a></li><li id="pipelineapis" class="  "><a href="/apis/pipelines">Pipeline APIs</a></li><li id="vocabulary" class="  "><a href="/apis/vocabulary">Step Vocabulary</a></li><li id="stepapis" class="on  "><a href="/apis/steps">Step APIs</a></li><li id="apidocs" class="  last"><a href="/apidocs">API Docs</a></li></ul></div></div><article class="article"><h1>Step APIs</h1><p>One of my goals is to conceal as much of the underlying framework
-as possible from step implementors. Atomic steps are only required to implement
-a simple API; almost nothing about the framework is exposed. (Containers are
-a little trickier; there aren’t any provisions for extension containers at
-the moment, but I’m open to suggestions for new containers.)</p><p>The API for atomic steps is straigthforward. Each step
+</div><div class="navset" id="nav"><div class="hd"><ul><li id="home"><a href="/"><em>Home</em></a></li><li id="pipelines"><a href="/pipelines"><em>Pipelines</em></a></li><li id="apis" class="on" title="selected"><a href="/apis"><strong><em>APIs</em></strong></a></li></ul></div><div class="bd"><ul><li class=" first "><a href="/apis">Overview</a></li><li id="pipelineapis" class="  "><a href="/apis/pipelines">Pipeline APIs</a></li><li id="vocabulary" class="  "><a href="/apis/vocabulary">Step Vocabulary</a></li><li id="stepapis" class="on  "><a href="/apis/steps">Step APIs</a></li><li id="apidocs" class="  last"><a href="/apidocs">API Docs</a></li></ul></div></div><article class="article"><h1>Step APIs</h1><p>One of the goals of JAFPL is to conceal as much of the
+underlying framework as possible from step implementors. Atomic steps
+are only required to implement an API; almost nothing about the
+framework is exposed. (Containers are a little trickier; there aren’t
+any provisions for extension containers at the moment, but I’m open to
+suggestions for new containers.)</p><p>The API for atomic steps is straightforward. Each step
 implmentation must implement the
-<a href="apidocs/com/jafpl/steps/Step.html">Step</a>
+<a href="/apidocs/com/jafpl/steps/Step.html">Step</a>
 interface.</p><p>Most of the interface is completely straightforward:
 </p><div class="itemizedlist"><ul><li><p><code class="methodname">initialize(runtime)</code> will be called once as
-pipeline execution begins. The current runtime configuration is passed in.</p></li><li><p>If the step accepts any inputs,
-<code class="methodname">receive(port,item)</code> will be called
-once for each input the step receives.
-</p></li><li><p>If any variable bindings apply to the step,
-<code class="methodname">receiveBinding(variable,value)</code> will be called
-once for each binding.
-</p></li><li><p><code class="methodname">run()</code> will be called
+pipeline execution begins. The current runtime configuration is passed in.</p></li><li><p><code class="methodname">receive(port,item)</code> will be called
+once for each input the step receives on the port. If the step receives
+no inputs, this method will not be called.</p></li><li><p><code class="methodname">receiveBinding(variable,value)</code> will be called
+once for each variable binding provided to the step. If no bindings apply,
+this method will not be called.</p></li><li><p><code class="methodname">run()</code> will be called
 once to run the step.
-</p></li><li><p>If the step appears in a loop, <code class="methodname">reset()</code> will
-be called once between each iteration.</p></li><li><p>If the execution of the container in which the step appears fails,
-<code class="methodname">abort()</code> will be called. This must be treated as a
-variation of <code class="methodname">reset()</code>. If the failure is caught by
-a try/catch, and the try/catch is in a loop, the step may run again.
+</p></li><li><p><code class="methodname">reset()</code> will called once between each iteration
+if the step appears in a loop.</p></li><li><p><code class="methodname">abort()</code> will be called if execution
+fails for the container in which the step appears. This must be
+treated as a variation of <code class="methodname">reset()</code>. If the
+failure is caught by a try/catch, and the try/catch is in a loop, the
+step may run again.
 </p></li><li><p><code class="methodname">stop()</code> will be called once as
-pipeline execution ends.</p></li></ul></div><p>That leaves only a few odds and ends. The
+pipeline execution ends.</p></li></ul></div><p>That leaves only a few odds and ends.</p><div class="itemizedlist"><ul><li><p>
+The
 <code class="methodname">inputSpec()</code>,
 <code class="methodname">outputSpec()</code>, and
-<code class="methodname">bindingSpec()</code> methods allow the step to declare
+<code class="methodname">bindingSpec()</code> methods will be called once.
+They allow the step to enumerate
 what inputs and outputs it has (and their cardinalities) as well as
-the bindings that it requires.</p><p>The only thing left is to provide some way for the step to return
-results to the pipeline. That’s accomplished with the
-<code class="methodname">setConsumer()</code> method. The pipeline engine
-will call <code class="methodname">setConsumer()</code> once, before execution
-begins, giving the step a
-<code class="classname"><a href="/apidocs/com/jafpl/steps/StepDataProvider.html">StepDataProvider</a></code>.
+the bindings that it requires. This allows the pipeline engine to detect
+pipelines that have been constructed incorrectly.</p></li><li><p><code class="methodname">setConsumer(consumer)</code> will be called once,
+before execution begins. This provides the step with a way to produce
+results.
 When the running step wishes to send output to the pipeline, it
-calls <code class="methodname">send(port,item)</code> on that object.</p><footer><p>Copyright © 2016, 2017 Norman Walsh. See
-      <a href="https://github.com/ndw/jafpl/blob/master/LICENSE.md">LICENSE</a>.
-      Last updated on 13 Sep 2017 at 01:41p.m. GMT+01:00 by Norman Walsh</p></footer></article><script src="http://cdn.docbook.org/release/2.0.20/resources/js/prism.js"></script></body></html>
+calls <code class="methodname">receive(port,item)</code> on the consumer.</p></li><li><p><code class="methodname">setLocation(location)</code> may also be called once.
+It provides information about the location of the step. This could be used,
+for example, in an implementation that provides a declarative grammar for
+constructing pipelines. Steps aren’t required to do anything with the location,
+but it may be useful in error messages, for example.</p></li></ul></div></article><footer><p>Copyright © 2016, 2017, 2018 Norman Walsh. See
+    <a href="https://github.com/ndw/jafpl/blob/master/LICENSE.md">LICENSE</a>.
+    Last updated on 01 Jun 2018 at 07:26p.m. GMT-05:00 by Norman Walsh</p></footer><script src="http://cdn.docbook.org/release/2.0.20/resources/js/prism.js"></script></body></html>

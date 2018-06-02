@@ -7,15 +7,16 @@
   <title>Step APIs</title>
 </info>
 
-<para>One of my goals is to conceal as much of the underlying framework
-as possible from step implementors. Atomic steps are only required to implement
-a simple API; almost nothing about the framework is exposed. (Containers are
-a little trickier; there aren’t any provisions for extension containers at
-the moment, but I’m open to suggestions for new containers.)</para>
+<para>One of the goals of JAFPL is to conceal as much of the
+underlying framework as possible from step implementors. Atomic steps
+are only required to implement an API; almost nothing about the
+framework is exposed. (Containers are a little trickier; there aren’t
+any provisions for extension containers at the moment, but I’m open to
+suggestions for new containers.)</para>
 
-<para>The API for atomic steps is straigthforward. Each step
+<para>The API for atomic steps is straightforward. Each step
 implmentation must implement the
-<link xlink:href="apidocs/com/jafpl/steps/Step.html">Step</link>
+<link xlink:href="/apidocs/com/jafpl/steps/Step.html">Step</link>
 interface.</para>
 
 <para>Most of the interface is completely straightforward:
@@ -27,16 +28,14 @@ interface.</para>
 pipeline execution begins. The current runtime configuration is passed in.</simpara>
 </listitem>
 <listitem>
-<simpara>If the step accepts any inputs,
-<methodname>receive(port,item)</methodname> will be called
-once for each input the step receives.
-</simpara>
+<simpara><methodname>receive(port,item)</methodname> will be called
+once for each input the step receives on the port. If the step receives
+no inputs, this method will not be called.</simpara>
 </listitem>
 <listitem>
-<simpara>If any variable bindings apply to the step,
-<methodname>receiveBinding(variable,value)</methodname> will be called
-once for each binding.
-</simpara>
+<simpara><methodname>receiveBinding(variable,value)</methodname> will be called
+once for each variable binding provided to the step. If no bindings apply,
+this method will not be called.</simpara>
 </listitem>
 <listitem>
 <simpara><methodname>run()</methodname> will be called
@@ -44,14 +43,15 @@ once to run the step.
 </simpara>
 </listitem>
 <listitem>
-<simpara>If the step appears in a loop, <methodname>reset()</methodname> will
-be called once between each iteration.</simpara>
+<simpara><methodname>reset()</methodname> will called once between each iteration
+if the step appears in a loop.</simpara>
 </listitem>
 <listitem>
-<simpara>If the execution of the container in which the step appears fails,
-<methodname>abort()</methodname> will be called. This must be treated as a
-variation of <methodname>reset()</methodname>. If the failure is caught by
-a try/catch, and the try/catch is in a loop, the step may run again.
+<simpara><methodname>abort()</methodname> will be called if execution
+fails for the container in which the step appears. This must be
+treated as a variation of <methodname>reset()</methodname>. If the
+failure is caught by a try/catch, and the try/catch is in a loop, the
+step may run again.
 </simpara>
 </listitem>
 <listitem>
@@ -60,19 +60,34 @@ pipeline execution ends.</simpara>
 </listitem>
 </itemizedlist>
 
-<para>That leaves only a few odds and ends. The
+<para>That leaves only a few odds and ends.</para>
+
+<itemizedlist>
+<listitem>
+<simpara>
+The
 <methodname>inputSpec()</methodname>,
 <methodname>outputSpec()</methodname>, and
-<methodname>bindingSpec()</methodname> methods allow the step to declare
+<methodname>bindingSpec()</methodname> methods will be called once.
+They allow the step to enumerate
 what inputs and outputs it has (and their cardinalities) as well as
-the bindings that it requires.</para>
-
-<para>The only thing left is to provide some way for the step to return
-results to the pipeline. That’s accomplished with the
-<methodname>setConsumer()</methodname> method. The pipeline engine
-will call <methodname>setConsumer()</methodname> once, before execution
-begins, giving the step a
-<classname xlink:href="/apidocs/com/jafpl/steps/StepDataProvider.html">StepDataProvider</classname>.
+the bindings that it requires. This allows the pipeline engine to detect
+pipelines that have been constructed incorrectly.</simpara>
+</listitem>
+<listitem>
+<simpara><methodname>setConsumer(consumer)</methodname> will be called once,
+before execution begins. This provides the step with a way to produce
+results.
 When the running step wishes to send output to the pipeline, it
-calls <methodname>send(port,item)</methodname> on that object.</para>
+calls <methodname>receive(port,item)</methodname> on the consumer.</simpara>
+</listitem>
+<listitem>
+<simpara><methodname>setLocation(location)</methodname> may also be called once.
+It provides information about the location of the step. This could be used,
+for example, in an implementation that provides a declarative grammar for
+constructing pipelines. Steps aren’t required to do anything with the location,
+but it may be useful in error messages, for example.</simpara>
+</listitem>
+</itemizedlist>
+
 </article>
