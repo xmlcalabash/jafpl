@@ -188,6 +188,10 @@ C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9
 
 <!-- ============================================================ -->
 
+<xsl:template match="db:package">
+  <xsl:call-template name="t:inline-monoseq"/>
+</xsl:template>
+
 <xsl:template match="db:co" mode="m:callout-bug">
   <xsl:call-template name="t:callout-bug">
     <xsl:with-param name="conum">
