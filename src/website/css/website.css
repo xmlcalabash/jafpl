@@ -76,8 +76,8 @@ article {
     border-left: 1px solid #999;
     border-right: 1px solid #999;
     border-top: 1px solid #999;
-    padding-left: 10px;
-    padding-right: 140px;
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 .subscribe {
