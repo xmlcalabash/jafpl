@@ -19,9 +19,29 @@ are arbitrary; asserting that an edge exists between two ports creates
 the ports if necessary. (Some steps impose constraints on the ports that
 can be used, those constraints are enforced.)</para>
 
-<para>For more information, see the description of
-<link xlink:href="pipelines">the pipeline library API</link>,
-<link xlink:href="steps">the step API</link>, or go straight to
-the <link xlink:href="/apidocs">API Docs</link>, if you prefer.</para>
+<para>For more information,</para>
+
+<itemizedlist>
+<listitem>
+<simpara>
+The <link xlink:href="pipelines">pipeline APIs</link> walk through
+some examples of how pipelines are constructed.</simpara>
+</listitem>
+<listitem>
+<simpara>
+The <link xlink:href="vocabulary">step vocabulary</link> describes the compound
+steps types in more detail.</simpara>
+</listitem>
+<listitem>
+<simpara>
+The <link xlink:href="steps">step API</link> outlines the life cycle of
+an atomic step.</simpara>
+</listitem>
+<listitem>
+<simpara>
+And the <link xlink:href="/apidocs/com/jafpl/">API Docs</link> take you right to the
+generated “Scala Doc”.</simpara>
+</listitem>
+</itemizedlist>
 
 </article>

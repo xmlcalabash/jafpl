@@ -27,6 +27,7 @@ any other JVM language.</para>
 
   val config = new PrimitiveRuntimeConfiguration()       <co xml:id="x.prtc"/>
   val runtime = new GraphRuntime(graph, config)          <co xml:id="x.runtime"/>
+
   runtime.run()                                          <co xml:id="x.run"/></programlisting>
 </example>
 
@@ -68,7 +69,7 @@ runs it, unsurprisingly.</para>
 </callout>
 </calloutlist>
 
-<para>Of course, this pipeline does nothing, so it’s not very interesting.
+<para>This pipeline does nothing, so it’s not very interesting.
 Pipelines are only interesting when data flows through them. In order to have
 data flow, we either need to connect our pipeline to some external data source, or
 we have to introduce a step that produces some data.
@@ -80,17 +81,18 @@ items. When it runs, it produces those items on it’s “result” port. (Port 
 are arbitrary, but as a matter of practicality, the pipeline and the step
 implementations have to agree on the names.)</para>
 
-<para>Here’s a pipeline that uses the producer step.</para>
+<para><xref linkend="example2"/> is a pipeline that uses the producer step.</para>
 
 <example xml:id="example2">
 <title>Producer pipeline</title>
-<programlisting language="scala">  val config = new PrimitiveRuntimeConfiguration()
-  val graph  = new Graph()
+<programlisting language="scala">  val graph  = new Graph()
 
   val pipeline = graph.addPipeline("pipeline")
   val producer = pipeline.addAtomic(new Producer(List("Hello, world")), "producer")
 
+  val config = new PrimitiveRuntimeConfiguration()
   val runtime = new GraphRuntime(graph, config)
+
   runtime.run()</programlisting>
 </example>
 
@@ -106,8 +108,7 @@ the consumer.</para>
 
 <example xml:id="example3">
 <title>Producer/consumer pipeline</title>
-<programlisting language="scala">  val config = new PrimitiveRuntimeConfiguration()
-  val graph  = new Graph()
+<programlisting language="scala">  val graph  = new Graph()
 
   val pipeline = graph.addPipeline("pipeline")
   val producer = pipeline.addAtomic(new Producer(List("Hello, world")), "producer")
@@ -115,17 +116,24 @@ the consumer.</para>
 
   graph.addEdge(producer, "result", consumer, "source")  <co xml:id="x.edge1"/>
 
+  val config = new PrimitiveRuntimeConfiguration()
   val runtime = new GraphRuntime(graph, config)
+
   runtime.run()</programlisting>
 </example>
 
 <para>Our pipeline now has two steps, but that all by itself wouldn’t be enough.
-We also need to connect them together, to describe the data flow.
+We also need to connect them together to describe the data flow.
 (The library provides no implicit connections between steps.)
 The
 <methodname>addEdge</methodname> call at <coref linkend="x.edge1"/> establishes
 a directed edge from the “result” port of <code>producer</code> <emphasis>to</emphasis>
 the “source” port of <code>consumer</code>.</para>
+
+<para>The graph library doesn’t care about port names, but step implementations
+do. In order for this pipeline to work as described, the producer step must be
+written to send output to a port named “result” and the consumer step must be
+written to read input from a port named “source”.</para>
 
 <para>If you run <emphasis>this</emphasis> pipeline, you’ll finally get some output:
 the canonical “Hello, world” message.</para>
@@ -135,8 +143,7 @@ so it’s always safe to add them to a flow. Let’s make our pipeline a few ste
 
 <example xml:id="example4">
 <title>Longer producer/consumer pipeline</title>
-<programlisting language="scala">  val config = new PrimitiveRuntimeConfiguration()
-  val graph  = new Graph()
+<programlisting language="scala">  val graph  = new Graph()
 
   val pipeline = graph.addPipeline("pipeline")
   val producer = pipeline.addAtomic(new Producer(List("Hello, world")), "producer")
@@ -148,6 +155,7 @@ so it’s always safe to add them to a flow. Let’s make our pipeline a few ste
   graph.addEdge(b,        "result", a,        "source") <co xml:id="x.linka"/>
   graph.addEdge(a,        "result", consumer, "source")
 
+  val config = new PrimitiveRuntimeConfiguration()
   val runtime = new GraphRuntime(graph, config)
   runtime.run()</programlisting>
 </example>
@@ -162,8 +170,9 @@ they are connected.</para>
 “b” <coref linkend="x.linkb"/>, then “a” <coref linkend="x.linka"/>, then
 “consumer”.</para>
 
-<para>Let’s do something transformative this time. Pipelines that do
+<para>Pipelines that do
 nothing more than copy their inputs around aren’t very interesting.
+Let’s do something transformative this time. 
 The <classname>Uppercase</classname> step takes a single string input
 on its “source” port and returns only the words in the string, shifted
 to upper case, on its “result” port. (The semantics are a little odd,
@@ -171,8 +180,7 @@ but we’ll come back to that.)</para>
 
 <example xml:id="example5">
 <title>Uppercase pipeline</title>
-<programlisting language="scala">  val config = new PrimitiveRuntimeConfiguration()
-  val graph  = new Graph()
+<programlisting language="scala">  val graph  = new Graph()
 
   val pipeline = graph.addPipeline("pipeline")
   val producer = pipeline.addAtomic(new Producer(List("Hello, world")), "producer")
@@ -182,25 +190,26 @@ but we’ll come back to that.)</para>
   graph.addEdge(producer, "result", upper, "source")
   graph.addEdge(upper, "result", consumer, "source")
 
+  val config = new PrimitiveRuntimeConfiguration()
   val runtime = new GraphRuntime(graph, config)
+
   runtime.run()</programlisting>
 </example>
 
 <para>If you run this pipeline, it produces “HELLO WORLD”.</para>
 
 <para>What happens if you change the producer so that it actually produces
-a sequence? (Feel free to got try it out!)</para>
+a sequence? (Feel free to go try it out!)</para>
 
-<para>The answer is, an error. The uppercase step does not accept a sequence,
-so the pipeline will generate an error as soon as the second input arrives on
-its input.</para>
+<para>The answer is: an error. The uppercase step does not accept a sequence,
+so the pipeline will generate an error as soon as the second string arrives on
+its source input.</para>
 
 <para>The way to work around that is with a loop.</para>
 
 <example xml:id="example6">
 <title>Uppercase loop pipeline</title>
-<programlisting language="scala">  val config = new PrimitiveRuntimeConfiguration()
-  val graph  = new Graph()
+<programlisting language="scala">  val graph  = new Graph()
 
   val pipeline = graph.addPipeline("pipeline")
   val producer = pipeline.addAtomic(new Producer(List("Hello", "There", "World")), "producer")
@@ -215,13 +224,15 @@ its input.</para>
   graph.addEdge(upper, "result", loop, "result")    <co xml:id="x.edge4"/>
   graph.addEdge(loop, "result", consumer, "source") <co xml:id="x.edge5"/>
 
+  val config = new PrimitiveRuntimeConfiguration()
   val runtime = new GraphRuntime(graph, config)
+
   runtime.run()</programlisting>
 </example>
 
 <calloutlist>
 <callout arearefs="x.loop">
-<para>A loop container is created in the pipeline.
+<para>A “for each” loop container is created in the pipeline.
 </para>
 </callout>
 <callout arearefs="x.loopup">
@@ -235,7 +246,7 @@ input port, <code>source</code>.
 </callout>
 <callout arearefs="x.edge3">
 <para>From <emphasis>inside</emphasis> the loop, reading from the
-loop’s <code>current</code> port reads the current input document in
+loop’s <code>current</code> port reads the current input string in
 the loop. This is connected to the source for the upper step.
 </para>
 </callout>
@@ -251,7 +262,7 @@ the loop. This is connected to the source for the upper step.
 
 <para>If you run this pipeline, it produces “HELLO”, “THERE”, and “WORLD”.</para>
 
-<para>As a final example for the moment, let’s look at how we could use the
+<para>As a final example, let’s look at how we could use the
 upper step to capitalize the words of a sentence without losing the punctuation.
 JAFPL includes a “viewport” step for this purpose. Viewports expose sub-parts
 of their input to a pipeline and then stitch the results of processing those
@@ -259,8 +270,7 @@ sub-parts back into the original.</para>
 
 <example xml:id="example7">
 <title>Viewport pipeline</title>
-<programlisting language="scala">  val config = new PrimitiveRuntimeConfiguration()
-  val graph  = new Graph()
+<programlisting language="scala">  val graph  = new Graph()
 
   val pipeline = graph.addPipeline()
 
@@ -275,7 +285,9 @@ sub-parts back into the original.</para>
   graph.addEdge(viewport, "result", pipeline, "result")
   graph.addEdge(pipeline, "result", consumer, "source")
 
+  val config = new PrimitiveRuntimeConfiguration()
   val runtime = new GraphRuntime(graph, config)
+
   runtime.run()</programlisting>
 </example>
 

@@ -42,7 +42,7 @@ those must have edges connected to them.
 <para>Every output port in JAFPL is read by exactly one step and
 exactly one step writes to every input port. If the graph described by
 your edges multiplexes access to any port, a “splitter” or “joiner”
-step will be inserted as appropriate.</para>
+step will be inserted automatically as appropriate.</para>
 
 <para>In other words, this graph never happens:</para>
 
@@ -111,11 +111,9 @@ to buffer inputs so that they’re available to each iteration. A choose
 must make sure that <emphasis>none</emphasis> of the steps in any of its
 branches run before a specific branch is selected. Etc.</para>
 
-<para>This library will amend the graph and introduce additional steps as
-necessary to hide all of this complexity from the user. Let’s look at
-a larger example. I plan to use this library as the core of
-my new XProc implementation, but if you aren’t familiar with XProc
-(and odds are, you’re not), that’s not going to be very intuitive.
+<para>This library amends the graph and introduces additional steps as
+necessary to hide all of this complexity. Let’s look at
+a larger example.
 </para>
 
 <para>To illustrate how things work, a small repository of demonstration

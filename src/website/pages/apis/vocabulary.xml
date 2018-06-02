@@ -45,8 +45,8 @@ matches, so make sure you put a “true” condition at the end.</para>
 <title>try/catch/finally</title>
 
 <para>The <code>try-catch</code> object takes a <code>try</code>
-object, zero or more <code>catch</code> objects, and, optoinally,
-<code>finally</code> object. Evaluation of the <code>try</code> is
+object, zero or more <code>catch</code> objects, and, optionally,
+a <code>finally</code> object. Evaluation of the <code>try</code> is
 attempted. If that fails, its output is discarded and one of the
 <code>catch</code> branches is selected and run. In either case, the
 <code>finally</code> runs after the try/catch is otherwise finished.</para>
@@ -55,7 +55,7 @@ attempted. If that fails, its output is discarded and one of the
 <section xml:id="for-each">
 <title>For-each loop</title>
 
-<para>A <code>for-each</code> loop iterates over a sequence of documents,
+<para>A <code>for-each</code> loop iterates over a sequence of inputs,
 applying processing to each one.</para>
 
 </section>
@@ -70,33 +70,35 @@ which also defaults to 1).</para>
 <section xml:id="while">
 <title>while loop</title>
 
-<para>A <code>while</code> loop takes a single document and a tester.
-If testing the document returns true, the loop is evaluated once. The tested
-document appears on the “current” port of the loop. The
-body of the loop must write exactly one document to the “test” output
-port of the loop. When the loop finishes, the document written to “test”
+<para>A <code>while</code> loop takes a single input and a tester.
+If testing the input returns true, the loop is evaluated. The tested
+input appears on the “current” port of the loop. The
+body of the loop must write exactly one result to the “test” output
+port of the loop. When the loop finishes, the result written to “test”
 is tested again. Iteration continues until the test returns false.</para>
 
 </section>
 <section xml:id="until">
 <title>until loop</title>
 
-<para>An <code>until</code> loop takes a document and a comparator.
-The body of the loop is evaluated once using the input document as the
-“current” document. The body of the loop must write exactly one
-document to the “test” output port of the loop. When the loop finishes,
-the comparator is passed the original document and the processed document.
-If it returns true, the process begins again with the processed document.
+<para>An <code>until</code> loop takes a single input and a comparator.
+The body of the loop is evaluated once using the input as the
+“current” input. The body of the loop must write exactly one
+result to the “test” output port of the loop. When the loop finishes,
+the comparator is passed the original input and the result.
+If it returns true, the process begins again with the result as the new input.
 </para>
 
 </section>
 <section xml:id="viewport">
 <title>viewport</title>
 
-<para>A <code>viewport</code> decomposes a document into a series of fragments.
-How the fragment are constructed is determined by the implementation. Each fragment
-is processed by the pipeline that the viewport contains. The result of processing
-each fragment is used to stitch the orginal document back together.</para>
+<para>A <code>viewport</code> decomposes an input into a series of
+fragments. How the fragment are constructed is determined by the
+implementation. Each fragment is processed by the pipeline that the
+viewport contains. The resulting collection of fragments (both the ones
+selected for processing and the ones not selected) are stitched back together
+to produce the result.</para>
 
 </section>
 </article>
