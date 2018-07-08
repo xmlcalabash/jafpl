@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.graph.{Joiner, Node}
+import com.jafpl.graph.{JoinMode, Joiner, Node}
 import com.jafpl.messages.Message
 import com.jafpl.runtime.GraphMonitor.GOutput
 import com.jafpl.util.UniqueId
@@ -16,23 +16,25 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
   private val portClosed = mutable.HashMap.empty[Int,Boolean]
   private val portBuffer = mutable.HashMap.empty[Int,ListBuffer[Message]]
   private var currentPort = 1
+  private var hadPriorityInput = false
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    if (node.ordered) {
+    if (node.mode == JoinMode.MIXED) {
+      monitor ! GOutput(node, "result", item)
+    } else {
       this.synchronized {
         orderedInput(from, fromPort, port, item)
       }
-    } else {
-      monitor ! GOutput(node, "result", item)
     }
   }
 
   override protected def close(port: String): Unit = {
-    if (node.ordered) {
+    if (node.mode != JoinMode.MIXED) {
       this.synchronized {
         portClosed.put(portNo(port),true)
         drainBuffers()
       }
+      super.close(port)
     } else {
       super.close(port)
     }
@@ -46,6 +48,7 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
   private def orderedInput(from: Node, fromPort: String, port: String, item: Message): Unit = {
     val pnum = portNo(port)
     if (pnum == currentPort) {
+      hadPriorityInput = hadPriorityInput || (node.mode == JoinMode.PRIORITY && currentPort == 1)
       monitor ! GOutput(node, "result", item)
       return
     }
@@ -56,7 +59,9 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
 
     drainBuffers()
 
-    if (pnum == currentPort) {
+    val allowWrite = (node.mode != JoinMode.PRIORITY) || (currentPort == 1)
+
+    if (allowWrite && (pnum == currentPort)) {
       monitor ! GOutput(node, "result", item)
     } else {
       val list = portBuffer.getOrElse(pnum, ListBuffer.empty[Message])
@@ -71,9 +76,14 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
     while (stillDraining) {
       stillDraining = portClosed.getOrElse(port, false)
       val list = portBuffer.getOrElse(port, ListBuffer.empty[Message])
-      for (item <- list) {
-        monitor ! GOutput(node, "result", item)
+
+      val allowWrite = (node.mode != JoinMode.PRIORITY) || (port == 1) || (!hadPriorityInput && (port == 2))
+      if (allowWrite) {
+        for (item <- list) {
+          monitor ! GOutput(node, "result", item)
+        }
       }
+
       portBuffer.remove(port)
       if (stillDraining) {
         super.close("source_" + port)

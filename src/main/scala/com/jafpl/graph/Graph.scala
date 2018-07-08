@@ -2,6 +2,7 @@ package com.jafpl.graph
 
 import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.{GraphException, PipelineException}
+import com.jafpl.graph.JoinMode.JoinMode
 import com.jafpl.steps.{Step, ViewportComposer}
 import com.jafpl.util.{ItemComparator, ItemTester, UniqueId}
 import org.slf4j.{Logger, LoggerFactory}
@@ -384,12 +385,16 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     node
   }
 
-  protected[graph] def addJoiner(ordered: Boolean): Joiner = {
+  protected[graph] def addJoiner(): Joiner = {
+    addJoiner(JoinMode.MIXED)
+  }
+
+  protected[graph] def addJoiner(mode: JoinMode): Joiner = {
     checkOpen()
 
     logger.debug("addJoiner")
 
-    val node = new Joiner(this, ordered)
+    val node = new Joiner(this, mode)
     _nodes += node
     node
   }
@@ -461,14 +466,18 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     * @param toName The name of the input port on the destination node.
     */
   def addEdge(from: Node, fromName: String, to: Node, toName: String): Unit = {
-    addEdge(from, fromName, to, toName, ordered=false)
+    addEdge(from, fromName, to, toName, JoinMode.MIXED)
   }
 
   def addOrderedEdge(from: Node, fromName: String, to: Node, toName: String): Unit = {
-    addEdge(from, fromName, to, toName, ordered=true)
+    addEdge(from, fromName, to, toName, JoinMode.ORDERED)
   }
 
-  private def addEdge(from: Node, fromName: String, to: Node, toName: String, ordered: Boolean): Unit = {
+  def addPriorityEdge(from: Node, fromName: String, to: Node, toName: String): Unit = {
+    addEdge(from, fromName, to, toName, JoinMode.PRIORITY)
+  }
+
+  private def addEdge(from: Node, fromName: String, to: Node, toName: String, mode: JoinMode): Unit = {
     checkOpen()
 
     logger.debug("addEdge {}.{} -> {}.{}", from, fromName, to, toName)
@@ -483,32 +492,32 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       val ancestor = commonAncestor(from, to)
       if (ancestor.isDefined && ancestor.get == to) {
         // println(s"patch $from/$to to ${to.asInstanceOf[ContainerStart].containerEnd} for $from.$fromName")
-        val edge = new Edge(this, from, fromName, to.asInstanceOf[ContainerStart].containerEnd, toName, ordered)
+        val edge = new Edge(this, from, fromName, to.asInstanceOf[ContainerStart].containerEnd, toName, mode)
         _edges += edge
       } else {
-        val edge = new Edge(this, from, fromName, to, toName, ordered)
+        val edge = new Edge(this, from, fromName, to, toName, mode)
         _edges += edge
       }
     } else {
       // If `from` is a child of `to`, then we really mean to write to the end of the container
       val ancestor = commonAncestor(from, to)
       if (ancestor.isDefined && ancestor.get == to) {
-        val edge = new Edge(this, from, fromName, to.asInstanceOf[ContainerStart].containerEnd, toName, ordered)
+        val edge = new Edge(this, from, fromName, to.asInstanceOf[ContainerStart].containerEnd, toName, mode)
         _edges += edge
       } else {
         // If `from` isn't a container or if `to` is a child of from, then read from the start
         from match {
           case start: ContainerStart =>
             if (ancestor.isDefined && ancestor.get == from) {
-              val edge = new Edge(this, from, fromName, to, toName, ordered)
+              val edge = new Edge(this, from, fromName, to, toName, mode)
               _edges += edge
             } else {
               // Otherwise, read from the end
-              val edge = new Edge(this, start.containerEnd, fromName, to, toName, ordered)
+              val edge = new Edge(this, start.containerEnd, fromName, to, toName, mode)
               _edges += edge
             }
           case _ =>
-            val edge = new Edge(this, from, fromName, to, toName, ordered)
+            val edge = new Edge(this, from, fromName, to, toName, mode)
             _edges += edge
         }
       }
@@ -949,21 +958,29 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       for (port <- node.inputs) {
         val edges = edgesTo(node, port)
         if (edges.length > 1) {
-          var ordered = false
+          var mode = JoinMode.MIXED
           for (edge <- edges) {
-            ordered = ordered || edge.ordered
+            if (edge.mode != JoinMode.MIXED) {
+              if (mode == JoinMode.MIXED) {
+                mode = edge.mode
+              } else {
+                if (mode != edge.mode) {
+                  throw new GraphException("Cannot mix ordered and priority edges", None)
+                }
+              }
+            }
           }
 
           val joiner = if (node.parent.isDefined) {
-            node.parent.get.addJoiner(ordered)
+            node.parent.get.addJoiner(mode)
           } else {
-            addJoiner(ordered)
+            addJoiner(mode)
           }
           addEdge(joiner, "result", node, port)
           var count = 1
           for (edge <- edges) {
             val iport = "source_" + count
-            addEdge(edge.from, edge.fromPort, joiner, iport, ordered=edge.ordered)
+            addEdge(edge.from, edge.fromPort, joiner, iport, mode)
             count += 1
           }
 

@@ -1,5 +1,6 @@
 package com.jafpl.graph
 
+import com.jafpl.graph.JoinMode.JoinMode
 import com.jafpl.steps.{Step, ViewportComposer}
 import com.jafpl.util.{ItemComparator, ItemTester}
 
@@ -315,8 +316,8 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     node
   }
 
-  protected[graph] def addJoiner(ordered: Boolean): Joiner = {
-    val node = graph.addJoiner(ordered)
+  protected[graph] def addJoiner(mode: JoinMode): Joiner = {
+    val node = graph.addJoiner(mode)
     addChild(node)
     node
   }
