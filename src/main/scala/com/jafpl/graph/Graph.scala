@@ -488,16 +488,19 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       return
     }
 
+    var edge: Option[Edge] = None
+    val ancestor = commonAncestor(from, to)
+    if (ancestor.isDefined && ancestor.get == to) {
+      // println(s"patch $from/$to to ${to.asInstanceOf[ContainerStart].containerEnd} for $from.$fromName")
+      edge = Some(new Edge(this, from, fromName, to.asInstanceOf[ContainerStart].containerEnd, toName, mode))
+      _edges += edge.get
+    } else {
+      edge = Some(new Edge(this, from, fromName, to, toName, mode))
+      _edges += edge.get
+    }
+    /*
     if (true) {
-      val ancestor = commonAncestor(from, to)
-      if (ancestor.isDefined && ancestor.get == to) {
-        // println(s"patch $from/$to to ${to.asInstanceOf[ContainerStart].containerEnd} for $from.$fromName")
-        val edge = new Edge(this, from, fromName, to.asInstanceOf[ContainerStart].containerEnd, toName, mode)
-        _edges += edge
-      } else {
-        val edge = new Edge(this, from, fromName, to, toName, mode)
-        _edges += edge
-      }
+        ... stuff above ...
     } else {
       // If `from` is a child of `to`, then we really mean to write to the end of the container
       val ancestor = commonAncestor(from, to)
@@ -520,6 +523,13 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
             val edge = new Edge(this, from, fromName, to, toName, mode)
             _edges += edge
         }
+      }
+    }
+    */
+
+    if (mode == JoinMode.PRIORITY) {
+      if (edgesTo(edge.get.to, edge.get.toPort).length > 1) {
+        throw new GraphException("Only the first edge to a node can be a priority edge", None)
       }
     }
   }
@@ -958,15 +968,12 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       for (port <- node.inputs) {
         val edges = edgesTo(node, port)
         if (edges.length > 1) {
+          // Work out the mode
           var mode = JoinMode.MIXED
           for (edge <- edges) {
             if (edge.mode != JoinMode.MIXED) {
               if (mode == JoinMode.MIXED) {
                 mode = edge.mode
-              } else {
-                if (mode != edge.mode) {
-                  throw new GraphException("Cannot mix ordered and priority edges", None)
-                }
               }
             }
           }

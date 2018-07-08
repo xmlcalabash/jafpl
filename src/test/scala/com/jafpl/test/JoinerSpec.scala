@@ -1,6 +1,7 @@
 package com.jafpl.test
 
 import com.jafpl.config.Jafpl
+import com.jafpl.exceptions.GraphException
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{BufferSink, Identity, Producer, Sink, Sleep}
@@ -49,6 +50,27 @@ class JoinerSpec extends FlatSpec {
     assert(bc.items(1) == "A2")
     assert(bc.items(2) == "B1")
     assert(bc.items(3) == "B2")
+  }
+
+  "Attempting to make any edge but the first a priority edge " should " fail" in {
+    val graph = Jafpl.newInstance().newGraph()
+    val bc = new BufferSink()
+
+    val pipeline = graph.addPipeline()
+    val p1 = pipeline.addAtomic(new Producer(List("A1","A2")), "Adocs")
+    val p2 = pipeline.addAtomic(new Producer(List("B1","B2")), "Bdocs")
+    val consumer = pipeline.addAtomic(bc, "consumer")
+
+    var pass = false
+    try {
+      graph.addEdge(p1, "result", pipeline, "result")
+      graph.addPriorityEdge(p2, "result", pipeline, "result")
+      graph.addEdge(pipeline, "result", consumer, "source")
+    } catch {
+      case g: GraphException => pass = true
+    }
+
+    assert(pass)
   }
 
   "With input on P1, a priority joiner " should " return only A1 and A2" in {
@@ -140,5 +162,4 @@ class JoinerSpec extends FlatSpec {
     assert(bc.items(2) == "C1")
     assert(bc.items(3) == "C2")
   }
-
 }

@@ -34,7 +34,6 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
         portClosed.put(portNo(port),true)
         drainBuffers()
       }
-      super.close(port)
     } else {
       super.close(port)
     }
@@ -47,8 +46,11 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
 
   private def orderedInput(from: Node, fromPort: String, port: String, item: Message): Unit = {
     val pnum = portNo(port)
-    if (pnum == currentPort) {
-      hadPriorityInput = hadPriorityInput || (node.mode == JoinMode.PRIORITY && currentPort == 1)
+
+    hadPriorityInput = hadPriorityInput || (node.mode == JoinMode.PRIORITY && pnum == 1)
+    var writeOk = (pnum == currentPort) && ((currentPort == 1) || (node.mode != JoinMode.PRIORITY) || !hadPriorityInput)
+
+    if (writeOk) {
       monitor ! GOutput(node, "result", item)
       return
     }
@@ -59,9 +61,13 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
 
     drainBuffers()
 
-    val allowWrite = (node.mode != JoinMode.PRIORITY) || (currentPort == 1)
+    // If we got here, then pnum > 1 and we've just drained all the queued
+    // messages that we can. If pnum == currentPort *now*, then we can
+    // write it, subject to the priority constraints
 
-    if (allowWrite && (pnum == currentPort)) {
+    writeOk = (pnum == currentPort) && ((node.mode != JoinMode.PRIORITY) || !hadPriorityInput)
+
+    if (writeOk) {
       monitor ! GOutput(node, "result", item)
     } else {
       val list = portBuffer.getOrElse(pnum, ListBuffer.empty[Message])
