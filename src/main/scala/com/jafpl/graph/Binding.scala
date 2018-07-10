@@ -5,8 +5,6 @@ package com.jafpl.graph
   * When pipelines are constructed, variable bindings associate expressions with variable names.
   * At runtime, the association is between the name and its computed value.
   *
-  * Variables are lexically scoped.
-  *
   * @constructor Use the `addBinding()` method on [[com.jafpl.graph.ContainerStart]] to construct a binding.
   * @param graph The graph into which this node is to be inserted.
   * @param name The variable's name
