@@ -58,4 +58,7 @@ trait ExpressionEvaluator {
     * @return The boolean value of the computed expression.
     */
   def booleanValue(expr: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Boolean
+
+  def precomputedValue(expr: Any, value: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Message
+
 }

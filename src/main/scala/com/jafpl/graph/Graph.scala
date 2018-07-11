@@ -134,12 +134,40 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     * @param name The variable name.
     * @return The constructed binding.
     */
+  /*
   def addBinding(name: String): Binding = {
     checkOpen()
 
     logger.debug("addBinding {}", name)
 
     val binding = new Binding(this, name)
+    _nodes += binding
+    binding
+  }
+  */
+
+  /**
+    * FIXME: WRITE THIS
+    * @param name The option name
+    * @param expression The default initializer for the option
+    * @return The binding
+    */
+  def addOption(name: String, expression: Any): OptionBinding = {
+    addOption(name, expression, None)
+  }
+
+  /**
+    * FIXME: WRITE THIS
+    * @param name The option name
+    * @param expression The default initializer for the option
+    * @param options Any implementation specific options you want to pass
+    * @return The binding
+    */
+  def addOption(name: String, expression: Any, options: Option[Any]): OptionBinding = {
+    checkOpen()
+    logger.debug("addOption {} {}", name, expression)
+
+    val binding = new OptionBinding(this, name, expression, options)
     _nodes += binding
     binding
   }
@@ -438,7 +466,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
     logger.debug("addVariable {} {}", name, expression)
 
-    val binding = new Binding(this, name, Some(expression), options)
+    val binding = new Binding(this, name, expression, options)
     _nodes += binding
     binding
   }

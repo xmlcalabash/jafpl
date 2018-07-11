@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.exceptions.PipelineException
-import com.jafpl.graph.{Binding, Node}
+import com.jafpl.graph.{Binding, Node, OptionBinding}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message, Metadata}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput}
 import com.jafpl.steps.DataConsumer
@@ -54,9 +54,37 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
       trace(s"COMPUTE= ${binding.name}=${binding.expression}$sbindings", "Bindings")
     }
 
+    binding match {
+      case opt: OptionBinding =>
+        if (opt.value.isDefined) {
+          computedValue(opt.value.get)
+        } else {
+          computeValue()
+        }
+      case _ =>
+        computeValue()
+    }
+  }
+
+  private def computeValue(): Unit = {
     try {
       val expreval = runtime.runtime.expressionEvaluator.newInstance()
-      val answer = expreval.value(binding.expression.get, exprContext.toList, bindings.toMap, binding.options)
+      val answer = expreval.value(binding.expression, exprContext.toList, bindings.toMap, binding.options)
+
+      val msg = new BindingMessage(binding.name, answer)
+      monitor ! GOutput(binding, "result", msg)
+      monitor ! GClose(binding, "result")
+      monitor ! GFinished(binding)
+    } catch {
+      case t: Throwable =>
+        monitor ! GException(Some(binding), t)
+    }
+  }
+
+  private def computedValue(value: Any): Unit = {
+    try {
+      val expreval = runtime.runtime.expressionEvaluator.newInstance()
+      val answer = expreval.precomputedValue(binding.expression, value, exprContext.toList, bindings.toMap, binding.options)
 
       val msg = new BindingMessage(binding.name, answer)
       monitor ! GOutput(binding, "result", msg)

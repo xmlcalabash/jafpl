@@ -88,8 +88,8 @@ class BindingSpec extends FlatSpec {
   "An external variable binding " should " be consumable" in {
     val graph    = Jafpl.newInstance().newGraph()
 
-    val binding  = graph.addBinding("foo")
     val pipeline = graph.addPipeline()
+    val binding  = pipeline.addOption("foo", "")
 
     val pb       = pipeline.addAtomic(new ProduceBinding("foo"), "pb")
 
@@ -100,7 +100,7 @@ class BindingSpec extends FlatSpec {
     graph.close()
     val runtime = new GraphRuntime(graph, runtimeConfig)
 
-    runtime.bindings("foo").set("Spoon!")
+    runtime.setOption("foo", "Spoon!")
 
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
@@ -114,8 +114,8 @@ class BindingSpec extends FlatSpec {
   "Reading an external variable binding twice " should " work" in {
     val graph    = Jafpl.newInstance().newGraph()
 
-    val binding  = graph.addBinding("foo")
     val pipeline = graph.addPipeline()
+    val binding  = pipeline.addOption("foo", "")
 
     val pb1      = pipeline.addAtomic(new ProduceBinding("foo"), "pb")
     val pb2      = pipeline.addAtomic(new ProduceBinding("foo"), "pb")
@@ -134,7 +134,7 @@ class BindingSpec extends FlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
 
-    runtime.bindings("foo").set("Spoon!")
+    runtime.setOption("foo", "Spoon!")
 
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
@@ -142,35 +142,5 @@ class BindingSpec extends FlatSpec {
 
     assert(bc.items.size == 1)
     assert(bc.items.head == 2)
-  }
-
-  "Leaving an external variable binding unbound " should " be an error" in {
-    val graph    = Jafpl.newInstance().newGraph()
-
-    val binding  = graph.addBinding("foo")
-    val pipeline = graph.addPipeline()
-
-    val pb       = pipeline.addAtomic(new ProduceBinding("foo"), "pb")
-
-    graph.addBindingEdge(binding, pb)
-    graph.addEdge(pb, "result", pipeline, "result")
-    graph.addOutput(pipeline, "result")
-
-    graph.close()
-    val runtime = new GraphRuntime(graph, runtimeConfig)
-
-    //runtime.bindings("foo").set("Spoon!")
-
-    val bc = new BufferConsumer()
-    runtime.outputs("result").setConsumer(bc)
-
-    var pass = false
-    try {
-      runtime.run()
-    } catch {
-      case _: Throwable => pass = true
-    }
-
-    assert(pass)
   }
 }

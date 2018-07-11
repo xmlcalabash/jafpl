@@ -123,4 +123,20 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
         ! ( (strexpr == "") || (strexpr == "false") || (strexpr == "0") )
     }
   }
+
+  override def precomputedValue(expr: Any, value: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Message = {
+    if (context.size > 1) {
+      throw new PipelineException("badconext", "Context contains more than one item", None)
+    }
+
+    value match {
+      case num: Integer =>
+        new ItemMessage(num, Metadata.NUMBER)
+      case str: String =>
+        new ItemMessage(str, Metadata.STRING)
+      case bool: Boolean =>
+        new ItemMessage(bool, Metadata.BOOLEAN)
+      case _ => throw new PipelineException("unexpected", s"Unexpected object as value: $value", None)
+    }
+  }
 }

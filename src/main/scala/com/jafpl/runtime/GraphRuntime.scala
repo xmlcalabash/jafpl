@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.{ActorRef, ActorSystem, DeadLetter, Props}
 import com.jafpl.exceptions.{GraphException, PipelineException}
-import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, EmptySource, FinallyStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopForStart, LoopUntilStart, LoopWhileStart, PipelineStart, Sink, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
+import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, EmptySource, FinallyStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopForStart, LoopUntilStart, LoopWhileStart, OptionBinding, PipelineStart, Sink, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
 import com.jafpl.runtime.GraphMonitor.{GAbortExecution, GException, GNode, GRun, GWatchdog}
 import com.jafpl.runtime.Reaper.WatchMe
 import com.jafpl.steps.{BindingProvider, DataConsumerProxy, DataProvider}
@@ -34,7 +34,8 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   private var _finished = false
   private var _exception = Option.empty[Throwable]
   private var _graphInputs = mutable.HashMap.empty[String, InputProxy]
-  private var _graphBindings = mutable.HashMap.empty[String, BindingProxy]
+  //private var _graphBindings = mutable.HashMap.empty[String, BindingProxy]
+  private val _graphOptions = mutable.HashMap.empty[String, OptionBinding]
   private var _graphOutputs = mutable.HashMap.empty[String, OutputProxy]
   private var _traceEventManager: TraceEventManager = new DefaultTraceEventManager()
 
@@ -79,14 +80,13 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   /** A map of the variable bindings that the pipeline expects.
     *
     * This mapping from names (strings) to [[com.jafpl.steps.BindingProvider]]s is the set of variable
-    * bindings that
-    * the pipeline expects from the outside world. If you do not provide an input,
+    * bindings that the pipeline expects from the outside world. If you do not provide an input,
     * the name will be unbound. The result of referring to an unbound variable
     * is undefined.
     *
     * @return A map of the expected variable bindings.
     */
-  def bindings: Map[String, BindingProvider] =  Map() ++ _graphBindings
+  //def bindings: Map[String, BindingProvider] =  Map() ++ _graphBindings
 
   /** A map of the outputs that the pipeline produces.
     *
@@ -97,6 +97,21 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
     * @return A map of the expected inputs.
     */
   def outputs: Map[String, DataConsumerProxy] = Map() ++ _graphOutputs
+
+  /** Set the value of an option.
+    *
+    * @param option The option name
+    * @param value The value
+    */
+  def setOption(option: String, value: Any): Unit = {
+    val binding = _graphOptions.get(option)
+    if (binding.isDefined) {
+      binding.get.value = value
+    } else {
+      throw new PipelineException("attempt to bind unknown option: " + option)
+    }
+  }
+
 
   protected[runtime] def finish(): Unit = {
     _finished = true
@@ -131,13 +146,14 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
     * To determine if execution has completed, check the `finished` value.
     */
   def runInBackground(): Unit = {
+    /*
     for ((name, provider) <- _graphBindings) {
       if (!provider.closed) {
         provider.close()
         logger.debug("No binding provided for " + name)
       }
     }
-
+    */
     _monitor ! GRun()
     _started = true
   }
@@ -199,64 +215,36 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
       var actorName = "_" * (7 - node.id.length) + node.id
 
       val actor = node match {
-        case split: Splitter =>
-          _system.actorOf(Props(new SplitterActor(_monitor, this, split)), actorName)
-        case join: Joiner =>
-          _system.actorOf(Props(new JoinerActor(_monitor, this, join)), actorName)
-        case buf: Buffer =>
-          _system.actorOf(Props(new BufferActor(_monitor, this, buf)), actorName)
-        case sink: Sink =>
-          _system.actorOf(Props(new SinkActor(_monitor, this, sink)), actorName)
-        case source: EmptySource =>
-          _system.actorOf(Props(new EmptySourceActor(_monitor, this, source)), actorName)
-        case forEach: LoopEachStart =>
-          _system.actorOf(Props(new LoopEachActor(_monitor, this, forEach)), actorName)
-        case viewport: ViewportStart =>
-          _system.actorOf(Props(new ViewportActor(_monitor, this, viewport)), actorName)
-        case choose: ChooseStart =>
-          _system.actorOf(Props(new ChooseActor(_monitor, this, choose)), actorName)
-        case when: WhenStart =>
-          _system.actorOf(Props(new WhenActor(_monitor, this, when)), actorName)
-        case forLoop: LoopForStart =>
-          _system.actorOf(Props(new LoopForActor(_monitor, this, forLoop)), actorName)
-        case trycatch: TryCatchStart =>
-          _system.actorOf(Props(new TryCatchActor(_monitor, this, trycatch)), actorName)
-        case trycatch: TryStart =>
-          _system.actorOf(Props(new StartActor(_monitor, this, trycatch)), actorName)
-        case trycatch: CatchStart =>
-          _system.actorOf(Props(new CatchActor(_monitor, this, trycatch)), actorName)
-        case fin: FinallyStart =>
-          _system.actorOf(Props(new FinallyActor(_monitor, this, fin)), actorName)
-        case pipe: PipelineStart =>
-          _system.actorOf(Props(new PipelineActor(_monitor, this, pipe)), actorName)
-        case group: GroupStart =>
-          _system.actorOf(Props(new StartActor(_monitor, this, group)), actorName)
-        case wstart: LoopWhileStart =>
-          _system.actorOf(Props(new LoopWhileActor(_monitor, this, wstart)), actorName)
-        case start: LoopUntilStart =>
-          _system.actorOf(Props(new LoopUntilActor(_monitor, this, start)), actorName)
-        case start: ContainerStart =>
-          throw new GraphException("Attempt to instantiate naked container: " + start, start.location)
+        case act: Splitter => _system.actorOf(Props(new SplitterActor(_monitor, this, act)), actorName)
+        case act: Joiner => _system.actorOf(Props(new JoinerActor(_monitor, this, act)), actorName)
+        case act: Buffer => _system.actorOf(Props(new BufferActor(_monitor, this, act)), actorName)
+        case act: Sink => _system.actorOf(Props(new SinkActor(_monitor, this, act)), actorName)
+        case act: EmptySource => _system.actorOf(Props(new EmptySourceActor(_monitor, this, act)), actorName)
+        case act: LoopEachStart => _system.actorOf(Props(new LoopEachActor(_monitor, this, act)), actorName)
+        case act: ViewportStart => _system.actorOf(Props(new ViewportActor(_monitor, this, act)), actorName)
+        case act: ChooseStart => _system.actorOf(Props(new ChooseActor(_monitor, this, act)), actorName)
+        case act: WhenStart => _system.actorOf(Props(new WhenActor(_monitor, this, act)), actorName)
+        case act: LoopForStart => _system.actorOf(Props(new LoopForActor(_monitor, this, act)), actorName)
+        case act: TryCatchStart => _system.actorOf(Props(new TryCatchActor(_monitor, this, act)), actorName)
+        case act: TryStart => _system.actorOf(Props(new StartActor(_monitor, this, act)), actorName)
+        case act: CatchStart => _system.actorOf(Props(new CatchActor(_monitor, this, act)), actorName)
+        case act: FinallyStart => _system.actorOf(Props(new FinallyActor(_monitor, this, act)), actorName)
+        case act: PipelineStart => _system.actorOf(Props(new PipelineActor(_monitor, this, act)), actorName)
+        case act: GroupStart => _system.actorOf(Props(new StartActor(_monitor, this, act)), actorName)
+        case act: LoopWhileStart => _system.actorOf(Props(new LoopWhileActor(_monitor, this, act)), actorName)
+        case act: LoopUntilStart => _system.actorOf(Props(new LoopUntilActor(_monitor, this, act)), actorName)
+        case act: ContainerStart => throw new GraphException("Attempt to instantiate naked container: " + act, act.location)
         case end: ContainerEnd =>
           end.start.get match {
-            case trycatch: TryCatchStart =>
-              _system.actorOf(Props(new TryCatchEndActor(_monitor, this, end)), actorName)
-            case trycatch: TryStart =>
-              _system.actorOf(Props(new ConditionalEndActor(_monitor, this, end)), actorName)
-            case trycatch: CatchStart =>
-              _system.actorOf(Props(new ConditionalEndActor(_monitor, this, end)), actorName)
-            case trycatch: WhenStart =>
-              _system.actorOf(Props(new ConditionalEndActor(_monitor, this, end)), actorName)
-            case foreach: LoopEachStart =>
-              _system.actorOf(Props(new LoopEachEndActor(_monitor, this, end)), actorName)
-            case wstart: LoopWhileStart =>
-              _system.actorOf(Props(new LoopWhileEndActor(_monitor, this, end)), actorName)
-            case start: LoopUntilStart =>
-              _system.actorOf(Props(new LoopUntilEndActor(_monitor, this, end)), actorName)
-            case viewport: ViewportStart =>
-              _system.actorOf(Props(new ViewportEndActor(_monitor, this, end)), actorName)
-            case _ =>
-              _system.actorOf(Props(new EndActor(_monitor, this, end)), actorName)
+            case act: TryCatchStart => _system.actorOf(Props(new TryCatchEndActor(_monitor, this, end)), actorName)
+            case act: TryStart => _system.actorOf(Props(new ConditionalEndActor(_monitor, this, end)), actorName)
+            case act: CatchStart => _system.actorOf(Props(new ConditionalEndActor(_monitor, this, end)), actorName)
+            case act: WhenStart => _system.actorOf(Props(new ConditionalEndActor(_monitor, this, end)), actorName)
+            case act: LoopEachStart => _system.actorOf(Props(new LoopEachEndActor(_monitor, this, end)), actorName)
+            case act: LoopWhileStart => _system.actorOf(Props(new LoopWhileEndActor(_monitor, this, end)), actorName)
+            case act: LoopUntilStart => _system.actorOf(Props(new LoopUntilEndActor(_monitor, this, end)), actorName)
+            case act: ViewportStart => _system.actorOf(Props(new ViewportEndActor(_monitor, this, end)), actorName)
+            case _ => _system.actorOf(Props(new EndActor(_monitor, this, end)), actorName)
           }
         case req: GraphInput =>
           if (_graphInputs.contains(req.name)) {
@@ -272,17 +260,14 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
           val op = new OutputProxy(_monitor, this, node)
           _graphOutputs.put(req.name, op)
           _system.actorOf(Props(new OutputActor(_monitor, this, node, op)), actorName)
-        case req: Binding =>
-          if (req.expression.isDefined) {
-            _system.actorOf(Props(new VariableActor(_monitor, this, req)), actorName)
-          } else {
-            if (_graphBindings.contains(req.name)) {
-              throw new PipelineException("dupname", s"Input binding name repeated: ${req.name}", req.location)
-            }
-            val ip = new BindingProxy(_monitor, this, req)
-            _graphBindings.put(req.name, ip)
-            _system.actorOf(Props(new BindingActor(_monitor, this, req, ip)), actorName)
+        case req: OptionBinding =>
+          if (_graphOptions.contains(req.name)) {
+            throw new PipelineException("dupname", s"Input binding name repeated: ${req.name}", req.location)
           }
+          _graphOptions.put(req.name, req)
+          _system.actorOf(Props(new VariableActor(_monitor, this, req)), actorName)
+        case req: Binding =>
+          _system.actorOf(Props(new VariableActor(_monitor, this, req)), actorName)
         case atomic: AtomicNode =>
           if (node.step.isDefined) {
             val cp = new ConsumingProxy(_monitor, this, node)

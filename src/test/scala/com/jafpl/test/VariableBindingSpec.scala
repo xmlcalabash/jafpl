@@ -1,8 +1,9 @@
 package com.jafpl.test
 
+import java.io.{File, PrintWriter}
+
 import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.PipelineException
-import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
@@ -39,7 +40,7 @@ class VariableBindingSpec extends FlatSpec {
     val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
 
-    val bind     = graph.addBinding("fred")
+    val bind     = pipeline.addOption("fred", "some")
     val prodbind = pipeline.addAtomic(new ProduceBinding("fred"), "pb")
 
     graph.addBindingEdge(bind, prodbind)
@@ -49,9 +50,13 @@ class VariableBindingSpec extends FlatSpec {
 
     graph.close()
 
+    val pw = new PrintWriter(new File("/projects/github/xproc/jafpl/pg.xml"))
+    pw.write(graph.asXML.toString)
+    pw.close()
+
     val runtime = new GraphRuntime(graph, runtimeConfig)
 
-    runtime.bindings("fred").set("hello world")
+    runtime.setOption("fred", "hello world")
 
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
@@ -65,8 +70,8 @@ class VariableBindingSpec extends FlatSpec {
     val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
 
-    val bind_a   = graph.addBinding("a")
-    val bind_b   = graph.addBinding("b")
+    val bind_a   = pipeline.addOption("a", "")
+    val bind_b   = pipeline.addOption("b", "")
     val prodbind = pipeline.addAtomic(new ProduceBinding("a"), "pb")
 
     graph.addBindingEdge(bind_a, prodbind)
@@ -77,7 +82,7 @@ class VariableBindingSpec extends FlatSpec {
     graph.close()
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
-    runtime.bindings("a").set("0")
+    runtime.setOption("a", "0")
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
 
@@ -93,45 +98,11 @@ class VariableBindingSpec extends FlatSpec {
     assert(pass)
   }
 
-  "An referenced unbound variable " should " cause an exception" in {
-    val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline()
-
-    val bind      = graph.addBinding("a")
-    val sum       = pipeline.addVariable("sum", "a + 0")
-
-    val prodbind  = pipeline.addAtomic(new ProduceBinding("sum"), "pb")
-
-    graph.addBindingEdge(bind, sum)
-    graph.addBindingEdge(sum, prodbind)
-    graph.addEdge(prodbind, "result", pipeline, "result")
-
-    graph.addOutput(pipeline, "result")
-
-    graph.close()
-
-    val runtime = new GraphRuntime(graph, runtimeConfig)
-
-    val bc = new BufferConsumer()
-    runtime.outputs("result").setConsumer(bc)
-
-    var pass = false
-    try {
-      runtime.run()
-    } catch {
-      case err: PipelineException =>
-        pass = (err.code == "nobinding")
-      case _: Throwable => Unit
-    }
-
-    assert(pass)
-  }
-
   "Intermediate variables " should " be computed" in {
     val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline()
 
-    val bind     = graph.addBinding("a")
+    val bind     = pipeline.addOption("a", "")
 
     val b        = pipeline.addVariable("b", "a + 1")
     val c        = pipeline.addVariable("c", "a + 2")
@@ -152,7 +123,7 @@ class VariableBindingSpec extends FlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
 
-    runtime.bindings("a").set("1")
+    runtime.setOption("a", "1")
 
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
