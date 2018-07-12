@@ -1,6 +1,6 @@
 package com.jafpl.steps
 
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.Location
 import com.jafpl.messages.{ItemMessage, Message, Metadata}
 
@@ -34,9 +34,9 @@ class StringComposer(location: Option[Location]) extends ViewportComposer {
                   more = false
               }
             }
-          case _ => throw new PipelineException("UnexpectedType", s"Unexpected item type: $imsg.item", location)
+          case _ => throw JafplException.unexpectedItemType(imsg.item.toString, "source", location)
         }
-      case _ => throw new PipelineException("UnexpectedMsg", s"Unexpected message type: $message", location)
+      case _ => throw JafplException.unexpectedMessage(message.toString, "source", location)
     }
 
     items.toList

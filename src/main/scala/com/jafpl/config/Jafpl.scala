@@ -1,6 +1,6 @@
 package com.jafpl.config
 
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.Graph
 import com.jafpl.util.{ErrorListener, TraceEventManager}
 
@@ -47,11 +47,11 @@ class Jafpl private() {
   /** Return the trace event manager.
     *
     * @return The trace event manager.
-    * @throws PipelineException if there is no [[com.jafpl.util.TraceEventManager]].
+    * @throws JafplException if there is no [[com.jafpl.util.TraceEventManager]].
     */
   def traceEventManager: TraceEventManager = {
     if (_traceEventManager == null) {
-      throw new PipelineException("unconfig", "attempt to use unconfigured jafpl", None)
+      throw JafplException.unconfigured("traceEventManager")
     }
     _traceEventManager
   }
@@ -65,11 +65,11 @@ class Jafpl private() {
   /** Return the error listener.
     *
     * @return The error listener.
-    * @throws PipelineException if there is no [[com.jafpl.util.TraceEventManager]].
+    * @throws JafplException if there is no [[com.jafpl.util.TraceEventManager]].
     */
   def errorListener: ErrorListener = {
     if (_errorListener == null) {
-      throw new PipelineException("unconfig", "attempt to use unconfigured jafpl", None)
+      throw JafplException.unconfigured("errorListener")
     }
     _errorListener
   }
@@ -95,7 +95,7 @@ class Jafpl private() {
 
   private def checkClosed(): Unit = {
     if (closed) {
-      throw new PipelineException("closed", "Cannot change a closed configuration.", None)
+      throw JafplException.configurationClosed()
     }
   }
 }

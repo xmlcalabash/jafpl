@@ -8,7 +8,7 @@ import com.jafpl.messages.Message
   * The runtime is agnostic to the form of the expressions or their results. In order to support choose
   * steps, it's necessary for the evaluator to be able to return a boolean result for an expression.
   *
-  * The evaluator may throw a [[com.jafpl.exceptions.PipelineException]] if the specified expression is
+  * The evaluator may throw a [[com.jafpl.exceptions.JafplException]] if the specified expression is
   * invalid or, in the case of a request for a boolean, if it has no boolean value.
   *
   */

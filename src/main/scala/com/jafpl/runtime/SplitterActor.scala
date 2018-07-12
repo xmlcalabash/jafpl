@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{Edge, Node, Splitter}
 import com.jafpl.messages.{BindingMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GException, GOutput}
@@ -43,7 +43,7 @@ private[runtime] class SplitterActor(private val monitor: ActorRef,
         case binding: BindingMessage => Unit
         case _ =>
           monitor ! GException(None,
-            new PipelineException("badbinding", "Unexpected item on #bindings port", node.location))
+            JafplException.unexpectedMessage(item.toString, port, node.location))
       }
     }
   }

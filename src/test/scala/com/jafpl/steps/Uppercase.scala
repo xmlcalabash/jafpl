@@ -1,6 +1,6 @@
 package com.jafpl.steps
 
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.messages.{ItemMessage, Message, Metadata}
 
 class Uppercase extends DefaultStep {
@@ -14,10 +14,10 @@ class Uppercase extends DefaultStep {
           case s: String =>
             consumer.get.receive("result", new ItemMessage(s.toUpperCase(), Metadata.STRING))
           case _ =>
-            throw new PipelineException("unexpectedtype", "Unexpected input type", location)
+            throw JafplException.unexpectedItemType(item.toString, port, location)
         }
       case _ =>
-        throw new PipelineException("unexpectedmsg", "Unexpected message type", location)
+        throw JafplException.unexpectedMessage(message.toString, port, location)
     }
   }
 }

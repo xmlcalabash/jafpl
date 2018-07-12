@@ -1,6 +1,6 @@
 package com.jafpl.graph
 
-import com.jafpl.exceptions.GraphException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.injection.{PortInjectable, StepInjectable}
 import com.jafpl.steps.Step
 import com.jafpl.util.UniqueId
@@ -124,7 +124,7 @@ abstract class Node(val graph: Graph,
     if (_start.isEmpty) {
       _start = Some(node)
     } else {
-      throw new GraphException("Parent of " + this + " is already defined: " + _start.get, location)
+      throw JafplException.startRedefined(this.toString, node.location)
     }
   }
 

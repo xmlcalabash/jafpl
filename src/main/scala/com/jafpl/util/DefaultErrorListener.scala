@@ -1,5 +1,6 @@
 package com.jafpl.util
 
+import com.jafpl.exceptions.{JafplException, JafplExceptionCode}
 import com.jafpl.graph.Location
 
 class DefaultErrorListener extends ErrorListener {

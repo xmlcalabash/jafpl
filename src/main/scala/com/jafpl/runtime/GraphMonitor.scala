@@ -4,7 +4,7 @@ import java.time.{Duration, Instant}
 
 import akka.actor.{Actor, ActorRef, PoisonPill}
 import akka.event.Logging
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{ContainerEnd, Graph, Node}
 import com.jafpl.messages.{ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GAbort, GAbortExecution, GCatch, GCheckGuard, GClose, GException, GFinally, GFinished, GFinishedViewport, GGuardResult, GLoop, GNode, GOutput, GReset, GRun, GRunFinally, GStart, GStop, GStopped, GTrace, GWatchdog}
@@ -75,7 +75,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
     for (node <- unfinishedNodes) {
       trace(s"-------- $node", "Watchdog")
     }
-    crashAndBurn(new PipelineException("watchdog", "Watchdog timer expired", None))
+    crashAndBurn(JafplException.watchdogTimeout())
   }
 
   def stopPipeline(): Unit = {

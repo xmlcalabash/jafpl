@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{LoopEachStart, Node}
 import com.jafpl.messages.{ItemMessage, Message, Metadata}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
@@ -41,7 +41,7 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
         queue += message
       case _ =>
         monitor ! GException(None,
-          new PipelineException("badmessage", "Unexpected message $item on input", node.location))
+          JafplException.unexpectedMessage(item.toString, port, node.location))
     }
     runIfReady()
   }

@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.Node
 import com.jafpl.messages.{ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.GException
@@ -24,7 +24,7 @@ private[runtime] class OutputActor(private val monitor: ActorRef,
         }
       case _ =>
         monitor ! GException(None,
-          PipelineException.BADMESSAGE(s"Unexpected message $item on $port", node.location))
+          JafplException.unexpectedMessage(item.toString, port, node.location))
     }
   }
 

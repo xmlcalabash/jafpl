@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.{Actor, ActorRef}
 import akka.event.Logging
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{ContainerStart, Node}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GStopped}
@@ -178,9 +178,6 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           }
         }
       } catch {
-        case pipeex: PipelineException =>
-          threwException = true
-          monitor ! GException(Some(node), pipeex)
         case cause: Throwable =>
           threwException = true
           monitor ! GException(Some(node), cause)
@@ -276,7 +273,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
               trace(s"↴BINDING $node: ${binding.name}=${binding.message} (no step)", "Bindings")
             }
           case _ =>
-            throw new PipelineException("badbinding", s"Unexpected message $item on #bindings port", node.location)
+            throw JafplException.unexpectedMessage(item.toString, "#bindings", node.location)
         }
       } else {
         item match {
@@ -296,7 +293,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
               trace(s"↴DELIVER $node (no step)", "StepIO")
             }
           case _ =>
-            throw new PipelineException("badmessage", s"Unexpected message $item on port $port", node.location)
+            throw JafplException.unexpectedMessage(item.toString, port, node.location)
         }
       }
     } catch {
@@ -331,7 +328,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         case loop: LoopWhileActor =>
           loop.loop(item)
         case _ =>
-          monitor ! GException(None, new PipelineException("invloop", s"Invalid loop to $node", node.location))
+          monitor ! GException(None, JafplException.internalError(s"Invalid loop to $node", node.location))
       }
 
     case NClose(port) =>
@@ -357,7 +354,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           catchStep.start(cause)
         case _ =>
           monitor ! GException(None,
-            new PipelineException("notcatch", "Attempt to send exception to something that's not a catch", node.location))
+            JafplException.internalError("Attempt to send exception to something that's not a catch", node.location))
       }
 
     case NFinally() =>
@@ -367,7 +364,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           block.runFinally()
         case _ =>
           monitor ! GException(None,
-            new PipelineException("nottry", s"Attempt to send finally to something that's not a try/catch: $this", node.location))
+            JafplException.internalError("Attempt to send finally to something that's not a try/catch", node.location))
       }
 
     case NRunFinally(cause) =>
@@ -377,7 +374,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           block.startFinally(cause)
         case _ =>
           monitor ! GException(None,
-            new PipelineException("notfinally", "Attempt to send run finally to something that's not a finally", node.location))
+            JafplException.internalError("Attempt to send run_finally to something that's not a finally", node.location))
       }
 
     case NReset() =>
@@ -392,7 +389,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           start.finished()
         case _ =>
           monitor ! GException(None,
-            new PipelineException("notstart", s"Container finish message sent to $node", node.location))
+            JafplException.internalError(s"Container finish message sent to something that isn't a start: $node", node.location))
       }
 
     case NViewportFinished(buffer) =>
@@ -404,7 +401,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           start.finished()
         case _ =>
           monitor ! GException(None,
-            new PipelineException("notviewport", s"Viewport finish message sent to $node", node.location))
+            JafplException.internalError(s"Viewport finish messages sent to something that isn't a viewport: $node", node.location))
       }
 
     case NChildFinished(otherNode) =>
@@ -414,7 +411,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           end.finished(otherNode)
         case _ =>
           monitor ! GException(None,
-            new PipelineException("notend", s"Child finish message sent to $node", node.location))
+            JafplException.internalError(s"Child finish message sent to something that isn't an end: $node", node.location))
       }
 
     case NCheckGuard() =>
@@ -424,7 +421,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           when.checkGuard()
         case _ =>
           monitor ! GException(None,
-            new PipelineException("badguard", "Attempted to check guard on something that isn't a when: " + this, node.location))
+            JafplException.internalError(s"Attept to check guard expresson on something that isn't a when: $node", node.location))
       }
 
     case NGuardResult(when, pass) =>
@@ -434,7 +431,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           choose.guardResult(when, pass)
         case _ =>
           monitor ! GException(None,
-            new PipelineException("badguard", "Attempted to pass guard result to something that isn't a when", node.location))
+            JafplException.internalError(s"Attempt to pass guard result to something that isn't a when: $node", node.location))
       }
 
     case NException(cause) =>

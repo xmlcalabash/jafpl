@@ -1,6 +1,6 @@
 package com.jafpl.primitive
 
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.messages.{ItemMessage, Message, Metadata}
 import com.jafpl.runtime.{ExpressionEvaluator, RuntimeConfiguration}
 import org.slf4j.{Logger, LoggerFactory}
@@ -18,12 +18,12 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
 
   override def singletonValue(expr: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Message = {
     if (context.size > 1) {
-      throw new PipelineException("badconext", "Context contains more than one item", None)
+      throw JafplException.singletonContextExpected()
     }
 
     val strexpr = expr match {
       case str: String => str
-      case _ => throw new PipelineException("unexpected", s"Unexpected object as expression value: $expr", None)
+      case _ => throw JafplException.unexpectedExpressionObject(expr.toString)
     }
 
     val addPatn = "(\\S+)\\s*([-+*/])\\s*(\\S+)".r
@@ -37,7 +37,7 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
             if (bindings.contains(left)) {
               numberFromBinding(bindings(left))
             } else {
-              throw new PipelineException("nobinding", "No binding for " + left)
+              throw JafplException.noBindingFor(left)
             }
         }
         val rightv = right match {
@@ -46,7 +46,7 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
             if (bindings.contains(right)) {
               numberFromBinding(bindings(right))
             } else {
-              throw new PipelineException("nobinding", "No binding for " + right)
+              throw JafplException.noBindingFor(right)
             }
         }
         val result = op match {
@@ -84,12 +84,12 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
 
   override def booleanValue(expr: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Boolean = {
     if (context.size > 1) {
-      throw new PipelineException("badconext", "Context contains more than one item", None)
+      throw JafplException.singletonContextExpected()
     }
 
     val strexpr = expr match {
       case str: String => str
-      case _ => throw new PipelineException("unexpected", s"Unexpected object as expression value: $expr", None)
+      case _ => throw JafplException.unexpectedExpressionObject(expr.toString)
     }
 
     val patn = ". ([<=>]) ([0-9]+)".r
@@ -126,7 +126,7 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
 
   override def precomputedValue(expr: Any, value: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Message = {
     if (context.size > 1) {
-      throw new PipelineException("badconext", "Context contains more than one item", None)
+      throw JafplException.singletonContextExpected()
     }
 
     value match {
@@ -136,7 +136,7 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
         new ItemMessage(str, Metadata.STRING)
       case bool: Boolean =>
         new ItemMessage(bool, Metadata.BOOLEAN)
-      case _ => throw new PipelineException("unexpected", s"Unexpected object as value: $value", None)
+      case _ => throw JafplException.unexpectedValueObject(value.toString)
     }
   }
 }

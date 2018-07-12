@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{LoopUntilStart, Node}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
@@ -44,13 +44,13 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
         case message: ItemMessage =>
           if (currentItem.isDefined) {
             monitor ! GException(None,
-              new PipelineException("seqinput", "UntilFinished received a sequence.", node.location))
+              JafplException.unexpectedSequence(node.toString, port, node.location))
             return
           }
           currentItem = Some(message)
         case _ =>
           monitor ! GException(None,
-            new PipelineException("badmessage", s"Unexpected message on $port: $item", node.location))
+            JafplException.unexpectedMessage(item.toString, port, node.location))
           return
       }
     } else if (port == "#bindings") {
@@ -59,7 +59,7 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
           bindings.put(msg.name, msg)
         case _ =>
           monitor ! GException(None,
-            new PipelineException("badmessage", s"Unexpected message on $port: $item", node.location))
+            JafplException.unexpectedMessage(item.toString, port, node.location))
           return
       }
     }

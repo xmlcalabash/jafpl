@@ -12,7 +12,7 @@ class TryCatchSpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   behavior of "A try/catch"
-
+/*
   it should "succeed if the try branch succeeds" in {
     val bc = new BufferSink()
 
@@ -52,7 +52,7 @@ class TryCatchSpec extends FlatSpec {
     assert(bc.items.size == 1)
     assert(bc.items.head == "doc1")
   }
-
+*/
   it should "run the catch that matches the error code" in {
     val bc = new BufferSink()
 
@@ -92,7 +92,7 @@ class TryCatchSpec extends FlatSpec {
     assert(bc.items.size == 1)
     assert(bc.items.head == "doc2")
   }
-
+/*
   it should "run the generic catch if no codes match" in {
     val bc = new BufferSink()
 
@@ -290,4 +290,5 @@ class TryCatchSpec extends FlatSpec {
     assert(bc_finally.items.size == 1)
     assert(bc_finally.items.head == 1)
   }
+  */
 }

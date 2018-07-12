@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{ContainerEnd, Node}
 import com.jafpl.messages.{ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GException, GLoop, GOutput}
@@ -40,7 +40,7 @@ private[runtime] class LoopUntilEndActor(private val monitor: ActorRef,
           monitor ! GLoop(node.start.get, message)
         case _ =>
           monitor ! GException(None,
-            new PipelineException("badmessage", s"Unexpected message $msg on port $port", node.location))
+            JafplException.unexpectedMessage(msg.toString, port, node.location))
       }
     } else {
       // Buffer everything in case this iteration is false

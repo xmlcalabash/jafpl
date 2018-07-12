@@ -1,7 +1,7 @@
 package com.jafpl.test
 
 import com.jafpl.config.Jafpl
-import com.jafpl.exceptions.GraphException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{BufferSink, Identity, Producer, Sink, Sleep}
@@ -67,7 +67,7 @@ class JoinerSpec extends FlatSpec {
       graph.addPriorityEdge(p2, "result", pipeline, "result")
       graph.addEdge(pipeline, "result", consumer, "source")
     } catch {
-      case g: GraphException => pass = true
+      case g: JafplException => pass = true
     }
 
     assert(pass)

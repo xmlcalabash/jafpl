@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.Node
 import com.jafpl.messages.{Message, Metadata}
 import com.jafpl.runtime.GraphMonitor.GException
@@ -17,7 +17,7 @@ class OutputProxy(private val monitor: ActorRef,
   override def setConsumer(provider: DataConsumer): Unit = {
     if (_provider.isDefined) {
       monitor ! GException(None,
-        new PipelineException("dupprovider", "Attempt to reset provider.", node.location))
+        JafplException.internalError(s"Attempt to reset provider: $node", node.location))
     }
     _provider = Some(provider)
   }

@@ -1,7 +1,7 @@
 package com.jafpl.graph
 
 import com.jafpl.config.Jafpl
-import com.jafpl.exceptions.{GraphException, PipelineException}
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.JoinMode.JoinMode
 import com.jafpl.steps.{Step, ViewportComposer}
 import com.jafpl.util.{ItemComparator, ItemTester, UniqueId}
@@ -45,9 +45,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     }
 
     cause match {
-      case err: GraphException =>
-        jafpl.errorListener.error(err, err.location)
-      case err: PipelineException =>
+      case err: JafplException =>
         jafpl.errorListener.error(err, err.location)
       case _ =>
         jafpl.errorListener.error(cause, None)
@@ -512,7 +510,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
     // If from and two aren't in the same graph...
     if (! (_nodes.contains(from) && _nodes.contains(to))) {
-      error(new GraphException(s"Cannot add edge. $from and $to are in different graphs.", from.location))
+      error(JafplException.differentGraphs(from.toString, to.toString, from.location))
       return
     }
 
@@ -557,7 +555,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
     if (mode == JoinMode.PRIORITY) {
       if (edgesTo(edge.get.to, edge.get.toPort).length > 1) {
-        throw new GraphException("Only the first edge to a node can be a priority edge", None)
+        throw JafplException.dupPriorityEdge(from.toString, to.toString, from.location)
       }
     }
   }
@@ -575,7 +573,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     // Find the variable
     val binding = findInScopeBinding(varname, to)
     if (binding.isEmpty) {
-      error(new GraphException(s"No in-scope binding for $varname from $to", None))
+      error(JafplException.variableNotInScope(varname.toString, to.toString, to.location))
     } else {
       addBindingEdge(binding.get, to)
     }
@@ -633,7 +631,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       val edge = new BindingEdge(this, from, to)
       _edges += edge
     } else {
-      error(new GraphException(s"Cannot add binding edge. $from and $to are in different graphs.", from.location))
+      error(JafplException.differentGraphs(from.toString, to.toString, from.location))
     }
   }
 
@@ -650,7 +648,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       val edge = new Edge(this, from, fromName, to, toName)
       _edges += edge
     } else {
-      error(new GraphException(s"Cannot add dependency. $from and $to are in different graphs.", from.location))
+      error(JafplException.differentGraphs(from.toString, to.toString, from.location))
     }
   }
 
@@ -714,12 +712,6 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       }
     }
 
-    /*
-    if (outboundEdges.isEmpty) {
-      error(new GraphException(s"Node $node has no output port $port", node.location))
-    }
-    */
-
     outboundEdges.toList
   }
 
@@ -739,12 +731,6 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
         inboundEdges += edge
       }
     }
-
-    /*
-    if (inboundEdges.isEmpty) {
-      error(new GraphException(s"Node $node has no input port $port", node.location))
-    }
-    */
 
     inboundEdges.toList
   }
@@ -791,7 +777,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
             }
             if (map.nonEmpty) {
               val port = map.toList.head
-              error(new GraphException(s"Required input '$port' missing: $atomic", node.location))
+              error(JafplException.requiredInputMissing(port, atomic.toString, node.location))
             }
 
             // It's always ok to drop outputs on the floor.
@@ -804,13 +790,13 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
             }
             if (map.nonEmpty) {
               val varname = map.toList.head
-              error(new GraphException(s"Required variable binding '$varname' missing: $atomic", node.location))
+              error(JafplException.requiredVariableBindingMissing(varname.toString, atomic.toString, node.location))
             }
           }
         case loop: LoopEachStart =>
           for (in <- loop.inputs) {
             if (in != "source") {
-              error(new GraphException(s"LoopEach has incorrect input port: $in", node.location))
+              error(JafplException.badLoopInputPort(in, loop.toString, node.location))
             }
           }
 
@@ -1062,11 +1048,11 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     for (node <- nodes) {
       if (!node.inputsOk()) {
         _valid = false
-        error(new GraphException(s"Invalid inputs on $node", node.location))
+        error(JafplException.invalidInputs(node.toString, node.location))
       }
       if (!node.outputsOk()) {
         _valid = false
-        error(new GraphException(s"Invalid outputs on $node", node.location))
+        error(JafplException.invalidOutputs(node.toString, node.location))
       }
       if (node.parent.isEmpty) {
         checkLoops(node, ListBuffer.empty[Node])
@@ -1096,7 +1082,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
                   case "?" =>
                     logger.warn(s"${edge.from}.${edge.fromPort} may produce a sequence but ${edge.to}.${edge.toPort} requires at most one input")
                   case _ =>
-                    error(new GraphException(s"Unexpected cardinality on ${edge.to}.${edge.toPort}: ${toCard.get}", edge.to.location))
+                    error(JafplException.unexpectedCardinality(edge.to.toString, edge.toPort, toCard.get, edge.to.location))
                 }
               case "+" =>
                 toCard.get match {
@@ -1105,7 +1091,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
                   case "?" =>
                     logger.warn(s"${edge.from}.${edge.fromPort} may produce a sequence but ${edge.to}.${edge.toPort} requires at most one input")
                   case _ =>
-                    error(new GraphException(s"Unexpected cardinality on ${edge.to}.${edge.toPort}: ${toCard.get}", edge.to.location))
+                    error(JafplException.unexpectedCardinality(edge.to.toString, edge.toPort, toCard.get, edge.to.location))
                 }
               case "?" =>
                 toCard.get match {
@@ -1114,10 +1100,10 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
                   case "1" =>
                     logger.warn(s"${edge.from}.${edge.fromPort} may produce no output but ${edge.to}.${edge.toPort} requires exactly one input")
                   case _ =>
-                    error(new GraphException(s"Unexpected cardinality on ${edge.to}.${edge.toPort}: ${toCard.get}", edge.to.location))
+                    error(JafplException.unexpectedCardinality(edge.to.toString, edge.toPort, toCard.get, edge.to.location))
                 }
               case _ =>
-                error(new GraphException(s"Unexpected cardinality on ${edge.from}.${edge.fromPort}: ${fromCard.get}", edge.from.location))
+                error(JafplException.unexpectedCardinality(edge.from.toString, edge.fromPort, fromCard.get, edge.from.location))
             }
           }
         }
@@ -1132,7 +1118,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
             _valid = false
             var from = usefulAncestor(edge.from)
             var to = usefulAncestor(edge.to)
-            error(new GraphException(s"Attempting to read from inside a container: $from -> $to ($d1, $d2)", to.location))
+            error(JafplException.readInsideContainer(from.toString,to.toString,d1.toString,d2.toString, from.location))
           }
         } else {
           if (d1 > d2) {
@@ -1144,13 +1130,13 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
                   _valid = false
                   var from = usefulAncestor(edge.from)
                   var to = usefulAncestor(edge.to)
-                  error(new GraphException(s"Attempting to read from inside a container: $from -> $to ($d1, $d2)", to.location))
+                  error(JafplException.readInsideContainer(from.toString,to.toString,d1.toString,d2.toString, from.location))
                 }
               case _ =>
                 _valid = false
                 var from = usefulAncestor(edge.from)
                 var to = usefulAncestor(edge.to)
-                error(new GraphException(s"Attempting to read from inside a container: $from -> $to ($d1, $d2)", to.location))
+                error(JafplException.readInsideContainer(from.toString,to.toString,d1.toString,d2.toString, from.location))
             }
           }
         }
@@ -1230,7 +1216,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
         }
       }
       loop = loop + arrow + node
-      error(new GraphException("Loop detected: " + loop, node.location))
+      error(JafplException.loopDetected(loop, node.location))
     }
 
     if (valid) {
@@ -1248,7 +1234,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
   private def checkOpen(): Unit = {
     if (!open) {
-      throw new GraphException("Changes cannot be made to a closed graph", None)
+      throw JafplException.graphClosed(None)
     }
   }
 

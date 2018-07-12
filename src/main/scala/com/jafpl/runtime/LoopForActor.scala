@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{LoopForStart, Node}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message, Metadata}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
@@ -33,7 +33,7 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
   }
 
   override protected def input(from: Node, fromPort: String, port: String, msg: Message): Unit = {
-    throw PipelineException.INTERNALERR(s"No input is expected on a for loop; input arrived on $port", node.location)
+    throw JafplException.noInputOnLoop(port, node.location)
   }
 
   protected[runtime] def loop(item: ItemMessage): Unit = {
@@ -41,7 +41,7 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
   }
 
   override protected def close(port: String): Unit = {
-    throw new PipelineException("noclose", "No port closures are expected on a for-loop", node.location)
+    throw JafplException.internalError("No port closures are expected on a for-loop", node.location)
   }
 
   private def runIfReady(): Unit = {

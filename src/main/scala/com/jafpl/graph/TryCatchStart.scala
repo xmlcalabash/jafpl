@@ -1,6 +1,6 @@
 package com.jafpl.graph
 
-import com.jafpl.exceptions.GraphException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.steps.{Step, ViewportComposer}
 
 class TryCatchStart private[jafpl] (override val graph: Graph,
@@ -35,26 +35,26 @@ class TryCatchStart private[jafpl] (override val graph: Graph,
   def addFinally(label: String): FinallyStart = addFinally(Some(label))
 
   override def addAtomic(step: Step, label: Option[String]): Node = {
-    throw new GraphException("Cannot add Atomic steps to Try/Catch", location)
+    throw JafplException.childForbidden(this.toString, step.toString, location)
   }
 
   override def addGroup(label: Option[String]): ContainerStart = {
-    throw new GraphException("Cannot add Group steps to Try/Catch", location)
+    throw JafplException.childForbidden(this.toString, label.getOrElse("group"), location)
   }
 
   override def addChoose(label: Option[String]): ChooseStart = {
-    throw new GraphException("Cannot add Choose steps to Try/Catch", location)
+    throw JafplException.childForbidden(this.toString, label.getOrElse("choose"), location)
   }
 
   override def addForEach(label: Option[String]): LoopEachStart = {
-    throw new GraphException("Cannot add For-Each steps to Try/Catch", location)
+    throw JafplException.childForbidden(this.toString, label.getOrElse("for-each"), location)
   }
 
   override def addViewport(composer: ViewportComposer, label: Option[String]): ViewportStart = {
-    throw new GraphException("Cannot add Viewport steps to Try/Catch", location)
+    throw JafplException.childForbidden(this.toString, label.getOrElse("viewport"), location)
   }
 
   override def addTryCatch(label: Option[String]): TryCatchStart = {
-    throw new GraphException("Cannot add Try/Catch steps to Try/Catch", location)
+    throw JafplException.childForbidden(this.toString, label.getOrElse("try"), location)
   }
 }

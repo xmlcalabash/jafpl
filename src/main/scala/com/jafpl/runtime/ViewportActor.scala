@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{Node, ViewportStart}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message, PipelineMessage}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
@@ -45,7 +45,7 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
         if (port == "source") {
           if (received) {
             monitor ! GException(None,
-              new PipelineException("noseq", "Sequence not allowed on viewport", node.location))
+              JafplException.unexpectedSequence(node.toString, port, node.location))
             return
           }
           received = true
@@ -55,7 +55,7 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
         }
       case _ =>
         monitor ! GException(None,
-          new PipelineException("badmessage", s"Unexpected message on $msg on $port", node.location))
+          JafplException.unexpectedMessage(msg.toString, port, node.location))
         return
     }
 
@@ -95,7 +95,7 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
           ibuffer += msg.item
         case msg: Message =>
           monitor ! GException(None,
-            new PipelineException("badmessage", s"Unexpected message on returnItems", node.location))
+            JafplException.internalError("Unexpected message $msg on returnItems in viewport", node.location))
           return
         case _ =>
           ibuffer += item

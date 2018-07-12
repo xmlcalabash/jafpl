@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.{JafplException, JafplExceptionCode}
 import com.jafpl.graph.{CatchStart, ContainerStart, FinallyStart, Joiner, Node, Splitter, TryStart}
 import com.jafpl.runtime.GraphMonitor.{GAbort, GCatch, GClose, GException, GFinished, GRunFinally, GStart}
 
@@ -47,8 +47,8 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
 
       var code: Option[Any] = None
       cause match {
-        case pe: PipelineException =>
-          code = Some(pe.code)
+        case je: JafplExceptionCode =>
+          code = Some(je.jafplExceptionCode)
         case _ => Unit
       }
 

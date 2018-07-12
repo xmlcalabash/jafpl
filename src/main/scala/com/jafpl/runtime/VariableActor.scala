@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{Binding, Node, OptionBinding}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message, Metadata}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput}
@@ -34,8 +34,7 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
         bindings.put(binding.name, binding.message)
       case _ =>
         monitor ! GException(None,
-          new PipelineException("badmessage", s"Unexpected message on $item on $port", binding.location))
-        return
+          JafplException.unexpectedMessage(item.toString, port, binding.location))
     }
   }
 

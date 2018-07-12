@@ -1,6 +1,6 @@
 package com.jafpl.steps
 
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.messages.{ItemMessage, Message, Metadata}
 import com.jafpl.util.UniqueId
 
@@ -16,9 +16,9 @@ class Decrement() extends DefaultStep {
         item.item match {
           case num: Long => consumer.get.receive("result", new ItemMessage(num - 1, Metadata.NUMBER))
           case num: Int => consumer.get.receive("result", new ItemMessage(num - 1, Metadata.NUMBER))
-          case _ => throw new PipelineException("nan", "Decrement input not a number: " + item, location)
+          case _ => JafplException.internalError(s"Decrement input is not a number: $item", location)
         }
-      case _ => throw new PipelineException("noitems", "No items in message: " + message, location)
+      case _ => JafplException.internalError(s"No items in message: $message", location)
     }
   }
 }

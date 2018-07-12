@@ -1,7 +1,7 @@
 package com.jafpl.test
 
 import com.jafpl.config.Jafpl
-import com.jafpl.exceptions.GraphException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.Graph
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
@@ -20,7 +20,7 @@ class ChooseSpec extends FlatSpec {
     try {
       choose.addAtomic(new Identity(), "identity")
     } catch {
-      case eg: GraphException => pass = true
+      case eg: JafplException => pass = true
     }
     assert(pass)
 
@@ -28,7 +28,7 @@ class ChooseSpec extends FlatSpec {
     try {
       choose.addChoose("subchoose")
     } catch {
-      case eg: GraphException => pass = true
+      case eg: JafplException => pass = true
     }
     assert(pass)
 
@@ -36,7 +36,7 @@ class ChooseSpec extends FlatSpec {
     try {
       choose.addGroup("group")
     } catch {
-      case eg: GraphException => pass = true
+      case eg: JafplException => pass = true
     }
     assert(pass)
   }

@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.exceptions.PipelineException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{LoopWhileStart, Node}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
@@ -44,7 +44,7 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
       case item: ItemMessage =>
         if (currentItem.nonEmpty) {
           monitor ! GException(None,
-            new PipelineException("noseq", "Sequence not allowed on while", node.location))
+            JafplException.unexpectedSequence(node.toString, port, node.location))
           return
         }
         currentItem += item
@@ -56,7 +56,7 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
         bindings.put(item.name, item)
       case _ =>
         monitor ! GException(None,
-          new PipelineException("badmessage", s"Unexpected message on $port", node.location))
+          JafplException.unexpectedMessage(msg.toString, port, node.location))
         return
     }
     runIfReady()

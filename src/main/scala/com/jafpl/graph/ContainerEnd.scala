@@ -1,6 +1,6 @@
 package com.jafpl.graph
 
-import com.jafpl.exceptions.GraphException
+import com.jafpl.exceptions.JafplException
 
 private[jafpl] class ContainerEnd(override val graph: Graph) extends Node(graph, None, None) {
   var _start: Option[ContainerStart] = None
@@ -12,12 +12,12 @@ private[jafpl] class ContainerEnd(override val graph: Graph) extends Node(graph,
   def start_=(node: ContainerStart): Unit = {
     if (_start.isEmpty) {
       if (node.containerEnd != this) {
-        throw new GraphException("End of " + this + " is this: " + node, location)
+        throw JafplException.badContainerEnd(this.toString, node.toString, location)
       }
       _start = Some(node)
       internal_name = node.internal_name + "_end"
     } else {
-      throw new GraphException("Start of " + this + " is already defined: " + _start.get, location)
+      throw JafplException.dupContainerStart(this.toString, _start.get.toString, location)
     }
   }
 

@@ -1,6 +1,5 @@
 package com.jafpl.graph
 
-import com.jafpl.exceptions.GraphException
 import com.jafpl.util.ItemTester
 
 private[jafpl] class LoopForStart(override val graph: Graph,

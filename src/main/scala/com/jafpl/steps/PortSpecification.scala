@@ -1,6 +1,6 @@
 package com.jafpl.steps
 
-import com.jafpl.exceptions.{GraphException, PipelineException}
+import com.jafpl.exceptions.JafplException
 
 import scala.collection.{immutable, mutable}
 
@@ -53,10 +53,10 @@ class PortSpecification(spec: immutable.Map[String,String]) {
   private val cardinalities: List[String] = List("1", "?", "+", "*")
   for (port <- spec.keySet) {
     if (!cardinalities.contains(spec(port))) {
-      throw new GraphException(s"Invalid cardinality for port $port: ${spec(port)}", None)
+      throw JafplException.invalidCardinality(port, spec(port), None)
     }
     if ((port == "*") && (spec(port) != "*")) {
-      throw new GraphException(s"Only cardinality '*' is allowed for the wildcard port", None)
+      throw JafplException.invalidWildcardCardinality()
     }
   }
 
@@ -88,7 +88,7 @@ class PortSpecification(spec: immutable.Map[String,String]) {
 
   /** Check the actual cardinality against the specification.
     *
-    * This method throws a [[com.jafpl.exceptions.PipelineException]] if the `count` of documents
+    * This method throws a [[com.jafpl.exceptions.JafplException]] if the `count` of documents
     * provided on this port is not acceptable according to the defined cardinality.
     *
     * @param port The port name.
@@ -96,7 +96,7 @@ class PortSpecification(spec: immutable.Map[String,String]) {
     */
   def checkCardinality(port: String, count: Long): Unit = {
     if (count < 0) {
-      throw new PipelineException("badcount", s"Impossible document count '$count' for port '$port'", None)
+      JafplException.internalError(s"Impossible document count $count for $port", None)
     }
 
     var pass = false
@@ -112,12 +112,11 @@ class PortSpecification(spec: immutable.Map[String,String]) {
       }
 
       if (!pass) {
-        throw new PipelineException("badcardinality",
-          s"Cardinality error: '$count' document(s) sent to port '$port' (allowed: ${spec(port)})", None)
+        throw JafplException.cardinalityError(port, count.toString, spec(port))
       }
     } else {
       if (!spec.contains("*")) {
-        throw new PipelineException("badport", s"Port named '$port' is not allowed", None)
+        throw JafplException.badPort(port)
       }
     }
   }

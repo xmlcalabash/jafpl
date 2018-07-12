@@ -3,7 +3,6 @@ package com.jafpl.test
 import java.io.{File, PrintWriter}
 
 import com.jafpl.config.Jafpl
-import com.jafpl.exceptions.PipelineException
 import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime

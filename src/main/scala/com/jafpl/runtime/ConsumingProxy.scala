@@ -1,7 +1,6 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.exceptions.PipelineException
 import com.jafpl.graph.Node
 import com.jafpl.messages.{ItemMessage, Message, Metadata, PipelineMessage}
 import com.jafpl.runtime.GraphMonitor.{GException, GOutput}

@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import akka.actor.{ActorRef, ActorSystem, DeadLetter, Props}
-import com.jafpl.exceptions.{GraphException, PipelineException}
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, EmptySource, FinallyStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopForStart, LoopUntilStart, LoopWhileStart, OptionBinding, PipelineStart, Sink, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
 import com.jafpl.runtime.GraphMonitor.{GAbortExecution, GException, GNode, GRun, GWatchdog}
 import com.jafpl.runtime.Reaper.WatchMe
@@ -34,7 +34,6 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   private var _finished = false
   private var _exception = Option.empty[Throwable]
   private var _graphInputs = mutable.HashMap.empty[String, InputProxy]
-  //private var _graphBindings = mutable.HashMap.empty[String, BindingProxy]
   private val _graphOptions = mutable.HashMap.empty[String, OptionBinding]
   private var _graphOutputs = mutable.HashMap.empty[String, OutputProxy]
   private var _traceEventManager: TraceEventManager = new DefaultTraceEventManager()
@@ -42,7 +41,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   graph.close()
 
   if (!graph.valid) {
-    throw new GraphException("Cannot run an invalid graph", None)
+    throw JafplException.invalidGraph()
   }
 
   makeActors()
@@ -108,7 +107,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
     if (binding.isDefined) {
       binding.get.value = value
     } else {
-      throw new PipelineException("attempt to bind unknown option: " + option)
+      throw JafplException.setUnknownOption(option)
     }
   }
 
@@ -166,7 +165,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
     */
   def waitForPipeline(): Unit = {
     if (!started) {
-      _exception = Some(new PipelineException("notstarted", "Pipeline execution has not started", None))
+      _exception = Some(JafplException.notRunning())
       throw _exception.get
     }
     waitForTeardown()
@@ -177,7 +176,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
       val watchdog = runtime.watchdogTimeout
       if (watchdog < 0) {
         _monitor ! GException(None,
-          new PipelineException("invwatchdog", "The watchdog timer value must have a non-negative value", None))
+          JafplException.invalidConfigurationValue("watchdog timer", watchdog.toString))
       }
 
       var ticker = watchdog
@@ -233,7 +232,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
         case act: GroupStart => _system.actorOf(Props(new StartActor(_monitor, this, act)), actorName)
         case act: LoopWhileStart => _system.actorOf(Props(new LoopWhileActor(_monitor, this, act)), actorName)
         case act: LoopUntilStart => _system.actorOf(Props(new LoopUntilActor(_monitor, this, act)), actorName)
-        case act: ContainerStart => throw new GraphException("Attempt to instantiate naked container: " + act, act.location)
+        case act: ContainerStart => throw JafplException.abstractContainer(act.toString, act.location)
         case end: ContainerEnd =>
           end.start.get match {
             case act: TryCatchStart => _system.actorOf(Props(new TryCatchEndActor(_monitor, this, end)), actorName)
@@ -248,21 +247,21 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
           }
         case req: GraphInput =>
           if (_graphInputs.contains(req.name)) {
-            throw new PipelineException("dupname", s"Input port name repeated: ${req.name}", req.location)
+            throw JafplException.dupInputPort(req.name, req.location)
           }
           val ip = new InputProxy(_monitor, this, node)
           _graphInputs.put(req.name, ip)
           _system.actorOf(Props(new InputActor(_monitor, this, node, ip)), actorName)
         case req: GraphOutput =>
           if (_graphOutputs.contains(req.name)) {
-            throw new PipelineException("dupname", s"Output port name repeated: ${req.name}", req.location)
+            throw JafplException.dupOutputPort(req.name, req.location)
           }
           val op = new OutputProxy(_monitor, this, node)
           _graphOutputs.put(req.name, op)
           _system.actorOf(Props(new OutputActor(_monitor, this, node, op)), actorName)
         case req: OptionBinding =>
           if (_graphOptions.contains(req.name)) {
-            throw new PipelineException("dupname", s"Input binding name repeated: ${req.name}", req.location)
+            throw JafplException.dupOptionName(req.name, req.location)
           }
           _graphOptions.put(req.name, req)
           _system.actorOf(Props(new VariableActor(_monitor, this, req)), actorName)
@@ -278,7 +277,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
           }
 
         case _ =>
-          throw new PipelineException("unexpected", s"Unexpected step type: $node", node.location)
+          throw JafplException.unexpecteStepType(node.toString, node.location)
       }
 
       reaper ! WatchMe(actor)

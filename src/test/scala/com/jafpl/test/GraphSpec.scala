@@ -1,7 +1,7 @@
 package com.jafpl.test
 
 import com.jafpl.config.Jafpl
-import com.jafpl.exceptions.GraphException
+import com.jafpl.exceptions.JafplException
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.steps.{Identity, Producer, Sink}
 import org.scalatest.FlatSpec
@@ -89,7 +89,7 @@ class GraphSpec extends FlatSpec {
       graph1.addEdge(ident1, "result", ident2, "source")
       graph1.close()
     } catch {
-      case eg: GraphException => pass = true
+      case eg: JafplException => pass = true
     }
 
     assert(pass)
@@ -116,7 +116,7 @@ class GraphSpec extends FlatSpec {
     try {
       graph.addEdge(ident1, "result", ident2, "source")
     } catch {
-      case ge: GraphException => pass = true
+      case ge: JafplException => pass = true
     }
 
     assert(pass)
