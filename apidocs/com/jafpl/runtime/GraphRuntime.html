@@ -132,12 +132,6 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       <p class="shortcomment cmt">The graph runtime APIs.</p><div class="fullcomment"><div class="comment cmt"><p>The graph runtime APIs.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.jafpl">jafpl</a></dd></dl></div>
     </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="class" href="BindingProxy.html" title=""></a>
-                        <a href="BindingProxy.html" title="">
-                          BindingProxy
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
                         <a class="trait" href="ExpressionEvaluator.html" title="Evaluate expressions (for variable bindings and the alternatives in a choose)."></a>
                         <a href="ExpressionEvaluator.html" title="Evaluate expressions (for variable bindings and the alternatives in a choose).">
                           ExpressionEvaluator
@@ -342,27 +336,6 @@ to run the pipeline, you must call <code>stop</code> to tear it down.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.jafpl.runtime.GraphRuntime#bindings" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="bindings:Map[String,com.jafpl.steps.BindingProvider]"></a><a id="bindings:Map[String,BindingProvider]"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#bindings:Map[String,com.jafpl.steps.BindingProvider]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">bindings</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <a href="../steps/BindingProvider.html" class="extype" name="com.jafpl.steps.BindingProvider">BindingProvider</a>]</span>
-      </span>
-      
-      <p class="shortcomment cmt">A map of the variable bindings that the pipeline expects.</p><div class="fullcomment"><div class="comment cmt"><p>A map of the variable bindings that the pipeline expects.</p><p>This mapping from names (strings) to <a href="../steps/BindingProvider.html" class="extype" name="com.jafpl.steps.BindingProvider">com.jafpl.steps.BindingProvider</a>s is the set of variable
-bindings that
-the pipeline expects from the outside world. If you do not provide an input,
-the name will be unbound. The result of referring to an unbound variable
-is undefined.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>A map of the expected variable bindings.</p></dd></dl></div>
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
@@ -721,6 +694,23 @@ The pipeline will continue to run in other threads.</p><p>To determine if execut
       </span>
       
       
+    </li><li name="com.jafpl.runtime.GraphRuntime#setOption" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setOption(option:String,value:Any):Unit"></a><a id="setOption(String,Any):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/GraphRuntime.html#setOption(option:String,value:Any):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setOption</span><span class="params">(<span name="option">option: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="value">value: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Set the value of an option.</p><div class="fullcomment"><div class="comment cmt"><p>Set the value of an option.
+</p></div><dl class="paramcmts block"><dt class="param">option</dt><dd class="cmt"><p>The option name</p></dd><dt class="param">value</dt><dd class="cmt"><p>The value</p></dd></dl></div>
     </li><li name="com.jafpl.runtime.GraphRuntime#started" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="started:Boolean"></a>
       <span class="permalink">

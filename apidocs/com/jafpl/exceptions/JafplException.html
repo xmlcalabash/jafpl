@@ -131,16 +131,16 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       
       <p class="shortcomment cmt">Exceptions thrown.</p><div class="fullcomment"><div class="comment cmt"><p>Exceptions thrown.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.jafpl">jafpl</a></dd></dl></div>
     </li><li class="current-entities indented3">
-                        <span class="separator"></span>
-                        <a class="class" href="GraphException.html" title="An exception raised by an illegal graph."></a>
-                        <a href="GraphException.html" title="An exception raised by an illegal graph.">
-                          GraphException
+                        <a class="object" href="JafplException$.html" title=""></a>
+                        <a class="class" href="" title=""></a>
+                        <a href="" title="">
+                          JafplException
                         </a>
                       </li><li class="current-entities indented3">
-                        <a class="object" href="PipelineException$.html" title=""></a>
-                        <a class="class" href="" title="An exception raised during pipeline evaluation."></a>
-                        <a href="" title="An exception raised during pipeline evaluation.">
-                          PipelineException
+                        <span class="separator"></span>
+                        <a class="trait" href="JafplExceptionCode.html" title=""></a>
+                        <a href="JafplExceptionCode.html" title="">
+                          JafplExceptionCode
                         </a>
                       </li>
               </ul>
@@ -149,15 +149,15 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
           <div id="content">
             <body class="class type">
       <div id="definition">
-        <a href="PipelineException$.html" title="See companion object"><div class="big-circle class-companion-object">c</div></a>
+        <a href="JafplException$.html" title="See companion object"><div class="big-circle class-companion-object">c</div></a>
         <p id="owner"><a href="../../index.html" class="extype" name="com">com</a>.<a href="../index.html" class="extype" name="com.jafpl">jafpl</a>.<a href="index.html" class="extype" name="com.jafpl.exceptions">exceptions</a></p>
-        <h1><a href="PipelineException$.html" title="See companion object">PipelineException</a><span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html" title="Permalink">
+        <h1><a href="JafplException$.html" title="See companion object">JafplException</a><span class="permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
         <h3><span class="morelinks"><div>
-            Companion <a href="PipelineException$.html" title="See companion object">object PipelineException</a>
+            Companion <a href="JafplException$.html" title="See companion object">object JafplException</a>
           </div></span></h3>
       </div>
 
@@ -167,17 +167,16 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">PipelineException</span><span class="result"> extends <span class="extype" name="scala.Throwable">Throwable</span></span>
+        <span class="name">JafplException</span><span class="result"> extends <span class="extype" name="scala.RuntimeException">RuntimeException</span> with <a href="JafplExceptionCode.html" class="extype" name="com.jafpl.exceptions.JafplExceptionCode">JafplExceptionCode</a></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>An exception raised during pipeline evaluation.
-</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="java.lang.Throwable">Throwable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="JafplExceptionCode.html" class="extype" name="com.jafpl.exceptions.JafplExceptionCode">JafplExceptionCode</a>, <span class="extype" name="java.lang.RuntimeException">RuntimeException</span>, <span class="extype" name="java.lang.Exception">Exception</span>, <span class="extype" name="java.lang.Throwable">Throwable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -203,7 +202,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.jafpl.exceptions.PipelineException"><span>PipelineException</span></li><li class="in" name="java.lang.Throwable"><span>Throwable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.jafpl.exceptions.JafplException"><span>JafplException</span></li><li class="in" name="com.jafpl.exceptions.JafplExceptionCode"><span>JafplExceptionCode</span></li><li class="in" name="java.lang.RuntimeException"><span>RuntimeException</span></li><li class="in" name="java.lang.Exception"><span>Exception</span></li><li class="in" name="java.lang.Throwable"><span>Throwable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -221,106 +220,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
 
       <div id="template">
         <div id="allMembers">
-        <div id="constructors" class="members">
-              <h3>Instance Constructors</h3>
-              <ol><li name="com.jafpl.exceptions.PipelineException#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(code:String,message:String,location:com.jafpl.graph.Location,cause:Throwable):com.jafpl.exceptions.PipelineException"></a><a id="&lt;init&gt;:PipelineException"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#&lt;init&gt;(code:String,message:String,location:com.jafpl.graph.Location,cause:Throwable):com.jafpl.exceptions.PipelineException" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">new</span>
-      </span>
-      <span class="symbol">
-        <span class="name">PipelineException</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="message">message: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="location">location: <a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a></span>, <span name="cause">cause: <span class="extype" name="scala.Throwable">Throwable</span></span>)</span>
-      </span>
-      
-      <p class="shortcomment cmt">Alternate constructor with no data.</p>
-    </li><li name="com.jafpl.exceptions.PipelineException#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(code:String,message:String,location:com.jafpl.graph.Location):com.jafpl.exceptions.PipelineException"></a><a id="&lt;init&gt;:PipelineException"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#&lt;init&gt;(code:String,message:String,location:com.jafpl.graph.Location):com.jafpl.exceptions.PipelineException" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">new</span>
-      </span>
-      <span class="symbol">
-        <span class="name">PipelineException</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="message">message: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="location">location: <a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a></span>)</span>
-      </span>
-      
-      <p class="shortcomment cmt">Alternate constructor with no cause or data.</p>
-    </li><li name="com.jafpl.exceptions.PipelineException#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(code:String,message:String,location:Option[com.jafpl.graph.Location]):com.jafpl.exceptions.PipelineException"></a><a id="&lt;init&gt;:PipelineException"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#&lt;init&gt;(code:String,message:String,location:Option[com.jafpl.graph.Location]):com.jafpl.exceptions.PipelineException" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">new</span>
-      </span>
-      <span class="symbol">
-        <span class="name">PipelineException</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="message">message: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="location">location: <span class="extype" name="scala.Option">Option</span>[<a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>)</span>
-      </span>
-      
-      <p class="shortcomment cmt">Alternate constructor with no cause or data.</p>
-    </li><li name="com.jafpl.exceptions.PipelineException#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(code:Any,location:Option[com.jafpl.graph.Location]):com.jafpl.exceptions.PipelineException"></a><a id="&lt;init&gt;:PipelineException"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#&lt;init&gt;(code:Any,location:Option[com.jafpl.graph.Location]):com.jafpl.exceptions.PipelineException" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">new</span>
-      </span>
-      <span class="symbol">
-        <span class="name">PipelineException</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Any">Any</span></span>, <span name="location">location: <span class="extype" name="scala.Option">Option</span>[<a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>)</span>
-      </span>
-      
-      <p class="shortcomment cmt">Alternate constructor with no message, cause or data.</p>
-    </li><li name="com.jafpl.exceptions.PipelineException#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(code:Any,message:String):com.jafpl.exceptions.PipelineException"></a><a id="&lt;init&gt;:PipelineException"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#&lt;init&gt;(code:Any,message:String):com.jafpl.exceptions.PipelineException" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">new</span>
-      </span>
-      <span class="symbol">
-        <span class="name">PipelineException</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Any">Any</span></span>, <span name="message">message: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
-      </span>
-      
-      <p class="shortcomment cmt">Alternate constructor with no location, cause or data.</p>
-    </li><li name="com.jafpl.exceptions.PipelineException#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(code:Any):com.jafpl.exceptions.PipelineException"></a><a id="&lt;init&gt;:PipelineException"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#&lt;init&gt;(code:Any):com.jafpl.exceptions.PipelineException" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">new</span>
-      </span>
-      <span class="symbol">
-        <span class="name">PipelineException</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Any">Any</span></span>)</span>
-      </span>
-      
-      <p class="shortcomment cmt">A pipeline exception.</p><div class="fullcomment"><div class="comment cmt"><p>A pipeline exception.</p></div><dl class="paramcmts block"><dt class="param">code</dt><dd class="cmt"><p>An error code (can be caught by catch steps).</p></dd></dl></div>
-    </li></ol>
-            </div>
+        
 
         
 
@@ -332,7 +232,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -348,7 +248,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html###():Int" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -364,7 +264,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -377,58 +277,10 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.jafpl.exceptions.PipelineException#_cause" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="_cause:Option[Throwable]"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#_cause:Option[Throwable]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">var</span>
-      </span>
-      <span class="symbol">
-        <span class="name">_cause</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Throwable">Throwable</span>]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
-    </li><li name="com.jafpl.exceptions.PipelineException#_location" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="_location:Option[com.jafpl.graph.Location]"></a><a id="_location:Option[Location]"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#_location:Option[com.jafpl.graph.Location]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">var</span>
-      </span>
-      <span class="symbol">
-        <span class="name">_location</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
-    </li><li name="com.jafpl.exceptions.PipelineException#_message" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="_message:Option[String]"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#_message:Option[String]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">var</span>
-      </span>
-      <span class="symbol">
-        <span class="name">_message</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="java.lang.Throwable#addSuppressed" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="addSuppressed(x$1:Throwable):Unit"></a><a id="addSuppressed(Throwable):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#addSuppressed(x$1:Throwable):Unit" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#addSuppressed(x$1:Throwable):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -444,7 +296,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -457,26 +309,10 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.jafpl.exceptions.PipelineException#cause" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="cause:Option[Throwable]"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#cause:Option[Throwable]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">cause</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Throwable">Throwable</span>]</span>
-      </span>
-      
-      <p class="shortcomment cmt">The cause, if this exception wraps a deeper exception.</p>
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#clone():Object" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -495,10 +331,10 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.jafpl.exceptions.PipelineException#code" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="code:Any"></a>
+    </li><li name="com.jafpl.exceptions.JafplException#code" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="code:Int"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#code:Any" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#code:Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -507,14 +343,30 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">code</span><span class="result">: <span class="extype" name="scala.Any">Any</span></span>
+        <span class="name">code</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      
+      
+    </li><li name="com.jafpl.exceptions.JafplException#details" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="details:List[String]"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#details:List[String]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">details</span><span class="result">: <span class="extype" name="scala.List">List</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
       </span>
       
       
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -530,7 +382,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#equals(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#equals(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -546,7 +398,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="java.lang.Throwable#fillInStackTrace" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="fillInStackTrace():Throwable"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#fillInStackTrace():Throwable" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#fillInStackTrace():Throwable" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -562,7 +414,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#finalize():Unit" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -584,7 +436,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="java.lang.Throwable#getCause" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getCause():Throwable"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#getCause():Throwable" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#getCause():Throwable" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -600,7 +452,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -616,7 +468,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="java.lang.Throwable#getLocalizedMessage" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getLocalizedMessage():String"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#getLocalizedMessage():String" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#getLocalizedMessage():String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -629,10 +481,10 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Throwable</dd></dl></div>
-    </li><li name="java.lang.Throwable#getMessage" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="com.jafpl.exceptions.JafplException#getMessage" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getMessage():String"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#getMessage():String" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#getMessage():String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -641,14 +493,14 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">getMessage</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+        <span class="name">getMessage</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Throwable</dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.exceptions.JafplException">JafplException</a> → Throwable</dd></dl></div>
     </li><li name="java.lang.Throwable#getStackTrace" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getStackTrace():Array[StackTraceElement]"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#getStackTrace():Array[StackTraceElement]" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#getStackTrace():Array[StackTraceElement]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -664,7 +516,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="java.lang.Throwable#getSuppressed" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getSuppressed():Array[Throwable]"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#getSuppressed():Array[Throwable]" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#getSuppressed():Array[Throwable]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -680,7 +532,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#hashCode():Int" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#hashCode():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -696,7 +548,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="java.lang.Throwable#initCause" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="initCause(x$1:Throwable):Throwable"></a><a id="initCause(Throwable):Throwable"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#initCause(x$1:Throwable):Throwable" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#initCause(x$1:Throwable):Throwable" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -712,7 +564,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -725,42 +577,42 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.jafpl.exceptions.PipelineException#location" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="location:Option[com.jafpl.graph.Location]"></a><a id="location:Option[Location]"></a>
+    </li><li name="com.jafpl.exceptions.JafplException#jafplExceptionCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="jafplExceptionCode:Any"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#location:Option[com.jafpl.graph.Location]" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#jafplExceptionCode:Any" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">jafplExceptionCode</span><span class="result">: <span class="extype" name="scala.Any">Any</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.exceptions.JafplException">JafplException</a> → <a href="JafplExceptionCode.html" class="extype" name="com.jafpl.exceptions.JafplExceptionCode">JafplExceptionCode</a></dd></dl></div>
+    </li><li name="com.jafpl.exceptions.JafplException#location" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="location:Option[com.jafpl.graph.Location]"></a><a id="location:Option[Location]"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#location:Option[com.jafpl.graph.Location]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
       </span>
       <span class="symbol">
         <span class="name">location</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="../graph/Location.html" class="extype" name="com.jafpl.graph.Location">Location</a>]</span>
       </span>
       
-      <p class="shortcomment cmt">The location, if there was one.</p>
-    </li><li name="com.jafpl.exceptions.PipelineException#message" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="message:Option[String]"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#message:Option[String]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">message</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
-      </span>
       
-      <p class="shortcomment cmt">The exception message, if there was one.</p>
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -776,7 +628,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#notify():Unit" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -792,7 +644,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -808,7 +660,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="java.lang.Throwable#printStackTrace" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="printStackTrace(x$1:java.io.PrintWriter):Unit"></a><a id="printStackTrace(PrintWriter):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#printStackTrace(x$1:java.io.PrintWriter):Unit" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#printStackTrace(x$1:java.io.PrintWriter):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -824,7 +676,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="java.lang.Throwable#printStackTrace" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="printStackTrace(x$1:java.io.PrintStream):Unit"></a><a id="printStackTrace(PrintStream):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#printStackTrace(x$1:java.io.PrintStream):Unit" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#printStackTrace(x$1:java.io.PrintStream):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -840,7 +692,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="java.lang.Throwable#printStackTrace" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="printStackTrace():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#printStackTrace():Unit" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#printStackTrace():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -856,7 +708,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="java.lang.Throwable#setStackTrace" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="setStackTrace(x$1:Array[StackTraceElement]):Unit"></a><a id="setStackTrace(Array[StackTraceElement]):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#setStackTrace(x$1:Array[StackTraceElement]):Unit" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#setStackTrace(x$1:Array[StackTraceElement]):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -872,7 +724,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -885,10 +737,26 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.jafpl.exceptions.PipelineException#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="com.jafpl.exceptions.JafplException#template" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="template:String"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#template:String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">template</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      
+      
+    </li><li name="com.jafpl.exceptions.JafplException#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#toString():String" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#toString():String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -900,11 +768,11 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       
-      <p class="shortcomment cmt">String representation</p><div class="fullcomment"><div class="comment cmt"><p>String representation</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.exceptions.PipelineException">PipelineException</a> → Throwable → AnyRef → Any</dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.exceptions.JafplException">JafplException</a> → Throwable → AnyRef → Any</dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#wait():Unit" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -926,7 +794,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -948,7 +816,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/exceptions/PipelineException.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../com/jafpl/exceptions/JafplException.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -977,7 +845,13 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="java.lang.Throwable">
+        <div class="parent" name="com.jafpl.exceptions.JafplExceptionCode">
+              <h3>Inherited from <a href="JafplExceptionCode.html" class="extype" name="com.jafpl.exceptions.JafplExceptionCode">JafplExceptionCode</a></h3>
+            </div><div class="parent" name="java.lang.RuntimeException">
+              <h3>Inherited from <span class="extype" name="java.lang.RuntimeException">RuntimeException</span></h3>
+            </div><div class="parent" name="java.lang.Exception">
+              <h3>Inherited from <span class="extype" name="java.lang.Exception">Exception</span></h3>
+            </div><div class="parent" name="java.lang.Throwable">
               <h3>Inherited from <span class="extype" name="java.lang.Throwable">Throwable</span></h3>
             </div><div class="parent" name="java.io.Serializable">
               <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>

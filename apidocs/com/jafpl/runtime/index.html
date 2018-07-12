@@ -223,12 +223,6 @@ methods on those objects.</p></div><dl class="attributes block"> <dt>Definition 
       <p class="shortcomment cmt">The graph runtime APIs.</p><div class="fullcomment"><div class="comment cmt"><p>The graph runtime APIs.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.jafpl">jafpl</a></dd></dl></div>
     </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="class" href="BindingProxy.html" title=""></a>
-                        <a href="BindingProxy.html" title="">
-                          BindingProxy
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
                         <a class="trait" href="ExpressionEvaluator.html" title="Evaluate expressions (for variable bindings and the alternatives in a choose)."></a>
                         <a href="ExpressionEvaluator.html" title="Evaluate expressions (for variable bindings and the alternatives in a choose).">
                           ExpressionEvaluator
@@ -379,25 +373,7 @@ methods on those objects.</p></div><dl class="attributes block"> <dt>Definition 
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="com.jafpl.runtime.BindingProxy" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="BindingProxyextendsBindingProvider"></a><a id="BindingProxy:BindingProxy"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/runtime/index.html#BindingProxyextendsBindingProvider" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">class</span>
-      </span>
-      <span class="symbol">
-        <a title="" href="BindingProxy.html">
-              <span class="name">BindingProxy</span>
-            </a><span class="result"> extends <a href="../steps/BindingProvider.html" class="extype" name="com.jafpl.steps.BindingProvider">BindingProvider</a></span>
-      </span>
-      
-      
-    </li><li name="com.jafpl.runtime.ExpressionEvaluator" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+              <ol><li name="com.jafpl.runtime.ExpressionEvaluator" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="ExpressionEvaluatorextendsAnyRef"></a><a id="ExpressionEvaluator:ExpressionEvaluator"></a>
       <span class="permalink">
       <a href="../../../com/jafpl/runtime/index.html#ExpressionEvaluatorextendsAnyRef" title="Permalink">
@@ -416,7 +392,7 @@ methods on those objects.</p></div><dl class="attributes block"> <dt>Definition 
       
       <p class="shortcomment cmt">Evaluate expressions (for variable bindings and the alternatives in a choose).</p><div class="fullcomment"><div class="comment cmt"><p>Evaluate expressions (for variable bindings and the alternatives in a choose).</p><p>The expression evaluator is responsible for taking the string form of an expression and evaluating it.
 The runtime is agnostic to the form of the expressions or their results. In order to support choose
-steps, it's necessary for the evaluator to be able to return a boolean result for an expression.</p><p>The evaluator may throw a <a href="../exceptions/PipelineException.html" class="extype" name="com.jafpl.exceptions.PipelineException">com.jafpl.exceptions.PipelineException</a> if the specified expression is
+steps, it's necessary for the evaluator to be able to return a boolean result for an expression.</p><p>The evaluator may throw a <a href="../exceptions/JafplException.html" class="extype" name="com.jafpl.exceptions.JafplException">com.jafpl.exceptions.JafplException</a> if the specified expression is
 invalid or, in the case of a request for a boolean, if it has no boolean value.</p></div></div>
     </li><li name="com.jafpl.runtime.GraphRuntime" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="GraphRuntimeextendsAnyRef"></a><a id="GraphRuntime:GraphRuntime"></a>

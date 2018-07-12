@@ -247,6 +247,12 @@ methods on those objects.</p></div><dl class="attributes block"> <dt>Definition 
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
+                        <a class="class" href="OptionBinding.html" title="An option binding."></a>
+                        <a href="OptionBinding.html" title="An option binding.">
+                          OptionBinding
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
                         <a class="class" href="TryCatchStart.html" title=""></a>
                         <a href="TryCatchStart.html" title="">
                           TryCatchStart
@@ -462,7 +468,7 @@ by the <code>step</code>.
       </span>
       
       <p class="shortcomment cmt">A variable binding.</p><div class="fullcomment"><div class="comment cmt"><p>A variable binding.</p><p>When pipelines are constructed, variable bindings associate expressions with variable names.
-At runtime, the association is between the name and its computed value.</p><p>Variables are lexically scoped.
+At runtime, the association is between the name and its computed value.
 </p></div></div>
     </li><li name="com.jafpl.graph.CatchStart" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="CatchStartextendsContainerStart"></a><a id="CatchStart:CatchStart"></a>
@@ -662,6 +668,28 @@ on <a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerS
       </span>
       
       
+    </li><li name="com.jafpl.graph.OptionBinding" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="OptionBindingextendsBinding"></a><a id="OptionBinding:OptionBinding"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/index.html#OptionBindingextendsBinding" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a title="An option binding." href="OptionBinding.html">
+              <span class="name">OptionBinding</span>
+            </a><span class="result"> extends <a href="Binding.html" class="extype" name="com.jafpl.graph.Binding">Binding</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">An option binding.</p><div class="fullcomment"><div class="comment cmt"><p>An option binding.</p><p>When pipelines are constructed, option bindings associate expressions with variable names.
+At runtime, the association is between the name and its computed value.</p><p>An <a href="OptionBinding.html" class="extype" name="com.jafpl.graph.OptionBinding">OptionBinding</a> is just like a <a href="Binding.html" class="extype" name="com.jafpl.graph.Binding">Binding</a> except that a specific, computed value may be
+provided before the graph begins executing. In that case, the provided value is used and the
+expression is not evaluated.
+</p></div></div>
     </li><li name="com.jafpl.graph.TryCatchStart" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="TryCatchStartextendsContainerStart"></a><a id="TryCatchStart:TryCatchStart"></a>
       <span class="permalink">

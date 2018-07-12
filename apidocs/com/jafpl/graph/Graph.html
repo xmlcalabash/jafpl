@@ -213,6 +213,12 @@ methods on those objects.</p></div><dl class="attributes block"> <dt>Definition 
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
+                        <a class="class" href="OptionBinding.html" title="An option binding."></a>
+                        <a href="OptionBinding.html" title="An option binding.">
+                          OptionBinding
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
                         <a class="class" href="TryCatchStart.html" title=""></a>
                         <a href="TryCatchStart.html" title="">
                           TryCatchStart
@@ -395,24 +401,6 @@ digits, hyphens, and underscores.
       
       <p class="shortcomment cmt">Adds an atomic step to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds an atomic step to the graph.
 </p></div><dl class="paramcmts block"><dt class="param">step</dt><dd class="cmt"><p>The step implementation.</p></dd><dt class="param">label</dt><dd class="cmt"><p>An optional, user-defined label.</p></dd><dt>returns</dt><dd class="cmt"><p>The constructed atomic.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
-    </li><li name="com.jafpl.graph.Graph#addBinding" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addBinding(name:String):com.jafpl.graph.Binding"></a><a id="addBinding(String):Binding"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addBinding(name:String):com.jafpl.graph.Binding" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">addBinding</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="Binding.html" class="extype" name="com.jafpl.graph.Binding">Binding</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">Add a graph variable binding.</p><div class="fullcomment"><div class="comment cmt"><p>Add a graph variable binding.</p><p>Graph variable bindings are named variables for which some input must be
-provided at runtime.
-</p></div><dl class="paramcmts block"><dt class="param">name</dt><dd class="cmt"><p>The variable name.</p></dd><dt>returns</dt><dd class="cmt"><p>The constructed binding.</p></dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addBindingEdge" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="addBindingEdge(from:com.jafpl.graph.Binding,to:com.jafpl.graph.Node):Unit"></a><a id="addBindingEdge(Binding,Node):Unit"></a>
       <span class="permalink">
@@ -655,6 +643,38 @@ ports into which data can be poured before the pipeline is run.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
+    </li><li name="com.jafpl.graph.Graph#addOption" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="addOption(name:String,expression:Any,options:Option[Any]):com.jafpl.graph.OptionBinding"></a><a id="addOption(String,Any,Option[Any]):OptionBinding"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addOption(name:String,expression:Any,options:Option[Any]):com.jafpl.graph.OptionBinding" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addOption</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Any">Any</span></span>, <span name="options">options: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <a href="OptionBinding.html" class="extype" name="com.jafpl.graph.OptionBinding">OptionBinding</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">FIXME: WRITE THIS</p><div class="fullcomment"><div class="comment cmt"><p>FIXME: WRITE THIS</p></div><dl class="paramcmts block"><dt class="param">name</dt><dd class="cmt"><p>The option name</p></dd><dt class="param">expression</dt><dd class="cmt"><p>The default initializer for the option</p></dd><dt class="param">options</dt><dd class="cmt"><p>Any implementation specific options you want to pass</p></dd><dt>returns</dt><dd class="cmt"><p>The binding</p></dd></dl></div>
+    </li><li name="com.jafpl.graph.Graph#addOption" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="addOption(name:String,expression:Any):com.jafpl.graph.OptionBinding"></a><a id="addOption(String,Any):OptionBinding"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addOption(name:String,expression:Any):com.jafpl.graph.OptionBinding" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addOption</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <a href="OptionBinding.html" class="extype" name="com.jafpl.graph.OptionBinding">OptionBinding</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">FIXME: WRITE THIS</p><div class="fullcomment"><div class="comment cmt"><p>FIXME: WRITE THIS</p></div><dl class="paramcmts block"><dt class="param">name</dt><dd class="cmt"><p>The option name</p></dd><dt class="param">expression</dt><dd class="cmt"><p>The default initializer for the option</p></dd><dt>returns</dt><dd class="cmt"><p>The binding</p></dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addOrderedEdge" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="addOrderedEdge(from:com.jafpl.graph.Node,fromName:String,to:com.jafpl.graph.Node,toName:String):Unit"></a><a id="addOrderedEdge(Node,String,Node,String):Unit"></a>
       <span class="permalink">

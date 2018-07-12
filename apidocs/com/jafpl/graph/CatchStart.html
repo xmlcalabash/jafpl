@@ -213,6 +213,12 @@ methods on those objects.</p></div><dl class="attributes block"> <dt>Definition 
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
+                        <a class="class" href="OptionBinding.html" title="An option binding."></a>
+                        <a href="OptionBinding.html" title="An option binding.">
+                          OptionBinding
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
                         <a class="class" href="TryCatchStart.html" title=""></a>
                         <a href="TryCatchStart.html" title="">
                           TryCatchStart
@@ -734,6 +740,45 @@ methods on those objects.</p></div><dl class="attributes block"> <dt>Definition 
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd><dt>Definition Classes</dt><dd><a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">ContainerStart</a></dd></dl></div>
+    </li><li name="com.jafpl.graph.ContainerStart#addOption" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="addOption(name:String,expression:Any,options:Any):com.jafpl.graph.Binding"></a><a id="addOption(String,Any,Any):Binding"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/CatchStart.html#addOption(name:String,expression:Any,options:Any):com.jafpl.graph.Binding" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addOption</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Any">Any</span></span>, <span name="options">options: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <a href="Binding.html" class="extype" name="com.jafpl.graph.Binding">Binding</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">ContainerStart</a></dd></dl></div>
+    </li><li name="com.jafpl.graph.ContainerStart#addOption" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="addOption(name:String,expression:Any):com.jafpl.graph.Binding"></a><a id="addOption(String,Any):Binding"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/CatchStart.html#addOption(name:String,expression:Any):com.jafpl.graph.Binding" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addOption</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <a href="Binding.html" class="extype" name="com.jafpl.graph.Binding">Binding</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">Add a option to this container.</p><div class="fullcomment"><div class="comment cmt"><p>Add a option to this container.</p><p>This method inserts an option binding into the container. This binding is
+effectively the source of a options's value. Other steps may connect to this
+binding in order to read its computed value at runtime.</p><p>Option bindings consist of a name and an expression. The name and expression are
+arbitrary. At runtime the <a href="../runtime/ExpressionEvaluator.html" class="extype" name="com.jafpl.runtime.ExpressionEvaluator">com.jafpl.runtime.ExpressionEvaluator</a> provided as
+part of the <a href="../runtime/GraphRuntime.html" class="extype" name="com.jafpl.runtime.GraphRuntime">com.jafpl.runtime.GraphRuntime</a> must understand how to evaluate
+the expression.</p><p>Unlike a variable, an option value can be supplied at runtime which will
+be used *instead* of evaluating the expression.</p><p>At runtime, the computed values are provided to steps through binding edges.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The node added.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">ContainerStart</a></dd></dl></div>
     </li><li name="com.jafpl.graph.Node#addOutputInjectable" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="addOutputInjectable(injectable:com.jafpl.injection.PortInjectable):Unit"></a><a id="addOutputInjectable(PortInjectable):Unit"></a>
       <span class="permalink">

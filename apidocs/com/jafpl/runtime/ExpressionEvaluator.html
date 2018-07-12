@@ -132,12 +132,6 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       <p class="shortcomment cmt">The graph runtime APIs.</p><div class="fullcomment"><div class="comment cmt"><p>The graph runtime APIs.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.jafpl">jafpl</a></dd></dl></div>
     </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="class" href="BindingProxy.html" title=""></a>
-                        <a href="BindingProxy.html" title="">
-                          BindingProxy
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
                         <a class="trait" href="" title="Evaluate expressions (for variable bindings and the alternatives in a choose)."></a>
                         <a href="" title="Evaluate expressions (for variable bindings and the alternatives in a choose).">
                           ExpressionEvaluator
@@ -202,7 +196,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Evaluate expressions (for variable bindings and the alternatives in a choose).</p><p>The expression evaluator is responsible for taking the string form of an expression and evaluating it.
 The runtime is agnostic to the form of the expressions or their results. In order to support choose
-steps, it's necessary for the evaluator to be able to return a boolean result for an expression.</p><p>The evaluator may throw a <a href="../exceptions/PipelineException.html" class="extype" name="com.jafpl.exceptions.PipelineException">com.jafpl.exceptions.PipelineException</a> if the specified expression is
+steps, it's necessary for the evaluator to be able to return a boolean result for an expression.</p><p>The evaluator may throw a <a href="../exceptions/JafplException.html" class="extype" name="com.jafpl.exceptions.JafplException">com.jafpl.exceptions.JafplException</a> if the specified expression is
 invalid or, in the case of a request for a boolean, if it has no boolean value.</p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
@@ -292,6 +286,22 @@ invalid or, in the case of a request for a boolean, if it has no boolean value.<
       <p class="shortcomment cmt">Obtain a new instance of the expression evaluator.</p><div class="fullcomment"><div class="comment cmt"><p>Obtain a new instance of the expression evaluator.</p><p>If the evalauator is reentrant then it can simply return itself. However, if it has local state,
 then it must return a new instance ready to evaluate an expression.
 </p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>An instance of itself.</p></dd></dl></div>
+    </li><li name="com.jafpl.runtime.ExpressionEvaluator#precomputedValue" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="precomputedValue(expr:Any,value:Any,context:List[com.jafpl.messages.Message],bindings:Map[String,com.jafpl.messages.Message],options:Option[Any]):com.jafpl.messages.Message"></a><a id="precomputedValue(Any,Any,List[Message],Map[String,Message],Option[Any]):Message"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#precomputedValue(expr:Any,value:Any,context:List[com.jafpl.messages.Message],bindings:Map[String,com.jafpl.messages.Message],options:Option[Any]):com.jafpl.messages.Message" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">precomputedValue</span><span class="params">(<span name="expr">expr: <span class="extype" name="scala.Any">Any</span></span>, <span name="value">value: <span class="extype" name="scala.Any">Any</span></span>, <span name="context">context: <span class="extype" name="scala.List">List</span>[<a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a>]</span>, <span name="bindings">bindings: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a>]</span>, <span name="options">options: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a></span>
+      </span>
+      
+      
     </li><li name="com.jafpl.runtime.ExpressionEvaluator#singletonValue" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="singletonValue(expr:Any,context:List[com.jafpl.messages.Message],bindings:Map[String,com.jafpl.messages.Message],options:Option[Any]):com.jafpl.messages.Message"></a><a id="singletonValue(Any,List[Message],Map[String,Message],Option[Any]):Message"></a>
       <span class="permalink">
