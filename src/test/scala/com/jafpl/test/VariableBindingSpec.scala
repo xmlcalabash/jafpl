@@ -49,10 +49,6 @@ class VariableBindingSpec extends FlatSpec {
 
     graph.close()
 
-    val pw = new PrintWriter(new File("/projects/github/xproc/jafpl/pg.xml"))
-    pw.write(graph.asXML.toString)
-    pw.close()
-
     val runtime = new GraphRuntime(graph, runtimeConfig)
 
     runtime.setOption("fred", "hello world")
