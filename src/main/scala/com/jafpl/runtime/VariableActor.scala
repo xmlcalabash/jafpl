@@ -85,13 +85,11 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
   }
 
   private def computedValue(value: Any): Unit = {
+    // If a precomputed value is provided, it wins. Note that the caller is responsible
+    // for dealing with static vs. dynamic values in this case.
     try {
       val expreval = runtime.runtime.expressionEvaluator.newInstance()
-      val answer = if (binding.staticValue.isDefined) {
-        binding.staticValue.get.asInstanceOf[Message]
-      } else {
-        expreval.precomputedValue(binding.expression, value, exprContext.toList, bindings.toMap, binding.options)
-      }
+      val answer = expreval.precomputedValue(binding.expression, value, exprContext.toList, bindings.toMap, binding.options)
 
       val msg = new BindingMessage(binding.name, answer)
       monitor ! GOutput(binding, "result", msg)
