@@ -306,9 +306,9 @@ expression is not evaluated.
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.jafpl.graph.OptionBinding#&lt;init&gt;" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(graph:com.jafpl.graph.Graph,name:String,expression:Any,options:Option[Any]):com.jafpl.graph.OptionBinding"></a><a id="&lt;init&gt;:OptionBinding"></a>
+      <a id="&lt;init&gt;(graph:com.jafpl.graph.Graph,name:String,expression:Any,staticValue:Option[Any],options:Option[Any]):com.jafpl.graph.OptionBinding"></a><a id="&lt;init&gt;:OptionBinding"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/OptionBinding.html#&lt;init&gt;(graph:com.jafpl.graph.Graph,name:String,expression:Any,options:Option[Any]):com.jafpl.graph.OptionBinding" title="Permalink">
+      <a href="../../../com/jafpl/graph/OptionBinding.html#&lt;init&gt;(graph:com.jafpl.graph.Graph,name:String,expression:Any,staticValue:Option[Any],options:Option[Any]):com.jafpl.graph.OptionBinding" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -317,7 +317,7 @@ expression is not evaluated.
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">OptionBinding</span><span class="params">(<span name="graph">graph: <a href="Graph.html" class="extype" name="com.jafpl.graph.Graph">Graph</a></span>, <span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Any">Any</span></span>, <span name="options">options: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span>
+        <span class="name">OptionBinding</span><span class="params">(<span name="graph">graph: <a href="Graph.html" class="extype" name="com.jafpl.graph.Graph">Graph</a></span>, <span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Any">Any</span></span>, <span name="staticValue">staticValue: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>, <span name="options">options: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span>
       </span>
       
       <p class="shortcomment cmt">Use the <code>addBinding()</code> method on <a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">com.jafpl.graph.ContainerStart</a> to construct a binding.</p><div class="fullcomment"><div class="comment cmt"><p>Use the <code>addBinding()</code> method on <a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">com.jafpl.graph.ContainerStart</a> to construct a binding.</p></div><dl class="paramcmts block"><dt class="param">graph</dt><dd class="cmt"><p>The graph into which this node is to be inserted.</p></dd><dt class="param">name</dt><dd class="cmt"><p>The variable's name</p></dd><dt class="param">expression</dt><dd class="cmt"><p>Its initializer expression</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../index.html" class="extype" name="com.jafpl">com.jafpl</a>] </dd></dl></div>
@@ -1042,6 +1042,22 @@ node is always appended to the label.</p></div><dl class="attributes block"> <dt
       
       <p class="shortcomment cmt">This node's parent.</p><div class="fullcomment"><div class="comment cmt"><p>This node's parent.
 </p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>This node's parent.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
+    </li><li name="com.jafpl.graph.OptionBinding#staticValue" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="staticValue:Option[Any]"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/OptionBinding.html#staticValue:Option[Any]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">staticValue</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.graph.OptionBinding">OptionBinding</a> → <a href="Binding.html" class="extype" name="com.jafpl.graph.Binding">Binding</a></dd></dl></div>
     </li><li name="com.jafpl.graph.Node#step" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="step:Option[com.jafpl.steps.Step]"></a><a id="step:Option[Step]"></a>
       <span class="permalink">
