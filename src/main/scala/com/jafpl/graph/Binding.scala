@@ -13,6 +13,7 @@ package com.jafpl.graph
 class Binding protected[jafpl] (override val graph: Graph,
                                 val name: String,
                                 val expression: Any,
+                                val staticValue: Option[Any],
                                 val options: Option[Any])
   extends Node(graph, None, None) {
 

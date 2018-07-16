@@ -17,8 +17,9 @@ package com.jafpl.graph
 class OptionBinding protected[jafpl](override val graph: Graph,
                                      override val name: String,
                                      override val expression: Any,
+                                     override val staticValue: Option[Any],
                                      override val options: Option[Any])
-  extends Binding(graph, name, expression, options) {
+  extends Binding(graph, name, expression, staticValue, options) {
 
   var _value: Option[Any] = None
 

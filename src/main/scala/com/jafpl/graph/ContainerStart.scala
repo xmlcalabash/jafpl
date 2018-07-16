@@ -329,13 +329,19 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * @return The node added.
     */
   def addVariable(name: String, expression: Any): Binding = {
-    val binding = graph.addVariable(name, expression, None)
+    val binding = graph.addVariable(name, expression, None, None)
     addChild(binding)
     binding
   }
 
-  def addVariable(name: String, expression: Any, options: Any): Binding = {
-    val binding = graph.addVariable(name, expression, Some(options))
+  def addVariable(name: String, expression: Any, staticValue: Option[Any]): Binding = {
+    val binding = graph.addVariable(name, expression, staticValue, None)
+    addChild(binding)
+    binding
+  }
+
+  def addVariable(name: String, expression: Any, staticValue: Option[Any], options: Any): Binding = {
+    val binding = graph.addVariable(name, expression, staticValue, Some(options))
     addChild(binding)
     binding
   }

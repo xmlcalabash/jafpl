@@ -68,7 +68,11 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
   private def computeValue(): Unit = {
     try {
       val expreval = runtime.runtime.expressionEvaluator.newInstance()
-      val answer = expreval.value(binding.expression, exprContext.toList, bindings.toMap, binding.options)
+      val answer = if (binding.staticValue.isDefined) {
+        binding.staticValue.get.asInstanceOf[Message]
+      } else {
+        expreval.value(binding.expression, exprContext.toList, bindings.toMap, binding.options)
+      }
 
       val msg = new BindingMessage(binding.name, answer)
       monitor ! GOutput(binding, "result", msg)

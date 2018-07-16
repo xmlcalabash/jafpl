@@ -4,6 +4,7 @@ import java.io.{File, PrintWriter}
 
 import com.jafpl.config.Jafpl
 import com.jafpl.io.BufferConsumer
+import com.jafpl.messages.{ItemMessage, Metadata}
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.ProduceBinding
@@ -59,6 +60,30 @@ class VariableBindingSpec extends FlatSpec {
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "hello world")
+  }
+
+  "A static variable binding " should " work" in {
+    val graph    = Jafpl.newInstance().newGraph()
+    val pipeline = graph.addPipeline()
+
+    val static   = new ItemMessage("static", Metadata.STRING)
+    val bind     = pipeline.addVariable("fred", "some value", Some(static))
+    val prodbind = pipeline.addAtomic(new ProduceBinding("fred"), "pb")
+
+    graph.addBindingEdge(bind, prodbind)
+    graph.addEdge(prodbind, "result", pipeline, "result")
+
+    graph.addOutput(pipeline, "result")
+
+    graph.close()
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+    val bc = new BufferConsumer()
+    runtime.outputs("result").setConsumer(bc)
+    runtime.run()
+
+    assert(bc.items.size == 1)
+    assert(bc.items.head == "static")
   }
 
   "An unreferenced unbound variable " should " be fine" in {

@@ -151,21 +151,33 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     * @return The binding
     */
   def addOption(name: String, expression: Any): OptionBinding = {
-    addOption(name, expression, None)
+    addOption(name, expression, None, None)
   }
 
   /**
     * FIXME: WRITE THIS
     * @param name The option name
     * @param expression The default initializer for the option
+    * @param staticValue The statically computed value for the option
+    * @return The binding
+    */
+  def addOption(name: String, expression: Any, staticValue: Option[Any]): OptionBinding = {
+    addOption(name, expression, staticValue, None)
+  }
+
+  /**
+    * FIXME: WRITE THIS
+    * @param name The option name
+    * @param expression The default initializer for the option
+    * @param staticValue The statically computed value for the option
     * @param options Any implementation specific options you want to pass
     * @return The binding
     */
-  def addOption(name: String, expression: Any, options: Option[Any]): OptionBinding = {
+  def addOption(name: String, expression: Any, staticValue: Option[Any], options: Option[Any]): OptionBinding = {
     checkOpen()
     logger.debug("addOption {} {}", name, expression)
 
-    val binding = new OptionBinding(this, name, expression, options)
+    val binding = new OptionBinding(this, name, expression, staticValue, options)
     _nodes += binding
     binding
   }
@@ -459,12 +471,12 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     node
   }
 
-  protected[graph] def addVariable(name: String, expression: Any, options: Option[Any]): Binding = {
+  protected[graph] def addVariable(name: String, expression: Any, staticValue: Option[Any], options: Option[Any]): Binding = {
     checkOpen()
 
-    logger.debug("addVariable {} {}", name, expression)
+    logger.debug(s"addVariable $name, $expression, $staticValue")
 
-    val binding = new Binding(this, name, expression, options)
+    val binding = new Binding(this, name, expression, staticValue, options)
     _nodes += binding
     binding
   }
