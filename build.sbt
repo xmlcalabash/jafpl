@@ -1,10 +1,9 @@
 name := "jafpl"
 
 organization := "com.jafpl"
-version      := "0.0.53"
-scalaVersion := "2.12.3"
-
-resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
+homepage     := Some(url("https://github.com/ndw/jafpl"))
+version      := "0.0.54"
+scalaVersion := "2.12.6"
 
 libraryDependencies ++= Seq(
   "org.apache.logging.log4j" % "log4j-api" % "2.11.0",
@@ -29,5 +28,6 @@ scalacOptions in (Compile, doc) ++= Seq(
   "-no-link-warnings"
 )
 
+// I'm publishing the informal pre-release builds on my own repo
 publishTo := Some(Resolver.file("file",
-  new File(Path.userHome.absolutePath+"/.m2/repository")))
+  new File("/space/websites/nwalsh.com/build/website/maven/repo")))
