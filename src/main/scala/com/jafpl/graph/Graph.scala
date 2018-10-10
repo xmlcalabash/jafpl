@@ -536,34 +536,6 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       edge = Some(new Edge(this, from, fromName, to, toName, mode))
       _edges += edge.get
     }
-    /*
-    if (true) {
-        ... stuff above ...
-    } else {
-      // If `from` is a child of `to`, then we really mean to write to the end of the container
-      val ancestor = commonAncestor(from, to)
-      if (ancestor.isDefined && ancestor.get == to) {
-        val edge = new Edge(this, from, fromName, to.asInstanceOf[ContainerStart].containerEnd, toName, mode)
-        _edges += edge
-      } else {
-        // If `from` isn't a container or if `to` is a child of from, then read from the start
-        from match {
-          case start: ContainerStart =>
-            if (ancestor.isDefined && ancestor.get == from) {
-              val edge = new Edge(this, from, fromName, to, toName, mode)
-              _edges += edge
-            } else {
-              // Otherwise, read from the end
-              val edge = new Edge(this, start.containerEnd, fromName, to, toName, mode)
-              _edges += edge
-            }
-          case _ =>
-            val edge = new Edge(this, from, fromName, to, toName, mode)
-            _edges += edge
-        }
-      }
-    }
-    */
 
     if (mode == JoinMode.PRIORITY) {
       if (edgesTo(edge.get.to, edge.get.toPort).length > 1) {
