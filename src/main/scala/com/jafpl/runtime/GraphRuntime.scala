@@ -10,6 +10,7 @@ import com.jafpl.util.{DeadLetterListener, DefaultTraceEventManager, TraceEventM
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 /** Execute a pipeline.
   *
@@ -26,6 +27,7 @@ import scala.collection.mutable
   */
 class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   protected[jafpl] val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private val actorList = ListBuffer.empty[ActorRef]
   private var _system: ActorSystem = _
   private var _monitor: ActorRef = _
   private var reaper: ActorRef = _
@@ -44,7 +46,15 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
     throw JafplException.invalidGraph()
   }
 
-  makeActors()
+  try {
+    makeActors()
+  } catch {
+    case ex: Exception =>
+      for (actor <- actorList) {
+        _system.stop(actor)
+      }
+      throw ex
+  }
 
   def traceEventManager: TraceEventManager = _traceEventManager
   def traceEventManager_=(manager: TraceEventManager): Unit = {
@@ -280,6 +290,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
           throw JafplException.unexpecteStepType(node.toString, node.location)
       }
 
+      actorList += actor
       reaper ! WatchMe(actor)
       _monitor ! GNode(node, actor)
     }
