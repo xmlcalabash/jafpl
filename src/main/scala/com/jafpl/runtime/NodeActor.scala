@@ -55,7 +55,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
 
   protected def trace(level: String, message: String, event: String): Unit = {
     // We don't use the traceEventManager.trace() call because we want to use the Akka logger
-    if (true|| runtime.traceEventManager.traceEnabled(event)) {
+    if (runtime.traceEventManager.traceEnabled(event)) {
       level match {
         case "info" => log.info(message)
         case "debug" => log.debug(message)
