@@ -1,7 +1,6 @@
 package com.jafpl.test
 
 import com.jafpl.config.Jafpl
-import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
 import com.jafpl.messages.{ItemMessage, Metadata}
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration

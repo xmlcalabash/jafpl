@@ -4,7 +4,7 @@ import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.JafplException
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, Identity, Manifold, Producer, Sink, Sleep}
+import com.jafpl.steps.{BufferSink, Manifold, Producer}
 import org.scalatest.FlatSpec
 
 class JoinerSpec extends FlatSpec {

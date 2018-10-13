@@ -2,7 +2,6 @@ package com.jafpl.test
 
 import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.JafplException
-import com.jafpl.graph.Graph
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{BufferSink, Identity, Manifold, Producer}

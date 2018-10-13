@@ -1,9 +1,7 @@
 package com.jafpl.test
 
 import com.jafpl.config.Jafpl
-import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
-import com.jafpl.messages.Metadata
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{Identity, Manifold, Producer}
