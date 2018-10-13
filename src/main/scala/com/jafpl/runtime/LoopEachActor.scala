@@ -94,26 +94,17 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
 
     if (sourceClosed && queue.isEmpty) {
       trace(s"FINISH ForEach: $node $sourceClosed, ${queue.isEmpty}", "ForEach")
+
+      checkCardinalities("current")
+
       // now close the outputs
       for (output <- node.outputs) {
-        if (!output.startsWith("#") && output != "current") {
-          val count = node.outputCardinalities.getOrElse(output, 0L)
-          val ospec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
-          try {
-            ospec.outputSpec.checkCardinality(output, count)
-          } catch {
-            case jex: JafplException =>
-              trace(s"FINISH ForEach cardinality error on $output", "ForEach")
-              monitor ! GException(Some(node), jex)
-          }
-        }
         if (!node.inputs.contains(output)) {
           monitor ! GClose(node, output)
         }
       }
+
       trace(s"RSTCRD $node", "Cardinality")
-      node.inputCardinalities.clear()
-      node.outputCardinalities.clear()
       monitor ! GFinished(node)
       commonFinished()
     } else {

@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{LoopWhileStart, Node}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
-import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
+import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GRestartLoop, GStart}
 import com.jafpl.steps.DataConsumer
 
 import scala.collection.mutable
@@ -28,6 +28,15 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
 
   override protected def reset(): Unit = {
     super.reset()
+    running = false
+    readyToRun = true
+    looped = false
+    runIfReady()
+  }
+
+  protected[runtime] def restartLoop(): Unit = {
+    trace(s"MRELOOP $node", "Methods")
+    super.reset() // yes, reset
     running = false
     readyToRun = true
     looped = false
@@ -98,8 +107,10 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
     trace(s"CHKWHILE condition: $pass: ${currentItem.head}", "While")
 
     if (pass) {
-      monitor ! GReset(node)
+      monitor ! GRestartLoop(node)
     } else {
+      checkCardinalities("current")
+
       monitor ! GOutput(node, "result", currentItem.head)
       // now close the outputs
       for (output <- node.outputs) {

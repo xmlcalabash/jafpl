@@ -77,9 +77,17 @@ private[runtime] class StartActor(private val monitor: ActorRef,
     }
   }
 
-  protected[runtime] def finished(): Unit = {
-    for (output <- node.outputs) {
-      if (!output.startsWith("#")) {
+  protected[runtime] def checkCardinalities(): Unit = {
+    checkCardinalities(List.empty[String])
+  }
+
+  protected[runtime] def checkCardinalities(exclude: String): Unit = {
+    checkCardinalities(List(exclude))
+  }
+
+  protected[runtime] def checkCardinalities(exclude: List[String]): Unit = {
+    for (output <- node.outputs.filter(!_.startsWith("#"))) {
+      if (!exclude.contains(output)) {
         val count = node.outputCardinalities.getOrElse(output, 0L)
         val ospec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
         try {
@@ -90,7 +98,14 @@ private[runtime] class StartActor(private val monitor: ActorRef,
             monitor ! GException(Some(node), jex)
         }
       }
+    }
+    node.inputCardinalities.clear()
+    node.outputCardinalities.clear()
+  }
 
+  protected[runtime] def finished(): Unit = {
+    checkCardinalities()
+    for (output <- node.outputs) {
       monitor ! GClose(node, output)
     }
     monitor ! GFinished(node)

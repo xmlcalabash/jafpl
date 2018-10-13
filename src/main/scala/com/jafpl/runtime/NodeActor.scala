@@ -215,7 +215,6 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       }
       bufferedInput.clear()
     }
-    trace(s"Closing $port for $node", "Cardinalities")
 
     // We buffer inputs so that all #bindings are delivered before all other documents
     // That means we can't check cardinalities on close, we have to wait until any
@@ -225,7 +224,6 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       if (node.step.get.inputSpec != PortSpecification.ANY) {
         for (port <- node.step.get.inputSpec.ports.filter(_ != "*")) {
           try {
-            trace(s"Check cardinality of $port for $node", "Cardinalities")
             val count = node.inputCardinalities.getOrElse(port, 0L)
             val ispec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
             ispec.inputSpec.checkCardinality(port, count)
@@ -373,8 +371,10 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     case NRestartLoop() =>
       trace(s"RSETLOOP $node", "StepMessages")
       this match {
-        case loopEach: LoopEachActor =>
-          loopEach.restartLoop()
+        case loop: LoopEachActor => loop.restartLoop()
+        case loop: LoopForActor => loop.restartLoop()
+        case loop: LoopUntilActor => loop.restartLoop()
+        case loop: LoopWhileActor => loop.restartLoop()
         case _ =>
           monitor ! GException(None, JafplException.internalError(s"Attempt to restart non-loop $node", node.location))
       }

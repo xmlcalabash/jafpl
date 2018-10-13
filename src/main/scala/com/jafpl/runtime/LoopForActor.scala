@@ -3,11 +3,10 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{LoopForStart, Node}
-import com.jafpl.messages.{BindingMessage, ItemMessage, Message, Metadata}
-import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
+import com.jafpl.messages.{ItemMessage, Message, Metadata}
+import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput, GRestartLoop, GStart}
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
 private[runtime] class LoopForActor(private val monitor: ActorRef,
                                     private val runtime: GraphRuntime,
@@ -26,6 +25,15 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
 
   override protected def reset(): Unit = {
     super.reset()
+    running = false
+    readyToRun = true
+    looped = false
+    runIfReady()
+  }
+
+  protected[runtime] def restartLoop(): Unit = {
+    trace(s"MRELOOP $node", "Methods")
+    super.reset() // yes, reset
     running = false
     readyToRun = true
     looped = false
@@ -86,10 +94,10 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
     trace(s"CHKFLOOP condition: $pass: $current", "ForLoop")
 
     if (pass) {
-      //monitor ! GOutput(node, "test", new ItemMessage(current, Metadata.NUMBER))
-      //monitor ! GClose(node, "test")
-      monitor ! GReset(node)
+      monitor ! GRestartLoop(node)
     } else {
+      checkCardinalities("current")
+
       // now close the outputs
       for (output <- node.outputs) {
         if (!node.inputs.contains(output)) {
