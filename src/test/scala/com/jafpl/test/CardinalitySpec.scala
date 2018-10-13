@@ -4,7 +4,7 @@ import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.JafplException
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, Identity, LiesAboutOutputBindings, Manifold, PortCardinality, Producer}
+import com.jafpl.steps.{BufferSink, Identity, LiesAboutOutputBindings, Manifold, PortCardinality, Producer, Sink}
 import org.scalatest.FlatSpec
 
 class CardinalitySpec extends FlatSpec {
@@ -59,7 +59,7 @@ class CardinalitySpec extends FlatSpec {
     assert(pass)
   }
 
-  "Cardinalities " should " be enforced on group" in {
+  "Cardinality overflow " should " be enforced on group" in {
     val graph    = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
@@ -71,6 +71,34 @@ class CardinalitySpec extends FlatSpec {
 
     graph.addEdge(p1, "result", ident, "source")
     graph.addEdge(ident, "result", group, "result")
+    graph.addEdge(group, "result", pipeline, "result")
+    graph.addEdge(pipeline, "result", consumer, "source")
+
+    var pass = false
+    try {
+      val runtime = new GraphRuntime(graph, runtimeConfig)
+      runtime.run()
+    } catch {
+      case jafpl: JafplException =>
+        pass = jafpl.code == JafplException.CARDINALITY_ERROR
+    }
+
+    assert(pass)
+  }
+
+  "Cardinality underflow " should " be enforced on group" in {
+    val graph    = Jafpl.newInstance().newGraph()
+    val bc = new BufferSink()
+
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
+    val p1       = pipeline.addAtomic(new Producer(List("P1", "P2", "P3")), "producer")
+    val group    = pipeline.addGroup(oneOutput)
+    val ident    = group.addAtomic(new Identity(), "identity")
+    val sink     = group.addAtomic(new Sink(), "sink")
+    val consumer = pipeline.addAtomic(bc, "consumer")
+
+    graph.addEdge(p1, "result", ident, "source")
+    graph.addEdge(ident, "result", sink, "source")
     graph.addEdge(group, "result", pipeline, "result")
     graph.addEdge(pipeline, "result", consumer, "source")
 
