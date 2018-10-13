@@ -7,7 +7,7 @@ import com.jafpl.io.BufferConsumer
 import com.jafpl.messages.{ItemMessage, Metadata}
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.ProduceBinding
+import com.jafpl.steps.{Manifold, ProduceBinding}
 import org.scalatest.FlatSpec
 
 class VariableBindingSpec extends FlatSpec {
@@ -15,7 +15,7 @@ class VariableBindingSpec extends FlatSpec {
 
   "A variable binding " should " work" in {
     val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
 
     val bind     = pipeline.addVariable("fred", "some value")
     val prodbind = pipeline.addAtomic(new ProduceBinding("fred"), "pb")
@@ -38,7 +38,7 @@ class VariableBindingSpec extends FlatSpec {
 
   "A variable binding provided by the runtime " should " also work" in {
     val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
 
     val bind     = pipeline.addOption("fred", "some")
     val prodbind = pipeline.addAtomic(new ProduceBinding("fred"), "pb")
@@ -64,7 +64,7 @@ class VariableBindingSpec extends FlatSpec {
 
   "A static variable binding " should " work" in {
     val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
 
     val static   = new ItemMessage("static", Metadata.STRING)
     val bind     = pipeline.addVariable("fred", "some value", Some(static))
@@ -88,7 +88,7 @@ class VariableBindingSpec extends FlatSpec {
 
   "An unreferenced unbound variable " should " be fine" in {
     val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
 
     val bind_a   = pipeline.addOption("a", "")
     val bind_b   = pipeline.addOption("b", "")
@@ -120,7 +120,7 @@ class VariableBindingSpec extends FlatSpec {
 
   "Intermediate variables " should " be computed" in {
     val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
 
     val bind     = pipeline.addOption("a", "")
 

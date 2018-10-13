@@ -1,5 +1,9 @@
 package com.jafpl.graph
 
+import com.jafpl.steps.PortCardinality
+
+import scala.collection.mutable
+
 /** A looping container.
   *
   * Loops need buffers when they read from steps outside the loop.

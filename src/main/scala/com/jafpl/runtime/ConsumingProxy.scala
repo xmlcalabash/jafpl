@@ -11,21 +11,10 @@ import scala.collection.mutable
 private[runtime] class ConsumingProxy(private val monitor: ActorRef,
                                       private val runtime: GraphRuntime,
                                       private val node: Node) extends DataConsumer {
-  protected val cardinalities = mutable.HashMap.empty[String, Long]
-
   override def id: String = node.id
 
   override def receive(port: String, message: Message): Unit = {
-    val card = cardinalities.getOrElse(port, 0L) + 1L
-    cardinalities.put(port, card)
+    node.outputCardinalities.put(port, node.outputCardinalities.getOrElse(port, 0L) + 1)
     monitor ! GOutput(node, port, message)
-  }
-
-  def reset(): Unit = {
-    cardinalities.clear()
-  }
-
-  def cardinality(port: String): Long = {
-    cardinalities.getOrElse(port, 0L)
   }
 }

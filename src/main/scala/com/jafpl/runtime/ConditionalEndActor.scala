@@ -40,6 +40,7 @@ private[runtime] class ConditionalEndActor(private val monitor: ActorRef,
       if (openInputs.isEmpty && unfinishedChildren.isEmpty) {
         for (port <- buffer.keySet) {
           for (item <- buffer(port)) {
+            node.start.get.outputCardinalities.put(port, node.start.get.outputCardinalities.getOrElse(port, 0L) + 1)
             monitor ! GOutput(node.start.get, port, item)
           }
         }

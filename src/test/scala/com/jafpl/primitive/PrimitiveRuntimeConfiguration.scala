@@ -1,8 +1,6 @@
 package com.jafpl.primitive
 
-import com.jafpl.messages.Message
 import com.jafpl.runtime.{ExpressionEvaluator, RuntimeConfiguration}
-import com.jafpl.steps.DataConsumer
 
 import scala.collection.mutable
 

@@ -5,7 +5,7 @@ import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.{PrimitiveItemComparator, PrimitiveRuntimeConfiguration}
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{Decrement, Producer}
+import com.jafpl.steps.{Decrement, Manifold, Producer}
 import org.scalatest.FlatSpec
 
 class UntilSpec extends FlatSpec {
@@ -13,12 +13,12 @@ class UntilSpec extends FlatSpec {
 
   "An until " should " iterate until finished" in {
     val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1       = pipeline.addAtomic(new Producer(List(7)), "p1")
 
     val comp = new PrimitiveItemComparator()
 
-    val ustep    = pipeline.addUntil(comp)
+    val ustep    = pipeline.addUntil(comp, Manifold.ALLOW_ANY)
     val decr     = ustep.addAtomic(new Decrement(), "decr")
 
     graph.addEdge(p1, "result", ustep, "source")
@@ -42,12 +42,12 @@ class UntilSpec extends FlatSpec {
 
   "An until " should " require a test" in {
     val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1       = pipeline.addAtomic(new Producer(List(7)), "p1")
 
     val comp = new PrimitiveItemComparator()
 
-    val ustep    = pipeline.addUntil(comp)
+    val ustep    = pipeline.addUntil(comp, Manifold.ALLOW_ANY)
     val decr     = ustep.addAtomic(new Decrement(), "decr")
 
     graph.addEdge(p1, "result", ustep, "source")
@@ -70,12 +70,12 @@ class UntilSpec extends FlatSpec {
 
   "An until " should " iterate at least once" in {
     val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1       = pipeline.addAtomic(new Producer(List(0)), "p1")
 
     val comp = new PrimitiveItemComparator()
 
-    val ustep    = pipeline.addUntil(comp)
+    val ustep    = pipeline.addUntil(comp, Manifold.ALLOW_ANY)
     val decr     = ustep.addAtomic(new Decrement(), "decr")
 
     graph.addEdge(p1, "result", ustep, "source")

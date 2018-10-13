@@ -5,7 +5,7 @@ import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, Count, Identity, Producer, Sink}
+import com.jafpl.steps.{BufferSink, Count, Identity, Manifold, Producer, Sink}
 import org.scalatest.FlatSpec
 
 class ForLoopSpec extends FlatSpec {
@@ -15,8 +15,8 @@ class ForLoopSpec extends FlatSpec {
 
   it should "iterate up" in {
     val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline("mypipe")
-    val forloop  = pipeline.addFor("loop", 1, 10)
+    val pipeline = graph.addPipeline("mypipe", Manifold.ALLOW_ANY)
+    val forloop  = pipeline.addFor("loop", 1, 10, Manifold.ALLOW_ANY)
     val ident = forloop.addAtomic(new Identity(), "ident")
 
     graph.addEdge(forloop, "current", ident, "source")
@@ -42,8 +42,8 @@ class ForLoopSpec extends FlatSpec {
 
   it should "iterate down" in {
     val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline("mypipe")
-    val forloop  = pipeline.addFor("loop", 20, 1, -2)
+    val pipeline = graph.addPipeline("mypipe", Manifold.ALLOW_ANY)
+    val forloop  = pipeline.addFor("loop", 20, 1, -2, Manifold.ALLOW_ANY)
     val ident = forloop.addAtomic(new Identity(), "ident")
 
     graph.addEdge(forloop, "current", ident, "source")

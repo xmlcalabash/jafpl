@@ -4,8 +4,8 @@ import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{LoopEachStart, Node}
 import com.jafpl.messages.{ItemMessage, Message, Metadata}
-import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GStart}
-import com.jafpl.steps.DataConsumer
+import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GRestartLoop, GStart}
+import com.jafpl.steps.{DataConsumer, Manifold}
 
 import scala.collection.mutable.ListBuffer
 
@@ -19,12 +19,24 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
   private var sourceClosed = false
 
   override protected def start(): Unit = {
+    trace(s"MSTART $node", "Methods")
+    running = false
     commonStart()
     runIfReady()
   }
 
   override protected def reset(): Unit = {
     super.reset()
+    trace(s"MRESET $node", "Methods")
+    running = false
+    readyToRun = true
+    sourceClosed = false
+    runIfReady()
+  }
+
+  protected[runtime] def restartLoop(): Unit = {
+    trace(s"MRELOOP $node", "Methods")
+    super.reset() // yes, reset
     running = false
     readyToRun = true
     runIfReady()
@@ -36,22 +48,25 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
 
   override def id: String = node.id
   override def receive(port: String, item: Message): Unit = {
+    trace(s"MRECV  $node", "Methods")
     item match {
       case message: ItemMessage =>
         queue += message
       case _ =>
-        monitor ! GException(None,
-          JafplException.unexpectedMessage(item.toString, port, node.location))
+        monitor ! GException(Some(node), JafplException.unexpectedMessage(item.toString, port, node.location))
     }
     runIfReady()
   }
 
   override protected def close(port: String): Unit = {
+    trace(s"MCLOSE $node", "Methods")
     sourceClosed = true
     runIfReady()
   }
 
   private def runIfReady(): Unit = {
+    trace(s"MRIFRD $node ${!running} $readyToRun $sourceClosed", "Methods")
+
     if (!running && readyToRun && sourceClosed) {
       running = true
 
@@ -75,19 +90,35 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def finished(): Unit = {
+    trace(s"MFINSH $node $sourceClosed ${queue.isEmpty}", "Methods")
+
     if (sourceClosed && queue.isEmpty) {
       trace(s"FINISH ForEach: $node $sourceClosed, ${queue.isEmpty}", "ForEach")
       // now close the outputs
       for (output <- node.outputs) {
+        if (!output.startsWith("#") && output != "current") {
+          val count = node.outputCardinalities.getOrElse(output, 0L)
+          val ospec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
+          try {
+            ospec.outputSpec.checkCardinality(output, count)
+          } catch {
+            case jex: JafplException =>
+              trace(s"FINISH ForEach cardinality error on $output", "ForEach")
+              monitor ! GException(Some(node), jex)
+          }
+        }
         if (!node.inputs.contains(output)) {
           monitor ! GClose(node, output)
         }
       }
+      trace(s"RSTCRD $node", "Cardinality")
+      node.inputCardinalities.clear()
+      node.outputCardinalities.clear()
       monitor ! GFinished(node)
       commonFinished()
     } else {
-      trace(s"RESET ForEach: $node $sourceClosed, ${queue.isEmpty}", "ForEach")
-      monitor ! GReset(node)
+      trace(s"RESTART ForEach: $node $sourceClosed, ${queue.isEmpty}", "ForEach")
+      monitor ! GRestartLoop(node)
     }
   }
 }

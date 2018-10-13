@@ -4,7 +4,7 @@ import com.jafpl.config.Jafpl
 import com.jafpl.graph.Graph
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, Identity, Producer, Sink, Sleep}
+import com.jafpl.steps.{BufferSink, Identity, Manifold, Producer, Sink, Sleep}
 import org.scalatest.FlatSpec
 
 class SimplestPipelineSpec extends FlatSpec {
@@ -12,7 +12,7 @@ class SimplestPipelineSpec extends FlatSpec {
 
   "The almost simplest possible pipeline " should " run" in {
     val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "doc")
     val sink = pipeline.addAtomic(new Sink(), "sink")
 
@@ -24,7 +24,7 @@ class SimplestPipelineSpec extends FlatSpec {
 
   "A pipeline with splits and joins " should " run" in {
     val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
     val ident1 = pipeline.addAtomic(new Identity(), "ident1")
     val ident2 = pipeline.addAtomic(new Identity(), "ident2")
@@ -44,7 +44,7 @@ class SimplestPipelineSpec extends FlatSpec {
     val graph    = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1       = pipeline.addAtomic(new Producer(List("P1")), "P1")
     val p2       = pipeline.addAtomic(new Producer(List("P2")), "P2")
     val sleep    = pipeline.addAtomic(new Sleep(500), "sleep")
@@ -67,7 +67,7 @@ class SimplestPipelineSpec extends FlatSpec {
     val graph    = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1       = pipeline.addAtomic(new Producer(List("P1")), "P1")
     val p2       = pipeline.addAtomic(new Producer(List("P2")), "P2")
     val p3       = pipeline.addAtomic(new Producer(List("P3")), "P3")

@@ -1,9 +1,11 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{ContainerStart, Node}
 import com.jafpl.messages.{BindingMessage, Message}
-import com.jafpl.runtime.GraphMonitor.{GAbort, GClose, GFinished, GOutput, GReset, GStart, GStop, GStopped}
+import com.jafpl.runtime.GraphMonitor.{GAbort, GClose, GException, GFinished, GOutput, GReset, GStart, GStop, GStopped}
+import com.jafpl.steps.Manifold
 
 private[runtime] class StartActor(private val monitor: ActorRef,
                                   private val runtime: GraphRuntime,
@@ -70,12 +72,25 @@ private[runtime] class StartActor(private val monitor: ActorRef,
     } else {
       val edge = node.outputEdge(port)
       trace(s"Start actor $node sends to ${edge.toPort}: $item", "StepIO")
+      node.outputCardinalities.put(port, node.outputCardinalities.getOrElse(port, 0L) + 1)
       monitor ! GOutput(node, edge.fromPort, item)
     }
   }
 
   protected[runtime] def finished(): Unit = {
     for (output <- node.outputs) {
+      if (!output.startsWith("#")) {
+        val count = node.outputCardinalities.getOrElse(output, 0L)
+        val ospec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
+        try {
+          ospec.outputSpec.checkCardinality(output, count)
+        } catch {
+          case jex: JafplException =>
+            trace(s"FINISH ForEach cardinality error on $output", "ForEach")
+            monitor ! GException(Some(node), jex)
+        }
+      }
+
       monitor ! GClose(node, output)
     }
     monitor ! GFinished(node)

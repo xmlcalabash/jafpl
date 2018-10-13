@@ -4,7 +4,7 @@ import com.jafpl.config.Jafpl
 import com.jafpl.graph.Graph
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, Count, Identity, Producer, Sink}
+import com.jafpl.steps.{BufferSink, Count, Identity, Manifold, Producer, Sink}
 import org.scalatest.FlatSpec
 
 class ForEachSpec extends FlatSpec {
@@ -13,9 +13,9 @@ class ForEachSpec extends FlatSpec {
   "A for-each " should " iterate" in {
     val graph    = Jafpl.newInstance().newGraph()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val producer = pipeline.addAtomic(new Producer(List("1", "2", "3")), "producer")
-    val forEach  = pipeline.addForEach("for-each")
+    val forEach  = pipeline.addForEach("for-each", Manifold.ALLOW_ANY)
     val ident    = forEach.addAtomic(new Identity(), "ident")
 
     val bc = new BufferSink()
@@ -41,9 +41,9 @@ class ForEachSpec extends FlatSpec {
   "A for-each with three inputs " should " output 3 documents" in {
     val graph    = Jafpl.newInstance().newGraph()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val producer = pipeline.addAtomic(new Producer(List("1", "2", "3")), "producer")
-    val forEach  = pipeline.addForEach("for-each")
+    val forEach  = pipeline.addForEach("for-each", Manifold.ALLOW_ANY)
     val ident    = forEach.addAtomic(new Identity(), "ident")
 
     val count    = pipeline.addAtomic(new Count(), "count")
@@ -68,11 +68,11 @@ class ForEachSpec extends FlatSpec {
   "Inputs that cross a for-each " should " be buffered" in {
     val graph    = Jafpl.newInstance().newGraph()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val cprod    = pipeline.addAtomic(new Producer(List("1", "2", "3", "4")), "count_producer")
     val lprod    = pipeline.addAtomic(new Producer(List("1", "2", "3")), "loop_producer")
     val count    = pipeline.addAtomic(new Count(), "count")
-    val forEach  = pipeline.addForEach("for-each")
+    val forEach  = pipeline.addForEach("for-each", Manifold.ALLOW_ANY)
     val sink     = forEach.addAtomic(new Sink(), "sink")
     val ident    = forEach.addAtomic(new Identity(), "ident")
 
@@ -100,9 +100,9 @@ class ForEachSpec extends FlatSpec {
   "A for-each with no input " should " produce no output" in {
     val graph    = Jafpl.newInstance().newGraph()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val producer = pipeline.addAtomic(new Producer(List()), "producer")
-    val forEach  = pipeline.addForEach("for-each")
+    val forEach  = pipeline.addForEach("for-each", Manifold.ALLOW_ANY)
     val ident    = forEach.addAtomic(new Identity(), "ident")
 
     val bc = new BufferSink()

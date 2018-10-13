@@ -6,7 +6,7 @@ import com.jafpl.io.BufferConsumer
 import com.jafpl.messages.Metadata
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{Identity, Producer}
+import com.jafpl.steps.{Identity, Manifold, Producer}
 import org.scalatest.FlatSpec
 
 class ContainerSpec extends FlatSpec {
@@ -17,9 +17,9 @@ class ContainerSpec extends FlatSpec {
   "Containers " should " allow unread inputs" in {
     val graph     = jafpl.newGraph()
 
-    val pipeline  = graph.addPipeline()
+    val pipeline  = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1        = pipeline.addAtomic(new Producer(List("doc1")), "p1")
-    val group     = pipeline.addGroup("group")
+    val group     = pipeline.addGroup("group", Manifold.ALLOW_ANY)
     val p2        = group.addAtomic(new Producer(List("doc2")), "p1")
     val ident     = group.addAtomic(new Identity(), "ident")
 
@@ -45,8 +45,8 @@ class ContainerSpec extends FlatSpec {
   "Containers " should " allow unread outputs" in {
     val graph     = jafpl.newGraph()
 
-    val pipeline  = graph.addPipeline()
-    val group     = pipeline.addGroup("group")
+    val pipeline  = graph.addPipeline(Manifold.ALLOW_ANY)
+    val group     = pipeline.addGroup("group", Manifold.ALLOW_ANY)
     val p1        = group.addAtomic(new Producer(List("doc1")), "p1")
     val p2        = group.addAtomic(new Producer(List("doc2")), "p1")
     val ident     = group.addAtomic(new Identity(), "ident")

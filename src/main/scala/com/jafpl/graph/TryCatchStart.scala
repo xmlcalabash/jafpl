@@ -1,7 +1,7 @@
 package com.jafpl.graph
 
 import com.jafpl.exceptions.JafplException
-import com.jafpl.steps.{Step, ViewportComposer}
+import com.jafpl.steps.{ManifoldSpecification, Step, ViewportComposer}
 
 class TryCatchStart private[jafpl] (override val graph: Graph,
                                     override protected val end: ContainerEnd,
@@ -38,7 +38,7 @@ class TryCatchStart private[jafpl] (override val graph: Graph,
     throw JafplException.childForbidden(this.toString, step.toString, location)
   }
 
-  override def addGroup(label: Option[String]): ContainerStart = {
+  override def addGroup(label: Option[String], manifold: ManifoldSpecification): ContainerStart = {
     throw JafplException.childForbidden(this.toString, label.getOrElse("group"), location)
   }
 
@@ -46,7 +46,7 @@ class TryCatchStart private[jafpl] (override val graph: Graph,
     throw JafplException.childForbidden(this.toString, label.getOrElse("choose"), location)
   }
 
-  override def addForEach(label: Option[String]): LoopEachStart = {
+  override def addForEach(label: Option[String], manifold: ManifoldSpecification): LoopEachStart = {
     throw JafplException.childForbidden(this.toString, label.getOrElse("for-each"), location)
   }
 

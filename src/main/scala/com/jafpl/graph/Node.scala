@@ -2,10 +2,11 @@ package com.jafpl.graph
 
 import com.jafpl.exceptions.JafplException
 import com.jafpl.injection.{PortInjectable, StepInjectable}
-import com.jafpl.steps.Step
+import com.jafpl.steps.{ManifoldSpecification, PortCardinality, Step}
 import com.jafpl.util.UniqueId
 import org.slf4j.{Logger, LoggerFactory}
 
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.xml.UnprefixedAttribute
 
@@ -26,6 +27,13 @@ abstract class Node(val graph: Graph,
   protected[jafpl] val inputInjectables: ListBuffer[PortInjectable] = ListBuffer.empty[PortInjectable]
   protected[jafpl] val outputInjectables: ListBuffer[PortInjectable] = ListBuffer.empty[PortInjectable]
   protected[jafpl] val stepInjectables: ListBuffer[StepInjectable] = ListBuffer.empty[StepInjectable]
+  protected[jafpl] val inputCardinalities: mutable.HashMap[String,Long] = mutable.HashMap.empty[String,Long]
+  protected[jafpl] val outputCardinalities: mutable.HashMap[String,Long] = mutable.HashMap.empty[String,Long]
+  private var _manifold: Option[ManifoldSpecification] = if (step.isDefined) {
+    step
+  } else {
+    None
+  }
   private var _start: Option[ContainerStart] = None
   private var _name: String = if (userLabel.isDefined) {
     userLabel.get
@@ -55,6 +63,14 @@ abstract class Node(val graph: Graph,
     _loc = Some(loc)
   }
 
+  def manifold: Option[ManifoldSpecification] = _manifold
+  protected[jafpl] def manifold_=(man: ManifoldSpecification): Unit = {
+    if (_manifold.isDefined) {
+      throw new IllegalArgumentException("Cannot reset a manifold")
+    }
+    _manifold = Some(man)
+  }
+
   /** The node label.
     *
     * Labels are used in output to help identify the node in question. The `id` of the
@@ -77,7 +93,7 @@ abstract class Node(val graph: Graph,
     * In cases where there is no data flow dependency, but it's still necessary to force an
     * order, you can impose one by saying that `A.dependsOn(B)`.
     *
-    * @param node
+    * @param node The node in the graph which must be run before this one
     */
   def dependsOn(node: Node): Unit = {
     graph.addDependsEdge(node, this)

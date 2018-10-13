@@ -3,7 +3,7 @@ package com.jafpl.test
 import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.JafplException
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
-import com.jafpl.steps.{Identity, Producer, Sink}
+import com.jafpl.steps.{Identity, Manifold, Producer, Sink}
 import org.scalatest.FlatSpec
 
 class GraphSpec extends FlatSpec {
@@ -12,7 +12,7 @@ class GraphSpec extends FlatSpec {
   "A simple graph " should " compile" in {
     val graph    = Jafpl.newInstance().newGraph()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
     val ident1 = pipeline.addAtomic(new Identity(), "ident1")
     val ident2 = pipeline.addAtomic(new Identity(), "ident2")
@@ -31,9 +31,9 @@ class GraphSpec extends FlatSpec {
   "Containers " should " be able to read from nodes outside them" in {
     val graph    = Jafpl.newInstance().newGraph()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
-    val group    = pipeline.addGroup("group")
+    val group    = pipeline.addGroup("group", Manifold.ALLOW_ANY)
     val inner    = group.addAtomic(new Identity(), "ident")
     val consumer = pipeline.addAtomic(new Sink(), "consumer")
 
@@ -49,9 +49,9 @@ class GraphSpec extends FlatSpec {
   "Steps " should " not be able to read from nodes inside containers" in {
     val graph    = Jafpl.newInstance().newGraph()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
-    val group    = pipeline.addGroup("group")
+    val group    = pipeline.addGroup("group", Manifold.ALLOW_ANY)
     val inner    = group.addAtomic(new Identity(), "inner")
     val outer    = pipeline.addAtomic(new Identity(), "outer")
     val consumer = pipeline.addAtomic(new Sink(), "consumer")
@@ -78,10 +78,10 @@ class GraphSpec extends FlatSpec {
     val graph1    = jafpl.newGraph()
     val graph2    = jafpl.newGraph()
 
-    val pipeline1 = graph1.addPipeline()
+    val pipeline1 = graph1.addPipeline(Manifold.ALLOW_ANY)
     val ident1 = pipeline1.addAtomic(new Identity(), "ident1")
 
-    val pipeline2 = graph2.addPipeline()
+    val pipeline2 = graph2.addPipeline(Manifold.ALLOW_ANY)
     val ident2 = pipeline2.addAtomic(new Identity(), "ident2")
 
     var pass = false
@@ -98,7 +98,7 @@ class GraphSpec extends FlatSpec {
   "A closed graph " should " not be updatable" in {
     val graph    = Jafpl.newInstance().newGraph()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
     val ident1 = pipeline.addAtomic(new Identity(), "ident1")
     val ident2 = pipeline.addAtomic(new Identity(), "ident2")
@@ -125,7 +125,7 @@ class GraphSpec extends FlatSpec {
   "No loops " should " be allowed" in {
     val graph    = Jafpl.newInstance().newGraph()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
     val ident1 = pipeline.addAtomic(new Identity(), "ident1")
     val ident2 = pipeline.addAtomic(new Identity(), "ident2")

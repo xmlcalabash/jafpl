@@ -6,7 +6,7 @@ import com.jafpl.io.BufferConsumer
 import com.jafpl.messages.{ItemMessage, Metadata}
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, Count, Identity, ProduceBinding}
+import com.jafpl.steps.{BufferSink, Count, Identity, Manifold, ProduceBinding}
 import org.scalatest.FlatSpec
 
 class BindingSpec extends FlatSpec {
@@ -15,7 +15,7 @@ class BindingSpec extends FlatSpec {
   "An external document binding " should " be consumable" in {
     val graph    = Jafpl.newInstance().newGraph()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val ident    = pipeline.addAtomic(new Identity(), "ident")
 
     graph.addInput(pipeline, "source")
@@ -40,7 +40,7 @@ class BindingSpec extends FlatSpec {
   "An unbound external document binding " should " provides no documents" in {
     val graph    = Jafpl.newInstance().newGraph()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val ident    = pipeline.addAtomic(new Identity(), "ident")
 
     graph.addInput(pipeline, "source")
@@ -65,7 +65,7 @@ class BindingSpec extends FlatSpec {
     var bc = new BufferSink()
 
     val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
 
     val binding  = pipeline.addVariable("x", "twelve")
     val binding2 = pipeline.addVariable("y", "eleven")
@@ -88,7 +88,7 @@ class BindingSpec extends FlatSpec {
   "An external variable binding " should " be consumable" in {
     val graph    = Jafpl.newInstance().newGraph()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val binding  = pipeline.addOption("foo", "")
 
     val pb       = pipeline.addAtomic(new ProduceBinding("foo"), "pb")
@@ -114,7 +114,7 @@ class BindingSpec extends FlatSpec {
   "Reading an external variable binding twice " should " work" in {
     val graph    = Jafpl.newInstance().newGraph()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val binding  = pipeline.addOption("foo", "")
 
     val pb1      = pipeline.addAtomic(new ProduceBinding("foo"), "pb")

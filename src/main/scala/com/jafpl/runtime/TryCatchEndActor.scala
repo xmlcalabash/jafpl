@@ -65,6 +65,7 @@ private[runtime] class TryCatchEndActor(private val monitor: ActorRef,
         readyToRun = false // don't run again if some joiner closes
         for (port <- buffer.keySet) {
           for (item <- buffer(port)) {
+            node.outputCardinalities.put(port, node.outputCardinalities.getOrElse(port, 0L) + 1)
             monitor ! GOutput(node.start.get, port, item)
           }
         }

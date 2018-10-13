@@ -4,7 +4,7 @@ import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.JafplException
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, Identity, Producer, Sink, Sleep}
+import com.jafpl.steps.{BufferSink, Identity, Manifold, Producer, Sink, Sleep}
 import org.scalatest.FlatSpec
 
 class JoinerSpec extends FlatSpec {
@@ -14,7 +14,7 @@ class JoinerSpec extends FlatSpec {
     val graph = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1 = pipeline.addAtomic(new Producer(List("A1","A2")), "Adocs")
     val p2 = pipeline.addAtomic(new Producer(List("B1","B2")), "Bdocs")
     val consumer = pipeline.addAtomic(bc, "consumer")
@@ -33,7 +33,7 @@ class JoinerSpec extends FlatSpec {
     val graph = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1 = pipeline.addAtomic(new Producer(List("A1","A2")), "Adocs")
     val p2 = pipeline.addAtomic(new Producer(List("B1","B2")), "Bdocs")
     val consumer = pipeline.addAtomic(bc, "consumer")
@@ -56,7 +56,7 @@ class JoinerSpec extends FlatSpec {
     val graph = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1 = pipeline.addAtomic(new Producer(List("A1","A2")), "Adocs")
     val p2 = pipeline.addAtomic(new Producer(List("B1","B2")), "Bdocs")
     val consumer = pipeline.addAtomic(bc, "consumer")
@@ -77,7 +77,7 @@ class JoinerSpec extends FlatSpec {
     val graph = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1 = pipeline.addAtomic(new Producer(List("A1","A2")), "Adocs")
     val p2 = pipeline.addAtomic(new Producer(List("B1","B2")), "Bdocs")
     val consumer = pipeline.addAtomic(bc, "consumer")
@@ -98,7 +98,7 @@ class JoinerSpec extends FlatSpec {
     val graph = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1 = pipeline.addAtomic(new Producer(List()), "Adocs")
     val p2 = pipeline.addAtomic(new Producer(List("B1","B2")), "Bdocs")
     val consumer = pipeline.addAtomic(bc, "consumer")
@@ -119,7 +119,7 @@ class JoinerSpec extends FlatSpec {
     val graph = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1 = pipeline.addAtomic(new Producer(List("A1","A2")), "Adocs")
     val p2 = pipeline.addAtomic(new Producer(List("B1","B2")), "Bdocs")
     val p3 = pipeline.addAtomic(new Producer(List("C1","C2")), "Cdocs")
@@ -142,7 +142,7 @@ class JoinerSpec extends FlatSpec {
     val graph = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1 = pipeline.addAtomic(new Producer(List()), "Adocs")
     val p2 = pipeline.addAtomic(new Producer(List("B1","B2")), "Bdocs")
     val p3 = pipeline.addAtomic(new Producer(List("C1","C2")), "Cdocs")

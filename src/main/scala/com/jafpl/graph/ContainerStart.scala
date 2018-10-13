@@ -1,7 +1,7 @@
 package com.jafpl.graph
 
 import com.jafpl.graph.JoinMode.JoinMode
-import com.jafpl.steps.{Step, ViewportComposer}
+import com.jafpl.steps.{ManifoldSpecification, Step, ViewportComposer}
 import com.jafpl.util.{ItemComparator, ItemTester}
 
 import scala.collection.mutable.ListBuffer
@@ -83,22 +83,22 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     *
     * @return The node added.
     */
-  def addGroup(): ContainerStart = addGroup(None)
+  def addGroup(manifold: ManifoldSpecification): ContainerStart = addGroup(None, manifold)
 
   /** Add a new group container to this container.
     *
     * @param label A user-defined label.
     * @return The node added.
     */
-  def addGroup(label: String): ContainerStart = addGroup(Some(label))
+  def addGroup(label: String, manifold: ManifoldSpecification): ContainerStart = addGroup(Some(label), manifold)
 
   /** Add a new group container to this container.
     *
     * @param label An optional, user-defined label.
     * @return The node added.
     */
-  def addGroup(label: Option[String]): ContainerStart = {
-    val node = graph.addGroup(label)
+  def addGroup(label: Option[String], manifold: ManifoldSpecification): ContainerStart = {
+    val node = graph.addGroup(label, manifold)
     addChild(node)
     node
   }
@@ -131,22 +131,22 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     *
     * @return The node added.
     */
-  def addForEach(): LoopEachStart = addForEach(None)
+  def addForEach(manifold: ManifoldSpecification): LoopEachStart = addForEach(None, manifold)
 
   /** Add a new for-each container to this container.
     *
     * @param label A user-defined label.
     * @return The node added.
     */
-  def addForEach(label: String): LoopEachStart = addForEach(Some(label))
+  def addForEach(label: String, manifold: ManifoldSpecification): LoopEachStart = addForEach(Some(label), manifold: ManifoldSpecification)
 
   /** Add a new for-each container to this container.
     *
     * @param label An optional, user-defined label.
     * @return The node added.
     */
-  def addForEach(label: Option[String]): LoopEachStart = {
-    val node = graph.addForEach(label)
+  def addForEach(label: Option[String], manifold: ManifoldSpecification): LoopEachStart = {
+    val node = graph.addForEach(label, manifold)
     addChild(node)
     node
   }
@@ -155,27 +155,27 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     *
     * @return The node added.
     */
-  def addFor(countTo: Long): LoopForStart = addFor(None, 1, countTo, 1)
+  def addFor(countTo: Long, manifold: ManifoldSpecification): LoopForStart = addFor(None, 1, countTo, 1, manifold)
 
   /** Add a new for-loop container to this container.
     *
     * @param label A user-defined label.
     * @return The node added.
     */
-  def addFor(label: String, countTo: Long): LoopForStart = addFor(Some(label), 1, countTo, 1)
+  def addFor(label: String, countTo: Long, manifold: ManifoldSpecification): LoopForStart = addFor(Some(label), 1, countTo, 1, manifold)
 
-  def addFor(countFrom: Long, countTo: Long): LoopForStart = addFor(None, countFrom, countTo, 1)
-  def addFor(label: String, countFrom: Long, countTo: Long): LoopForStart = addFor(Some(label), countFrom, countTo, 1)
-  def addFor(countFrom: Long, countTo: Long, countBy: Long): LoopForStart = addFor(None, countFrom, countTo, countBy)
-  def addFor(label: String, countFrom: Long, countTo: Long, countBy: Long): LoopForStart = addFor(Some(label), countFrom, countTo, countBy)
+  def addFor(countFrom: Long, countTo: Long, manifold: ManifoldSpecification): LoopForStart = addFor(None, countFrom, countTo, 1, manifold)
+  def addFor(label: String, countFrom: Long, countTo: Long, manifold: ManifoldSpecification): LoopForStart = addFor(Some(label), countFrom, countTo, 1, manifold)
+  def addFor(countFrom: Long, countTo: Long, countBy: Long, manifold: ManifoldSpecification): LoopForStart = addFor(None, countFrom, countTo, countBy, manifold)
+  def addFor(label: String, countFrom: Long, countTo: Long, countBy: Long, manifold: ManifoldSpecification): LoopForStart = addFor(Some(label), countFrom, countTo, countBy, manifold)
 
   /** Add a new for-loop container to this container.
     *
     * @param label An optional, user-defined label.
     * @return The node added.
     */
-  def addFor(label: Option[String], countFrom: Long, countTo: Long, countBy: Long): LoopForStart = {
-    val node = graph.addFor(label, countFrom, countTo, countBy)
+  def addFor(label: Option[String], countFrom: Long, countTo: Long, countBy: Long, manifold: ManifoldSpecification): LoopForStart = {
+    val node = graph.addFor(label, countFrom, countTo, countBy, manifold)
     addChild(node)
     node
   }
@@ -185,7 +185,7 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * @param tester The test evaluator.
     * @return The node added.
     */
-  def addWhile(tester: ItemTester): LoopWhileStart = addWhile(tester, None)
+  def addWhile(tester: ItemTester, manifold: ManifoldSpecification): LoopWhileStart = addWhile(tester, None, manifold)
 
   /** Add a new while container to this container.
     *
@@ -193,7 +193,7 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * @param label A user-defined label.
     * @return The node added.
     */
-  def addWhile(tester: ItemTester, label: String): LoopWhileStart = addWhile(tester, Some(label))
+  def addWhile(tester: ItemTester, label: String, manifold: ManifoldSpecification): LoopWhileStart = addWhile(tester, Some(label), manifold)
 
   /** Add a new while container to this container.
     *
@@ -201,8 +201,8 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * @param label An optional, user-defined label.
     * @return The node added.
     */
-  def addWhile(tester: ItemTester, label: Option[String]): LoopWhileStart = {
-    val node = graph.addWhile(tester, label)
+  def addWhile(tester: ItemTester, label: Option[String], manifold: ManifoldSpecification): LoopWhileStart = {
+    val node = graph.addWhile(tester, label, manifold)
     addChild(node)
     node
   }
@@ -212,7 +212,7 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * @param comparator The comparator.
     * @return The node added.
     */
-  def addUntil(comparator: ItemComparator): LoopUntilStart = addUntil(comparator, None)
+  def addUntil(comparator: ItemComparator, manifold: ManifoldSpecification): LoopUntilStart = addUntil(comparator, None, manifold)
 
   /** Add a new until container to this container.
     *
@@ -220,8 +220,8 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * @param label A user-defined label.
     * @return The node added.
     */
-  def addUntil(comparator: ItemComparator, label: String): LoopUntilStart =
-    addUntil(comparator, Some(label))
+  def addUntil(comparator: ItemComparator, label: String, manifold: ManifoldSpecification): LoopUntilStart =
+    addUntil(comparator, Some(label), manifold)
 
   /** Add a new until container to this container.
     *
@@ -229,8 +229,8 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * @param label An optional, user-defined label.
     * @return The node added.
     */
-  def addUntil(comparator: ItemComparator, label: Option[String]): LoopUntilStart = {
-    val node = graph.addUntil(comparator, label)
+  def addUntil(comparator: ItemComparator, label: Option[String], manifold: ManifoldSpecification): LoopUntilStart = {
+    val node = graph.addUntil(comparator, label, manifold)
     addChild(node)
     node
   }

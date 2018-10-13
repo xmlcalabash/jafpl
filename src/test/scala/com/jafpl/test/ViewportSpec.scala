@@ -4,7 +4,7 @@ import com.jafpl.config.Jafpl
 import com.jafpl.graph.Graph
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, Producer, StringComposer, Uppercase}
+import com.jafpl.steps.{BufferSink, Manifold, Producer, StringComposer, Uppercase}
 import org.scalatest.FlatSpec
 
 class ViewportSpec extends FlatSpec {
@@ -14,7 +14,7 @@ class ViewportSpec extends FlatSpec {
     val graph    = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
 
     val prod     = pipeline.addAtomic(new Producer(List("Now is the time; just do it.")), "prod")
     val viewport = pipeline.addViewport(new StringComposer(), "viewport")
@@ -39,7 +39,7 @@ class ViewportSpec extends FlatSpec {
     val graph    = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
 
     val prod     = pipeline.addAtomic(new Producer(List("Now is the time; just do it.")), "prod")
     val viewport = pipeline.addViewport(new StringComposer(), "viewport")
@@ -64,7 +64,7 @@ class ViewportSpec extends FlatSpec {
     val graph    = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
 
     val prod     = pipeline.addAtomic(new Producer(List()), "prod")
     val viewport = pipeline.addViewport(new StringComposer(), "viewport")

@@ -1,13 +1,17 @@
 package com.jafpl.graph
 
 import com.jafpl.exceptions.JafplException
+import com.jafpl.steps.ManifoldSpecification
 import com.jafpl.util.ItemTester
 
 private[jafpl] class LoopWhileStart(override val graph: Graph,
                                     override protected val end: ContainerEnd,
                                     override val userLabel: Option[String],
+                                    private val manspec: ManifoldSpecification,
                                     val tester: ItemTester)
   extends LoopStart(graph, end, userLabel) {
+
+  manifold = manspec
 
   override def inputsOk(): Boolean = {
     var hasSource = false

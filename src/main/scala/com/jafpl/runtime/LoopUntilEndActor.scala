@@ -19,6 +19,7 @@ private[runtime] class LoopUntilEndActor(private val monitor: ActorRef,
     // That means the output we buffered on this loop is good.
     for (port <- buffer.keySet) {
       for (item <- buffer(port)) {
+        node.start.get.outputCardinalities.put(port, node.start.get.outputCardinalities.getOrElse(port, 0L) + 1)
         monitor ! GOutput(node.start.get, port, item)
       }
     }

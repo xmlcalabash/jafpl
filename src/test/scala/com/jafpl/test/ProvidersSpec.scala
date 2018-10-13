@@ -6,7 +6,7 @@ import com.jafpl.io.BufferConsumer
 import com.jafpl.messages.{ItemMessage, Metadata}
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.Identity
+import com.jafpl.steps.{Identity, Manifold}
 import org.scalatest.FlatSpec
 
 class ProvidersSpec extends FlatSpec {
@@ -16,7 +16,7 @@ class ProvidersSpec extends FlatSpec {
   "Pipeline providers " should " should provide input and consume output" in {
     val graph    = Jafpl.newInstance().newGraph()
 
-    val pipeline = graph.addPipeline(None)
+    val pipeline = graph.addPipeline(None, Manifold.ALLOW_ANY)
     val ident = pipeline.addAtomic(new Identity(), "ident")
 
     graph.addEdge(pipeline, "source", ident, "source")

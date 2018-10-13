@@ -1,6 +1,7 @@
 package com.jafpl.exceptions
 
 import com.jafpl.graph.Location
+import com.jafpl.steps.PortCardinality
 
 object JafplException {
   val CHILD_FORBIDDEN = 1
@@ -135,7 +136,7 @@ object JafplException {
   = new JafplException(INTERNAL_ERROR, location, List(msg), "$1")
   protected[jafpl] def unexpectedSequence(step: String, port: String, location: Option[Location]): JafplException
   = new JafplException(UNEXPECTED_SEQUENCE, location, List(step, port), "Unexpected sequence on $2 port of $1")
-  protected[jafpl] def cardinalityError(port: String, count: String, spec: String): JafplException
+  protected[jafpl] def cardinalityError(port: String, count: String, spec: PortCardinality): JafplException
   = new JafplException(CARDINALITY_ERROR, None, List(port, count, spec), "Cardinality error: $2 documents sent to $1 (spec: $3)")
   protected[jafpl] def badPort(port: String): JafplException
   = new JafplException(BAD_PORT, None, List(port), "Port named $1 is not allowed")
@@ -150,7 +151,7 @@ object JafplException {
   */
 }
 
-class JafplException private (val code: Int, val location: Option[Location], val details: List[String], val template: String) extends RuntimeException with JafplExceptionCode {
+class JafplException private (val code: Int, val location: Option[Location], val details: List[Any], val template: String) extends RuntimeException with JafplExceptionCode {
   override def jafplExceptionCode: Any = code
 
   override def getMessage: String = toString

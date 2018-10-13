@@ -1,5 +1,7 @@
 package com.jafpl.graph
 
+import com.jafpl.steps.ManifoldSpecification
+
 /** A for-each container.
   *
   * ForEach containers are created with the `addForEach` method of [[com.jafpl.graph.ContainerStart]].
@@ -10,8 +12,11 @@ package com.jafpl.graph
   */
 class LoopEachStart private[jafpl](override val graph: Graph,
                                    override protected val end: ContainerEnd,
-                                   override val userLabel: Option[String])
+                                   override val userLabel: Option[String],
+                                   private val manspec: ManifoldSpecification)
   extends LoopStart(graph, end, userLabel) {
+
+  manifold = manspec
 
   override def inputsOk(): Boolean = {
     var hasSource = false

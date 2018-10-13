@@ -4,7 +4,7 @@ import com.jafpl.config.Jafpl
 import com.jafpl.graph.Graph
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, Identity, Producer}
+import com.jafpl.steps.{BufferSink, Identity, Manifold, Producer}
 import org.scalatest.FlatSpec
 
 class IOPipelineSpec extends FlatSpec {
@@ -12,7 +12,7 @@ class IOPipelineSpec extends FlatSpec {
 
   "A pipeline with inputs and outputs " should " run" in {
     val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
     val ident = pipeline.addAtomic(new Identity(), "ident1")
     val bc = new BufferSink()

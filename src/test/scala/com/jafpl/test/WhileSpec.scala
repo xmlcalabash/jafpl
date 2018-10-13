@@ -5,7 +5,7 @@ import com.jafpl.graph.Graph
 import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.{PrimitiveItemTester, PrimitiveRuntimeConfiguration}
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{Decrement, Producer}
+import com.jafpl.steps.{Decrement, Manifold, Producer}
 import org.scalatest.FlatSpec
 
 class WhileSpec extends FlatSpec {
@@ -13,11 +13,11 @@ class WhileSpec extends FlatSpec {
 
   "A while " should " iterate until finished" in {
     val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1       = pipeline.addAtomic(new Producer(List(7)), "p1")
 
     val tester   = new PrimitiveItemTester(runtimeConfig, ". > 0")
-    val wstep    = pipeline.addWhile(tester)
+    val wstep    = pipeline.addWhile(tester, Manifold.ALLOW_ANY)
     val decr     = wstep.addAtomic(new Decrement(), "decr")
 
     graph.addEdge(p1, "result", wstep, "source")
@@ -41,11 +41,11 @@ class WhileSpec extends FlatSpec {
 
   "A while " should " not run without a test" in {
     val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1       = pipeline.addAtomic(new Producer(List(7)), "p1")
 
     val tester   = new PrimitiveItemTester(runtimeConfig, ". > 0")
-    val wstep    = pipeline.addWhile(tester)
+    val wstep    = pipeline.addWhile(tester, Manifold.ALLOW_ANY)
     val decr     = wstep.addAtomic(new Decrement(), "decr")
 
     graph.addEdge(p1, "result", wstep, "source")
@@ -68,11 +68,11 @@ class WhileSpec extends FlatSpec {
 
   "A while " should " not iterate at all if it's condition is initially false" in {
     val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1       = pipeline.addAtomic(new Producer(List(0)), "p1")
 
     val tester   = new PrimitiveItemTester(runtimeConfig, ". > 0")
-    val wstep    = pipeline.addWhile(tester)
+    val wstep    = pipeline.addWhile(tester, Manifold.ALLOW_ANY)
     val decr     = wstep.addAtomic(new Decrement(), "decr")
 
     graph.addEdge(p1, "result", wstep, "source")
@@ -95,11 +95,11 @@ class WhileSpec extends FlatSpec {
 
   "A while " should " be able to have multiple outputs" in {
     val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1       = pipeline.addAtomic(new Producer(List(3)), "p1")
 
     val tester   = new PrimitiveItemTester(runtimeConfig, ". > 0")
-    val wstep    = pipeline.addWhile(tester)
+    val wstep    = pipeline.addWhile(tester, Manifold.ALLOW_ANY)
     val decr     = wstep.addAtomic(new Decrement(), "decr")
 
     graph.addEdge(p1, "result", wstep, "source")

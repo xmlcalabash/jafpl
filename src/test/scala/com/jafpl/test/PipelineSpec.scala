@@ -6,7 +6,7 @@ import com.jafpl.io.BufferConsumer
 import com.jafpl.messages.{ItemMessage, Metadata}
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{Identity, Producer}
+import com.jafpl.steps.{Identity, Manifold, Producer}
 import org.scalatest.FlatSpec
 
 class PipelineSpec extends FlatSpec {
@@ -18,7 +18,7 @@ class PipelineSpec extends FlatSpec {
   it should "allow multiple inputs" in {
     val graph    = jafpl.newGraph()
 
-    val pipeline  = graph.addPipeline()
+    val pipeline  = graph.addPipeline(Manifold.ALLOW_ANY)
     val ident     = pipeline.addAtomic(new Identity(), "ident")
 
     graph.addEdge(pipeline, "source1", ident, "source")
@@ -47,7 +47,7 @@ class PipelineSpec extends FlatSpec {
   it should "allow multiple outputs" in {
     val graph    = jafpl.newGraph()
 
-    val pipeline  = graph.addPipeline()
+    val pipeline  = graph.addPipeline(Manifold.ALLOW_ANY)
     val producer1 = pipeline.addAtomic(new Producer("ONE"), "producer1")
     val producer2 = pipeline.addAtomic(new Producer("TWO"), "producer2")
 
@@ -76,7 +76,7 @@ class PipelineSpec extends FlatSpec {
   it should "allow unread inputs" in {
     val graph = jafpl.newGraph()
 
-    val pipeline  = graph.addPipeline()
+    val pipeline  = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1        = pipeline.addAtomic(new Producer(List("doc1")), "p1")
     val ident     = pipeline.addAtomic(new Identity(), "ident")
 
@@ -100,7 +100,7 @@ class PipelineSpec extends FlatSpec {
   it should "allow unread outputs" in {
     val graph = jafpl.newGraph()
 
-    val pipeline  = graph.addPipeline()
+    val pipeline  = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1        = pipeline.addAtomic(new Producer(List("doc1")), "p1")
     val p2        = pipeline.addAtomic(new Producer(List("doc2")), "p1")
     val ident     = pipeline.addAtomic(new Identity(), "ident")
@@ -125,7 +125,7 @@ class PipelineSpec extends FlatSpec {
   it should " be abortable" in {
     val graph = jafpl.newGraph()
 
-    val pipeline  = graph.addPipeline()
+    val pipeline  = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1        = pipeline.addAtomic(new Producer(List("doc1")), "p1")
     val p2        = pipeline.addAtomic(new Producer(List("doc2")), "p1")
     val ident     = pipeline.addAtomic(new Identity(), "ident")

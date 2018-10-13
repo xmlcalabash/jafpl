@@ -4,7 +4,7 @@ import com.jafpl.config.Jafpl
 import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{Identity, Producer}
+import com.jafpl.steps.{Identity, Manifold, Producer}
 import org.scalatest.FlatSpec
 
 class OrderedSpec extends FlatSpec {
@@ -12,7 +12,7 @@ class OrderedSpec extends FlatSpec {
 
   "A pipeline with an ordered joiner " should " join inputs in the right order" in {
     val graph    = Jafpl.newInstance().newGraph()
-    val pipeline = graph.addPipeline()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
 
     val p1  = pipeline.addAtomic(new Producer("One"), "one")
     val p2a = pipeline.addAtomic(new Producer("TwoA"), "twoA")

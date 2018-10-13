@@ -8,18 +8,20 @@ import scala.collection.{immutable, mutable}
   *
   */
 object PortSpecification {
+  /** The wildcard port name */
+  val WILDCARD: String = "*"
   /** Allow any ports. */
-  val ANY: PortSpecification = new PortSpecification(Map("*" -> "*"))
+  val ANY: PortSpecification = new PortSpecification(Map(WILDCARD->PortCardinality.ZERO_OR_MORE))
   /** Allow no ports. */
   val NONE: PortSpecification = new PortSpecification(Map())
   /** Allow a single document on the `source` port. */
-  val SOURCE: PortSpecification = new PortSpecification(Map("source" -> "1"))
+  val SOURCE: PortSpecification = new PortSpecification(Map("source" -> PortCardinality.EXACTLY_ONE))
   /** Allow a single document on the `result` port. */
-  val RESULT: PortSpecification = new PortSpecification(Map("result" -> "1"))
+  val RESULT: PortSpecification = new PortSpecification(Map("result" -> PortCardinality.EXACTLY_ONE))
   /** Allow a sequence of zero or more documents on the `source` port. */
-  val SOURCESEQ: PortSpecification = new PortSpecification(Map("source" -> "*"))
+  val SOURCESEQ: PortSpecification = new PortSpecification(Map("source" -> PortCardinality.ZERO_OR_MORE))
   /** Allow a sequence of zero or more documents on the `result` port. */
-  val RESULTSEQ: PortSpecification = new PortSpecification(Map("result" -> "*"))
+  val RESULTSEQ: PortSpecification = new PortSpecification(Map("result" -> PortCardinality.ZERO_OR_MORE))
 }
 
 /** Specify the valid bindings for step inputs or outputs
@@ -32,55 +34,25 @@ object PortSpecification {
   * A port binding specification identifies the ports that the step expects to read from (or
   * write to) and what the acceptable cardinality of documents is on those ports.
   *
-  * The available cardinalities are:
-  * 1. `1`: exactly one document is required.
-  * 2. `?`: one document is expected, but it's optional.
-  * 3. `+`: at least one document is expected, but more are ok.
-  * 4. `*`: any number of documents are expected, including none.
-  *
-  * It would, of course, be possible to extend this specification to allow for "exactly 3 documents"
-  * or "between 4 and 7 documents", but that seems beyond the point of diminishing returns.
-  * The pipeline engine will enforce the cardinalities above, you're free to enforce other
-  * cardinalities in the step implementation.
-  *
-  * The special port name "*" may be given to indicate that other, arbitrarily named ports
-  * are also acceptable.
+  * The port named `PortSpecification.WILDCARD` serves as a wildcard for ports of any name
   *
   * @constructor A port binding specification.
   * @param spec A map from port names to cardinalities.
   */
-class PortSpecification(spec: immutable.Map[String,String]) {
-  private val cardinalities: List[String] = List("1", "?", "+", "*")
-  for (port <- spec.keySet) {
-    if (!cardinalities.contains(spec(port))) {
-      throw JafplException.invalidCardinality(port, spec(port), None)
-    }
-    if ((port == "*") && (spec(port) != "*")) {
-      throw JafplException.invalidWildcardCardinality()
-    }
-  }
-
+class PortSpecification(spec: immutable.Map[String,PortCardinality]) {
   /** List the ports in this specification.
     *
-    * The wildcard port, "*" is not returned in this list.
-    *
-    * @return
+    * @return the set of ports
     */
   def ports: Set[String] = {
-    val plist = mutable.HashSet.empty[String]
-    for (port <- spec.keySet) {
-      if (port != "*") {
-        plist += port
-      }
-    }
-    plist.toSet
+    spec.keySet.filter(_ != PortSpecification.WILDCARD)
   }
 
-  def cardinality(port: String): Option[String] = {
+  def cardinality(port: String): Option[PortCardinality] = {
     if (spec.contains(port)) {
       Some(spec(port))
-    } else if (spec.contains("*")) {
-      Some(spec("*"))
+    } else if (spec.contains(PortSpecification.WILDCARD)) {
+      Some(spec(PortSpecification.WILDCARD))
     } else {
       None
     }
@@ -99,25 +71,14 @@ class PortSpecification(spec: immutable.Map[String,String]) {
       JafplException.internalError(s"Impossible document count $count for $port", None)
     }
 
-    var pass = false
-    if (spec.contains(port)) {
-      if (spec(port) == "*") {
-        pass = true
-      } else {
-        pass = count match {
-          case 0 => spec(port) == "?"
-          case 1 => (spec(port) == "?") || (spec(port) == "1")
-          case _ => spec(port) == "+"
-        }
-      }
-
-      if (!pass) {
-        throw JafplException.cardinalityError(port, count.toString, spec(port))
+    val card = cardinality(port)
+    if (card.isDefined) {
+      //println(s"$count: $card")
+      if (!card.get.withinBounds(count)) {
+        throw JafplException.cardinalityError(port, count.toString, card.get)
       }
     } else {
-      if (!spec.contains("*")) {
-        throw JafplException.badPort(port)
-      }
+      throw JafplException.badPort(port)
     }
   }
 }

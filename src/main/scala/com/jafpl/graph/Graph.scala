@@ -3,7 +3,7 @@ package com.jafpl.graph
 import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.JoinMode.JoinMode
-import com.jafpl.steps.{Step, ViewportComposer}
+import com.jafpl.steps.{Manifold, ManifoldSpecification, Step, ViewportComposer}
 import com.jafpl.util.{ItemComparator, ItemTester, UniqueId}
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -61,27 +61,27 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     *
     * @return The constructed Pipeline object.
     */
-  def addPipeline(): PipelineStart = addPipeline(None)
+  def addPipeline(manifold: ManifoldSpecification): PipelineStart = addPipeline(None, manifold)
 
   /** Adds a pipeline to the graph.
     *
     * @param label A user-defined label.
     * @return The constructed Pipeline object.
     */
-  def addPipeline(label: String): PipelineStart = addPipeline(Some(label))
+  def addPipeline(label: String, manifold: ManifoldSpecification): PipelineStart = addPipeline(Some(label), manifold)
 
   /** Adds a pipeline to the graph.
     *
     * @param label An optional, user-defined label.
     * @return The constructed Pipeline object.
     */
-  def addPipeline(label: Option[String]): PipelineStart = {
+  def addPipeline(label: Option[String], manifold: ManifoldSpecification): PipelineStart = {
     checkOpen()
 
     logger.debug("addPipeline {}", label.getOrElse("ANONYMOUS"))
 
     val end = new ContainerEnd(this)
-    val start = new PipelineStart(this, end, label)
+    val start = new PipelineStart(this, end, manifold, label)
     end.parent = start
     end.start = start
     _nodes += start
@@ -204,14 +204,14 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     * @param label An optional, user-defined label.
     * @return The constructed group.
     */
-  protected[graph] def addGroup(label: Option[String]): ContainerStart = {
+  protected[graph] def addGroup(label: Option[String], manifold: ManifoldSpecification): ContainerStart = {
     checkOpen()
 
     val dlabel = label.getOrElse("")
     logger.debug(s"addGroup $dlabel")
 
     val end = new ContainerEnd(this)
-    val start = new GroupStart(this, end, label)
+    val start = new GroupStart(this, end, manifold, label)
     end.parent = start
     end.start = start
     _nodes += start
@@ -230,7 +230,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     logger.debug("addChoose {}", label.getOrElse("ANONYMOUS"))
 
     val end = new ContainerEnd(this)
-    val start = new ChooseStart(this, end, label)
+    val start = new ChooseStart(this, end, Manifold.ALLOW_ANY, label)
     end.parent = start
     end.start = start
     _nodes += start
@@ -238,13 +238,13 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     start
   }
 
-  protected[graph] def addWhen(expression: Any, label: Option[String]): WhenStart = {
+  protected[graph] def addWhen(expression: Any, label: Option[String], manifold: ManifoldSpecification): WhenStart = {
     checkOpen()
 
     logger.debug("addWhen {} {}", label.getOrElse("ANONYMOUS"), expression)
 
     val end = new ContainerEnd(this)
-    val start = new WhenStart(this, end, label, expression)
+    val start = new WhenStart(this, end, label, manifold, expression)
     end.parent = start
     end.start = start
     _nodes += start
@@ -257,13 +257,13 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     * @param label An optional, user-defined label.
     * @return The constructed for-each.
     */
-  protected[graph] def addForEach(label: Option[String]): LoopEachStart = {
+  protected[graph] def addForEach(label: Option[String], manifold: ManifoldSpecification): LoopEachStart = {
     checkOpen()
 
     logger.debug("addForEach {}", label.getOrElse("ANONYMOUS"))
 
     val end = new ContainerEnd(this)
-    val start = new LoopEachStart(this, end, label)
+    val start = new LoopEachStart(this, end, label, manifold)
     end.parent = start
     end.start = start
     _nodes += start
@@ -277,13 +277,13 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     * @param label An optional, user-defined label.
     * @return The constructed for-each.
     */
-  protected[graph] def addWhile(tester: ItemTester, label: Option[String]): LoopWhileStart = {
+  protected[graph] def addWhile(tester: ItemTester, label: Option[String], manifold: ManifoldSpecification): LoopWhileStart = {
     checkOpen()
 
     logger.debug("addWhile {}", label.getOrElse("ANONYMOUS"))
 
     val end = new ContainerEnd(this)
-    val start = new LoopWhileStart(this, end, label, tester)
+    val start = new LoopWhileStart(this, end, label, manifold, tester)
     end.parent = start
     end.start = start
     _nodes += start
@@ -297,13 +297,13 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     * @param label An optional, user-defined label.
     * @return The constructed for-each.
     */
-  protected[graph] def addUntil(comparator: ItemComparator, label: Option[String]): LoopUntilStart = {
+  protected[graph] def addUntil(comparator: ItemComparator, label: Option[String], manifold: ManifoldSpecification): LoopUntilStart = {
     checkOpen()
 
     logger.debug("addUntil {}", label.getOrElse("ANONYMOUS"))
 
     val end = new ContainerEnd(this)
-    val start = new LoopUntilStart(this, end, label, comparator)
+    val start = new LoopUntilStart(this, end, label, manifold, comparator)
     end.parent = start
     end.start = start
     _nodes += start
@@ -316,13 +316,13 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     * @param label An optional, user-defined label.
     * @return The constructed for-each.
     */
-  protected[graph] def addFor(label: Option[String], countFrom: Long, countTo: Long, countBy: Long): LoopForStart = {
+  protected[graph] def addFor(label: Option[String], countFrom: Long, countTo: Long, countBy: Long, manifold: ManifoldSpecification): LoopForStart = {
     checkOpen()
 
     logger.debug("addFor {}", label.getOrElse("ANONYMOUS"))
 
     val end = new ContainerEnd(this)
-    val start = new LoopForStart(this, end, label, countFrom, countTo, countBy)
+    val start = new LoopForStart(this, end, label, countFrom, countTo, countBy, manifold)
     end.parent = start
     end.start = start
     _nodes += start
@@ -1053,41 +1053,14 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
         } else if (toCard.isEmpty) {
           logger.debug(s"Step ${edge.to.step.get} has no input port named ${edge.toPort}")
         } else {
-          if ((fromCard.get == "1") || (toCard.get == "*") || (fromCard.get == toCard.get)) {
-            // nop; this is bound to be fine.
+          if (fromCard.get.minimum >= toCard.get.minimum && fromCard.get.maximum <= toCard.get.maximum) {
+            // this will be fine
           } else {
-            fromCard.get match {
-              case "*" =>
-                toCard.get match {
-                  case "+" =>
-                    logger.warn(s"${edge.from}.${edge.fromPort} may produce no output but ${edge.to}.${edge.toPort} requires at least one input")
-                  case "1" =>
-                    logger.warn(s"${edge.from}.${edge.fromPort} may produce a sequence but ${edge.to}.${edge.toPort} requires exactly one input")
-                  case "?" =>
-                    logger.warn(s"${edge.from}.${edge.fromPort} may produce a sequence but ${edge.to}.${edge.toPort} requires at most one input")
-                  case _ =>
-                    error(JafplException.unexpectedCardinality(edge.to.toString, edge.toPort, toCard.get, edge.to.location))
-                }
-              case "+" =>
-                toCard.get match {
-                  case "1" =>
-                    logger.warn(s"${edge.from}.${edge.fromPort} may produce a sequence but ${edge.to}.${edge.toPort} requires exactly one input")
-                  case "?" =>
-                    logger.warn(s"${edge.from}.${edge.fromPort} may produce a sequence but ${edge.to}.${edge.toPort} requires at most one input")
-                  case _ =>
-                    error(JafplException.unexpectedCardinality(edge.to.toString, edge.toPort, toCard.get, edge.to.location))
-                }
-              case "?" =>
-                toCard.get match {
-                  case "+" =>
-                    logger.warn(s"${edge.from}.${edge.fromPort} may produce no output but ${edge.to}.${edge.toPort} requires at least one input")
-                  case "1" =>
-                    logger.warn(s"${edge.from}.${edge.fromPort} may produce no output but ${edge.to}.${edge.toPort} requires exactly one input")
-                  case _ =>
-                    error(JafplException.unexpectedCardinality(edge.to.toString, edge.toPort, toCard.get, edge.to.location))
-                }
-              case _ =>
-                error(JafplException.unexpectedCardinality(edge.from.toString, edge.fromPort, fromCard.get, edge.from.location))
+            if (fromCard.get.minimum < toCard.get.minimum) {
+              logger.warn(s"${edge.from}.${edge.fromPort} may produce fewer documents than ${edge.to}.${edge.toPort} requires")
+            }
+            if (fromCard.get.maximum > toCard.get.maximum) {
+              logger.warn(s"${edge.from}.${edge.fromPort} may produce more documents than ${edge.to}.${edge.toPort} allows")
             }
           }
         }

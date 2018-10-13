@@ -1,7 +1,7 @@
 package com.jafpl.graph
 
 import com.jafpl.exceptions.JafplException
-import com.jafpl.steps.{Step, ViewportComposer}
+import com.jafpl.steps.{ManifoldSpecification, Step, ViewportComposer}
 
 /** A choose container.
   *
@@ -13,12 +13,15 @@ import com.jafpl.steps.{Step, ViewportComposer}
   */
 class ChooseStart private[jafpl] (override val graph: Graph,
                                   override protected val end: ContainerEnd,
+                                  private val manspec: ManifoldSpecification,
                                   override val userLabel: Option[String])
   extends ContainerStart(graph, end, userLabel) {
 
-  def addWhen(expression: Any, label: String): WhenStart = addWhen(expression, Some(label))
-  def addWhen(expression: Any, label: Option[String]): WhenStart = {
-    val node = graph.addWhen(expression, label)
+  manifold = manspec
+
+  def addWhen(expression: Any, label: String, manifold: ManifoldSpecification): WhenStart = addWhen(expression, Some(label), manifold)
+  def addWhen(expression: Any, label: Option[String], manifold: ManifoldSpecification): WhenStart = {
+    val node = graph.addWhen(expression, label, manifold)
     addChild(node)
     node
   }
@@ -27,7 +30,7 @@ class ChooseStart private[jafpl] (override val graph: Graph,
     throw JafplException.childForbidden(this.label, label.getOrElse(step.toString), location)
   }
 
-  override def addGroup(label: Option[String]): ContainerStart = {
+  override def addGroup(label: Option[String], manifold: ManifoldSpecification): ContainerStart = {
     throw JafplException.childForbidden(this.label, label.getOrElse("group"), location)
   }
 
@@ -35,7 +38,7 @@ class ChooseStart private[jafpl] (override val graph: Graph,
     throw JafplException.childForbidden(this.label, label.getOrElse("choose"), location)
   }
 
-  override def addForEach(label: Option[String]): LoopEachStart = {
+  override def addForEach(label: Option[String], manifold: ManifoldSpecification): LoopEachStart = {
     throw JafplException.childForbidden(this.label, label.getOrElse("for-each"), location)
   }
 

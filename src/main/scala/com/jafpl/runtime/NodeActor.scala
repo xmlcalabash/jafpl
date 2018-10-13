@@ -6,8 +6,8 @@ import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{ContainerStart, Node}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GStopped}
-import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NFinally, NGuardResult, NInitialize, NInput, NLoop, NReset, NRunFinally, NStart, NStop, NTraceDisable, NTraceEnable, NViewportFinished}
-import com.jafpl.steps.{DataConsumer, PortSpecification}
+import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NFinally, NGuardResult, NInitialize, NInput, NLoop, NReset, NRestartLoop, NRunFinally, NStart, NStop, NTraceDisable, NTraceEnable, NViewportFinished}
+import com.jafpl.steps.{DataConsumer, Manifold, PortSpecification}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -21,6 +21,7 @@ private[runtime] object NodeActor {
   case class NFinally()
   case class NRunFinally(cause: Option[Throwable])
   case class NReset()
+  case class NRestartLoop()
   case class NInput(from: Node, fromPort: String, toPort: String, item: Message)
   case class NLoop(item: ItemMessage)
   case class NClose(port: String)
@@ -41,7 +42,6 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   protected val openInputs = mutable.HashSet.empty[String]
   protected val bufferedInput: ListBuffer[InputBuffer] = ListBuffer.empty[InputBuffer]
   protected var readyToRun = false
-  protected val cardinalities = mutable.HashMap.empty[String, Long]
   protected var proxy = Option.empty[DataConsumer]
 
   def this(monitor: ActorRef, runtime: GraphRuntime, node: Node, consumer: DataConsumer) {
@@ -55,7 +55,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
 
   protected def trace(level: String, message: String, event: String): Unit = {
     // We don't use the traceEventManager.trace() call because we want to use the Akka logger
-    if (runtime.traceEventManager.traceEnabled(event)) {
+    if (true|| runtime.traceEventManager.traceEnabled(event)) {
       level match {
         case "info" => log.info(message)
         case "debug" => log.debug(message)
@@ -86,14 +86,10 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     for (input <- node.inputs) {
       openInputs.add(input)
     }
-    cardinalities.clear()
-    if (proxy.isDefined) {
-      proxy.get match {
-        case cp: ConsumingProxy =>
-          cp.reset()
-        case _ => Unit
-      }
-    }
+
+    node.inputCardinalities.clear()
+    node.outputCardinalities.clear()
+
     if (node.step.isDefined) {
       trace(s"RESETNOD $node", "StepExec")
       try {
@@ -167,20 +163,16 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       trace(s"RUNSTEP  $node", "StepExec")
       try {
         node.step.get.run()
-        if (proxy.isDefined) {
-          for (output <- node.outputs) {
-            if (!output.startsWith("#")) {
-              proxy.get match {
-                case cp: ConsumingProxy => node.step.get.outputSpec.checkCardinality(output,cp.cardinality(output))
-                case _ => Unit
-              }
-            }
-          }
+
+        for (output <- node.outputs.filter(!_.startsWith("#"))) {
+          val count = node.outputCardinalities.getOrElse(output, 0L)
+          val ospec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
+          ospec.outputSpec.checkCardinality(output, count)
         }
       } catch {
-        case cause: Throwable =>
+        case ex: Exception =>
           threwException = true
-          monitor ! GException(Some(node), cause)
+          monitor ! GException(Some(node), ex)
       }
 
       trace(s"Ran $node: $threwException", "StepExec")
@@ -231,16 +223,15 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     // cardinalities after all ports are closed.
     if (openInputs.isEmpty && node.step.isDefined) {
       if (node.step.get.inputSpec != PortSpecification.ANY) {
-        for (port <- node.step.get.inputSpec.ports) {
-          if (port != "*") {
-            try {
-              trace(s"Check cardinality of $port for $node", "Cardinalities")
-              node.step.get.inputSpec.checkCardinality(port, cardinalities.getOrElse(port, 0L))
-            } catch {
-              case cause: Throwable =>
-                monitor ! GException(Some(node), cause)
-              case _: Throwable => Unit
-            }
+        for (port <- node.step.get.inputSpec.ports.filter(_ != "*")) {
+          try {
+            trace(s"Check cardinality of $port for $node", "Cardinalities")
+            val count = node.inputCardinalities.getOrElse(port, 0L)
+            val ispec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
+            ispec.inputSpec.checkCardinality(port, count)
+          } catch {
+            case ex: JafplException =>
+              monitor ! GException(Some(node), ex)
           }
         }
       }
@@ -283,9 +274,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
                 inj.run(message)
               }
             }
-            val card = cardinalities.getOrElse(port, 0L) + 1L
-            trace(s"Wrote to $port for $node: $card", "Cardinalities")
-            cardinalities.put(port, card)
+            node.inputCardinalities.put(port, node.inputCardinalities.getOrElse(port, 0L) + 1)
             if (node.step.isDefined) {
               trace(s"DELIVER→ ${node.step.get}.$port", "StepIO")
               node.step.get.receive(port, message)
@@ -381,6 +370,15 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       trace(s"RESETNOD $node", "StepMessages")
       reset()
 
+    case NRestartLoop() =>
+      trace(s"RSETLOOP $node", "StepMessages")
+      this match {
+        case loopEach: LoopEachActor =>
+          loopEach.restartLoop()
+        case _ =>
+          monitor ! GException(None, JafplException.internalError(s"Attempt to restart non-loop $node", node.location))
+      }
+
     case NContainerFinished() =>
       trace(s"CNTNRFIN $node", "StepMessages")
 
@@ -405,7 +403,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       }
 
     case NChildFinished(otherNode) =>
-      trace(s"CHILDFIN $otherNode", "StepMessages")
+      trace(s"NCHILDFN $otherNode", "StepMessages")
       this match {
         case end: EndActor =>
           end.finished(otherNode)
