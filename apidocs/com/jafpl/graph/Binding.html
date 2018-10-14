@@ -536,7 +536,7 @@ At runtime, the association is between the name and its computed value.
 data flow establishes dependencies automatically. If step A consumes the output of step B,
 the pipeline will assure that step B runs before step A.</p><p>In cases where there is no data flow dependency, but it's still necessary to force an
 order, you can impose one by saying that <code>A.dependsOn(B)</code>.
-</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
+</p></div><dl class="paramcmts block"><dt class="param">node</dt><dd class="cmt"><p>The node in the graph which must be run before this one</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
     </li><li name="com.jafpl.graph.Node#dump" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="dump(depth:Int):scala.xml.Elem"></a><a id="dump(Int):Elem"></a>
       <span class="permalink">
@@ -720,6 +720,22 @@ order, you can impose one by saying that <code>A.dependsOn(B)</code>.
       
       <p class="shortcomment cmt">A unique identifier for this node.</p><div class="fullcomment"><div class="comment cmt"><p>A unique identifier for this node.</p><p>Every node has a unique identifier.
 </p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
+    </li><li name="com.jafpl.graph.Node#inputCardinalities" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="inputCardinalities:scala.collection.mutable.HashMap[String,Long]"></a><a id="inputCardinalities:HashMap[String,Long]"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Binding.html#inputCardinalities:scala.collection.mutable.HashMap[String,Long]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">inputCardinalities</span><span class="result">: <span class="extype" name="scala.collection.mutable.HashMap">HashMap</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Long">Long</span>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../index.html" class="extype" name="com.jafpl">com.jafpl</a>] </dd><dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
     </li><li name="com.jafpl.graph.Node#inputEdge" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="inputEdge(port:String):com.jafpl.graph.Edge"></a><a id="inputEdge(String):Edge"></a>
       <span class="permalink">
@@ -883,6 +899,38 @@ node is always appended to the label.</p></div><dl class="attributes block"> <dt
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
+    </li><li name="com.jafpl.graph.Node#manifold" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="manifold:Option[com.jafpl.steps.ManifoldSpecification]"></a><a id="manifold:Option[ManifoldSpecification]"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Binding.html#manifold:Option[com.jafpl.steps.ManifoldSpecification]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">manifold</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="../steps/ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
+    </li><li name="com.jafpl.graph.Node#manifold_=" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="manifold_=(man:com.jafpl.steps.ManifoldSpecification):Unit"></a><a id="manifold_=(ManifoldSpecification):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Binding.html#manifold_=(man:com.jafpl.steps.ManifoldSpecification):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: manifold_$eq" class="name">manifold_=</span><span class="params">(<span name="man">man: <a href="../steps/ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../index.html" class="extype" name="com.jafpl">com.jafpl</a>] </dd><dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
     </li><li name="com.jafpl.graph.Binding#name" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="name:String"></a>
       <span class="permalink">
@@ -963,6 +1011,22 @@ node is always appended to the label.</p></div><dl class="attributes block"> <dt
       </span>
       
       
+    </li><li name="com.jafpl.graph.Node#outputCardinalities" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="outputCardinalities:scala.collection.mutable.HashMap[String,Long]"></a><a id="outputCardinalities:HashMap[String,Long]"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Binding.html#outputCardinalities:scala.collection.mutable.HashMap[String,Long]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">outputCardinalities</span><span class="result">: <span class="extype" name="scala.collection.mutable.HashMap">HashMap</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Long">Long</span>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../index.html" class="extype" name="com.jafpl">com.jafpl</a>] </dd><dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
     </li><li name="com.jafpl.graph.Node#outputEdge" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="outputEdge(port:String):com.jafpl.graph.Edge"></a><a id="outputEdge(String):Edge"></a>
       <span class="permalink">

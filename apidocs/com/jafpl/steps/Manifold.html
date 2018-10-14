@@ -138,8 +138,8 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                         </a>
                       </li><li class="current-entities indented3">
                         <a class="object" href="BindingSpecification$.html" title="Useful default binding specifications."></a>
-                        <a class="class" href="" title="Specify the required bindings for steps."></a>
-                        <a href="" title="Specify the required bindings for steps.">
+                        <a class="class" href="BindingSpecification.html" title="Specify the required bindings for steps."></a>
+                        <a href="BindingSpecification.html" title="Specify the required bindings for steps.">
                           BindingSpecification
                         </a>
                       </li><li class="current-entities indented3">
@@ -162,8 +162,8 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                         </a>
                       </li><li class="current-entities indented3">
                         <a class="object" href="Manifold$.html" title=""></a>
-                        <a class="class" href="Manifold.html" title=""></a>
-                        <a href="Manifold.html" title="">
+                        <a class="class" href="" title=""></a>
+                        <a href="" title="">
                           Manifold
                         </a>
                       </li><li class="current-entities indented3">
@@ -209,15 +209,15 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
           <div id="content">
             <body class="class type">
       <div id="definition">
-        <a href="BindingSpecification$.html" title="See companion object"><div class="big-circle class-companion-object">c</div></a>
+        <a href="Manifold$.html" title="See companion object"><div class="big-circle class-companion-object">c</div></a>
         <p id="owner"><a href="../../index.html" class="extype" name="com">com</a>.<a href="../index.html" class="extype" name="com.jafpl">jafpl</a>.<a href="index.html" class="extype" name="com.jafpl.steps">steps</a></p>
-        <h1><a href="BindingSpecification$.html" title="See companion object">BindingSpecification</a><span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html" title="Permalink">
+        <h1><a href="Manifold$.html" title="See companion object">Manifold</a><span class="permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
         <h3><span class="morelinks"><div>
-            Companion <a href="BindingSpecification$.html" title="See companion object">object BindingSpecification</a>
+            Companion <a href="Manifold$.html" title="See companion object">object Manifold</a>
           </div></span></h3>
       </div>
 
@@ -227,21 +227,16 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">BindingSpecification</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+        <span class="name">Manifold</span><span class="result"> extends <a href="ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Specify the required bindings for steps.</p><p>The core engine doesn't care what bindings are passed to steps. If you have a step
-that requires a specific set of bindings, you can declare that explicitly. Once declared
-the pipeline engine will assure that a binding is provided.</p><p>Unlike ports, which have cardinalities, all that you can specify for bindings is that
-they are required. You cannot forbid bindings; steps must ignore &quot;extra&quot; bindings
-that might be provided by the pipeline.
-</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -267,7 +262,7 @@ that might be provided by the pipeline.
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.jafpl.steps.BindingSpecification"><span>BindingSpecification</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.jafpl.steps.Manifold"><span>Manifold</span></li><li class="in" name="com.jafpl.steps.ManifoldSpecification"><span>ManifoldSpecification</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -287,10 +282,10 @@ that might be provided by the pipeline.
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="com.jafpl.steps.BindingSpecification#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(bindings:Set[String]):com.jafpl.steps.BindingSpecification"></a><a id="&lt;init&gt;:BindingSpecification"></a>
+              <ol><li name="com.jafpl.steps.Manifold#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(input:com.jafpl.steps.PortSpecification,output:com.jafpl.steps.PortSpecification):com.jafpl.steps.Manifold"></a><a id="&lt;init&gt;:Manifold"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#&lt;init&gt;(bindings:Set[String]):com.jafpl.steps.BindingSpecification" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#&lt;init&gt;(input:com.jafpl.steps.PortSpecification,output:com.jafpl.steps.PortSpecification):com.jafpl.steps.Manifold" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -299,10 +294,10 @@ that might be provided by the pipeline.
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">BindingSpecification</span><span class="params">(<span name="bindings">bindings: <span class="extype" name="scala.Predef.Set">Set</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span>
+        <span class="name">Manifold</span><span class="params">(<span name="input">input: <a href="PortSpecification.html" class="extype" name="com.jafpl.steps.PortSpecification">PortSpecification</a></span>, <span name="output">output: <a href="PortSpecification.html" class="extype" name="com.jafpl.steps.PortSpecification">PortSpecification</a></span>)</span>
       </span>
       
-      <p class="shortcomment cmt">A binding specification.</p><div class="fullcomment"><div class="comment cmt"><p>A binding specification.</p></div><dl class="paramcmts block"><dt class="param">bindings</dt><dd class="cmt"><p>A set of the names of required bindings.</p></dd></dl></div>
+      
     </li></ol>
             </div>
 
@@ -316,7 +311,7 @@ that might be provided by the pipeline.
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -332,7 +327,7 @@ that might be provided by the pipeline.
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html###():Int" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -348,7 +343,7 @@ that might be provided by the pipeline.
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -364,7 +359,7 @@ that might be provided by the pipeline.
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -377,26 +372,10 @@ that might be provided by the pipeline.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.jafpl.steps.BindingSpecification#bindings" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="bindings:Set[String]"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#bindings:Set[String]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">bindings</span><span class="result">: <span class="extype" name="scala.Predef.Set">Set</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#clone():Object" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -418,7 +397,7 @@ that might be provided by the pipeline.
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -434,7 +413,7 @@ that might be provided by the pipeline.
     </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#equals(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#equals(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -450,7 +429,7 @@ that might be provided by the pipeline.
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#finalize():Unit" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -472,7 +451,7 @@ that might be provided by the pipeline.
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -488,7 +467,7 @@ that might be provided by the pipeline.
     </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#hashCode():Int" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#hashCode():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -501,10 +480,27 @@ that might be provided by the pipeline.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.jafpl.steps.Manifold#inputSpec" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="IOSpecs">
+      <a id="inputSpec:com.jafpl.steps.PortSpecification"></a><a id="inputSpec:PortSpecification"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#inputSpec:com.jafpl.steps.PortSpecification" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">inputSpec</span><span class="result">: <a href="PortSpecification.html" class="extype" name="com.jafpl.steps.PortSpecification">PortSpecification</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">The names of the input ports this step requires.</p><div class="fullcomment"><div class="comment cmt"><p>The names of the input ports this step requires.</p><p>This method returns the names of the input ports that the step requires.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The list of required port names.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.steps.Manifold">Manifold</a> → <a href="ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -520,7 +516,7 @@ that might be provided by the pipeline.
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -536,7 +532,7 @@ that might be provided by the pipeline.
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#notify():Unit" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -552,7 +548,7 @@ that might be provided by the pipeline.
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -565,10 +561,27 @@ that might be provided by the pipeline.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.jafpl.steps.Manifold#outputSpec" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="IOSpecs">
+      <a id="outputSpec:com.jafpl.steps.PortSpecification"></a><a id="outputSpec:PortSpecification"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#outputSpec:com.jafpl.steps.PortSpecification" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">outputSpec</span><span class="result">: <a href="PortSpecification.html" class="extype" name="com.jafpl.steps.PortSpecification">PortSpecification</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">The names of the output ports this step requires.</p><div class="fullcomment"><div class="comment cmt"><p>The names of the output ports this step requires.</p><p>This method returns the names of the output ports that the step requires.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The list of required port names.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.jafpl.steps.Manifold">Manifold</a> → <a href="ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -584,7 +597,7 @@ that might be provided by the pipeline.
     </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#toString():String" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#toString():String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -600,7 +613,7 @@ that might be provided by the pipeline.
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#wait():Unit" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -622,7 +635,7 @@ that might be provided by the pipeline.
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -644,7 +657,7 @@ that might be provided by the pipeline.
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/BindingSpecification.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../com/jafpl/steps/Manifold.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -673,7 +686,9 @@ that might be provided by the pipeline.
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.AnyRef">
+        <div class="parent" name="com.jafpl.steps.ManifoldSpecification">
+              <h3>Inherited from <a href="ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
@@ -682,7 +697,10 @@ that might be provided by the pipeline.
         </div>
 
         <div id="groupedMembers">
-        <div class="group" name="Ungrouped">
+        <div class="group" name="IOSpecs">
+              <h3>IOSpecs</h3>
+              
+            </div><div class="group" name="Ungrouped">
               <h3>Ungrouped</h3>
               
             </div>

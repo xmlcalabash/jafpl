@@ -138,8 +138,8 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="class" href="" title="Execute a pipeline."></a>
-                        <a href="" title="Execute a pipeline.">
+                        <a class="class" href="GraphRuntime.html" title="Execute a pipeline."></a>
+                        <a href="GraphRuntime.html" title="Execute a pipeline.">
                           GraphRuntime
                         </a>
                       </li><li class="current-entities indented3">
@@ -174,8 +174,8 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="class" href="TracingActor.html" title=""></a>
-                        <a href="TracingActor.html" title="">
+                        <a class="class" href="" title=""></a>
+                        <a href="" title="">
                           TracingActor
                         </a>
                       </li>
@@ -187,8 +187,8 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       <div id="definition">
         <div class="big-circle class">c</div>
         <p id="owner"><a href="../../index.html" class="extype" name="com">com</a>.<a href="../index.html" class="extype" name="com.jafpl">jafpl</a>.<a href="index.html" class="extype" name="com.jafpl.runtime">runtime</a></p>
-        <h1>GraphRuntime<span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html" title="Permalink">
+        <h1>TracingActor<span class="permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
@@ -197,22 +197,20 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
 
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
-        <span class="modifier"></span>
+        <span class="modifier">abstract </span>
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">GraphRuntime</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+        <span class="name">TracingActor</span><span class="result"> extends <span class="extype" name="akka.actor.Actor">Actor</span></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Execute a pipeline.</p><p>The graph runtime executes a pipeline.</p><p>If the specified graph is open, it will be closed. If it is not valid, an exception is thrown.</p><p>Constructing the runtime builds the network of Akka actors. If for some reason you decide not
-to run the pipeline, you must call <code>stop</code> to tear it down.
-</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="akka.actor.Actor">Actor</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -238,7 +236,7 @@ to run the pipeline, you must call <code>stop</code> to tear it down.
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.jafpl.runtime.GraphRuntime"><span>GraphRuntime</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.jafpl.runtime.TracingActor"><span>TracingActor</span></li><li class="in" name="akka.actor.Actor"><span>Actor</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -258,10 +256,10 @@ to run the pipeline, you must call <code>stop</code> to tear it down.
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="com.jafpl.runtime.GraphRuntime#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(graph:com.jafpl.graph.Graph,runtime:com.jafpl.runtime.RuntimeConfiguration):com.jafpl.runtime.GraphRuntime"></a><a id="&lt;init&gt;:GraphRuntime"></a>
+              <ol><li name="com.jafpl.runtime.TracingActor#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(runtime:com.jafpl.runtime.GraphRuntime):com.jafpl.runtime.TracingActor"></a><a id="&lt;init&gt;:TracingActor"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#&lt;init&gt;(graph:com.jafpl.graph.Graph,runtime:com.jafpl.runtime.RuntimeConfiguration):com.jafpl.runtime.GraphRuntime" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#&lt;init&gt;(runtime:com.jafpl.runtime.GraphRuntime):com.jafpl.runtime.TracingActor" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -270,24 +268,62 @@ to run the pipeline, you must call <code>stop</code> to tear it down.
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">GraphRuntime</span><span class="params">(<span name="graph">graph: <a href="../graph/Graph.html" class="extype" name="com.jafpl.graph.Graph">Graph</a></span>, <span name="runtime">runtime: <a href="RuntimeConfiguration.html" class="extype" name="com.jafpl.runtime.RuntimeConfiguration">RuntimeConfiguration</a></span>)</span>
+        <span class="name">TracingActor</span><span class="params">(<span name="runtime">runtime: <a href="GraphRuntime.html" class="extype" name="com.jafpl.runtime.GraphRuntime">GraphRuntime</a></span>)</span>
       </span>
       
-      <p class="shortcomment cmt">A graph runtime.</p><div class="fullcomment"><div class="comment cmt"><p>A graph runtime.</p></div><dl class="paramcmts block"><dt class="param">graph</dt><dd class="cmt"><p>The graph to execute.</p></dd><dt class="param">runtime</dt><dd class="cmt"><p>Runtime context information for the execution.</p></dd></dl></div>
+      
     </li></ol>
             </div>
 
-        
-
-        
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="akka.actor.Actor.Receive" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Receive=akka.actor.Actor.Receive"></a><a id="Receive:Receive"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#Receive=akka.actor.Actor.Receive" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Receive</span><span class="result alias"> = <span class="extype" name="scala.PartialFunction">PartialFunction</span>[<span class="extype" name="scala.Any">Any</span>, <span class="extype" name="scala.Unit">Unit</span>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li></ol>
+            </div>
 
         <div class="values members">
-              <h3>Value Members</h3>
+              <h3>Abstract Value Members</h3>
+              <ol><li name="akka.actor.Actor#receive" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="receive:akka.actor.Actor.Receive"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#receive:akka.actor.Actor.Receive" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">receive</span><span class="result">: <span class="extype" name="akka.actor.Actor.Receive">akka.actor.Actor.Receive</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li></ol>
+            </div>
+
+        <div class="values members">
+              <h3>Concrete Value Members</h3>
               <ol>
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -303,7 +339,7 @@ to run the pipeline, you must call <code>stop</code> to tear it down.
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html###():Int" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -319,7 +355,7 @@ to run the pipeline, you must call <code>stop</code> to tear it down.
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -332,10 +368,105 @@ to run the pipeline, you must call <code>stop</code> to tear it down.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="akka.actor.Actor#aroundPostRestart" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="aroundPostRestart(reason:Throwable):Unit"></a><a id="aroundPostRestart(Throwable):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#aroundPostRestart(reason:Throwable):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">aroundPostRestart</span><span class="params">(<span name="reason">reason: <span class="extype" name="scala.Throwable">Throwable</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../akka/index.html" class="extype" name="akka">akka</a>] </dd><dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@InternalApi</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="akka.actor.Actor#aroundPostStop" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="aroundPostStop():Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#aroundPostStop():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">aroundPostStop</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../akka/index.html" class="extype" name="akka">akka</a>] </dd><dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@InternalApi</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="akka.actor.Actor#aroundPreRestart" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="aroundPreRestart(reason:Throwable,message:Option[Any]):Unit"></a><a id="aroundPreRestart(Throwable,Option[Any]):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#aroundPreRestart(reason:Throwable,message:Option[Any]):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">aroundPreRestart</span><span class="params">(<span name="reason">reason: <span class="extype" name="scala.Throwable">Throwable</span></span>, <span name="message">message: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../akka/index.html" class="extype" name="akka">akka</a>] </dd><dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@InternalApi</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="akka.actor.Actor#aroundPreStart" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="aroundPreStart():Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#aroundPreStart():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">aroundPreStart</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../akka/index.html" class="extype" name="akka">akka</a>] </dd><dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@InternalApi</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="akka.actor.Actor#aroundReceive" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="aroundReceive(receive:akka.actor.Actor.Receive,msg:Any):Unit"></a><a id="aroundReceive(akka.actor.Actor.Receive,Any):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#aroundReceive(receive:akka.actor.Actor.Receive,msg:Any):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">aroundReceive</span><span class="params">(<span name="receive">receive: <span class="extype" name="akka.actor.Actor.Receive">akka.actor.Actor.Receive</span></span>, <span name="msg">msg: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../akka/index.html" class="extype" name="akka">akka</a>] </dd><dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@InternalApi</span><span class="args">()</span>
+              
+        </dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -351,7 +482,7 @@ to run the pipeline, you must call <code>stop</code> to tear it down.
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#clone():Object" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -370,10 +501,26 @@ to run the pipeline, you must call <code>stop</code> to tear it down.
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="akka.actor.Actor#context" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="context:akka.actor.ActorContext"></a><a id="context:ActorContext"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#context:akka.actor.ActorContext" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">implicit </span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">context</span><span class="result">: <span class="extype" name="akka.actor.ActorContext">ActorContext</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -389,7 +536,7 @@ to run the pipeline, you must call <code>stop</code> to tear it down.
     </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#equals(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#equals(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -402,28 +549,10 @@ to run the pipeline, you must call <code>stop</code> to tear it down.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.jafpl.runtime.GraphRuntime#exception" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="exception:Option[Throwable]"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#exception:Option[Throwable]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">exception</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Throwable">Throwable</span>]</span>
-      </span>
-      
-      <p class="shortcomment cmt">Returns an optional exception raised during execution.</p><div class="fullcomment"><div class="comment cmt"><p>Returns an optional exception raised during execution.</p><p>If the pipeline execution halts because an uncaught exception is thrown, the
-exception is available from here after the pipeline finishes.
-</p></div></div>
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#finalize():Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -442,58 +571,10 @@ exception is available from here after the pipeline finishes.
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.jafpl.runtime.GraphRuntime#finish" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="finish(cause:Throwable):Unit"></a><a id="finish(Throwable):Unit"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#finish(cause:Throwable):Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">finish</span><span class="params">(<span name="cause">cause: <span class="extype" name="scala.Throwable">Throwable</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.runtime">com.jafpl.runtime</a>] </dd></dl></div>
-    </li><li name="com.jafpl.runtime.GraphRuntime#finish" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="finish():Unit"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#finish():Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">finish</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.runtime">com.jafpl.runtime</a>] </dd></dl></div>
-    </li><li name="com.jafpl.runtime.GraphRuntime#finished" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="finished:Boolean"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#finished:Boolean" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">finished</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Returns true if the pipeline execution has finished.</p>
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -506,26 +587,10 @@ exception is available from here after the pipeline finishes.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.jafpl.runtime.GraphRuntime#graph" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="graph:com.jafpl.graph.Graph"></a><a id="graph:Graph"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#graph:com.jafpl.graph.Graph" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">graph</span><span class="result">: <a href="../graph/Graph.html" class="extype" name="com.jafpl.graph.Graph">Graph</a></span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#hashCode():Int" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#hashCode():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -538,29 +603,10 @@ exception is available from here after the pipeline finishes.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.jafpl.runtime.GraphRuntime#inputs" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="inputs:Map[String,com.jafpl.steps.DataProvider]"></a><a id="inputs:Map[String,DataProvider]"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#inputs:Map[String,com.jafpl.steps.DataProvider]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">inputs</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <a href="../steps/DataProvider.html" class="extype" name="com.jafpl.steps.DataProvider">DataProvider</a>]</span>
-      </span>
-      
-      <p class="shortcomment cmt">A map of the inputs that the pipeline expects.</p><div class="fullcomment"><div class="comment cmt"><p>A map of the inputs that the pipeline expects.</p><p>This mapping from names (strings) to <a href="../steps/DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">com.jafpl.steps.DataConsumer</a>s is the set of inputs that
-the pipeline expects from the outside world. If you do not provide an input, an
-empty sequence of items will be provided.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>A map of the expected inputs.</p></dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -573,10 +619,10 @@ empty sequence of items will be provided.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.jafpl.runtime.GraphRuntime#logger" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="logger:org.slf4j.Logger"></a><a id="logger:Logger"></a>
+    </li><li name="com.jafpl.runtime.TracingActor#log" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="log:akka.event.LoggingAdapter"></a><a id="log:LoggingAdapter"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#logger:org.slf4j.Logger" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#log:akka.event.LoggingAdapter" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -585,14 +631,14 @@ empty sequence of items will be provided.
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">logger</span><span class="result">: <span class="extype" name="org.slf4j.Logger">Logger</span></span>
+        <span class="name">log</span><span class="result">: <span class="extype" name="akka.event.LoggingAdapter">LoggingAdapter</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../index.html" class="extype" name="com.jafpl">com.jafpl</a>] </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -608,7 +654,7 @@ empty sequence of items will be provided.
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#notify():Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -624,7 +670,7 @@ empty sequence of items will be provided.
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -637,10 +683,10 @@ empty sequence of items will be provided.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.jafpl.runtime.GraphRuntime#outputs" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="outputs:Map[String,com.jafpl.steps.DataConsumerProxy]"></a><a id="outputs:Map[String,DataConsumerProxy]"></a>
+    </li><li name="akka.actor.Actor#postRestart" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="postRestart(reason:Throwable):Unit"></a><a id="postRestart(Throwable):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#outputs:Map[String,com.jafpl.steps.DataConsumerProxy]" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#postRestart(reason:Throwable):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -649,17 +695,20 @@ empty sequence of items will be provided.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">outputs</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <a href="../steps/DataConsumerProxy.html" class="extype" name="com.jafpl.steps.DataConsumerProxy">DataConsumerProxy</a>]</span>
+        <span class="name">postRestart</span><span class="params">(<span name="reason">reason: <span class="extype" name="scala.Throwable">Throwable</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <p class="shortcomment cmt">A map of the outputs that the pipeline produces.</p><div class="fullcomment"><div class="comment cmt"><p>A map of the outputs that the pipeline produces.</p><p>This mapping from names (strings) to <a href="../steps/DataConsumerProxy.html" class="extype" name="com.jafpl.steps.DataConsumerProxy">com.jafpl.steps.DataConsumerProxy</a>s is the set of outputs that
-the pipeline. If you do not call the <code>setProvider</code> method, the output will be
-discarded.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>A map of the expected inputs.</p></dd></dl></div>
-    </li><li name="com.jafpl.runtime.GraphRuntime#run" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="run():Unit"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Exception]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="akka.actor.Actor#postStop" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="postStop():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#run():Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#postStop():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -668,14 +717,20 @@ discarded.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">run</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">postStop</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <p class="shortcomment cmt">Runs the pipeline.</p><div class="fullcomment"><div class="comment cmt"><p>Runs the pipeline.</p><p>This method will block until pipeline execution finishes.</p></div></div>
-    </li><li name="com.jafpl.runtime.GraphRuntime#runInBackground" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="runInBackground():Unit"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Exception]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="akka.actor.Actor#preRestart" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="preRestart(reason:Throwable,message:Option[Any]):Unit"></a><a id="preRestart(Throwable,Option[Any]):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#runInBackground():Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#preRestart(reason:Throwable,message:Option[Any]):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -684,16 +739,42 @@ discarded.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">runInBackground</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">preRestart</span><span class="params">(<span name="reason">reason: <span class="extype" name="scala.Throwable">Throwable</span></span>, <span name="message">message: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <p class="shortcomment cmt">Runs the pipeline.</p><div class="fullcomment"><div class="comment cmt"><p>Runs the pipeline.</p><p>This method starts execution of the pipeline and then returns immediately.
-The pipeline will continue to run in other threads.</p><p>To determine if execution has completed, check the <code>finished</code> value.
-</p></div></div>
-    </li><li name="com.jafpl.runtime.GraphRuntime#runtime" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="runtime:com.jafpl.runtime.RuntimeConfiguration"></a><a id="runtime:RuntimeConfiguration"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Exception]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="akka.actor.Actor#preStart" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="preStart():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#runtime:com.jafpl.runtime.RuntimeConfiguration" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#preStart():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">preStart</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Exception]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="com.jafpl.runtime.TracingActor#runtime" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="runtime:com.jafpl.runtime.GraphRuntime"></a><a id="runtime:GraphRuntime"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#runtime:com.jafpl.runtime.GraphRuntime" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -702,14 +783,46 @@ The pipeline will continue to run in other threads.</p><p>To determine if execut
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">runtime</span><span class="result">: <a href="RuntimeConfiguration.html" class="extype" name="com.jafpl.runtime.RuntimeConfiguration">RuntimeConfiguration</a></span>
+        <span class="name">runtime</span><span class="result">: <a href="GraphRuntime.html" class="extype" name="com.jafpl.runtime.GraphRuntime">GraphRuntime</a></span>
       </span>
       
-      
-    </li><li name="com.jafpl.runtime.GraphRuntime#setOption" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="setOption(option:String,value:Any):Unit"></a><a id="setOption(String,Any):Unit"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+    </li><li name="akka.actor.Actor#self" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="self:akka.actor.ActorRef"></a><a id="self:ActorRef"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#setOption(option:String,value:Any):Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#self:akka.actor.ActorRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">implicit final </span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">self</span><span class="result">: <span class="extype" name="akka.actor.ActorRef">ActorRef</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li name="akka.actor.Actor#sender" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="sender():akka.actor.ActorRef"></a><a id="sender():ActorRef"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#sender():akka.actor.ActorRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">sender</span><span class="params">()</span><span class="result">: <span class="extype" name="akka.actor.ActorRef">ActorRef</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li name="akka.actor.Actor#supervisorStrategy" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="supervisorStrategy:akka.actor.SupervisorStrategy"></a><a id="supervisorStrategy:SupervisorStrategy"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#supervisorStrategy:akka.actor.SupervisorStrategy" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -718,47 +831,14 @@ The pipeline will continue to run in other threads.</p><p>To determine if execut
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">setOption</span><span class="params">(<span name="option">option: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="value">value: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">supervisorStrategy</span><span class="result">: <span class="extype" name="akka.actor.SupervisorStrategy">SupervisorStrategy</span></span>
       </span>
       
-      <p class="shortcomment cmt">Set the value of an option.</p><div class="fullcomment"><div class="comment cmt"><p>Set the value of an option.
-</p></div><dl class="paramcmts block"><dt class="param">option</dt><dd class="cmt"><p>The option name</p></dd><dt class="param">value</dt><dd class="cmt"><p>The value</p></dd></dl></div>
-    </li><li name="com.jafpl.runtime.GraphRuntime#started" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="started:Boolean"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#started:Boolean" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">started</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Returns true if the pipeline execution has started.</p>
-    </li><li name="com.jafpl.runtime.GraphRuntime#stop" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="stop():Unit"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#stop():Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">stop</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -774,7 +854,7 @@ The pipeline will continue to run in other threads.</p><p>To determine if execut
     </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#toString():String" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#toString():String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -787,10 +867,10 @@ The pipeline will continue to run in other threads.</p><p>To determine if execut
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.jafpl.runtime.GraphRuntime#traceEventManager" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="traceEventManager:com.jafpl.util.TraceEventManager"></a><a id="traceEventManager:TraceEventManager"></a>
+    </li><li name="com.jafpl.runtime.TracingActor#trace" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="trace(level:String,code:String,details:String,event:com.jafpl.runtime.TraceEvent.TraceEvent):Unit"></a><a id="trace(String,String,String,TraceEvent):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#traceEventManager:com.jafpl.util.TraceEventManager" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#trace(level:String,code:String,details:String,event:com.jafpl.runtime.TraceEvent.TraceEvent):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -799,14 +879,14 @@ The pipeline will continue to run in other threads.</p><p>To determine if execut
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">traceEventManager</span><span class="result">: <a href="../util/TraceEventManager.html" class="extype" name="com.jafpl.util.TraceEventManager">TraceEventManager</a></span>
+        <span class="name">trace</span><span class="params">(<span name="level">level: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="details">details: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="event">event: <a href="TraceEvent$.html#TraceEvent=com.jafpl.runtime.TraceEvent.Value" class="extmbr" name="com.jafpl.runtime.TraceEvent.TraceEvent">TraceEvent</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      
-    </li><li name="com.jafpl.runtime.GraphRuntime#traceEventManager_=" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="traceEventManager_=(manager:com.jafpl.util.TraceEventManager):Unit"></a><a id="traceEventManager_=(TraceEventManager):Unit"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+    </li><li name="com.jafpl.runtime.TracingActor#trace" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="trace(code:String,details:String,event:com.jafpl.runtime.TraceEvent.TraceEvent):Unit"></a><a id="trace(String,String,TraceEvent):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#traceEventManager_=(manager:com.jafpl.util.TraceEventManager):Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#trace(code:String,details:String,event:com.jafpl.runtime.TraceEvent.TraceEvent):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -815,14 +895,46 @@ The pipeline will continue to run in other threads.</p><p>To determine if execut
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: traceEventManager_$eq" class="name">traceEventManager_=</span><span class="params">(<span name="manager">manager: <a href="../util/TraceEventManager.html" class="extype" name="com.jafpl.util.TraceEventManager">TraceEventManager</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">trace</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="details">details: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="event">event: <a href="TraceEvent$.html#TraceEvent=com.jafpl.runtime.TraceEvent.Value" class="extmbr" name="com.jafpl.runtime.TraceEvent.TraceEvent">TraceEvent</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+    </li><li name="com.jafpl.runtime.TracingActor#traceMessage" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="traceMessage(code:String,details:String):String"></a><a id="traceMessage(String,String):String"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#traceMessage(code:String,details:String):String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">traceMessage</span><span class="params">(<span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="details">details: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
       
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+    </li><li name="akka.actor.Actor#unhandled" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="unhandled(message:Any):Unit"></a><a id="unhandled(Any):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#unhandled(message:Any):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">unhandled</span><span class="params">(<span name="message">message: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#wait():Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -844,7 +956,7 @@ The pipeline will continue to run in other threads.</p><p>To determine if execut
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -866,7 +978,7 @@ The pipeline will continue to run in other threads.</p><p>To determine if execut
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -885,24 +997,6 @@ The pipeline will continue to run in other threads.</p><p>To determine if execut
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.jafpl.runtime.GraphRuntime#waitForPipeline" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="waitForPipeline():Unit"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/runtime/GraphRuntime.html#waitForPipeline():Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">waitForPipeline</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Wait for pipeline execution to complete.</p><div class="fullcomment"><div class="comment cmt"><p>Wait for pipeline execution to complete.</p><p>If you start a pipeline int he background and then wish to block until execution
-completes, call this method.
-</p></div></div>
     </li>
               </ol>
             </div>
@@ -913,7 +1007,9 @@ completes, call this method.
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.AnyRef">
+        <div class="parent" name="akka.actor.Actor">
+              <h3>Inherited from <span class="extype" name="akka.actor.Actor">Actor</span></h3>
+            </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>

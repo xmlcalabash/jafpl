@@ -270,6 +270,24 @@ methods on those objects.</p></div><dl class="attributes block"> <dt>Definition 
                           DataProvider
                         </a>
                       </li><li class="current-entities indented3">
+                        <a class="object" href="Manifold$.html" title=""></a>
+                        <a class="class" href="Manifold.html" title=""></a>
+                        <a href="Manifold.html" title="">
+                          Manifold
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
+                        <a class="trait" href="ManifoldSpecification.html" title=""></a>
+                        <a href="ManifoldSpecification.html" title="">
+                          ManifoldSpecification
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <a class="object" href="PortCardinality$.html" title=""></a>
+                        <a class="class" href="PortCardinality.html" title=""></a>
+                        <a href="PortCardinality.html" title="">
+                          PortCardinality
+                        </a>
+                      </li><li class="current-entities indented3">
                         <a class="object" href="PortSpecification$.html" title="Useful default port binding specifications."></a>
                         <a class="class" href="PortSpecification.html" title="Specify the valid bindings for step inputs or outputs"></a>
                         <a href="PortSpecification.html" title="Specify the valid bindings for step inputs or outputs">
@@ -490,6 +508,60 @@ where the data should be delivered.</p></div></div>
       <p class="shortcomment cmt">Interface for sending external data to a pipeline.</p><div class="fullcomment"><div class="comment cmt"><p>Interface for sending external data to a pipeline.</p><p>Call the <code>send</code> method on this object to deliver data.</p><p>(This really exists just to simplify the interface to the pipeline. There's a simple
 proxy that sends provided data to an appropriate consumer.)
 </p></div></div>
+    </li><li name="com.jafpl.steps.Manifold" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ManifoldextendsManifoldSpecification"></a><a id="Manifold:Manifold"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/steps/index.html#ManifoldextendsManifoldSpecification" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="Manifold.html">
+              <span class="name">Manifold</span>
+            </a><span class="result"> extends <a href="ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></span>
+      </span>
+      
+      
+    </li><li name="com.jafpl.steps.ManifoldSpecification" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="ManifoldSpecificationextendsAnyRef"></a><a id="ManifoldSpecification:ManifoldSpecification"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/steps/index.html#ManifoldSpecificationextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="ManifoldSpecification.html">
+              <span class="name">ManifoldSpecification</span>
+            </a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      
+    </li><li name="com.jafpl.steps.PortCardinality" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PortCardinalityextendsAnyRef"></a><a id="PortCardinality:PortCardinality"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/steps/index.html#PortCardinalityextendsAnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="PortCardinality.html">
+              <span class="name">PortCardinality</span>
+            </a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      
     </li><li name="com.jafpl.steps.PortSpecification" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="PortSpecificationextendsAnyRef"></a><a id="PortSpecification:PortSpecification"></a>
       <span class="permalink">
@@ -511,20 +583,12 @@ proxy that sends provided data to an appropriate consumer.)
 But in practice, many steps do care. If you have a step that expects to read a single
 document off the <code>source</code> port and to write a sequence of documents to the <code>result</code> port,
 it does no good to run a pipeline where those ports aren't connected.</p><p>A port binding specification identifies the ports that the step expects to read from (or
-write to) and what the acceptable cardinality of documents is on those ports.</p><p>The available cardinalities are:
-1. <code>1</code>: exactly one document is required.
-2. <code>?</code>: one document is expected, but it's optional.
-3. <code>+</code>: at least one document is expected, but more are ok.
-4. <code>*</code>: any number of documents are expected, including none.</p><p>It would, of course, be possible to extend this specification to allow for &quot;exactly 3 documents&quot;
-or &quot;between 4 and 7 documents&quot;, but that seems beyond the point of diminishing returns.
-The pipeline engine will enforce the cardinalities above, you're free to enforce other
-cardinalities in the step implementation.</p><p>The special port name &quot;*&quot; may be given to indicate that other, arbitrarily named ports
-are also acceptable.
+write to) and what the acceptable cardinality of documents is on those ports.</p><p>The port named <code>PortSpecification.WILDCARD</code> serves as a wildcard for ports of any name
 </p></div></div>
     </li><li name="com.jafpl.steps.Step" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="StepextendsDataConsumer"></a><a id="Step:Step"></a>
+      <a id="StepextendsDataConsumerwithManifoldSpecification"></a><a id="Step:Step"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/index.html#StepextendsDataConsumer" title="Permalink">
+      <a href="../../../com/jafpl/steps/index.html#StepextendsDataConsumerwithManifoldSpecification" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -535,7 +599,7 @@ are also acceptable.
       <span class="symbol">
         <a title="An atomic pipeline step." href="Step.html">
               <span class="name">Step</span>
-            </a><span class="result"> extends <a href="DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></span>
+            </a><span class="result"> extends <a href="DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a> with <a href="ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></span>
       </span>
       
       <p class="shortcomment cmt">An atomic pipeline step.</p><div class="fullcomment"><div class="comment cmt"><p>An atomic pipeline step.</p><p>Steps must implement this interface. The step lifecycle is as follows:</p><p>1. The <code>setConsumer</code> method will be called. The step must hold onto the consumer object.
@@ -620,6 +684,42 @@ larger resource.</p></div></div>
       </span>
       
       <p class="shortcomment cmt">Useful default binding specifications.</p>
+    </li><li name="com.jafpl.steps.Manifold" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Manifold"></a><a id="Manifold:Manifold"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/steps/index.html#Manifold" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="Manifold$.html">
+              <span class="name">Manifold</span>
+            </a>
+      </span>
+      
+      
+    </li><li name="com.jafpl.steps.PortCardinality" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="PortCardinality"></a><a id="PortCardinality:PortCardinality"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/steps/index.html#PortCardinality" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="PortCardinality$.html">
+              <span class="name">PortCardinality</span>
+            </a>
+      </span>
+      
+      
     </li><li name="com.jafpl.steps.PortSpecification" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="PortSpecification"></a><a id="PortSpecification:PortSpecification"></a>
       <span class="permalink">

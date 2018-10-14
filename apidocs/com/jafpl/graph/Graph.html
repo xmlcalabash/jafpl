@@ -543,9 +543,9 @@ the inner steps must provide outputs through their container.
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addFor" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addFor(label:Option[String],countFrom:Long,countTo:Long,countBy:Long):com.jafpl.graph.LoopForStart"></a><a id="addFor(Option[String],Long,Long,Long):LoopForStart"></a>
+      <a id="addFor(label:Option[String],countFrom:Long,countTo:Long,countBy:Long,manifold:com.jafpl.steps.ManifoldSpecification):com.jafpl.graph.LoopForStart"></a><a id="addFor(Option[String],Long,Long,Long,ManifoldSpecification):LoopForStart"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addFor(label:Option[String],countFrom:Long,countTo:Long,countBy:Long):com.jafpl.graph.LoopForStart" title="Permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addFor(label:Option[String],countFrom:Long,countTo:Long,countBy:Long,manifold:com.jafpl.steps.ManifoldSpecification):com.jafpl.graph.LoopForStart" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -554,15 +554,15 @@ the inner steps must provide outputs through their container.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addFor</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="countFrom">countFrom: <span class="extype" name="scala.Long">Long</span></span>, <span name="countTo">countTo: <span class="extype" name="scala.Long">Long</span></span>, <span name="countBy">countBy: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.LoopForStart">LoopForStart</span></span>
+        <span class="name">addFor</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="countFrom">countFrom: <span class="extype" name="scala.Long">Long</span></span>, <span name="countTo">countTo: <span class="extype" name="scala.Long">Long</span></span>, <span name="countBy">countBy: <span class="extype" name="scala.Long">Long</span></span>, <span name="manifold">manifold: <a href="../steps/ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.LoopForStart">LoopForStart</span></span>
       </span>
       
       <p class="shortcomment cmt">Adds a for-loop to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a for-loop to the graph.
 </p></div><dl class="paramcmts block"><dt class="param">label</dt><dd class="cmt"><p>An optional, user-defined label.</p></dd><dt>returns</dt><dd class="cmt"><p>The constructed for-each.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addForEach" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addForEach(label:Option[String]):com.jafpl.graph.LoopEachStart"></a><a id="addForEach(Option[String]):LoopEachStart"></a>
+      <a id="addForEach(label:Option[String],manifold:com.jafpl.steps.ManifoldSpecification):com.jafpl.graph.LoopEachStart"></a><a id="addForEach(Option[String],ManifoldSpecification):LoopEachStart"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addForEach(label:Option[String]):com.jafpl.graph.LoopEachStart" title="Permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addForEach(label:Option[String],manifold:com.jafpl.steps.ManifoldSpecification):com.jafpl.graph.LoopEachStart" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -571,15 +571,15 @@ the inner steps must provide outputs through their container.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addForEach</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="LoopEachStart.html" class="extype" name="com.jafpl.graph.LoopEachStart">LoopEachStart</a></span>
+        <span class="name">addForEach</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="manifold">manifold: <a href="../steps/ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></span>)</span><span class="result">: <a href="LoopEachStart.html" class="extype" name="com.jafpl.graph.LoopEachStart">LoopEachStart</a></span>
       </span>
       
       <p class="shortcomment cmt">Adds a for-each to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a for-each to the graph.
 </p></div><dl class="paramcmts block"><dt class="param">label</dt><dd class="cmt"><p>An optional, user-defined label.</p></dd><dt>returns</dt><dd class="cmt"><p>The constructed for-each.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addGroup" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addGroup(label:Option[String]):com.jafpl.graph.ContainerStart"></a><a id="addGroup(Option[String]):ContainerStart"></a>
+      <a id="addGroup(label:Option[String],manifold:com.jafpl.steps.ManifoldSpecification):com.jafpl.graph.ContainerStart"></a><a id="addGroup(Option[String],ManifoldSpecification):ContainerStart"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addGroup(label:Option[String]):com.jafpl.graph.ContainerStart" title="Permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addGroup(label:Option[String],manifold:com.jafpl.steps.ManifoldSpecification):com.jafpl.graph.ContainerStart" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -588,7 +588,7 @@ the inner steps must provide outputs through their container.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addGroup</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">ContainerStart</a></span>
+        <span class="name">addGroup</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="manifold">manifold: <a href="../steps/ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></span>)</span><span class="result">: <a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">ContainerStart</a></span>
       </span>
       
       <p class="shortcomment cmt">Adds a group to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a group to the graph.
@@ -725,9 +725,9 @@ ports into which data can be poured before the pipeline is run.
       <p class="shortcomment cmt">Adds a graph output.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a graph output.</p><p>Graph outputs are places where pipeline outputs can be poured.
 </p></div><dl class="paramcmts block"><dt class="param">node</dt><dd class="cmt"><p>The node that will produce output.</p></dd><dt class="param">port</dt><dd class="cmt"><p>The port port on which it will produce.</p></dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addPipeline" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addPipeline(label:Option[String]):com.jafpl.graph.PipelineStart"></a><a id="addPipeline(Option[String]):PipelineStart"></a>
+      <a id="addPipeline(label:Option[String],manifold:com.jafpl.steps.ManifoldSpecification):com.jafpl.graph.PipelineStart"></a><a id="addPipeline(Option[String],ManifoldSpecification):PipelineStart"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addPipeline(label:Option[String]):com.jafpl.graph.PipelineStart" title="Permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addPipeline(label:Option[String],manifold:com.jafpl.steps.ManifoldSpecification):com.jafpl.graph.PipelineStart" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -736,15 +736,15 @@ ports into which data can be poured before the pipeline is run.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addPipeline</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.PipelineStart">PipelineStart</span></span>
+        <span class="name">addPipeline</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="manifold">manifold: <a href="../steps/ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.PipelineStart">PipelineStart</span></span>
       </span>
       
       <p class="shortcomment cmt">Adds a pipeline to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a pipeline to the graph.
 </p></div><dl class="paramcmts block"><dt class="param">label</dt><dd class="cmt"><p>An optional, user-defined label.</p></dd><dt>returns</dt><dd class="cmt"><p>The constructed Pipeline object.</p></dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addPipeline" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addPipeline(label:String):com.jafpl.graph.PipelineStart"></a><a id="addPipeline(String):PipelineStart"></a>
+      <a id="addPipeline(label:String,manifold:com.jafpl.steps.ManifoldSpecification):com.jafpl.graph.PipelineStart"></a><a id="addPipeline(String,ManifoldSpecification):PipelineStart"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addPipeline(label:String):com.jafpl.graph.PipelineStart" title="Permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addPipeline(label:String,manifold:com.jafpl.steps.ManifoldSpecification):com.jafpl.graph.PipelineStart" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -753,15 +753,15 @@ ports into which data can be poured before the pipeline is run.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addPipeline</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.PipelineStart">PipelineStart</span></span>
+        <span class="name">addPipeline</span><span class="params">(<span name="label">label: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="manifold">manifold: <a href="../steps/ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.PipelineStart">PipelineStart</span></span>
       </span>
       
       <p class="shortcomment cmt">Adds a pipeline to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a pipeline to the graph.
 </p></div><dl class="paramcmts block"><dt class="param">label</dt><dd class="cmt"><p>A user-defined label.</p></dd><dt>returns</dt><dd class="cmt"><p>The constructed Pipeline object.</p></dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addPipeline" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addPipeline():com.jafpl.graph.PipelineStart"></a><a id="addPipeline():PipelineStart"></a>
+      <a id="addPipeline(manifold:com.jafpl.steps.ManifoldSpecification):com.jafpl.graph.PipelineStart"></a><a id="addPipeline(ManifoldSpecification):PipelineStart"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addPipeline():com.jafpl.graph.PipelineStart" title="Permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addPipeline(manifold:com.jafpl.steps.ManifoldSpecification):com.jafpl.graph.PipelineStart" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -770,7 +770,7 @@ ports into which data can be poured before the pipeline is run.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addPipeline</span><span class="params">()</span><span class="result">: <span class="extype" name="com.jafpl.graph.PipelineStart">PipelineStart</span></span>
+        <span class="name">addPipeline</span><span class="params">(<span name="manifold">manifold: <a href="../steps/ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.PipelineStart">PipelineStart</span></span>
       </span>
       
       <p class="shortcomment cmt">Adds a pipeline to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a pipeline to the graph.
@@ -857,9 +857,9 @@ ports into which data can be poured before the pipeline is run.
       <p class="shortcomment cmt">Adds a try/catch to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a try/catch to the graph.
 </p></div><dl class="paramcmts block"><dt class="param">label</dt><dd class="cmt"><p>An optional, user-defined label.</p></dd><dt>returns</dt><dd class="cmt"><p>The constructed try/catch.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addUntil" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addUntil(comparator:com.jafpl.util.ItemComparator,label:Option[String]):com.jafpl.graph.LoopUntilStart"></a><a id="addUntil(ItemComparator,Option[String]):LoopUntilStart"></a>
+      <a id="addUntil(comparator:com.jafpl.util.ItemComparator,label:Option[String],manifold:com.jafpl.steps.ManifoldSpecification):com.jafpl.graph.LoopUntilStart"></a><a id="addUntil(ItemComparator,Option[String],ManifoldSpecification):LoopUntilStart"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addUntil(comparator:com.jafpl.util.ItemComparator,label:Option[String]):com.jafpl.graph.LoopUntilStart" title="Permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addUntil(comparator:com.jafpl.util.ItemComparator,label:Option[String],manifold:com.jafpl.steps.ManifoldSpecification):com.jafpl.graph.LoopUntilStart" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -868,7 +868,7 @@ ports into which data can be poured before the pipeline is run.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addUntil</span><span class="params">(<span name="comparator">comparator: <a href="../util/ItemComparator.html" class="extype" name="com.jafpl.util.ItemComparator">ItemComparator</a></span>, <span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.LoopUntilStart">LoopUntilStart</span></span>
+        <span class="name">addUntil</span><span class="params">(<span name="comparator">comparator: <a href="../util/ItemComparator.html" class="extype" name="com.jafpl.util.ItemComparator">ItemComparator</a></span>, <span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="manifold">manifold: <a href="../steps/ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.LoopUntilStart">LoopUntilStart</span></span>
       </span>
       
       <p class="shortcomment cmt">Adds an until to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds an until to the graph.
@@ -907,9 +907,9 @@ ports into which data can be poured before the pipeline is run.
       <p class="shortcomment cmt">Adds a viewport to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a viewport to the graph.
 </p></div><dl class="paramcmts block"><dt class="param">composer</dt><dd class="cmt"><p>The viewport composer.</p></dd><dt class="param">label</dt><dd class="cmt"><p>An optional, user-defined label.</p></dd><dt>returns</dt><dd class="cmt"><p>The constructed viewport.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addWhen" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addWhen(expression:Any,label:Option[String]):com.jafpl.graph.WhenStart"></a><a id="addWhen(Any,Option[String]):WhenStart"></a>
+      <a id="addWhen(expression:Any,label:Option[String],manifold:com.jafpl.steps.ManifoldSpecification):com.jafpl.graph.WhenStart"></a><a id="addWhen(Any,Option[String],ManifoldSpecification):WhenStart"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addWhen(expression:Any,label:Option[String]):com.jafpl.graph.WhenStart" title="Permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addWhen(expression:Any,label:Option[String],manifold:com.jafpl.steps.ManifoldSpecification):com.jafpl.graph.WhenStart" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -918,14 +918,14 @@ ports into which data can be poured before the pipeline is run.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addWhen</span><span class="params">(<span name="expression">expression: <span class="extype" name="scala.Any">Any</span></span>, <span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.WhenStart">WhenStart</span></span>
+        <span class="name">addWhen</span><span class="params">(<span name="expression">expression: <span class="extype" name="scala.Any">Any</span></span>, <span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="manifold">manifold: <a href="../steps/ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.WhenStart">WhenStart</span></span>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addWhile" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addWhile(tester:com.jafpl.util.ItemTester,label:Option[String]):com.jafpl.graph.LoopWhileStart"></a><a id="addWhile(ItemTester,Option[String]):LoopWhileStart"></a>
+      <a id="addWhile(tester:com.jafpl.util.ItemTester,label:Option[String],manifold:com.jafpl.steps.ManifoldSpecification):com.jafpl.graph.LoopWhileStart"></a><a id="addWhile(ItemTester,Option[String],ManifoldSpecification):LoopWhileStart"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addWhile(tester:com.jafpl.util.ItemTester,label:Option[String]):com.jafpl.graph.LoopWhileStart" title="Permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addWhile(tester:com.jafpl.util.ItemTester,label:Option[String],manifold:com.jafpl.steps.ManifoldSpecification):com.jafpl.graph.LoopWhileStart" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -934,7 +934,7 @@ ports into which data can be poured before the pipeline is run.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addWhile</span><span class="params">(<span name="tester">tester: <a href="../util/ItemTester.html" class="extype" name="com.jafpl.util.ItemTester">ItemTester</a></span>, <span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.LoopWhileStart">LoopWhileStart</span></span>
+        <span class="name">addWhile</span><span class="params">(<span name="tester">tester: <a href="../util/ItemTester.html" class="extype" name="com.jafpl.util.ItemTester">ItemTester</a></span>, <span name="label">label: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>, <span name="manifold">manifold: <a href="../steps/ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></span>)</span><span class="result">: <span class="extype" name="com.jafpl.graph.LoopWhileStart">LoopWhileStart</span></span>
       </span>
       
       <p class="shortcomment cmt">Adds a while to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a while to the graph.

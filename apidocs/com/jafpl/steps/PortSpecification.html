@@ -161,6 +161,24 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                           DataProvider
                         </a>
                       </li><li class="current-entities indented3">
+                        <a class="object" href="Manifold$.html" title=""></a>
+                        <a class="class" href="Manifold.html" title=""></a>
+                        <a href="Manifold.html" title="">
+                          Manifold
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
+                        <a class="trait" href="ManifoldSpecification.html" title=""></a>
+                        <a href="ManifoldSpecification.html" title="">
+                          ManifoldSpecification
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <a class="object" href="PortCardinality$.html" title=""></a>
+                        <a class="class" href="PortCardinality.html" title=""></a>
+                        <a href="PortCardinality.html" title="">
+                          PortCardinality
+                        </a>
+                      </li><li class="current-entities indented3">
                         <a class="object" href="PortSpecification$.html" title="Useful default port binding specifications."></a>
                         <a class="class" href="" title="Specify the valid bindings for step inputs or outputs"></a>
                         <a href="" title="Specify the valid bindings for step inputs or outputs">
@@ -218,15 +236,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
 But in practice, many steps do care. If you have a step that expects to read a single
 document off the <code>source</code> port and to write a sequence of documents to the <code>result</code> port,
 it does no good to run a pipeline where those ports aren't connected.</p><p>A port binding specification identifies the ports that the step expects to read from (or
-write to) and what the acceptable cardinality of documents is on those ports.</p><p>The available cardinalities are:
-1. <code>1</code>: exactly one document is required.
-2. <code>?</code>: one document is expected, but it's optional.
-3. <code>+</code>: at least one document is expected, but more are ok.
-4. <code>*</code>: any number of documents are expected, including none.</p><p>It would, of course, be possible to extend this specification to allow for &quot;exactly 3 documents&quot;
-or &quot;between 4 and 7 documents&quot;, but that seems beyond the point of diminishing returns.
-The pipeline engine will enforce the cardinalities above, you're free to enforce other
-cardinalities in the step implementation.</p><p>The special port name &quot;*&quot; may be given to indicate that other, arbitrarily named ports
-are also acceptable.
+write to) and what the acceptable cardinality of documents is on those ports.</p><p>The port named <code>PortSpecification.WILDCARD</code> serves as a wildcard for ports of any name
 </p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
@@ -278,9 +288,9 @@ are also acceptable.
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.jafpl.steps.PortSpecification#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(spec:scala.collection.immutable.Map[String,String]):com.jafpl.steps.PortSpecification"></a><a id="&lt;init&gt;:PortSpecification"></a>
+      <a id="&lt;init&gt;(spec:scala.collection.immutable.Map[String,com.jafpl.steps.PortCardinality]):com.jafpl.steps.PortSpecification"></a><a id="&lt;init&gt;:PortSpecification"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/PortSpecification.html#&lt;init&gt;(spec:scala.collection.immutable.Map[String,String]):com.jafpl.steps.PortSpecification" title="Permalink">
+      <a href="../../../com/jafpl/steps/PortSpecification.html#&lt;init&gt;(spec:scala.collection.immutable.Map[String,com.jafpl.steps.PortCardinality]):com.jafpl.steps.PortSpecification" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -289,7 +299,7 @@ are also acceptable.
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">PortSpecification</span><span class="params">(<span name="spec">spec: <span class="extype" name="scala.collection.immutable.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <span class="extype" name="scala.Predef.String">String</span>]</span>)</span>
+        <span class="name">PortSpecification</span><span class="params">(<span name="spec">spec: <span class="extype" name="scala.collection.immutable.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <a href="PortCardinality.html" class="extype" name="com.jafpl.steps.PortCardinality">PortCardinality</a>]</span>)</span>
       </span>
       
       <p class="shortcomment cmt">A port binding specification.</p><div class="fullcomment"><div class="comment cmt"><p>A port binding specification.</p></div><dl class="paramcmts block"><dt class="param">spec</dt><dd class="cmt"><p>A map from port names to cardinalities.</p></dd></dl></div>
@@ -368,9 +378,9 @@ are also acceptable.
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
     </li><li name="com.jafpl.steps.PortSpecification#cardinality" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="cardinality(port:String):Option[String]"></a><a id="cardinality(String):Option[String]"></a>
+      <a id="cardinality(port:String):Option[com.jafpl.steps.PortCardinality]"></a><a id="cardinality(String):Option[PortCardinality]"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/PortSpecification.html#cardinality(port:String):Option[String]" title="Permalink">
+      <a href="../../../com/jafpl/steps/PortSpecification.html#cardinality(port:String):Option[com.jafpl.steps.PortCardinality]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -379,14 +389,14 @@ are also acceptable.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">cardinality</span><span class="params">(<span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+        <span class="name">cardinality</span><span class="params">(<span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="PortCardinality.html" class="extype" name="com.jafpl.steps.PortCardinality">PortCardinality</a>]</span>
       </span>
       
       
-    </li><li name="com.jafpl.steps.PortSpecification#checkCardinality" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="checkCardinality(port:String,count:Long):Unit"></a><a id="checkCardinality(String,Long):Unit"></a>
+    </li><li name="com.jafpl.steps.PortSpecification#checkInputCardinality" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkInputCardinality(port:String,count:Long):Unit"></a><a id="checkInputCardinality(String,Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/steps/PortSpecification.html#checkCardinality(port:String,count:Long):Unit" title="Permalink">
+      <a href="../../../com/jafpl/steps/PortSpecification.html#checkInputCardinality(port:String,count:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -395,10 +405,28 @@ are also acceptable.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">checkCardinality</span><span class="params">(<span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="count">count: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">checkInputCardinality</span><span class="params">(<span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="count">count: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <p class="shortcomment cmt">Check the actual cardinality against the specification.</p><div class="fullcomment"><div class="comment cmt"><p>Check the actual cardinality against the specification.</p><p>This method throws a <a href="../exceptions/JafplException.html" class="extype" name="com.jafpl.exceptions.JafplException">com.jafpl.exceptions.JafplException</a> if the <code>count</code> of documents
+      <p class="shortcomment cmt">Check the actual input cardinality against the specification.</p><div class="fullcomment"><div class="comment cmt"><p>Check the actual input cardinality against the specification.</p><p>This method throws a <a href="../exceptions/JafplException.html" class="extype" name="com.jafpl.exceptions.JafplException">com.jafpl.exceptions.JafplException</a> if the <code>count</code> of documents
+provided on this port is not acceptable according to the defined cardinality.
+</p></div><dl class="paramcmts block"><dt class="param">port</dt><dd class="cmt"><p>The port name.</p></dd><dt class="param">count</dt><dd class="cmt"><p>The number of documents that appeared on that port.</p></dd></dl></div>
+    </li><li name="com.jafpl.steps.PortSpecification#checkOutputCardinality" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkOutputCardinality(port:String,count:Long):Unit"></a><a id="checkOutputCardinality(String,Long):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/steps/PortSpecification.html#checkOutputCardinality(port:String,count:Long):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkOutputCardinality</span><span class="params">(<span name="port">port: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="count">count: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Check the actual output cardinality against the specification.</p><div class="fullcomment"><div class="comment cmt"><p>Check the actual output cardinality against the specification.</p><p>This method throws a <a href="../exceptions/JafplException.html" class="extype" name="com.jafpl.exceptions.JafplException">com.jafpl.exceptions.JafplException</a> if the <code>count</code> of documents
 provided on this port is not acceptable according to the defined cardinality.
 </p></div><dl class="paramcmts block"><dt class="param">port</dt><dd class="cmt"><p>The port name.</p></dd><dt class="param">count</dt><dd class="cmt"><p>The number of documents that appeared on that port.</p></dd></dl></div>
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
@@ -588,8 +616,8 @@ provided on this port is not acceptable according to the defined cardinality.
         <span class="name">ports</span><span class="result">: <span class="extype" name="scala.Predef.Set">Set</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
       </span>
       
-      <p class="shortcomment cmt">List the ports in this specification.</p><div class="fullcomment"><div class="comment cmt"><p>List the ports in this specification.</p><p>The wildcard port, &quot;*&quot; is not returned in this list.
-</p></div></div>
+      <p class="shortcomment cmt">List the ports in this specification.</p><div class="fullcomment"><div class="comment cmt"><p>List the ports in this specification.
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>the set of ports</p></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">

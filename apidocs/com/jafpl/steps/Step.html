@@ -161,6 +161,24 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                           DataProvider
                         </a>
                       </li><li class="current-entities indented3">
+                        <a class="object" href="Manifold$.html" title=""></a>
+                        <a class="class" href="Manifold.html" title=""></a>
+                        <a href="Manifold.html" title="">
+                          Manifold
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
+                        <a class="trait" href="ManifoldSpecification.html" title=""></a>
+                        <a href="ManifoldSpecification.html" title="">
+                          ManifoldSpecification
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <a class="object" href="PortCardinality$.html" title=""></a>
+                        <a class="class" href="PortCardinality.html" title=""></a>
+                        <a href="PortCardinality.html" title="">
+                          PortCardinality
+                        </a>
+                      </li><li class="current-entities indented3">
                         <a class="object" href="PortSpecification$.html" title="Useful default port binding specifications."></a>
                         <a class="class" href="PortSpecification.html" title="Specify the valid bindings for step inputs or outputs"></a>
                         <a href="PortSpecification.html" title="Specify the valid bindings for step inputs or outputs">
@@ -207,7 +225,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <span class="name">Step</span><span class="result"> extends <a href="DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></span>
+        <span class="name">Step</span><span class="result"> extends <a href="DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a> with <a href="ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></span>
       </span>
       </h4>
 
@@ -225,7 +243,7 @@ some sibling step raised an exception that caused an entire container to fail.
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><a href="DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a>, <a href="DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -251,7 +269,7 @@ some sibling step raised an exception that caused an entire container to fail.
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.jafpl.steps.Step"><span>Step</span></li><li class="in" name="com.jafpl.steps.DataConsumer"><span>DataConsumer</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.jafpl.steps.Step"><span>Step</span></li><li class="in" name="com.jafpl.steps.ManifoldSpecification"><span>ManifoldSpecification</span></li><li class="in" name="com.jafpl.steps.DataConsumer"><span>DataConsumer</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -345,7 +363,7 @@ the step requires a binding.
       <p class="shortcomment cmt">One time, startup initialization.</p><div class="fullcomment"><div class="comment cmt"><p>One time, startup initialization.</p><p>The pipeline has been constructed and is going to run. This method is called once
 before execution begins.
 </p></div><dl class="paramcmts block"><dt class="param">config</dt><dd class="cmt"><p>The runtime configuration used by this pipeline</p></dd></dl></div>
-    </li><li name="com.jafpl.steps.Step#inputSpec" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="IOSpecs">
+    </li><li name="com.jafpl.steps.ManifoldSpecification#inputSpec" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="IOSpecs">
       <a id="inputSpec:com.jafpl.steps.PortSpecification"></a><a id="inputSpec:PortSpecification"></a>
       <span class="permalink">
       <a href="../../../com/jafpl/steps/Step.html#inputSpec:com.jafpl.steps.PortSpecification" title="Permalink">
@@ -361,8 +379,8 @@ before execution begins.
       </span>
       
       <p class="shortcomment cmt">The names of the input ports this step requires.</p><div class="fullcomment"><div class="comment cmt"><p>The names of the input ports this step requires.</p><p>This method returns the names of the input ports that the step requires.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The list of required port names.</p></dd></dl></div>
-    </li><li name="com.jafpl.steps.Step#outputSpec" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="IOSpecs">
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The list of required port names.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></dd></dl></div>
+    </li><li name="com.jafpl.steps.ManifoldSpecification#outputSpec" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="IOSpecs">
       <a id="outputSpec:com.jafpl.steps.PortSpecification"></a><a id="outputSpec:PortSpecification"></a>
       <span class="permalink">
       <a href="../../../com/jafpl/steps/Step.html#outputSpec:com.jafpl.steps.PortSpecification" title="Permalink">
@@ -378,7 +396,7 @@ before execution begins.
       </span>
       
       <p class="shortcomment cmt">The names of the output ports this step requires.</p><div class="fullcomment"><div class="comment cmt"><p>The names of the output ports this step requires.</p><p>This method returns the names of the output ports that the step requires.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The list of required port names.</p></dd></dl></div>
+</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The list of required port names.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></dd></dl></div>
     </li><li name="com.jafpl.steps.DataConsumer#receive" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="receive(port:String,message:com.jafpl.messages.Message):Unit"></a><a id="receive(String,Message):Unit"></a>
       <span class="permalink">
@@ -850,7 +868,9 @@ is about to end.
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="com.jafpl.steps.DataConsumer">
+        <div class="parent" name="com.jafpl.steps.ManifoldSpecification">
+              <h3>Inherited from <a href="ManifoldSpecification.html" class="extype" name="com.jafpl.steps.ManifoldSpecification">ManifoldSpecification</a></h3>
+            </div><div class="parent" name="com.jafpl.steps.DataConsumer">
               <h3>Inherited from <a href="DataConsumer.html" class="extype" name="com.jafpl.steps.DataConsumer">DataConsumer</a></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>

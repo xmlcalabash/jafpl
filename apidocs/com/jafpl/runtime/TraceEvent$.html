@@ -132,8 +132,8 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       <p class="shortcomment cmt">The graph runtime APIs.</p><div class="fullcomment"><div class="comment cmt"><p>The graph runtime APIs.</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.jafpl">jafpl</a></dd></dl></div>
     </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="" title="Evaluate expressions (for variable bindings and the alternatives in a choose)."></a>
-                        <a href="" title="Evaluate expressions (for variable bindings and the alternatives in a choose).">
+                        <a class="trait" href="ExpressionEvaluator.html" title="Evaluate expressions (for variable bindings and the alternatives in a choose)."></a>
+                        <a href="ExpressionEvaluator.html" title="Evaluate expressions (for variable bindings and the alternatives in a choose).">
                           ExpressionEvaluator
                         </a>
                       </li><li class="current-entities indented3">
@@ -168,8 +168,8 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="object" href="TraceEvent$.html" title=""></a>
-                        <a href="TraceEvent$.html" title="">
+                        <a class="object" href="" title=""></a>
+                        <a href="" title="">
                           TraceEvent
                         </a>
                       </li><li class="current-entities indented3">
@@ -183,12 +183,12 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
             </div>
           </div>
           <div id="content">
-            <body class="trait type">
+            <body class="object value">
       <div id="definition">
-        <div class="big-circle trait">t</div>
+        <div class="big-circle object">o</div>
         <p id="owner"><a href="../../index.html" class="extype" name="com">com</a>.<a href="../index.html" class="extype" name="com.jafpl">jafpl</a>.<a href="index.html" class="extype" name="com.jafpl.runtime">runtime</a></p>
-        <h1>ExpressionEvaluator<span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html" title="Permalink">
+        <h1>TraceEvent<span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
@@ -198,22 +198,19 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">trait</span>
+        <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">ExpressionEvaluator</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+        <span class="name">TraceEvent</span><span class="result"> extends <span class="extype" name="scala.Enumeration">Enumeration</span></span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Evaluate expressions (for variable bindings and the alternatives in a choose).</p><p>The expression evaluator is responsible for taking the string form of an expression and evaluating it.
-The runtime is agnostic to the form of the expressions or their results. In order to support choose
-steps, it's necessary for the evaluator to be able to return a boolean result for an expression.</p><p>The evaluator may throw a <a href="../exceptions/JafplException.html" class="extype" name="com.jafpl.exceptions.JafplException">com.jafpl.exceptions.JafplException</a> if the specified expression is
-invalid or, in the case of a request for a boolean, if it has no boolean value.</p></div><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.Enumeration">Enumeration</span>, <span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -239,7 +236,7 @@ invalid or, in the case of a request for a boolean, if it has no boolean value.<
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.jafpl.runtime.ExpressionEvaluator"><span>ExpressionEvaluator</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.jafpl.runtime.TraceEvent"><span>TraceEvent</span></li><li class="in" name="scala.Enumeration"><span>Enumeration</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -259,107 +256,90 @@ invalid or, in the case of a request for a boolean, if it has no boolean value.<
         <div id="allMembers">
         
 
-        
-
-        <div class="values members">
-              <h3>Abstract Value Members</h3>
-              <ol><li name="com.jafpl.runtime.ExpressionEvaluator#booleanValue" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="booleanValue(expr:Any,context:List[com.jafpl.messages.Message],bindings:Map[String,com.jafpl.messages.Message],options:Option[Any]):Boolean"></a><a id="booleanValue(Any,List[Message],Map[String,Message],Option[Any]):Boolean"></a>
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="com.jafpl.runtime.TraceEvent.TraceEvent" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="TraceEvent=com.jafpl.runtime.TraceEvent.Value"></a><a id="TraceEvent:TraceEvent"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#booleanValue(expr:Any,context:List[com.jafpl.messages.Message],bindings:Map[String,com.jafpl.messages.Message],options:Option[Any]):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#TraceEvent=com.jafpl.runtime.TraceEvent.Value" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">TraceEvent</span><span class="result alias"> = <a href="#ValueextendsOrdered[Enumeration.this.Value]withSerializable" class="extmbr" name="com.jafpl.runtime.TraceEvent.Value">Value</a></span>
+      </span>
+      
+      
+    </li><li name="scala.Enumeration.Val" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ValextendsEnumeration.this.ValuewithSerializable"></a><a id="Val:Val"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#ValextendsEnumeration.this.ValuewithSerializable" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Val</span><span class="result"> extends <span class="extype" name="scala.Enumeration.Value">Value</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>Enumeration</dd><dt>Annotations</dt><dd>
+                <span class="name">@SerialVersionUID</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.Enumeration.Value" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="ValueextendsOrdered[Enumeration.this.Value]withSerializable"></a><a id="Value:Value"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#ValueextendsOrdered[Enumeration.this.Value]withSerializable" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
         <span class="modifier">abstract </span>
-        <span class="kind">def</span>
+        <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">booleanValue</span><span class="params">(<span name="expr">expr: <span class="extype" name="scala.Any">Any</span></span>, <span name="context">context: <span class="extype" name="scala.List">List</span>[<a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a>]</span>, <span name="bindings">bindings: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a>]</span>, <span name="options">options: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+        <span class="name">Value</span><span class="result"> extends <span class="extype" name="scala.Ordered">Ordered</span>[<span class="extype" name="scala.Enumeration.Value">Value</span>] with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
-      <p class="shortcomment cmt">Evaluate an expression and cast the result to a boolean.</p><div class="fullcomment"><div class="comment cmt"><p>Evaluate an expression and cast the result to a boolean.
-</p></div><dl class="paramcmts block"><dt class="param">expr</dt><dd class="cmt"><p>The expression to evaluate.</p></dd><dt class="param">context</dt><dd class="cmt"><p>The expression context.</p></dd><dt class="param">bindings</dt><dd class="cmt"><p>Any variable bindings that are provided for the expression.</p></dd><dt class="param">options</dt><dd class="cmt"><p>Any additional options that should be considered by the evaluator</p></dd><dt>returns</dt><dd class="cmt"><p>The boolean value of the computed expression.</p></dd></dl></div>
-    </li><li name="com.jafpl.runtime.ExpressionEvaluator#newInstance" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="newInstance():com.jafpl.runtime.ExpressionEvaluator"></a><a id="newInstance():ExpressionEvaluator"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Enumeration</dd><dt>Annotations</dt><dd>
+                <span class="name">@SerialVersionUID</span><span class="args">()</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.Enumeration.ValueSet" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ValueSetextendsAbstractSet[Enumeration.this.Value]withSortedSet[Enumeration.this.Value]withSortedSetLike[Enumeration.this.Value,Enumeration.this.ValueSet]withSerializable"></a><a id="ValueSet:ValueSet"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#newInstance():com.jafpl.runtime.ExpressionEvaluator" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#ValueSetextendsAbstractSet[Enumeration.this.Value]withSortedSet[Enumeration.this.Value]withSortedSetLike[Enumeration.this.Value,Enumeration.this.ValueSet]withSerializable" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
       <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
+        <span class="modifier"></span>
+        <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">newInstance</span><span class="params">()</span><span class="result">: <a href="" class="extype" name="com.jafpl.runtime.ExpressionEvaluator">ExpressionEvaluator</a></span>
+        <span class="name">ValueSet</span><span class="result"> extends <span class="extype" name="scala.collection.AbstractSet">AbstractSet</span>[<span class="extype" name="scala.Enumeration.Value">Value</span>] with <span class="extype" name="scala.collection.immutable.SortedSet">SortedSet</span>[<span class="extype" name="scala.Enumeration.Value">Value</span>] with <span class="extype" name="scala.collection.SortedSetLike">SortedSetLike</span>[<span class="extype" name="scala.Enumeration.Value">Value</span>, <span class="extype" name="scala.Enumeration.ValueSet">ValueSet</span>] with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
-      <p class="shortcomment cmt">Obtain a new instance of the expression evaluator.</p><div class="fullcomment"><div class="comment cmt"><p>Obtain a new instance of the expression evaluator.</p><p>If the evalauator is reentrant then it can simply return itself. However, if it has local state,
-then it must return a new instance ready to evaluate an expression.
-</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>An instance of itself.</p></dd></dl></div>
-    </li><li name="com.jafpl.runtime.ExpressionEvaluator#precomputedValue" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="precomputedValue(expr:Any,value:Any,context:List[com.jafpl.messages.Message],bindings:Map[String,com.jafpl.messages.Message],options:Option[Any]):com.jafpl.messages.Message"></a><a id="precomputedValue(Any,Any,List[Message],Map[String,Message],Option[Any]):Message"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#precomputedValue(expr:Any,value:Any,context:List[com.jafpl.messages.Message],bindings:Map[String,com.jafpl.messages.Message],options:Option[Any]):com.jafpl.messages.Message" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">precomputedValue</span><span class="params">(<span name="expr">expr: <span class="extype" name="scala.Any">Any</span></span>, <span name="value">value: <span class="extype" name="scala.Any">Any</span></span>, <span name="context">context: <span class="extype" name="scala.List">List</span>[<a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a>]</span>, <span name="bindings">bindings: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a>]</span>, <span name="options">options: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a></span>
-      </span>
-      
-      
-    </li><li name="com.jafpl.runtime.ExpressionEvaluator#singletonValue" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="singletonValue(expr:Any,context:List[com.jafpl.messages.Message],bindings:Map[String,com.jafpl.messages.Message],options:Option[Any]):com.jafpl.messages.Message"></a><a id="singletonValue(Any,List[Message],Map[String,Message],Option[Any]):Message"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#singletonValue(expr:Any,context:List[com.jafpl.messages.Message],bindings:Map[String,com.jafpl.messages.Message],options:Option[Any]):com.jafpl.messages.Message" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">singletonValue</span><span class="params">(<span name="expr">expr: <span class="extype" name="scala.Any">Any</span></span>, <span name="context">context: <span class="extype" name="scala.List">List</span>[<a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a>]</span>, <span name="bindings">bindings: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a>]</span>, <span name="options">options: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">Evaluate an expression that is expected to return a single value.</p><div class="fullcomment"><div class="comment cmt"><p>Evaluate an expression that is expected to return a single value.</p><p>The <code>expr</code> is evaluated according to whatever grammar the evaluator supports. The context is
-an item from the pipeline. The bindings are variable bindings from the pipeline.
-</p></div><dl class="paramcmts block"><dt class="param">expr</dt><dd class="cmt"><p>The expression to evaluate.</p></dd><dt class="param">context</dt><dd class="cmt"><p>The expression context.</p></dd><dt class="param">bindings</dt><dd class="cmt"><p>Any variable bindings that are provided for the expression.</p></dd><dt class="param">options</dt><dd class="cmt"><p>Any additional options that should be considered by the evaluator</p></dd><dt>returns</dt><dd class="cmt"><p>The computed value of the expression.</p></dd></dl></div>
-    </li><li name="com.jafpl.runtime.ExpressionEvaluator#value" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="value(expr:Any,context:List[com.jafpl.messages.Message],bindings:Map[String,com.jafpl.messages.Message],options:Option[Any]):com.jafpl.messages.Message"></a><a id="value(Any,List[Message],Map[String,Message],Option[Any]):Message"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#value(expr:Any,context:List[com.jafpl.messages.Message],bindings:Map[String,com.jafpl.messages.Message],options:Option[Any]):com.jafpl.messages.Message" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">value</span><span class="params">(<span name="expr">expr: <span class="extype" name="scala.Any">Any</span></span>, <span name="context">context: <span class="extype" name="scala.List">List</span>[<a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a>]</span>, <span name="bindings">bindings: <span class="extype" name="scala.Predef.Map">Map</span>[<span class="extype" name="scala.Predef.String">String</span>, <a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a>]</span>, <span name="options">options: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">Evaluate an expression.</p><div class="fullcomment"><div class="comment cmt"><p>Evaluate an expression. The expression may return any number of results, including none.</p><p>The <code>expr</code> is evaluated according to whatever grammar the evaluator supports. The context is
-an item from the pipeline. The bindings are variable bindings from the pipeline.
-</p></div><dl class="paramcmts block"><dt class="param">expr</dt><dd class="cmt"><p>The expression to evaluate.</p></dd><dt class="param">context</dt><dd class="cmt"><p>The expression context.</p></dd><dt class="param">bindings</dt><dd class="cmt"><p>Any variable bindings that are provided for the expression.</p></dd><dt class="param">options</dt><dd class="cmt"><p>Any additional options that should be considered by the evaluator</p></dd><dt>returns</dt><dd class="cmt"><p>The computed value of the expression.</p></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Enumeration</dd></dl></div>
     </li></ol>
             </div>
 
+        
+
         <div class="values members">
-              <h3>Concrete Value Members</h3>
+              <h3>Value Members</h3>
               <ol>
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -375,7 +355,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html###():Int" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -391,7 +371,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -404,10 +384,218 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.jafpl.runtime.TraceEvent#BINDINGS" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="BINDINGS:com.jafpl.runtime.TraceEvent.Value"></a><a id="BINDINGS:Value"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#BINDINGS:com.jafpl.runtime.TraceEvent.Value" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">BINDINGS</span><span class="result">: <a href="#ValueextendsOrdered[Enumeration.this.Value]withSerializable" class="extmbr" name="com.jafpl.runtime.TraceEvent.Value">Value</a></span>
+      </span>
+      
+      
+    </li><li name="com.jafpl.runtime.TraceEvent#CARDINALITY" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CARDINALITY:com.jafpl.runtime.TraceEvent.Value"></a><a id="CARDINALITY:Value"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#CARDINALITY:com.jafpl.runtime.TraceEvent.Value" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">CARDINALITY</span><span class="result">: <a href="#ValueextendsOrdered[Enumeration.this.Value]withSerializable" class="extmbr" name="com.jafpl.runtime.TraceEvent.Value">Value</a></span>
+      </span>
+      
+      
+    </li><li name="com.jafpl.runtime.TraceEvent#GMESSAGES" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="GMESSAGES:com.jafpl.runtime.TraceEvent.Value"></a><a id="GMESSAGES:Value"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#GMESSAGES:com.jafpl.runtime.TraceEvent.Value" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">GMESSAGES</span><span class="result">: <a href="#ValueextendsOrdered[Enumeration.this.Value]withSerializable" class="extmbr" name="com.jafpl.runtime.TraceEvent.Value">Value</a></span>
+      </span>
+      
+      
+    </li><li name="com.jafpl.runtime.TraceEvent#METHODS" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="METHODS:com.jafpl.runtime.TraceEvent.Value"></a><a id="METHODS:Value"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#METHODS:com.jafpl.runtime.TraceEvent.Value" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">METHODS</span><span class="result">: <a href="#ValueextendsOrdered[Enumeration.this.Value]withSerializable" class="extmbr" name="com.jafpl.runtime.TraceEvent.Value">Value</a></span>
+      </span>
+      
+      
+    </li><li name="com.jafpl.runtime.TraceEvent#NMESSAGES" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="NMESSAGES:com.jafpl.runtime.TraceEvent.Value"></a><a id="NMESSAGES:Value"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#NMESSAGES:com.jafpl.runtime.TraceEvent.Value" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">NMESSAGES</span><span class="result">: <a href="#ValueextendsOrdered[Enumeration.this.Value]withSerializable" class="extmbr" name="com.jafpl.runtime.TraceEvent.Value">Value</a></span>
+      </span>
+      
+      
+    </li><li name="com.jafpl.runtime.TraceEvent#STEPIO" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="STEPIO:com.jafpl.runtime.TraceEvent.Value"></a><a id="STEPIO:Value"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#STEPIO:com.jafpl.runtime.TraceEvent.Value" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">STEPIO</span><span class="result">: <a href="#ValueextendsOrdered[Enumeration.this.Value]withSerializable" class="extmbr" name="com.jafpl.runtime.TraceEvent.Value">Value</a></span>
+      </span>
+      
+      
+    </li><li name="com.jafpl.runtime.TraceEvent#TRACES" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="TRACES:com.jafpl.runtime.TraceEvent.Value"></a><a id="TRACES:Value"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#TRACES:com.jafpl.runtime.TraceEvent.Value" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">TRACES</span><span class="result">: <a href="#ValueextendsOrdered[Enumeration.this.Value]withSerializable" class="extmbr" name="com.jafpl.runtime.TraceEvent.Value">Value</a></span>
+      </span>
+      
+      
+    </li><li name="scala.Enumeration#Value" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Value(i:Int,name:String):Enumeration.this.Value"></a><a id="Value(Int,String):Value"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#Value(i:Int,name:String):Enumeration.this.Value" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Value</span><span class="params">(<span name="i">i: <span class="extype" name="scala.Int">Int</span></span>, <span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="#ValueextendsOrdered[Enumeration.this.Value]withSerializable" class="extmbr" name="com.jafpl.runtime.TraceEvent.Value">Value</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>Enumeration</dd></dl></div>
+    </li><li name="scala.Enumeration#Value" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Value(name:String):Enumeration.this.Value"></a><a id="Value(String):Value"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#Value(name:String):Enumeration.this.Value" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Value</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="#ValueextendsOrdered[Enumeration.this.Value]withSerializable" class="extmbr" name="com.jafpl.runtime.TraceEvent.Value">Value</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>Enumeration</dd></dl></div>
+    </li><li name="scala.Enumeration#Value" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Value(i:Int):Enumeration.this.Value"></a><a id="Value(Int):Value"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#Value(i:Int):Enumeration.this.Value" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Value</span><span class="params">(<span name="i">i: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <a href="#ValueextendsOrdered[Enumeration.this.Value]withSerializable" class="extmbr" name="com.jafpl.runtime.TraceEvent.Value">Value</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>Enumeration</dd></dl></div>
+    </li><li name="scala.Enumeration#Value" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Value:Enumeration.this.Value"></a><a id="Value:Value"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#Value:Enumeration.this.Value" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Value</span><span class="result">: <a href="#ValueextendsOrdered[Enumeration.this.Value]withSerializable" class="extmbr" name="com.jafpl.runtime.TraceEvent.Value">Value</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>Enumeration</dd></dl></div>
+    </li><li name="com.jafpl.runtime.TraceEvent#WATCHDOG" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="WATCHDOG:com.jafpl.runtime.TraceEvent.Value"></a><a id="WATCHDOG:Value"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#WATCHDOG:com.jafpl.runtime.TraceEvent.Value" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">WATCHDOG</span><span class="result">: <a href="#ValueextendsOrdered[Enumeration.this.Value]withSerializable" class="extmbr" name="com.jafpl.runtime.TraceEvent.Value">Value</a></span>
+      </span>
+      
+      
+    </li><li name="scala.Enumeration#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="apply(x:Int):Enumeration.this.Value"></a><a id="apply(Int):Value"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#apply(x:Int):Enumeration.this.Value" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">apply</span><span class="params">(<span name="x">x: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <a href="#ValueextendsOrdered[Enumeration.this.Value]withSerializable" class="extmbr" name="com.jafpl.runtime.TraceEvent.Value">Value</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Enumeration</dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -423,7 +611,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#clone():Object" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -445,7 +633,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -461,7 +649,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#equals(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#equals(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -477,7 +665,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#finalize():Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -499,7 +687,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -515,7 +703,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#hashCode():Int" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#hashCode():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -531,7 +719,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -544,10 +732,26 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="scala.Enumeration#maxId" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="maxId:Int"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#maxId:Int" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">maxId</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Enumeration</dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -560,10 +764,42 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Enumeration#nextId" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="nextId:Int"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#nextId:Int" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">nextId</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>Enumeration</dd></dl></div>
+    </li><li name="scala.Enumeration#nextName" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="nextName:Iterator[String]"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#nextName:Iterator[String]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">nextName</span><span class="result">: <span class="extype" name="scala.Iterator">Iterator</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>Enumeration</dd></dl></div>
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#notify():Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -579,7 +815,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -592,10 +828,26 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.Enumeration#readResolve" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="readResolve():AnyRef"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#readResolve():AnyRef" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">readResolve</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>Enumeration</dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -608,10 +860,10 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="scala.Enumeration#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#toString():String" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#toString():String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -623,11 +875,27 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
         <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Enumeration → AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Enumeration#values" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="values:Enumeration.this.ValueSet"></a><a id="values:ValueSet"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#values:Enumeration.this.ValueSet" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">values</span><span class="result">: <a href="#ValueSetextendsAbstractSet[Enumeration.this.Value]withSortedSet[Enumeration.this.Value]withSortedSetLike[Enumeration.this.Value,Enumeration.this.ValueSet]withSerializable" class="extmbr" name="com.jafpl.runtime.TraceEvent.ValueSet">ValueSet</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Enumeration</dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#wait():Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -649,7 +917,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -671,7 +939,7 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/runtime/ExpressionEvaluator.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -690,6 +958,22 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="scala.Enumeration#withName" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="withName(s:String):Enumeration.this.Value"></a><a id="withName(String):Value"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TraceEvent$.html#withName(s:String):Enumeration.this.Value" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">withName</span><span class="params">(<span name="s">s: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="#ValueextendsOrdered[Enumeration.this.Value]withSerializable" class="extmbr" name="com.jafpl.runtime.TraceEvent.Value">Value</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Enumeration</dd></dl></div>
     </li>
               </ol>
             </div>
@@ -700,7 +984,13 @@ an item from the pipeline. The bindings are variable bindings from the pipeline.
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.AnyRef">
+        <div class="parent" name="scala.Enumeration">
+              <h3>Inherited from <span class="extype" name="scala.Enumeration">Enumeration</span></h3>
+            </div><div class="parent" name="scala.Serializable">
+              <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="java.io.Serializable">
+              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
