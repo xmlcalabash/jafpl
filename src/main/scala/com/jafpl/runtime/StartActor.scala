@@ -91,7 +91,12 @@ private[runtime] class StartActor(private val monitor: ActorRef,
         val count = node.outputCardinalities.getOrElse(output, 0L)
         val ospec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
         try {
-          ospec.outputSpec.checkCardinality(output, count)
+          // If the port isn't explicitly defined, ignore it. (Sometimes extra ports exist because
+          // on compound steps, you need inputs to be outputs and vice-versa in order to read
+          // from them or write to them.)
+          if (ospec.outputSpec.cardinality(output).isDefined) {
+            ospec.outputSpec.checkOutputCardinality(output, count)
+          }
         } catch {
           case jex: JafplException =>
             trace(s"FINISH ForEach cardinality error on $output", "ForEach")

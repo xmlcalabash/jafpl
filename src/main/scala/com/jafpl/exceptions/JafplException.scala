@@ -47,10 +47,11 @@ object JafplException {
   val INTERNAL_ERROR = 41
   private val THE_ANSWER = 42
   val UNEXPECTED_SEQUENCE = 43
-  val CARDINALITY_ERROR = 44
+  val BAD_PORT = 44
   private val RACIST_MISOGYNIST_THUG = 45
-  val BAD_PORT = 46
-  val UNEXPECTED_ITEM_TYPE = 47
+  val INPUT_CARDINALITY_ERROR = 46
+  val OUTPUT_CARDINALITY_ERROR = 47
+  val UNEXPECTED_ITEM_TYPE = 48
 
   protected[jafpl] def childForbidden(parent: String, child: String, location: Option[Location]): JafplException = new JafplException(CHILD_FORBIDDEN, location, List(parent, child))
   protected[jafpl] def badContainerEnd(expectedEnd: String, actualEnd: String, location: Option[Location]): JafplException = new JafplException(BAD_CONTAINER_END, location, List(expectedEnd, actualEnd))
@@ -94,7 +95,8 @@ object JafplException {
   protected[jafpl] def unexpecteStepType(node: String, location: Option[Location]): JafplException = new JafplException(UNEXPECTED_STEP_TYPE, location, List(node))
   protected[jafpl] def internalError(msg: String, location: Option[Location]): JafplException = new JafplException(INTERNAL_ERROR, location, List(msg))
   protected[jafpl] def unexpectedSequence(step: String, port: String, location: Option[Location]): JafplException = new JafplException(UNEXPECTED_SEQUENCE, location, List(step, port))
-  protected[jafpl] def cardinalityError(port: String, count: String, spec: PortCardinality): JafplException = new JafplException(CARDINALITY_ERROR, None, List(port, count, spec))
+  protected[jafpl] def inputCardinalityError(port: String, count: String, spec: PortCardinality): JafplException = new JafplException(INPUT_CARDINALITY_ERROR, None, List(port, count, spec))
+  protected[jafpl] def outputCardinalityError(port: String, count: String, spec: PortCardinality): JafplException = new JafplException(OUTPUT_CARDINALITY_ERROR, None, List(port, count, spec))
   protected[jafpl] def badPort(port: String): JafplException = new JafplException(BAD_PORT, None, List(port))
   protected[jafpl] def unexpectedItemType(item: String, port: String, location: Option[Location]): JafplException = new JafplException(UNEXPECTED_ITEM_TYPE, location, List(item, port))
 }

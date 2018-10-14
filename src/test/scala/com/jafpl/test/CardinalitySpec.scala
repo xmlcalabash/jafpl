@@ -80,7 +80,7 @@ class CardinalitySpec extends FlatSpec {
       runtime.run()
     } catch {
       case jafpl: JafplException =>
-        pass = jafpl.code == JafplException.CARDINALITY_ERROR
+        pass = jafpl.code == JafplException.OUTPUT_CARDINALITY_ERROR
     }
 
     assert(pass)
@@ -108,7 +108,7 @@ class CardinalitySpec extends FlatSpec {
       runtime.run()
     } catch {
       case jafpl: JafplException =>
-        pass = jafpl.code == JafplException.CARDINALITY_ERROR
+        pass = jafpl.code == JafplException.OUTPUT_CARDINALITY_ERROR
     }
 
     assert(pass)
@@ -135,7 +135,7 @@ class CardinalitySpec extends FlatSpec {
       runtime.run()
     } catch {
       case jafpl: JafplException =>
-        pass = jafpl.code == JafplException.CARDINALITY_ERROR
+        pass = jafpl.code == JafplException.OUTPUT_CARDINALITY_ERROR
     }
 
     assert(pass)
@@ -164,7 +164,7 @@ class CardinalitySpec extends FlatSpec {
       runtime.run()
     } catch {
       case jafpl: JafplException =>
-        pass = jafpl.code == JafplException.CARDINALITY_ERROR
+        pass = jafpl.code == JafplException.OUTPUT_CARDINALITY_ERROR
     }
 
     assert(pass)

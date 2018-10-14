@@ -58,7 +58,7 @@ class PortSpecification(spec: immutable.Map[String,PortCardinality]) {
     }
   }
 
-  /** Check the actual cardinality against the specification.
+  /** Check the actual input cardinality against the specification.
     *
     * This method throws a [[com.jafpl.exceptions.JafplException]] if the `count` of documents
     * provided on this port is not acceptable according to the defined cardinality.
@@ -66,7 +66,23 @@ class PortSpecification(spec: immutable.Map[String,PortCardinality]) {
     * @param port The port name.
     * @param count The number of documents that appeared on that port.
     */
-  def checkCardinality(port: String, count: Long): Unit = {
+  def checkInputCardinality(port: String, count: Long): Unit = {
+    checkCardinality(port, count, true)
+  }
+
+  /** Check the actual output cardinality against the specification.
+    *
+    * This method throws a [[com.jafpl.exceptions.JafplException]] if the `count` of documents
+    * provided on this port is not acceptable according to the defined cardinality.
+    *
+    * @param port The port name.
+    * @param count The number of documents that appeared on that port.
+    */
+  def checkOutputCardinality(port: String, count: Long): Unit = {
+    checkCardinality(port, count, false)
+  }
+
+  private def checkCardinality(port: String, count: Long, input: Boolean): Unit = {
     if (count < 0) {
       JafplException.internalError(s"Impossible document count $count for $port", None)
     }
@@ -75,7 +91,11 @@ class PortSpecification(spec: immutable.Map[String,PortCardinality]) {
     if (card.isDefined) {
       //println(s"$count: $card")
       if (!card.get.withinBounds(count)) {
-        throw JafplException.cardinalityError(port, count.toString, card.get)
+        if (input) {
+          throw JafplException.inputCardinalityError(port, count.toString, card.get)
+        } else {
+          throw JafplException.outputCardinalityError(port, count.toString, card.get)
+        }
       }
     } else {
       throw JafplException.badPort(port)

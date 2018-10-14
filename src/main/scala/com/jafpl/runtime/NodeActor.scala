@@ -167,7 +167,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         for (output <- node.outputs.filter(!_.startsWith("#"))) {
           val count = node.outputCardinalities.getOrElse(output, 0L)
           val ospec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
-          ospec.outputSpec.checkCardinality(output, count)
+          ospec.outputSpec.checkOutputCardinality(output, count)
         }
       } catch {
         case ex: Exception =>
@@ -226,7 +226,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           try {
             val count = node.inputCardinalities.getOrElse(port, 0L)
             val ispec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
-            ispec.inputSpec.checkCardinality(port, count)
+            ispec.inputSpec.checkInputCardinality(port, count)
           } catch {
             case ex: JafplException =>
               monitor ! GException(Some(node), ex)
