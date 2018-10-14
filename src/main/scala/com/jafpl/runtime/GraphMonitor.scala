@@ -201,7 +201,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
 
     case GClose(node, port) =>
       lastMessage = Instant.now()
-      trace(s"CLOSEOUT $node.$port from ${fmtSender()}", "StepIO")
+      trace(s"GCLOSEOUT $node.$port from ${fmtSender()}", "StepIO")
       val edge = node.outputEdge(port)
       actors(edge.to) ! NClose(edge.toPort)
 

@@ -319,7 +319,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       }
 
     case NClose(port) =>
-      trace(s"CLOSEOUT $node.$port from ${fmtSender()}", "StepIO")
+      trace(s"NCLOSEOUT $node.$port from ${fmtSender()}", "StepIO")
       close(port)
 
     case NStart() =>

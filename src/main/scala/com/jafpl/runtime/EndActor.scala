@@ -5,6 +5,7 @@ import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{ContainerEnd, Node}
 import com.jafpl.messages.Message
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GStop}
+import com.jafpl.steps.{Manifold, PortSpecification}
 
 import scala.collection.mutable
 
@@ -38,6 +39,24 @@ private[runtime] class EndActor(private val monitor: ActorRef,
   }
 
   override protected def close(port: String): Unit = {
+    trace(s"XCLOSE $node/$port", "Methods")
+    try {
+      // Are we closing an input or an output?
+      val manifold = node.start.get.manifold
+      if (manifold.isDefined) {
+        if (manifold.get.inputSpec.ports.contains(port)) {
+          val count = node.start.get.inputCardinalities.getOrElse(port, 0L)
+          manifold.get.inputSpec.checkInputCardinality(port, count)
+        } else if (manifold.get.outputSpec.ports.contains(port)) {
+          val count = node.start.get.outputCardinalities.getOrElse(port, 0L)
+          manifold.get.outputSpec.checkOutputCardinality(port, count)
+        }
+      }
+    } catch {
+      case ex: JafplException =>
+        monitor ! GException(Some(node), ex)
+    }
+
     openInputs -= port
     monitor ! GClose(node.start.get, port)
     checkFinished()

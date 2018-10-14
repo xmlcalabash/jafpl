@@ -11,7 +11,7 @@ import scala.collection.mutable.ListBuffer
 
 private[runtime] class LoopForEndActor(private val monitor: ActorRef,
                                        private val runtime: GraphRuntime,
-                                       private val node: ContainerEnd) extends EndActor(monitor, runtime, node)  {
+                                       private val node: ContainerEnd) extends LoopEndActor(monitor, runtime, node) {
   val buffer = mutable.HashMap.empty[String, ListBuffer[Message]]
 
   override protected def reset(): Unit = {
@@ -51,11 +51,5 @@ private[runtime] class LoopForEndActor(private val monitor: ActorRef,
       }
       buffer(port) += msg
     }
-  }
-
-  override protected def close(port: String): Unit = {
-    openInputs -= port
-    checkFinished()
-    // Don't actually close the port...we're not done yet
   }
 }

@@ -10,6 +10,8 @@ import org.scalatest.FlatSpec
 class CardinalitySpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
   val oneOutput = new Manifold(Manifold.WILD, Manifold.singlePort("result", PortCardinality.EXACTLY_ONE))
+  val oneInput = new Manifold(Manifold.singlePort("source", PortCardinality.EXACTLY_ONE), Manifold.WILD)
+  val oneInputOutput = new Manifold(Manifold.singlePort("source", PortCardinality.EXACTLY_ONE), Manifold.singlePort("result", PortCardinality.EXACTLY_ONE))
 
   "Incorrect input cardinalities " should " cause the pipeline to fail" in {
     val graph    = Jafpl.newInstance().newGraph()
@@ -114,7 +116,35 @@ class CardinalitySpec extends FlatSpec {
     assert(pass)
   }
 
-  "Cardinalities " should " be enforced on pipeline" in {
+  "Cardinalities " should " be enforced on pipeline inputs" in {
+    val graph    = Jafpl.newInstance().newGraph()
+    val bc = new BufferSink()
+
+    val oneInput = new Manifold(Manifold.singlePort("psrc", PortCardinality.EXACTLY_ONE), Manifold.WILD)
+
+    val pipeline = graph.addPipeline(oneInput)
+    val producer = pipeline.addAtomic(new Producer(List("P1", "P2", "P3")), "producer")
+    val ident    = pipeline.addAtomic(new Identity(), "identity")
+    val consumer = pipeline.addAtomic(bc, "consumer")
+
+    graph.addEdge(producer, "result", pipeline, "psrc")
+    graph.addEdge(pipeline, "psrc", ident, "source")
+    graph.addEdge(ident, "result", pipeline, "result")
+    graph.addEdge(pipeline, "result", consumer, "source")
+
+    var pass = false
+    try {
+      val runtime = new GraphRuntime(graph, runtimeConfig)
+      runtime.run()
+    } catch {
+      case jafpl: JafplException =>
+        pass = jafpl.code == JafplException.INPUT_CARDINALITY_ERROR
+    }
+
+    assert(pass)
+  }
+
+  "Cardinalities " should " be enforced on pipeline outputs" in {
     val graph    = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 

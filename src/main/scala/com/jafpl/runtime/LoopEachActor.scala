@@ -3,9 +3,9 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{LoopEachStart, Node}
-import com.jafpl.messages.{ItemMessage, Message, Metadata}
-import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GReset, GRestartLoop, GStart}
-import com.jafpl.steps.{DataConsumer, Manifold}
+import com.jafpl.messages.{ItemMessage, Message}
+import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GRestartLoop, GStart}
+import com.jafpl.steps.DataConsumer
 
 import scala.collection.mutable.ListBuffer
 
