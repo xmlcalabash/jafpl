@@ -5,14 +5,15 @@ import com.jafpl.graph.{CatchStart, ContainerEnd, FinallyStart, Node, TryStart}
 import com.jafpl.runtime.GraphMonitor.{GClose, GFinally, GFinished, GOutput}
 
 private[runtime] class TryCatchEndActor(private val monitor: ActorRef,
-                                        private val runtime: GraphRuntime,
-                                        private val node: ContainerEnd) extends ConditionalEndActor(monitor, runtime, node)  {
+                                        override protected val runtime: GraphRuntime,
+                                        override protected val node: ContainerEnd) extends ConditionalEndActor(monitor, runtime, node)  {
   private var toldStart = false
   private var branchFinished = false
   private var ranFinally = false
   private var finblock = Option.empty[FinallyStart]
 
   override protected def reset(): Unit = {
+    trace("RESET", s"$node", TraceEvent.METHODS)
     super.reset()
 
     for (child <- unfinishedChildren) {
@@ -29,7 +30,7 @@ private[runtime] class TryCatchEndActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def finished(otherNode: Node): Unit = {
-    trace(s"CHILDFIN $otherNode", "StepFinished")
+    trace("FINISHED", s"$node $otherNode", TraceEvent.METHODS)
 
     // Only one child of a try-catch will ever run, so if we get called, something succeeded
     // Well. Not if splitters or joiners get called.
@@ -47,7 +48,7 @@ private[runtime] class TryCatchEndActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def checkFinished(): Unit = {
-    trace(s"FINIFRDY ${node.start.get}/end ready:$readyToRun inputs:${openInputs.isEmpty} branch:$branchFinished fin:$ranFinally", "StepFinished")
+    trace("CHKFINISH", s"${node.start.get}/end ready:$readyToRun inputs:${openInputs.isEmpty} branch:$branchFinished fin:$ranFinally", TraceEvent.METHODS)
 
     if (!toldStart && branchFinished) {
       if (ranFinally) {
@@ -74,5 +75,9 @@ private[runtime] class TryCatchEndActor(private val monitor: ActorRef,
         }
       }
     }
+  }
+
+  override protected def traceMessage(code: String, details: String): String = {
+    s"$code          ".substring(0, 10) + details + " [TryCatchEnd]"
   }
 }

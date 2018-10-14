@@ -10,8 +10,8 @@ import com.jafpl.steps.DataConsumer
 import scala.collection.mutable
 
 private[runtime] class LoopUntilActor(private val monitor: ActorRef,
-                                      private val runtime: GraphRuntime,
-                                      private val node: LoopUntilStart)
+                                      override protected val runtime: GraphRuntime,
+                                      override protected val node: LoopUntilStart)
   extends StartActor(monitor, runtime, node) with DataConsumer {
 
   var currentItem = Option.empty[ItemMessage]
@@ -21,11 +21,13 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
   val bindings = mutable.HashMap.empty[String, Message]
 
   override protected def start(): Unit = {
+    trace("START", s"$node", TraceEvent.METHODS)
     commonStart()
     runIfReady()
   }
 
   override protected def reset(): Unit = {
+    trace("RESET", s"$node", TraceEvent.METHODS)
     super.reset()
     running = false
     readyToRun = true
@@ -34,7 +36,7 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
   }
 
   protected[runtime] def restartLoop(): Unit = {
-    trace(s"MRELOOP $node", "Methods")
+    trace("RSTRTLOOP", s"$node", TraceEvent.METHODS)
     super.reset() // yes, reset
     running = false
     readyToRun = true
@@ -43,11 +45,13 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
   }
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
+    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
     receive(port, item)
   }
 
   override def id: String = node.id
   override def receive(port: String, item: Message): Unit = {
+    trace("RECEIVE", s"$node $port", TraceEvent.METHODS)
     if (port == "source") {
       item match {
         case message: ItemMessage =>
@@ -76,16 +80,18 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
   }
 
   protected[runtime] def loop(item: ItemMessage): Unit = {
+    trace("LOOP", s"$node", TraceEvent.METHODS)
     nextItem = Some(item)
     looped = true
   }
 
   override protected def close(port: String): Unit = {
+    trace("CLOSE", s"$node $port", TraceEvent.METHODS)
     runIfReady()
   }
 
   private def runIfReady(): Unit = {
-    trace(s"RUNIFR UntilFinished: $running $readyToRun ${currentItem.isDefined}", "UntilFinished")
+    trace("RUNIFREADY", s"$node ready:$readyToRun def:${currentItem.isDefined}", TraceEvent.METHODS)
     if (!running && readyToRun && currentItem.isDefined) {
       running = true
 
@@ -93,10 +99,7 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
       monitor ! GOutput(node, edge.fromPort, currentItem.get)
       monitor ! GClose(node, edge.fromPort)
 
-      trace(s"START UntilFinished: $node", "UntilFinished")
-
       for (child <- node.children) {
-        trace(s"START ...$child (for $node)", "UntilFinished")
         monitor ! GStart(child)
       }
     }
@@ -105,10 +108,9 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
   override protected[runtime] def finished(): Unit = {
     val finished = node.comparator.areTheSame(currentItem.get.item, nextItem.get.item)
 
-    trace(s"TESTE UntilFinished: " + currentItem.get + ": " + nextItem.get + ": " + finished, "UntilFinished")
+    trace("FINISHED", s"$node ${currentItem.get}: ${nextItem.get}: $finished", TraceEvent.METHODS)
 
     if (finished) {
-      trace(s"FINISH UntilFinished", "UntilFinished")
       checkCardinalities("current")
       monitor ! GOutput(node, "result", nextItem.get)
       // now close the outputs
@@ -120,11 +122,13 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
       monitor ! GFinished(node)
       commonFinished()
     } else {
-      trace(s"LOOPR UntilFinished", "UntilFinished")
-      trace(s"RESET UntilFinished: $node", "UntilFinished")
       currentItem = nextItem
       nextItem = None
       monitor ! GRestartLoop(node)
     }
+  }
+
+  override protected def traceMessage(code: String, details: String): String = {
+    s"$code          ".substring(0, 10) + details + " [LoopUntil]"
   }
 }

@@ -10,8 +10,8 @@ import com.jafpl.steps.DataConsumer
 import scala.collection.mutable.ListBuffer
 
 private[runtime] class LoopEachActor(private val monitor: ActorRef,
-                                     private val runtime: GraphRuntime,
-                                     private val node: LoopEachStart)
+                                     override protected val runtime: GraphRuntime,
+                                     override protected val node: LoopEachStart)
   extends StartActor(monitor, runtime, node) with DataConsumer {
 
   private val queue = ListBuffer.empty[ItemMessage]
@@ -19,7 +19,7 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
   private var sourceClosed = false
 
   override protected def start(): Unit = {
-    trace(s"MSTART $node", "Methods")
+    trace("START", s"$node", TraceEvent.METHODS)
     running = false
     commonStart()
     runIfReady()
@@ -27,7 +27,7 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
 
   override protected def reset(): Unit = {
     super.reset()
-    trace(s"MRESET $node", "Methods")
+    trace("RESTART", s"$node", TraceEvent.METHODS)
     running = false
     readyToRun = true
     sourceClosed = false
@@ -35,7 +35,7 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
   }
 
   protected[runtime] def restartLoop(): Unit = {
-    trace(s"MRELOOP $node", "Methods")
+    trace("RSTRTLOOP", s"$node", TraceEvent.METHODS)
     super.reset() // yes, reset
     running = false
     readyToRun = true
@@ -43,12 +43,13 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
   }
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
+    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
     receive(port, item)
   }
 
   override def id: String = node.id
   override def receive(port: String, item: Message): Unit = {
-    trace(s"MRECV  $node", "Methods")
+    trace("RECEIVE", s"$node $port", TraceEvent.METHODS)
     item match {
       case message: ItemMessage =>
         queue += message
@@ -59,14 +60,13 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
   }
 
   override protected def close(port: String): Unit = {
-    trace(s"MCLOSE $node", "Methods")
+    trace("CLOSE", s"$node $port", TraceEvent.METHODS)
     sourceClosed = true
     runIfReady()
   }
 
   private def runIfReady(): Unit = {
-    trace(s"MRIFRD $node ${!running} $readyToRun $sourceClosed", "Methods")
-
+    trace("RUNIFREADY", s"$node ready:$readyToRun closed:$sourceClosed", TraceEvent.METHODS)
     if (!running && readyToRun && sourceClosed) {
       running = true
 
@@ -76,11 +76,7 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
         val edge = node.outputEdge("current")
         monitor ! GOutput(node, edge.fromPort, item)
         monitor ! GClose(node, edge.fromPort)
-
-        trace(s"START ForEach: $node", "ForEach")
-
         for (child <- node.children) {
-          trace(s"START ...$child (for $node)", "ForEach")
           monitor ! GStart(child)
         }
       } else {
@@ -90,11 +86,9 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def finished(): Unit = {
-    trace(s"MFINSH $node $sourceClosed ${queue.isEmpty}", "Methods")
+    trace("FINISHED", s"$node closed:$sourceClosed queue:${queue.isEmpty}", TraceEvent.METHODS)
 
     if (sourceClosed && queue.isEmpty) {
-      trace(s"FINISH ForEach: $node $sourceClosed, ${queue.isEmpty}", "ForEach")
-
       checkCardinalities("current")
 
       // now close the outputs
@@ -104,12 +98,14 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
         }
       }
 
-      trace(s"RSTCRD $node", "Cardinality")
       monitor ! GFinished(node)
       commonFinished()
     } else {
-      trace(s"RESTART ForEach: $node $sourceClosed, ${queue.isEmpty}", "ForEach")
       monitor ! GRestartLoop(node)
     }
+  }
+
+  override protected def traceMessage(code: String, details: String): String = {
+    s"$code          ".substring(0, 10) + details + " [LoopEach]"
   }
 }

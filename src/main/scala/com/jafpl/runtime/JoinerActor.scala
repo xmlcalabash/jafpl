@@ -10,8 +10,8 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 private[runtime] class JoinerActor(private val monitor: ActorRef,
-                                   private val runtime: GraphRuntime,
-                                   private val node: Joiner) extends NodeActor(monitor, runtime, node) {
+                                   override protected val runtime: GraphRuntime,
+                                   override protected val node: Joiner) extends NodeActor(monitor, runtime, node) {
   private val id = UniqueId.nextId
   private val portClosed = mutable.HashMap.empty[Int,Boolean]
   private val portBuffer = mutable.HashMap.empty[Int,ListBuffer[Message]]
@@ -19,6 +19,7 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
   private var hadPriorityInput = false
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
+    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
     if (node.mode == JoinMode.MIXED) {
       monitor ! GOutput(node, "result", item)
     } else {
@@ -29,6 +30,7 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
   }
 
   override protected def close(port: String): Unit = {
+    trace("CLOSE", s"$node", TraceEvent.METHODS)
     if (node.mode != JoinMode.MIXED) {
       this.synchronized {
         portClosed.put(portNo(port),true)
@@ -97,5 +99,9 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
       }
     }
     currentPort = port
+  }
+
+  override protected def traceMessage(code: String, details: String): String = {
+    s"$code          ".substring(0, 10) + details + " [Joiner]"
   }
 }

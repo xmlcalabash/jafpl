@@ -6,10 +6,10 @@ import com.jafpl.graph.ContainerEnd
 import com.jafpl.runtime.GraphMonitor.GException
 
 private[runtime] class LoopEndActor(private val monitor: ActorRef,
-                                        private val runtime: GraphRuntime,
-                                        private val node: ContainerEnd) extends EndActor(monitor, runtime, node)  {
+                                    override protected val runtime: GraphRuntime,
+                                    override protected val node: ContainerEnd) extends EndActor(monitor, runtime, node)  {
   override protected def close(port: String): Unit = {
-    trace(s"XCLOSE $node/$port", "Methods")
+    trace("CLOSE", s"$node $port", TraceEvent.METHODS)
     try {
       // Are we closing an input or an output?
       val manifold = node.start.get.manifold

@@ -6,14 +6,15 @@ import com.jafpl.graph.{CatchStart, ContainerStart, FinallyStart, Joiner, Node, 
 import com.jafpl.runtime.GraphMonitor.{GAbort, GCatch, GClose, GException, GFinished, GRunFinally, GStart}
 
 private[runtime] class TryCatchActor(private val monitor: ActorRef,
-                                     private val runtime: GraphRuntime,
-                                     private val node: ContainerStart) extends StartActor(monitor, runtime, node) {
+                                     override protected val runtime: GraphRuntime,
+                                     override protected val node: ContainerStart) extends StartActor(monitor, runtime, node) {
   var runningTryBlock = true
   var tryblock: Option[TryStart] = None
   var finblock: Option[FinallyStart] = None
   var cause = Option.empty[Throwable]
 
   override protected def start(): Unit = {
+    trace("START", s"$node", TraceEvent.METHODS)
     commonStart()
     runningTryBlock = true
 
@@ -34,10 +35,12 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
   }
 
   def runFinally(): Unit = {
+    trace("RUNFINAL", s"$node", TraceEvent.METHODS)
     monitor ! GRunFinally(finblock.get, cause)
   }
 
   def exception(cause: Throwable): Unit = {
+    trace("EXCEPTION", s"$node $cause", TraceEvent.METHODS)
     this.cause = Some(cause)
 
     if (runningTryBlock) {
@@ -91,7 +94,7 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
   }
 
   private def stopUnselectedBranch(node: Node): Unit = {
-    trace(s"KILLC $node", "TryCatch")
+    trace("KILLBRANCH", s"${this.node} $node", TraceEvent.METHODS)
     monitor ! GAbort(node)
     for (output <- node.outputs) {
       monitor ! GClose(node, output)
@@ -99,7 +102,7 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def finished(): Unit = {
-    trace(s"FINISH TRY/CATCH SUCCESSFULLY", "TryCatch")
+    trace("FINISHED", s"$node finished successfully", TraceEvent.METHODS)
     if (runningTryBlock) {
       // Yay, we succeeded, stop all the catch blocks
       for (child <- node.children) {
@@ -113,5 +116,9 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
 
     monitor ! GFinished(node)
     commonFinished()
+  }
+
+  override protected def traceMessage(code: String, details: String): String = {
+    s"$code          ".substring(0, 10) + details + " [TryCatch]"
   }
 }

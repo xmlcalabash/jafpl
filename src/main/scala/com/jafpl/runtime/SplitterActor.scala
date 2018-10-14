@@ -10,18 +10,20 @@ import com.jafpl.steps.DataConsumer
 import scala.collection.mutable.ListBuffer
 
 private[runtime] class SplitterActor(private val monitor: ActorRef,
-                                     private val runtime: GraphRuntime,
-                                     private val node: Splitter)
+                                     override protected val runtime: GraphRuntime,
+                                     override protected val node: Splitter)
   extends NodeActor(monitor, runtime, node) with DataConsumer {
 
   var edges: Option[ListBuffer[Edge]] = None
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
+    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
     receive(port, item)
   }
 
   override def id: String = node.id
   override def receive(port: String, item: Message): Unit = {
+    trace("RECEIVE", s"$node $port", TraceEvent.METHODS)
     // Cache the edges for a small amount of efficiency
     if (edges.isEmpty) {
       val outbound = ListBuffer.empty[Edge]
@@ -33,7 +35,7 @@ private[runtime] class SplitterActor(private val monitor: ActorRef,
 
     if (edges.isDefined) {
       for (edge <- edges.get) {
-        trace("SPLTR Sends " + item + " to " + node + " on " + edge.fromPort, "Splitter")
+        trace("SPLITTER", s"$node sends $item to $node on ${edge.fromPort}", TraceEvent.STEPIO)
         monitor ! GOutput(node, edge.fromPort, item)
       }
     }
@@ -46,5 +48,9 @@ private[runtime] class SplitterActor(private val monitor: ActorRef,
             JafplException.unexpectedMessage(item.toString, port, node.location))
       }
     }
+  }
+
+  override protected def traceMessage(code: String, details: String): String = {
+    s"$code          ".substring(0, 10) + details + " [Splitter]"
   }
 }

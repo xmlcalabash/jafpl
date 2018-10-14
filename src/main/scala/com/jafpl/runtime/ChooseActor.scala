@@ -7,13 +7,15 @@ import com.jafpl.runtime.GraphMonitor.{GAbort, GCheckGuard, GClose, GStart}
 import scala.collection.mutable
 
 private[runtime] class ChooseActor(private val monitor: ActorRef,
-                                 private val runtime: GraphRuntime,
-                                 private val node: ContainerStart) extends StartActor(monitor, runtime, node) {
+                                   override protected val runtime: GraphRuntime,
+                                   override protected val node: ContainerStart) extends StartActor(monitor, runtime, node) {
   var chosen = Option.empty[Node]
   val guards = mutable.HashMap.empty[Node, Option[Boolean]]
   val stopped = mutable.HashMap.empty[Node, Option[Boolean]]
 
   override protected def start(): Unit = {
+    trace("START", s"$node", TraceEvent.METHODS)
+
     commonStart()
 
     for (child <- node.children) {
@@ -33,6 +35,8 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
   }
 
   protected[runtime] def guardResult(when: Node, pass: Boolean): Unit = {
+    trace("GUARDRES", s"$node $when: $pass", TraceEvent.METHODS)
+
     guards.put(when, Some(pass))
 
     var stillWaiting = false
@@ -105,10 +109,14 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
   }
 
   private def stopUnselectedBranch(node: Node): Unit = {
-    trace(s"KILLC $node", "Choose")
+    trace("KILLBRANCH", s"${this.node} $node", TraceEvent.METHODS)
     monitor ! GAbort(node)
     for (output <- node.outputs) {
       monitor ! GClose(node, output)
     }
+  }
+
+  override protected def traceMessage(code: String, details: String): String = {
+    s"$code          ".substring(0, 10) + details + " [Choose]"
   }
 }

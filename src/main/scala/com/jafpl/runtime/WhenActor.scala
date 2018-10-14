@@ -11,8 +11,8 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 private[runtime] class WhenActor(private val monitor: ActorRef,
-                                 private val runtime: GraphRuntime,
-                                 private val node: WhenStart)
+                                 override protected val runtime: GraphRuntime,
+                                 override protected val node: WhenStart)
   extends StartActor(monitor, runtime, node) with DataConsumer {
 
   private var readyToCheck = false
@@ -20,18 +20,20 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
   private val bindings = mutable.HashMap.empty[String, Message]
 
   override protected def input(from: Node, fromPort: String, port: String, msg: Message): Unit = {
+    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
     receive(port, msg)
   }
 
   override def id: String = node.id
   override def receive(port: String, item: Message): Unit = {
+    trace("RECEIVE", s"$node $port", TraceEvent.METHODS)
     item match {
       case item: ItemMessage =>
         assert(port == "condition")
         contextItem += item
       case binding: BindingMessage =>
         assert(port == "#bindings")
-        trace(s"$node received binding for ${binding.name}", "Bindings")
+        trace("WHENBIND", s"$node received binding for ${binding.name}", TraceEvent.BINDINGS)
         bindings.put(binding.name, binding.message)
       case _ =>
         monitor ! GException(None,
@@ -40,12 +42,13 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
   }
 
   override protected def close(port: String): Unit = {
-    trace(s"$node closed $port", "StepIO")
+    trace("CLOSE", s"$node $port", TraceEvent.METHODS)
     super.close(port)
     checkIfReady()
   }
 
   override protected def start(): Unit = {
+    trace("START", s"$node", TraceEvent.METHODS)
     commonStart()
     for (child <- node.children) {
       monitor ! GStart(child)
@@ -53,17 +56,21 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
   }
 
   protected[runtime] def checkGuard(): Unit = {
-    trace(s"$node checkGuard", "StepExec")
+    trace("CHKGUARD", s"$node", TraceEvent.METHODS)
     readyToCheck = true
     checkIfReady()
   }
 
   private def checkIfReady(): Unit = {
-    trace(s"$node checkIfReady: ready:$readyToCheck inputs:${openInputs.isEmpty}", "StepExec")
+    trace("CHKREADY", s"$node checkIfReady: ready:$readyToCheck inputs:${openInputs.isEmpty}", TraceEvent.METHODS)
     if (readyToCheck && openInputs.isEmpty) {
       val eval = runtime.runtime.expressionEvaluator.newInstance()
       val pass = eval.booleanValue(node.testExpr, contextItem.toList, bindings.toMap, None)
       monitor ! GGuardResult(node, pass)
     }
+  }
+
+  override protected def traceMessage(code: String, details: String): String = {
+    s"$code          ".substring(0, 10) + details + " [When]"
   }
 }

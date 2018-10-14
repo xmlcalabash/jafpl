@@ -1,7 +1,6 @@
 package com.jafpl.runtime
 
-import akka.actor.{Actor, ActorRef}
-import akka.event.Logging
+import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{ContainerStart, Node}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
@@ -36,9 +35,8 @@ private[runtime] object NodeActor {
 }
 
 private[runtime] class NodeActor(private val monitor: ActorRef,
-                                 private val runtime: GraphRuntime,
-                                 private val node: Node) extends Actor {
-  protected val log = Logging(context.system, this)
+                                 override protected val runtime: GraphRuntime,
+                                 protected val node: Node) extends TracingActor(runtime) {
   protected val openInputs = mutable.HashSet.empty[String]
   protected val bufferedInput: ListBuffer[InputBuffer] = ListBuffer.empty[InputBuffer]
   protected var readyToRun = false
@@ -49,27 +47,13 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     proxy = Some(consumer)
   }
 
-  protected def trace(message: String, event: String): Unit = {
-    trace("info", message, event)
-  }
-
-  protected def trace(level: String, message: String, event: String): Unit = {
-    // We don't use the traceEventManager.trace() call because we want to use the Akka logger
-    if (runtime.traceEventManager.traceEnabled(event)) {
-      level match {
-        case "info" => log.info(message)
-        case "debug" => log.debug(message)
-        case _ => log.warning(message)
-      }
-    }
-  }
-
   protected def initialize(): Unit = {
+    trace("INITACTOR", s"$node  step:${node.step.isDefined}", TraceEvent.METHODS)
+
     for (input <- node.inputs) {
       openInputs.add(input)
     }
     if (node.step.isDefined) {
-      trace(s"INITSTEP $node", "StepExec")
       try {
         node.step.get.initialize(runtime.runtime)
       } catch {
@@ -80,6 +64,8 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def reset(): Unit = {
+    trace("RESET", s"$node", TraceEvent.METHODS)
+
     readyToRun = false
     openInputs.clear()
     bufferedInput.clear()
@@ -91,7 +77,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     node.outputCardinalities.clear()
 
     if (node.step.isDefined) {
-      trace(s"RESETNOD $node", "StepExec")
+      trace("RESETNODE", s"$node", TraceEvent.METHODS)
       try {
         node.step.get.reset()
       } catch {
@@ -102,13 +88,15 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def start(): Unit = {
+    trace("START", s"$node", TraceEvent.METHODS)
     readyToRun = true
     runIfReady()
   }
 
   protected def abort(): Unit = {
+    trace("ABORT", s"$node", TraceEvent.METHODS)
     if (node.step.isDefined) {
-      trace(s"ABORTSTP $node", "StepExec")
+      trace("ABORTSTEP", s"$node ${node.step.get}", TraceEvent.METHODS)
       try {
         node.step.get.abort()
       } catch {
@@ -116,14 +104,15 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           monitor ! GException(Some(node), cause)
       }
     } else {
-      trace(s"ABORT___ $node", "StepExec")
+      trace("ABORTSTEP!", s"$node", TraceEvent.METHODS)
     }
     monitor ! GFinished(node)
   }
 
   protected def stop(): Unit = {
+    trace("STOP", s"$node", TraceEvent.METHODS)
     if (node.step.isDefined) {
-      trace(s"STOPSTEP $node", "Stopping")
+      trace("STOPSTEP", s"$node ${node.step.get}", TraceEvent.METHODS)
       try {
         node.step.get.stop()
       } catch {
@@ -131,27 +120,28 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           monitor ! GException(Some(node), cause)
       }
     } else {
-      trace(s"STOPXSTP $node", "Stopping")
+      trace("STOPSTEP!", s"$node", TraceEvent.METHODS)
     }
 
     monitor ! GStopped(node)
   }
 
   private def runIfReady(): Unit = {
-    trace(s"RUNIFRDY $node (ready:$readyToRun inputs:${openInputs.isEmpty})", "StepExec")
-
+    trace("RUNIFREADY", s"$node ready:$readyToRun inputs:${openInputs.isEmpty}", TraceEvent.METHODS)
     if (readyToRun) {
       if (openInputs.isEmpty) {
         run()
       } else {
         for (port <- openInputs) {
-          trace(s"........ $port open", "StepExec")
+          trace("...RWAITI", s"$node $port open", TraceEvent.METHODS)
         }
       }
     }
   }
 
   protected def run(): Unit = {
+    trace("RUN", s"$node", TraceEvent.METHODS)
+
     readyToRun = false
     var threwException = false
 
@@ -160,7 +150,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     }
 
     if (node.step.isDefined) {
-      trace(s"RUNSTEP  $node", "StepExec")
+      trace("RUNSTEP", s"$node ${node.step.get}", TraceEvent.METHODS)
       try {
         node.step.get.run()
 
@@ -175,10 +165,10 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           monitor ! GException(Some(node), ex)
       }
 
-      trace(s"Ran $node: $threwException", "StepExec")
+      trace("RAN", s"$node ${node.step.get} exception:$threwException", TraceEvent.METHODS)
+
       if (!threwException) {
         for (output <- node.outputs) {
-          trace(s"Closing $output for $node", "StepExec")
           monitor ! GClose(node, output)
         }
         monitor ! GFinished(node)
@@ -187,7 +177,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         }
       }
     } else {
-      trace(s"RUN____  $node", "StepExec")
+      trace("RUNSTEP!", s"$node", TraceEvent.METHODS)
       node match {
         case start: ContainerStart =>
           // Close all our "input" ports so that children reading them can run
@@ -208,6 +198,8 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def close(port: String): Unit = {
+    trace("CLOSE", s"$node / $port", TraceEvent.METHODS)
+
     openInputs -= port
     if (port == "#bindings" && bufferedInput.nonEmpty) {
       for (buf <- bufferedInput) {
@@ -225,6 +217,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         for (port <- node.step.get.inputSpec.ports.filter(_ != "*")) {
           try {
             val count = node.inputCardinalities.getOrElse(port, 0L)
+            trace("CARD", s"$node input $port: $count", TraceEvent.CARDINALITY)
             val ispec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
             ispec.inputSpec.checkInputCardinality(port, count)
           } catch {
@@ -239,7 +232,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    trace(s"Receiving input on $port for $node", "Cardinalities")
+    trace("INPUT", s"$node / $fromPort to $port", TraceEvent.METHODS)
     if (port != "#bindings" && openInputs.contains("#bindings")) {
       bufferedInput += new InputBuffer(from, fromPort, port, item)
       return
@@ -256,10 +249,10 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
               inj.receiveBinding(binding)
             }
             if (node.step.isDefined) {
-              trace(s"→BINDING $node: ${binding.name}=${binding.message}", "Bindings")
+              trace("BINDING→", s"$node: ${binding.name}=${binding.message}", TraceEvent.BINDINGS)
               node.step.get.receiveBinding(binding)
             } else {
-              trace(s"↴BINDING $node: ${binding.name}=${binding.message} (no step)", "Bindings")
+              trace("BINDING↴", s"$node: ${binding.name}=${binding.message}", TraceEvent.BINDINGS)
             }
           case _ =>
             throw JafplException.unexpectedMessage(item.toString, "#bindings", node.location)
@@ -274,10 +267,10 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
             }
             node.inputCardinalities.put(port, node.inputCardinalities.getOrElse(port, 0L) + 1)
             if (node.step.isDefined) {
-              trace(s"DELIVER→ ${node.step.get}.$port", "StepIO")
+              trace("DELIVER→", s"$node ${node.step.get}.$port", TraceEvent.STEPIO)
               node.step.get.receive(port, message)
             } else {
-              trace(s"↴DELIVER $node (no step)", "StepIO")
+              trace("DELIVER↴", s"$node (no step).$port", TraceEvent.STEPIO)
             }
           case _ =>
             throw JafplException.unexpectedMessage(item.toString, port, node.location)
@@ -300,15 +293,16 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
 
   final def receive: PartialFunction[Any, Unit] = {
     case NInitialize() =>
-      trace(s"INITLIZE $node", "StepMessages")
+      trace("NINIT", s"$node", TraceEvent.NMESSAGES)
       initialize()
 
     case NInput(from, fromPort, port, item) =>
-      trace(s"→RECEIVE $node.$port from ${fmtSender()}", "StepIO")
+      trace("NINPUT", s"$node $from.$fromPort → $port", TraceEvent.NMESSAGES)
+      trace("RECEIVE→",s"$node.$port from ${fmtSender()}", TraceEvent.STEPIO)
       input(from, fromPort, port, item)
 
     case NLoop(item) =>
-      trace(s"LOOPSTRT $item", "StepIO")
+      trace("NLOOP", s"$node $item", TraceEvent.NMESSAGES)
       this match {
         case loop: LoopUntilActor =>
           loop.loop(item)
@@ -319,23 +313,24 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       }
 
     case NClose(port) =>
-      trace(s"NCLOSEOUT $node.$port from ${fmtSender()}", "StepIO")
+      trace("NCLOSE", s"$node $port", TraceEvent.NMESSAGES)
+      trace("NCLOSE", s"$node.$port from ${fmtSender()}", TraceEvent.STEPIO)
       close(port)
 
     case NStart() =>
-      trace(s"RUNSTART $node", "StepMessages")
+      trace("NSTART", s"$node", TraceEvent.NMESSAGES)
       start()
 
     case NAbort() =>
-      trace(s"ABORTNOD $node", "StepMessages")
+      trace("NABORT", s"$node", TraceEvent.NMESSAGES)
       abort()
 
     case NStop() =>
-      trace(s"STOPNODE $node", "Stopping")
+      trace("NSTOP", s"$node", TraceEvent.NMESSAGES)
       stop()
 
     case NCatch(cause) =>
-      trace(s"RUNCATCH $node", "StepMessages")
+      trace("NCATCH", s"$node", TraceEvent.NMESSAGES)
       this match {
         case catchStep: CatchActor =>
           catchStep.start(cause)
@@ -345,7 +340,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       }
 
     case NFinally() =>
-      trace(s"FINALLY $node", "StepMessages")
+      trace("NFINALLY", s"$node", TraceEvent.NMESSAGES)
       this match {
         case block: TryCatchActor =>
           block.runFinally()
@@ -355,7 +350,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       }
 
     case NRunFinally(cause) =>
-      trace(s"RUNFINAL $node ($cause)", "StepMessages")
+      trace("NRUNFINAL", s"$node $cause", TraceEvent.NMESSAGES)
       this match {
         case block: FinallyActor =>
           block.startFinally(cause)
@@ -365,11 +360,11 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       }
 
     case NReset() =>
-      trace(s"RESETNOD $node", "StepMessages")
+      trace("NRESET", s"$node", TraceEvent.NMESSAGES)
       reset()
 
     case NRestartLoop() =>
-      trace(s"RSETLOOP $node", "StepMessages")
+      trace("NRSTRTLOOP", s"$node", TraceEvent.NMESSAGES)
       this match {
         case loop: LoopEachActor => loop.restartLoop()
         case loop: LoopForActor => loop.restartLoop()
@@ -380,8 +375,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       }
 
     case NContainerFinished() =>
-      trace(s"CNTNRFIN $node", "StepMessages")
-
+      trace("NCONTFNSHD", s"$node", TraceEvent.NMESSAGES)
       this match {
         case start: StartActor =>
           start.finished()
@@ -391,8 +385,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       }
 
     case NViewportFinished(buffer) =>
-      trace(s"VIEWPFIN $node", "StepMessages")
-
+      trace("NVIEWFNSHD", s"$node", TraceEvent.NMESSAGES)
       this match {
         case start: ViewportActor =>
           start.returnItems(buffer)
@@ -403,7 +396,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       }
 
     case NChildFinished(otherNode) =>
-      trace(s"NCHILDFN $otherNode", "StepMessages")
+      trace("NCHLDFNSHD", s"$node $otherNode", TraceEvent.NMESSAGES)
       this match {
         case end: EndActor =>
           end.finished(otherNode)
@@ -413,7 +406,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       }
 
     case NCheckGuard() =>
-      trace(s"CHKGUARD", "StepMessages")
+      trace("NCHKGUARD", s"$node", TraceEvent.NMESSAGES)
       this match {
         case when: WhenActor =>
           when.checkGuard()
@@ -423,7 +416,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       }
 
     case NGuardResult(when, pass) =>
-      trace(s"GRDRESLT $when: $pass", "StepMessages")
+      trace("NGUARDRES", s"$node $when: $pass", TraceEvent.NMESSAGES)
       this match {
         case choose: ChooseActor =>
           choose.guardResult(when, pass)
@@ -433,7 +426,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       }
 
     case NException(cause) =>
-      trace(s"EXCPTION $node $cause $this", "StepMessages")
+      trace("NEXCEPT", s"$node $cause ($this)", TraceEvent.NMESSAGES)
       this match {
         case trycatch: TryCatchActor =>
           trycatch.exception(cause)
@@ -442,18 +435,18 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       }
 
     case NTraceEnable(event) =>
-      trace(s"TRACEADD $event", "Traces")
+      trace("TRACE+", s"$node $event", TraceEvent.TRACES)
       runtime.traceEventManager.enableTrace(event)
 
     case NTraceDisable(event) =>
-      trace(s"TRACERMV $event", "Traces")
+      trace("TRACE-", s"$node $event", TraceEvent.TRACES)
       runtime.traceEventManager.disableTrace(event)
 
     case m: Any =>
+      trace("NERROR", s"$node $m", TraceEvent.NMESSAGES)
       log.error(s"Unexpected message: $m")
   }
 
-  class InputBuffer(val from: Node, val fromPort: String, val port: String, val item: Message) {
+  protected class InputBuffer(val from: Node, val fromPort: String, val port: String, val item: Message) {
   }
-
 }

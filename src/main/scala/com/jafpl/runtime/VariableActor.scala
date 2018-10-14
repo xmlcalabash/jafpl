@@ -11,26 +11,29 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 private[runtime] class VariableActor(private val monitor: ActorRef,
-                                     private val runtime: GraphRuntime,
+                                     override protected val runtime: GraphRuntime,
                                      private val binding: Binding)
   extends NodeActor(monitor, runtime, binding) with DataConsumer {
   private var exprContext = ListBuffer.empty[Message]
   private val bindings = mutable.HashMap.empty[String, Message]
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
+    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
     receive(port, item)
   }
 
   override def id: String = binding.id
   override def receive(port: String, item: Message): Unit = {
+    trace("RECEIVE", s"$port", TraceEvent.METHODS)
+
     item match {
       case item: ItemMessage =>
         assert(port == "source")
-        trace(s"RECEIVED binding context", "Bindings")
+        trace("RECVBCTX", "", TraceEvent.BINDINGS)
         exprContext += item
       case binding: BindingMessage =>
         assert(port == "#bindings")
-        trace(s"RECVBIND ${binding.name}=${binding.message}", "Bindings")
+        trace("RECVBIND", s"${binding.name}=${binding.message}", TraceEvent.BINDINGS)
         bindings.put(binding.name, binding.message)
       case _ =>
         monitor ! GException(None,
@@ -39,6 +42,7 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
   }
 
   override protected def run(): Unit = {
+    trace("RUN", s"$node", TraceEvent.METHODS)
     if (runtime.traceEventManager.traceEnabled("Bindings")) {
       var sbindings = ""
       for (name <- bindings.keySet) {
@@ -50,7 +54,7 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
       if (sbindings != "") {
         sbindings = " (with " + sbindings + ")"
       }
-      trace(s"COMPUTE= ${binding.name}=${binding.expression}$sbindings", "Bindings")
+      trace("COMPUTE", s"${binding.name}=${binding.expression}$sbindings", TraceEvent.BINDINGS)
     }
 
     binding match {
@@ -99,5 +103,9 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
       case t: Throwable =>
         monitor ! GException(Some(binding), t)
     }
+  }
+
+  override protected def traceMessage(code: String, details: String): String = {
+    s"$code          ".substring(0, 10) + details + " [Variable]"
   }
 }

@@ -10,11 +10,12 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 private[runtime] class LoopUntilEndActor(private val monitor: ActorRef,
-                                         private val runtime: GraphRuntime,
-                                         private val node: ContainerEnd) extends LoopEndActor(monitor, runtime, node)  {
+                                         override protected val runtime: GraphRuntime,
+                                         override protected val node: ContainerEnd) extends LoopEndActor(monitor, runtime, node)  {
   val buffer = mutable.HashMap.empty[String, ListBuffer[Message]]
 
   override protected def reset(): Unit = {
+    trace("RESET", s"$node", TraceEvent.METHODS)
     // We got reset, so we're going around again.
     // That means the output we buffered on this loop is good.
     for (port <- buffer.keySet) {
@@ -33,6 +34,8 @@ private[runtime] class LoopUntilEndActor(private val monitor: ActorRef,
   }
 
   override protected def input(from: Node, fromPort: String, port: String, msg: Message): Unit = {
+    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
+
     if (port == "test") {
       // A loop sends it's output back to the start.
       msg match {
@@ -50,5 +53,9 @@ private[runtime] class LoopUntilEndActor(private val monitor: ActorRef,
       }
       buffer(port) += msg
     }
+  }
+
+  override protected def traceMessage(code: String, details: String): String = {
+    s"$code          ".substring(0, 10) + details + " [LoopUntilEnd]"
   }
 }

@@ -8,8 +8,8 @@ import com.jafpl.runtime.GraphMonitor.{GAbort, GClose, GException, GFinished, GO
 import com.jafpl.steps.Manifold
 
 private[runtime] class StartActor(private val monitor: ActorRef,
-                                  private val runtime: GraphRuntime,
-                                  private val node: ContainerStart) extends NodeActor(monitor, runtime, node)  {
+                                  override protected val runtime: GraphRuntime,
+                                  override protected val node: ContainerStart) extends NodeActor(monitor, runtime, node)  {
   protected def commonStart(): Unit = {
     readyToRun = true
     for (inj <- node.stepInjectables) {
@@ -24,24 +24,24 @@ private[runtime] class StartActor(private val monitor: ActorRef,
   }
 
   override protected def start(): Unit = {
+    trace("START", s"$node", TraceEvent.METHODS)
     commonStart()
     for (child <- node.children) {
-      trace(s"START ... $child (for $node)", "Run")
       monitor ! GStart(child)
     }
   }
 
   override protected def abort(): Unit = {
+    trace("ABORT", s"$node", TraceEvent.METHODS)
     for (child <- node.children) {
-      trace(s"ABORT ... $child (for $node)", "Run")
       monitor ! GAbort(child)
     }
     monitor ! GFinished(node)
   }
 
   override protected def stop(): Unit = {
+    trace("STOP", s"$node", TraceEvent.METHODS)
     for (child <- node.children) {
-      trace(s"STOPC ... $child (for $node)", "Stopping")
       monitor ! GStop(child)
     }
     monitor ! GStop(node.containerEnd)
@@ -49,16 +49,18 @@ private[runtime] class StartActor(private val monitor: ActorRef,
   }
 
   override protected def reset(): Unit = {
+    trace("RESET", s"$node", TraceEvent.METHODS)
     readyToRun = false
 
     monitor ! GReset(node.containerEnd)
     for (child <- node.children) {
-      trace(s"RESET ...$child (for $node)", "Run")
       monitor ! GReset(child)
     }
   }
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
+    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
+
     // Bindings on compound steps are only ever for injectables
     if (port == "#bindings") {
       for (inj <- node.stepInjectables) {
@@ -71,7 +73,7 @@ private[runtime] class StartActor(private val monitor: ActorRef,
       }
     } else {
       val edge = node.outputEdge(port)
-      trace(s"Start actor $node sends to ${edge.toPort}: $item", "StepIO")
+      trace("STRTSEND", s"Start actor $node sends to ${edge.toPort}: $item", TraceEvent.STEPIO)
       node.outputCardinalities.put(port, node.outputCardinalities.getOrElse(port, 0L) + 1)
       monitor ! GOutput(node, edge.fromPort, item)
     }
@@ -99,7 +101,6 @@ private[runtime] class StartActor(private val monitor: ActorRef,
           }
         } catch {
           case jex: JafplException =>
-            trace(s"FINISH ForEach cardinality error on $output", "ForEach")
             monitor ! GException(Some(node), jex)
         }
       }
@@ -109,11 +110,17 @@ private[runtime] class StartActor(private val monitor: ActorRef,
   }
 
   protected[runtime] def finished(): Unit = {
+    trace("FINISHED", s"$node", TraceEvent.METHODS)
     checkCardinalities()
     for (output <- node.outputs) {
       monitor ! GClose(node, output)
     }
     monitor ! GFinished(node)
     commonFinished()
+  }
+
+
+  override protected def traceMessage(code: String, details: String): String = {
+    s"$code          ".substring(0, 10) + details + " [StartActor]"
   }
 }

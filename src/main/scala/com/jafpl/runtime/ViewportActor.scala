@@ -11,8 +11,8 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 private[runtime] class ViewportActor(private val monitor: ActorRef,
-                                     private val runtime: GraphRuntime,
-                                     private val node: ViewportStart)
+                                     override protected val runtime: GraphRuntime,
+                                     override protected val node: ViewportStart)
   extends StartActor(monitor, runtime, node) with DataConsumer {
 
   private val itemQueue = ListBuffer.empty[ViewportItem]
@@ -22,11 +22,13 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
   private var index = 0
 
   override protected def start(): Unit = {
+    trace("START", s"$node", TraceEvent.METHODS)
     commonStart()
     runIfReady()
   }
 
   override protected def reset(): Unit = {
+    trace("RESET", s"$node", TraceEvent.METHODS)
     super.reset()
     running = false
     readyToRun = true
@@ -34,11 +36,14 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
   }
 
   override protected def input(from: Node, fromPort: String, port: String, msg: Message): Unit = {
+    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
     receive(port, msg)
   }
 
   override def id: String = node.id
   override def receive(port: String, msg: Message): Unit = {
+    trace("RECEIVE", s"$node $port", TraceEvent.METHODS)
+
     msg match {
       case binding: BindingMessage => Unit
       case item: ItemMessage =>
@@ -63,12 +68,13 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
   }
 
   override protected def close(port: String): Unit = {
+    trace("CLOSE", s"$node", TraceEvent.METHODS)
     sourceClosed = true
     runIfReady()
   }
 
   private def runIfReady(): Unit = {
-    trace(s"RUNIFRDY $node (running:$running ready:$readyToRun closed:$sourceClosed", "Viewport")
+    trace("RUNIFREADY", s"$node (running:$running ready:$readyToRun closed:$sourceClosed", TraceEvent.METHODS)
 
     if (!running && readyToRun && sourceClosed) {
       running = true
@@ -107,6 +113,7 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def finished(): Unit = {
+    trace("FINISHED", s"$node source:$sourceClosed empty:${itemQueue.isEmpty}", TraceEvent.METHODS)
     if (sourceClosed) {
       if (itemQueue.isEmpty) {
         monitor ! GClose(node, node.outputPort)
@@ -114,10 +121,10 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
         commonFinished()
       } else {
         if (index >= itemQueue.size) {
-          trace(s"FINISHED $node source:$sourceClosed, queue:${itemQueue.isEmpty}", "Viewport")
+          trace("VFINISHED", s"$node source:$sourceClosed, index:$index size:${itemQueue.size}", TraceEvent.METHODS)
           // send the transformed result and close the output
           val recomposition = node.composer.recompose()
-          trace(s"RECOMP: $recomposition", "X")
+          trace("VRECOMP", s"$node $recomposition", TraceEvent.METHODS)
           monitor ! GOutput(node, node.outputPort, recomposition)
           monitor ! GClose(node, node.outputPort)
           monitor ! GFinished(node)
@@ -128,5 +135,9 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
     } else {
       // how does finished get called before run, exactly?
     }
+  }
+
+  override protected def traceMessage(code: String, details: String): String = {
+    s"$code          ".substring(0, 10) + details + " [Viewport]"
   }
 }

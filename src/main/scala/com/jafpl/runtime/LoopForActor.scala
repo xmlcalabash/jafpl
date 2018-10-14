@@ -9,8 +9,8 @@ import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput, GRestartLoop,
 import scala.collection.mutable
 
 private[runtime] class LoopForActor(private val monitor: ActorRef,
-                                    private val runtime: GraphRuntime,
-                                    private val node: LoopForStart)
+                                    override protected val runtime: GraphRuntime,
+                                    override protected val node: LoopForStart)
   extends StartActor(monitor, runtime, node)  {
 
   private var current = node.countFrom
@@ -19,11 +19,13 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
   val bindings = mutable.HashMap.empty[String, Any]
 
   override protected def start(): Unit = {
+    trace("START", s"$node", TraceEvent.METHODS)
     commonStart()
     runIfReady()
   }
 
   override protected def reset(): Unit = {
+    trace("RESET", s"$node", TraceEvent.METHODS)
     super.reset()
     running = false
     readyToRun = true
@@ -32,8 +34,9 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
   }
 
   protected[runtime] def restartLoop(): Unit = {
-    trace(s"MRELOOP $node", "Methods")
     super.reset() // yes, reset
+
+    trace("RSTRTLOOP", s"$node", TraceEvent.METHODS)
     running = false
     readyToRun = true
     looped = false
@@ -41,19 +44,24 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
   }
 
   override protected def input(from: Node, fromPort: String, port: String, msg: Message): Unit = {
+    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
+
     throw JafplException.noInputOnLoop(port, node.location)
   }
 
   protected[runtime] def loop(item: ItemMessage): Unit = {
+    trace("LOOP", s"$node", TraceEvent.METHODS)
     looped = true
   }
 
   override protected def close(port: String): Unit = {
+    trace("CLOSE", s"$node", TraceEvent.METHODS)
     throw JafplException.internalError("No port closures are expected on a for-loop", node.location)
   }
 
   private def runIfReady(): Unit = {
-    trace(s"RUNIFRDY $node (running:$running ready:$readyToRun)", "ForLoop")
+    trace("RUNIFREADY", s"$node running:$running ready:$readyToRun", TraceEvent.METHODS)
+
     if (!running && readyToRun) {
       running = true
 
@@ -63,7 +71,7 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
         current >= node.countTo
       }
 
-      trace(s"INIFLOOP initially: $initiallyTrue: $current", "ForLoop")
+      trace("INITFLOP", s"Initially: $initiallyTrue: $current", TraceEvent.METHODS)
 
       if (initiallyTrue) {
         for (port <- node.outputs) {
@@ -73,7 +81,6 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
           }
         }
         for (child <- node.children) {
-          trace(s"........ START $child", "ForLoop")
           monitor ! GStart(child)
         }
       } else {
@@ -91,7 +98,7 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
       current >= node.countTo
     }
 
-    trace(s"CHKFLOOP condition: $pass: $current", "ForLoop")
+    trace("FINISHED", s"$node $pass $current", TraceEvent.METHODS)
 
     if (pass) {
       monitor ! GRestartLoop(node)
@@ -107,5 +114,9 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
       monitor ! GFinished(node)
       commonFinished()
     }
+  }
+
+  override protected def traceMessage(code: String, details: String): String = {
+    s"$code          ".substring(0, 10) + details + " [LoopFor]"
   }
 }

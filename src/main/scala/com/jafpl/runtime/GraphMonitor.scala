@@ -37,28 +37,12 @@ private[runtime] object GraphMonitor {
   case class GWatchdog(millis: Long)
 }
 
-private[runtime] class GraphMonitor(private val graph: Graph, private val runtime: GraphRuntime) extends Actor {
-  val log = Logging(context.system, this)
+private[runtime] class GraphMonitor(private val graph: Graph, override protected val runtime: GraphRuntime) extends TracingActor(runtime) {
   protected val unfinishedNodes = mutable.HashSet.empty[Node]
   protected val unstoppedNodes = mutable.HashSet.empty[Node]
   private val actors = mutable.HashMap.empty[Node, ActorRef]
   private var lastMessage = Instant.now()
   private var exception: Option[Throwable] = None
-
-  protected def trace(message: String, event: String): Unit = {
-    trace("info", message, event)
-  }
-
-  protected def trace(level: String, message: String, event: String): Unit = {
-    // We don't use the traceEventManager.trace() call because we want to use the Akka logger
-    if (runtime.traceEventManager.traceEnabled(event)) {
-      level match {
-        case "info" => log.info(message)
-        case "debug" => log.debug(message)
-        case _ => log.warning(message)
-      }
-    }
-  }
 
   private def fmtSender(): String = {
     var str = sender().toString
@@ -72,15 +56,15 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
   }
 
   def watchdog(millis: Long): Unit = {
-    trace(s"WATCHDOG $millis", "Watchdog")
+    trace("WATCHDOG", s"$millis", TraceEvent.WATCHDOG)
     for (node <- unfinishedNodes) {
-      trace(s"-------- $node", "Watchdog")
+      trace("...UNFINSH", s"$node", TraceEvent.WATCHDOG)
     }
     crashAndBurn(JafplException.watchdogTimeout())
   }
 
   def stopPipeline(): Unit = {
-    trace(s"STOPPING", "Run")
+    trace("STOPPIPE", "", TraceEvent.METHODS)
     for (node <- unstoppedNodes) {
       if (node.parent.isEmpty) {
         actors(node) ! NStop()
@@ -89,6 +73,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
   }
 
   def stoppedStep(node: Node): Unit = {
+    trace("STOPDSTEP", s"$node", TraceEvent.METHODS)
     unstoppedNodes -= node
     actors(node) ! PoisonPill
     if (unstoppedNodes.isEmpty) {
@@ -101,13 +86,14 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
   }
 
   def crashAndBurn(cause: Throwable): Unit = {
-    trace(s"CRASHBRN $cause", "Exceptions")
+    trace("CRASHBURN", s"$cause", TraceEvent.METHODS)
     exception = Some(cause)
     stopPipeline()
   }
 
   final def receive: PartialFunction[Any, Unit] = {
     case GWatchdog(millis) =>
+      trace("GWATCHDOG", s"$millis", TraceEvent.WATCHDOG)
       val ns = Duration.between(lastMessage, Instant.now()).toMillis
       if (ns > millis) {
         watchdog(millis)
@@ -115,66 +101,65 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
 
     case GRun() =>
       lastMessage = Instant.now()
-      trace("RUNGRAPH", "Run")
+      trace("GRUN", "", TraceEvent.GMESSAGES)
       for (node <- graph.nodes) {
-        trace(s"INITLIZE $node", "Run")
         actors(node) ! NInitialize()
         if (node.parent.isEmpty) {
           unfinishedNodes += node
         }
       }
       for (node <- unfinishedNodes) {
-        trace(s"STARTTOP $node", "Run")
         actors(node) ! NStart()
       }
 
     case GStart(node) =>
       lastMessage = Instant.now()
-      trace(s"STRTNODE $node", "Run")
+      trace("GSTART", s"$node", TraceEvent.GMESSAGES)
       actors(node) ! NStart()
 
     case GAbort(node) =>
       lastMessage = Instant.now()
-      trace(s"ABRTNODE $node", "Run")
+      trace("GABORT", s"$node", TraceEvent.GMESSAGES)
       actors(node) ! NAbort()
 
     case GStop(node) =>
       lastMessage = Instant.now()
-      trace(s"STOPNODE $node", "Stopping")
+      trace("GSTOP", s"$node", TraceEvent.GMESSAGES)
       actors(node) ! NStop()
 
     case GStopped(node) =>
       lastMessage = Instant.now()
-      trace(s"STOPPED⯃ $node", "Stopping")
+      trace("GSTOPPED", s"$node", TraceEvent.GMESSAGES)
       stoppedStep(node)
 
     case GCatch(node, cause) =>
       lastMessage = Instant.now()
-      trace(s"STRTCTCH $node", "Run")
+      trace("GCATCH", s"$node $cause", TraceEvent.GMESSAGES)
       actors(node) ! NCatch(cause)
 
     case GFinally(node) =>
       lastMessage = Instant.now()
-      trace(s"TELLFINL $node", "Run")
+      trace("GFINALLY", s"$node", TraceEvent.GMESSAGES)
       actors(node) ! NFinally()
 
     case GRunFinally(node, cause) =>
       lastMessage = Instant.now()
-      trace(s"STRTFINL $node", "Run")
+      trace("GRUNFINAL", s"$node $cause", TraceEvent.GMESSAGES)
       actors(node) ! NRunFinally(cause)
 
     case GReset(node) =>
       lastMessage = Instant.now()
-      trace(s"RESETNOD $node", "Run")
+      trace("GRESET", s"$node", TraceEvent.GMESSAGES)
       actors(node) ! NReset()
 
     case GRestartLoop(node) =>
       lastMessage = Instant.now()
-      trace(s"RESTLOOP $node", "Run")
+      trace("GRSTRTLOOP", s"$node", TraceEvent.GMESSAGES)
       actors(node) ! NRestartLoop()
 
     case GOutput(node, port, item) =>
       lastMessage = Instant.now()
+      trace("GOUTPUT", s"$node.$port", TraceEvent.GMESSAGES)
 
       item match {
         case msg: ItemMessage =>
@@ -188,36 +173,37 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
 
       if (node.hasOutputEdge(port)) {
         val edge = node.outputEdge(port)
-        trace(s"SENDOUT→ $node.$port → ${edge.to}.${edge.toPort} from ${fmtSender()}", "StepIO")
+        trace("SENDOUT→", s"$node.$port → ${edge.to}.${edge.toPort} from ${fmtSender()}", TraceEvent.STEPIO)
         actors(edge.to) ! NInput(node, port, edge.toPort, item)
       } else {
-        trace(s"DROPOUT↴ $node.$port from ${fmtSender()}", "StepIO")
+        trace("DROPOUT↴", s"$node.$port from ${fmtSender()}", TraceEvent.STEPIO)
       }
 
     case GLoop(node, item) =>
       lastMessage = Instant.now()
-      trace(s"LOOPTOP↑ ($item)", "StepIO")
+      trace("GLOOP", s"$node ($item)", TraceEvent.GMESSAGES)
       actors(node) ! NLoop(item)
 
     case GClose(node, port) =>
       lastMessage = Instant.now()
-      trace(s"GCLOSEOUT $node.$port from ${fmtSender()}", "StepIO")
+      trace("GCLOSE", s"$node.$port", TraceEvent.GMESSAGES)
+      trace("GCLOSE", s"$node.$port from ${fmtSender()}", TraceEvent.STEPIO)
       val edge = node.outputEdge(port)
       actors(edge.to) ! NClose(edge.toPort)
 
     case GCheckGuard(node) =>
       lastMessage = Instant.now()
-      trace(s"CHKGUARD $node", "Choose")
+      trace("GCHKGUARD", s"$node", TraceEvent.GMESSAGES)
       actors(node) ! NCheckGuard()
 
     case GGuardResult(when, pass) =>
       lastMessage = Instant.now()
-      trace(s"GRDRESLT $when: $pass", "Choose")
+      trace("GGUARDRES", s"$when: $pass", TraceEvent.GMESSAGES)
       actors(when.parent.get) ! NGuardResult(when, pass)
 
     case GFinished(node) =>
       lastMessage = Instant.now()
-      trace(s"FINISHED $node", "Run")
+      trace("GFINISHED", s"$node", TraceEvent.GMESSAGES)
 
       if (unfinishedNodes.contains(node)) {
         unfinishedNodes -= node
@@ -228,46 +214,42 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
 
       node match {
         case end: ContainerEnd =>
-          trace(s"TLLSTART $node finished → ${end.start.get}", "Run")
           actors(end.start.get) ! NContainerFinished()
         case _ =>
           if (node.parent.isDefined) {
             val end = node.parent.get.containerEnd
-            trace(s"TLLPARNT $node finished → ${end.start.get}", "Run")
             actors(end) ! NChildFinished(node)
           }
       }
 
     case GFinishedViewport(node, buffer) =>
       lastMessage = Instant.now()
-      trace(s"FINISHED $node", "Run")
+      trace("GFINVIEWPRT", s"$node", TraceEvent.GMESSAGES)
 
       node match {
         case end: ContainerEnd =>
-          trace(s"TLLSTART $node finished → ${end.start.get}", "Run")
           actors(end.start.get) ! NViewportFinished(buffer)
         case _ =>
           if (node.parent.isDefined) {
             val end = node.parent.get.containerEnd
-            trace(s"TLLPARNT $node finished → ${end.start.get}", "Run")
             actors(end) ! NChildFinished(node)
           }
       }
 
     case GTrace(event) =>
       lastMessage = Instant.now()
-      trace(s"ADDTRACE $event", "Traces")
+      trace("GTRACE", s"$event", TraceEvent.TRACES)
       runtime.traceEventManager.enableTrace(event)
 
     case GNode(node,actor) =>
       lastMessage = Instant.now()
-      trace(s"+ADDNODE $node", "AddNode")
+      trace("GNODE", s"$node", TraceEvent.GMESSAGES)
       actors.put(node, actor)
       unstoppedNodes += node
 
     case GException(node, cause) =>
       lastMessage = Instant.now()
-      trace(s"EXCPTION $node $cause", "Exceptions")
+      trace("GEXCEPT", s"$node $cause", TraceEvent.GMESSAGES)
 
       if (node.isDefined) {
         actors(node.get) ! NException(cause)
@@ -277,11 +259,12 @@ private[runtime] class GraphMonitor(private val graph: Graph, private val runtim
 
     case GAbortExecution() =>
       lastMessage = Instant.now()
-      trace(s"STOPPIPE", "Run")
+      trace("GABORTEXEC", "", TraceEvent.GMESSAGES)
       stopPipeline()
 
     case m: Any =>
       lastMessage = Instant.now()
+      trace("GERROR", s"$m", TraceEvent.GMESSAGES)
       log.error(s"UNEXPECT $m")
   }
 }
