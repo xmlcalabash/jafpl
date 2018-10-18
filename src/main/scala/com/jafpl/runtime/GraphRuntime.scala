@@ -170,7 +170,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
 
   /** Wait for pipeline execution to complete.
     *
-    * If you start a pipeline int he background and then wish to block until execution
+    * If you start a pipeline in the background and then wish to block until execution
     * completes, call this method.
     */
   def waitForPipeline(): Unit = {
