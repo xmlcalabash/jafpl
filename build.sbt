@@ -2,7 +2,7 @@ name := "jafpl"
 
 organization := "com.jafpl"
 homepage     := Some(url("https://github.com/ndw/jafpl"))
-version      := "0.0.64"
+version      := "0.0.66"
 scalaVersion := "2.12.6"
 
 libraryDependencies ++= Seq(
