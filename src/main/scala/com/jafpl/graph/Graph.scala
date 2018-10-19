@@ -1057,10 +1057,10 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
             // this will be fine
           } else {
             if (fromCard.get.minimum < toCard.get.minimum) {
-              logger.warn(s"${edge.from}.${edge.fromPort} may produce fewer documents than ${edge.to}.${edge.toPort} requires")
+              logger.debug(s"${edge.from}.${edge.fromPort} may produce fewer documents than ${edge.to}.${edge.toPort} requires")
             }
             if (fromCard.get.maximum > toCard.get.maximum) {
-              logger.warn(s"${edge.from}.${edge.fromPort} may produce more documents than ${edge.to}.${edge.toPort} allows")
+              logger.debug(s"${edge.from}.${edge.fromPort} may produce more documents than ${edge.to}.${edge.toPort} allows")
             }
           }
         }
