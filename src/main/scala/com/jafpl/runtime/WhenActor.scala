@@ -64,9 +64,14 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
   private def checkIfReady(): Unit = {
     trace("CHKREADY", s"$node checkIfReady: ready:$readyToCheck inputs:${openInputs.isEmpty}", TraceEvent.METHODS)
     if (readyToCheck && openInputs.isEmpty) {
-      val eval = runtime.runtime.expressionEvaluator.newInstance()
-      val pass = eval.booleanValue(node.testExpr, contextItem.toList, bindings.toMap, None)
-      monitor ! GGuardResult(node, pass)
+      try {
+        val eval = runtime.runtime.expressionEvaluator.newInstance()
+        val pass = eval.booleanValue(node.testExpr, contextItem.toList, bindings.toMap, None)
+        monitor ! GGuardResult(node, pass)
+      } catch {
+        case ex: Exception =>
+          monitor ! GException(None, ex)
+      }
     }
   }
 
