@@ -1,1 +1,4 @@
-// addSbtPlugin("com.artima.supersafe" % "sbtplugin" % "1.1.2")
+logLevel := Level.Warn
+
+addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.7.0")
+

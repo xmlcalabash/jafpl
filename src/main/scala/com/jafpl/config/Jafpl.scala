@@ -2,6 +2,7 @@ package com.jafpl.config
 
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.Graph
+import com.jafpl.sbt.BuildInfo
 import com.jafpl.util.{ErrorListener, TraceEventManager}
 
 /** Just Another Fine Pipeline Language.
@@ -43,6 +44,9 @@ class Jafpl private() {
   private var closed = false
   private var _traceEventManager: TraceEventManager = _
   private var _errorListener: ErrorListener = _
+
+  def version: String = BuildInfo.version
+  def gitHash: String = BuildInfo.gitHash
 
   /** Return the trace event manager.
     *

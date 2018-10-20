@@ -1,9 +1,110 @@
+import java.io.{BufferedReader, InputStreamReader}
+
 name := "jafpl"
 
 organization := "com.jafpl"
 homepage     := Some(url("https://github.com/ndw/jafpl"))
-version      := "0.0.66"
+version      := "0.0.67"
 scalaVersion := "2.12.6"
+
+buildInfoKeys ++= Seq[BuildInfoKey](
+  BuildInfoKey.action("buildTime") {
+    System.currentTimeMillis
+  },
+  // Hat tip to: https://stackoverflow.com/questions/24191469/how-to-add-commit-hash-to-play-templates
+  "gitHash" -> new java.lang.Object() {
+    override def toString: String = {
+      try {
+        val extracted = new InputStreamReader(
+          java.lang.Runtime.getRuntime.exec("git rev-parse HEAD").getInputStream
+        )
+        new BufferedReader(extracted).readLine
+      } catch {
+        case ex: Exception => "FAILED"
+      }
+    }}.toString()
+)
+
+lazy val root = (project in file(".")).
+  enablePlugins(BuildInfoPlugin).
+  settings(
+    buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion),
+    buildInfoPackage := "com.jafpl.sbt"
+  )
+
+lazy val failTask = taskKey[Unit]("Force the build to fail")
+failTask := {
+  throw new sbt.MessageOnlyException("No build for you.")
+}
+
+// Redefine publish so that it will fail if the repo is dirty
+publish := Def.taskDyn {
+  val default = publish.taskValue
+
+  val shortstat = {
+    try {
+      val extracted = new InputStreamReader(
+        java.lang.Runtime.getRuntime.exec("git diff --shortstat").getInputStream
+      )
+      var diff = ""
+      val reader = new BufferedReader(extracted)
+      var line = reader.readLine
+      while (line != null) {
+        diff = line
+        line = reader.readLine
+      }
+      reader.close()
+      diff
+    } catch {
+      case ex: Exception => "FAILED"
+    }
+  }
+
+  val status = {
+    try {
+      val extracted = new InputStreamReader(
+        java.lang.Runtime.getRuntime.exec("git status --porcelain").getInputStream
+      )
+      var newFile = ""
+      val reader = new BufferedReader(extracted)
+      var line = reader.readLine
+      while (line != null) {
+        if (line.startsWith("??")) {
+          newFile = line
+        }
+        line = reader.readLine
+      }
+      reader.close()
+      newFile
+    } catch {
+      case ex: Exception => "FAILED"
+    }
+  }
+
+  val message = if (shortstat != "") {
+    if (status != "") {
+      Some("Repository has changed and untracked files.")
+    } else {
+      Some("Repository has changed files.")
+    }
+  } else if (status != "") {
+    Some("Repository has untracked files.")
+  } else {
+    None
+  }
+
+  if (message.isDefined) {
+    println(message.get)
+  }
+
+  if (message.isDefined) {
+    Def.taskDyn {
+      failTask
+    }
+  } else {
+    Def.task(default.value)
+  }
+}.value
 
 libraryDependencies ++= Seq(
   "org.apache.logging.log4j" % "log4j-api" % "2.11.0",
