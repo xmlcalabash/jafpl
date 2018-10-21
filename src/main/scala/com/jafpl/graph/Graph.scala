@@ -3,7 +3,7 @@ package com.jafpl.graph
 import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.JoinMode.JoinMode
-import com.jafpl.steps.{Manifold, ManifoldSpecification, Step, ViewportComposer}
+import com.jafpl.steps.{Manifold, ManifoldSpecification, PortSpecification, Step, ViewportComposer}
 import com.jafpl.util.{ItemComparator, ItemTester, UniqueId}
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -86,6 +86,15 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     end.start = start
     _nodes += start
     _nodes += end
+
+    for (port <- manifold.inputSpec.ports) {
+      addInput(start, port)
+    }
+
+    for (port <- manifold.outputSpec.ports) {
+      addInput(start, port)
+    }
+
     start
   }
 
@@ -102,7 +111,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
     logger.debug(s"addInput $node.$port")
 
-    val reqdInput = new GraphInput(this, port)
+    val reqdInput = new GraphInput(this, port, node)
     _nodes += reqdInput
     addEdge(reqdInput, "result", node, port)
   }
@@ -119,7 +128,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
     logger.debug(s"addOutput $node.$port")
 
-    val reqdOutput = new GraphOutput(this, port)
+    val reqdOutput = new GraphOutput(this, port, node)
     _nodes += reqdOutput
     addEdge(node, port, reqdOutput, "source")
   }
