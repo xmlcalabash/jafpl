@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.graph.Node
+import com.jafpl.graph.{GraphInput, Node}
 import com.jafpl.messages.{Message, Metadata, PipelineMessage}
 import com.jafpl.steps.{DataConsumer, DataProvider}
 
@@ -31,6 +31,14 @@ class InputProxy(private val monitor: ActorRef,
   }
 
   def close(): Unit = {
+    node match {
+      case gi: GraphInput =>
+        val manifold = gi.pipeline.manifold
+        if (manifold.isDefined) {
+          manifold.get.inputSpec.checkInputCardinality("source", items.length)
+        }
+      case _ => Unit
+    }
     _closed = true
   }
 }
