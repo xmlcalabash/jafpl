@@ -87,6 +87,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     _nodes += start
     _nodes += end
 
+    /*
     for (port <- manifold.inputSpec.ports) {
       addInput(start, port)
     }
@@ -94,6 +95,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     for (port <- manifold.outputSpec.ports) {
       addInput(start, port)
     }
+    */
 
     start
   }
