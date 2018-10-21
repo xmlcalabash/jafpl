@@ -98,7 +98,10 @@ class PortSpecification(spec: immutable.Map[String,PortCardinality]) {
         }
       }
     } else {
-      throw JafplException.badPort(port)
+      // It's ok for there to be no cardinality if we produced no output
+      if (count > 0) {
+        throw JafplException.badPort(port)
+      }
     }
   }
 }
