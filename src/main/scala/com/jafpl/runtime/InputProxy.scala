@@ -31,14 +31,9 @@ class InputProxy(private val monitor: ActorRef,
   }
 
   def close(): Unit = {
-    node match {
-      case gi: GraphInput =>
-        val manifold = gi.pipeline.manifold
-        if (manifold.isDefined) {
-          manifold.get.inputSpec.checkInputCardinality("source", items.length)
-        }
-      case _ => Unit
-    }
+    // It's tempting to check input cardinality here; but it's unreliable.
+    // What if the pipeline has some sort of default input mechanism? Then
+    // we'll get 0 here even if there are in fact "inputs" to the pipeline.
     _closed = true
   }
 }
