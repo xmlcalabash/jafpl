@@ -20,11 +20,10 @@ class CatchStart private[jafpl] (override val graph: Graph,
   private var _translator = Option.empty[Step]
 
   def translator: Option[Step] = _translator
-
-  def addTranslator(step: Step): Unit = {
+  def translator_=(xlate: Step): Unit = {
     if (_translator.isDefined) {
       throw new RuntimeException("Translator already defined")
     }
-    _translator = Some(step)
+    _translator = Some(xlate)
   }
 }

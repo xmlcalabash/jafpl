@@ -337,7 +337,7 @@ class TryCatchSpec extends FlatSpec {
     val catchx   = trycatch.addCatch("catchx")
     val identx   = catchx.addAtomic(new Identity(), "identx")
     val consumer = pipeline.addAtomic(bc, "consumer")
-    val xlate    = catchx.addTranslator(new ExceptionTranslator())
+    val xlate    = catchx.translator = new ExceptionTranslator()
 
     graph.addEdge(p1, "result", raise, "source")
     graph.addEdge(raise, "result", try1, "result")
