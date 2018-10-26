@@ -4,7 +4,7 @@ import com.jafpl.config.Jafpl
 import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, Count, Identity, Manifold, Producer, RaiseError}
+import com.jafpl.steps.{BufferSink, Count, ExceptionTranslator, Identity, Manifold, Producer, RaiseError, RaiseErrorException}
 import org.scalatest.FlatSpec
 
 class TryCatchSpec extends FlatSpec {
@@ -132,7 +132,7 @@ class TryCatchSpec extends FlatSpec {
     assert(bc.items.head == "doc3")
   }
 
-  it should " fail if no catches match" in {
+  it should "fail if no catches match" in {
     val bc = new BufferSink()
 
     val graph    = Jafpl.newInstance().newGraph()
@@ -289,4 +289,72 @@ class TryCatchSpec extends FlatSpec {
     assert(bc_finally.items.size == 1)
     assert(bc_finally.items.head == 1)
   }
+
+  it should "be possible to read the error port" in {
+    val bc = new BufferSink()
+
+    val graph    = Jafpl.newInstance().newGraph()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
+    val p1       = pipeline.addAtomic(new Producer(List("doc1")), "p1")
+    //val px       = pipeline.addAtomic(new Producer(List("doc2")), "p2")
+
+    val trycatch = pipeline.addTryCatch("trycatch")
+    val try1     = trycatch.addTry("try")
+    val raise    = try1.addAtomic(new RaiseError("e3"), "e3")
+    val catchx   = trycatch.addCatch("catchx")
+    val identx   = catchx.addAtomic(new Identity(), "identx")
+    val consumer = pipeline.addAtomic(bc, "consumer")
+
+    graph.addEdge(p1, "result", raise, "source")
+    graph.addEdge(raise, "result", try1, "result")
+    graph.addEdge(try1, "result", trycatch, "result")
+
+    graph.addEdge(catchx, "errors", identx, "source")
+    graph.addEdge(identx, "result", catchx, "result")
+    graph.addEdge(catchx, "result", trycatch, "result")
+
+    graph.addEdge(trycatch, "result", pipeline, "result")
+    graph.addEdge(pipeline, "result", consumer, "source")
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.run()
+
+    assert(bc.items.size == 1)
+    assert(bc.items.head.isInstanceOf[RaiseErrorException])
+  }
+
+  it should "be possible to add a translator for the errors" in {
+    val bc = new BufferSink()
+
+    val graph    = Jafpl.newInstance().newGraph()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
+    val p1       = pipeline.addAtomic(new Producer(List("doc1")), "p1")
+    //val px       = pipeline.addAtomic(new Producer(List("doc2")), "p2")
+
+    val trycatch = pipeline.addTryCatch("trycatch")
+    val try1     = trycatch.addTry("try")
+    val raise    = try1.addAtomic(new RaiseError("e3"), "e3")
+    val catchx   = trycatch.addCatch("catchx")
+    val identx   = catchx.addAtomic(new Identity(), "identx")
+    val consumer = pipeline.addAtomic(bc, "consumer")
+    val xlate    = catchx.addTranslator(new ExceptionTranslator())
+
+    graph.addEdge(p1, "result", raise, "source")
+    graph.addEdge(raise, "result", try1, "result")
+    graph.addEdge(try1, "result", trycatch, "result")
+
+    graph.addEdge(catchx, "errors", identx, "source")
+    graph.addEdge(identx, "result", catchx, "result")
+    graph.addEdge(catchx, "result", trycatch, "result")
+
+    graph.addEdge(trycatch, "result", pipeline, "result")
+    graph.addEdge(pipeline, "result", consumer, "source")
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.run()
+
+    assert(bc.items.size == 1)
+    assert(bc.items.head == "Caught one!")
+  }
+
 }

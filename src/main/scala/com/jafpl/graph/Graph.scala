@@ -759,6 +759,30 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
     _valid = true
 
+    // Insert exception translators into each catch if the catch reads from the
+    // error port and a translator has been provided.
+    for (csnode <- nodes.filter(_.isInstanceOf[CatchStart]).filter(_.asInstanceOf[CatchStart].translator.isDefined)) {
+      val readers = edgesFrom(csnode, "errors")
+      if (readers.nonEmpty) {
+        val catchStart = csnode.asInstanceOf[CatchStart]
+        logger.debug(s"addAtomic exception translator for ${csnode.step}")
+        val node = new AtomicNode(this, catchStart.translator, None)
+        _nodes += node
+
+        for (edge <- readers) {
+          // Replace this with an edge that reads from the translator
+          val newEdge = new Edge(this, node, "result", edge.to, edge.toPort)
+          _edges += newEdge
+        }
+        for (edge <- readers) {
+          _edges -= edge
+        }
+
+        val newEdge = new Edge(this, catchStart, "errors", node, "source")
+        _edges += newEdge
+      }
+    }
+
     // Make sure all the required edges exist
     for (node <- nodes) {
       node match {
