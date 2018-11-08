@@ -1,5 +1,7 @@
 package com.jafpl.graph
 
+import java.io.{File, PrintWriter}
+
 import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.JoinMode.JoinMode
@@ -38,6 +40,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   private var open = true
   private var _valid = false
   private var exception = Option.empty[Throwable]
+  private var _dumpGraphTransitions = false
+  private var _dumpCount = 0
 
   protected[graph] def error(cause: Throwable): Unit = {
     if (exception.isEmpty) {
@@ -56,6 +60,11 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
   /** True if the graph is known to be valid. */
   def valid: Boolean = _valid
+
+  def dumpGraphTransitions: Boolean = _dumpGraphTransitions
+  def dumpGraphTransitions_=(dump: Boolean): Unit = {
+    _dumpGraphTransitions = dump
+  }
 
   /** Adds a pipeline to the graph.
     *
@@ -759,6 +768,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
     _valid = true
 
+    debugDumpGraph()
+
     // Insert exception translators into each catch if the catch reads from the
     // error port and a translator has been provided.
     for (csnode <- nodes.filter(_.isInstanceOf[CatchStart]).filter(_.asInstanceOf[CatchStart].translator.isDefined)) {
@@ -780,6 +791,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
         val newEdge = new Edge(this, catchStart, "errors", node, "source")
         _edges += newEdge
+
+        debugDumpGraph()
       }
     }
 
@@ -840,6 +853,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       }
     }
 
+    debugDumpGraph()
+
     // For every case where an outbound edge has more than one connection,
     // insert a splitter so that it has only one outbound edge.
     for (node <- nodes) {
@@ -892,6 +907,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
           for (edge <- edges) {
             _edges -= edge
           }
+
+          debugDumpGraph()
         }
       }
     }
@@ -909,6 +926,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
               logger.debug(s"Input $port on $start unread, adding sink")
               val sink = start.addSink()
               addEdge(node, port, sink, "source")
+              debugDumpGraph()
             }
           }
         case end: ContainerEnd =>
@@ -923,6 +941,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
                 start.addSink()
               }
               addEdge(start, port, sink, "source")
+              debugDumpGraph()
             }
           }
         case atomic: AtomicNode =>
@@ -934,6 +953,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
                 val start = atomic.parent.get
                 val sink = start.addSink()
                 addEdge(node, port, sink, "source")
+                debugDumpGraph()
               }
             }
           }
@@ -959,6 +979,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
                 logger.debug(s"Adding empty source to feed output $start.$port")
                 val source = start.addEmptySource()
                 addEdge(source, "result", end, port)
+                debugDumpGraph()
               }
             }
           }
@@ -971,6 +992,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
                 logger.debug(s"Adding sink to consume $start.current")
                 val sink = start.addSink()
                 addEdge(node, "current", sink, "source")
+                debugDumpGraph()
               }
               /* I'm not convinced that reading from the error port is implemented correclty yet
             case start: CatchStart =>
@@ -1027,6 +1049,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
           for (edge <- edges) {
             _edges -= edge
           }
+
+          debugDumpGraph()
         }
       }
     }
@@ -1059,6 +1083,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
           if (loop.isDefined) {
             added = true
             addBuffer(loop.get, edge)
+            debugDumpGraph()
           }
         }
       }
@@ -1139,6 +1164,15 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     if (exception.isDefined) {
       _valid = false
       throw exception.get
+    }
+  }
+
+  private def debugDumpGraph(): Unit = {
+    if (dumpGraphTransitions) {
+      _dumpCount += 1
+      val pw = new PrintWriter(new File(s"dump_${_dumpCount}.xml"))
+      pw.write(asXML.toString())
+      pw.close()
     }
   }
 
