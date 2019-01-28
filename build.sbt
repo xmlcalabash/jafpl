@@ -7,7 +7,7 @@ homepage     := Some(url("https://github.com/ndw/jafpl"))
 version      := "0.0.75"
 scalaVersion := "2.12.6"
 
-useGpg := true
+//useGpg := true
 pgpSecretRing := pgpPublicRing.value
 usePgpKeyHex("21FDBF8F")
 
