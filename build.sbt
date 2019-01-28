@@ -7,6 +7,10 @@ homepage     := Some(url("https://github.com/ndw/jafpl"))
 version      := "0.0.75"
 scalaVersion := "2.12.6"
 
+useGpg := true
+pgpSecretRing := pgpPublicRing.value
+usePgpKeyHex("21FDBF8F")
+
 buildInfoKeys ++= Seq[BuildInfoKey](
   BuildInfoKey.action("buildTime") {
     System.currentTimeMillis
@@ -128,7 +132,3 @@ scalacOptions in (Compile, doc) ++= Seq(
   "-doc-root-content", baseDirectory.value+"/docs/apidocs/root.md",
   "-no-link-warnings"
 )
-
-// I'm publishing the informal pre-release builds on my own repo
-publishTo := Some(Resolver.file("file",
-  new File("/space/websites/nwalsh.com/build/website/maven/repo")))
