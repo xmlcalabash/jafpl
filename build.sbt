@@ -3,13 +3,9 @@ import java.io.{BufferedReader, InputStreamReader}
 name := "jafpl"
 
 organization := "com.jafpl"
-homepage     := Some(url("https://github.com/ndw/jafpl"))
-version      := "0.0.75"
+homepage     := Some(url("https://jafpl.com/"))
+version      := "0.0.76"
 scalaVersion := "2.12.6"
-
-//useGpg := true
-pgpSecretRing := pgpPublicRing.value
-usePgpKeyHex("21FDBF8F")
 
 buildInfoKeys ++= Seq[BuildInfoKey](
   BuildInfoKey.action("buildTime") {
