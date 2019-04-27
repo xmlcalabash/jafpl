@@ -22,7 +22,6 @@ class OutputProxy(private val monitor: ActorRef,
     _provider = Some(provider)
   }
 
-  override def id: String = node.id
   override def receive(port: String, message: Message): Unit = {
     if (_provider.isDefined) {
       _provider.get.receive("source", message)

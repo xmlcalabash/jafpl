@@ -18,7 +18,6 @@ private[runtime] class SinkActor(private val monitor: ActorRef,
     receive(port, item)
   }
 
-  override def id: String = node.id
   override def receive(port: String, item: Message): Unit = {
     trace("RECEIVE", s"$node $port (to /dev/null)", TraceEvent.METHODS)
     // Oops, I dropped it on the floor

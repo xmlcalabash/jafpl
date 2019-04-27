@@ -22,7 +22,6 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
     receive(port, item)
   }
 
-  override def id: String = binding.id
   override def receive(port: String, item: Message): Unit = {
     trace("RECEIVE", s"$port", TraceEvent.METHODS)
 

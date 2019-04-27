@@ -10,8 +10,6 @@ import com.jafpl.messages.{Message, Metadata}
   *
   */
 trait DataConsumer {
-  def id: String
-
   /** Send output from a step.
     *
     * Calling this method sends the specified `message` on the specified `port`.

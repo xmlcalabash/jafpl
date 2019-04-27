@@ -24,7 +24,6 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
     receive(port, msg)
   }
 
-  override def id: String = node.id
   override def receive(port: String, item: Message): Unit = {
     trace("RECEIVE", s"$node $port", TraceEvent.METHODS)
     item match {

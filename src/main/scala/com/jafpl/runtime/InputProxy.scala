@@ -25,7 +25,6 @@ class InputProxy(private val monitor: ActorRef,
     receive("source", message)
   }
 
-  override def id: String = node.id
   override def receive(port: String, message: Message): Unit = {
     _items += message
   }

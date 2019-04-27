@@ -49,7 +49,6 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
     receive(port, item)
   }
 
-  override def id: String = node.id
   override def receive(port: String, item: Message): Unit = {
     trace("RECEIVE", s"$node $port", TraceEvent.METHODS)
     if (port == "source") {

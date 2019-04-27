@@ -4,13 +4,11 @@ import com.jafpl.messages.{ItemMessage, Message, Metadata}
 import com.jafpl.util.UniqueId
 
 class Count extends DefaultStep {
-  private val _id = UniqueId.nextId.toString
   private var count: Long = 0
 
   override def inputSpec: PortSpecification = PortSpecification.SOURCESEQ
   override def outputSpec: PortSpecification = PortSpecification.RESULT
 
-  override def id: String = _id
   override def receive(port: String, message: Message): Unit = {
     count += 1
   }

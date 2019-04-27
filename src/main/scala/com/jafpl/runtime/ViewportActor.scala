@@ -40,7 +40,6 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
     receive(port, msg)
   }
 
-  override def id: String = node.id
   override def receive(port: String, msg: Message): Unit = {
     trace("RECEIVE", s"$node $port", TraceEvent.METHODS)
 

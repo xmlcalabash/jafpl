@@ -21,7 +21,6 @@ private[runtime] class SplitterActor(private val monitor: ActorRef,
     receive(port, item)
   }
 
-  override def id: String = node.id
   override def receive(port: String, item: Message): Unit = {
     trace("RECEIVE", s"$node $port", TraceEvent.METHODS)
     // Cache the edges for a small amount of efficiency

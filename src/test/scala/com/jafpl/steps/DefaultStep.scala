@@ -6,7 +6,6 @@ import com.jafpl.runtime.RuntimeConfiguration
 import com.jafpl.util.UniqueId
 
 class DefaultStep  extends Step {
-  private val _id = UniqueId.nextId.toString
   protected var location = Option.empty[Location]
 
   override def inputSpec: PortSpecification = PortSpecification.ANY
@@ -27,7 +26,6 @@ class DefaultStep  extends Step {
     this.location = Some(location)
   }
 
-  override def id: String = _id
   override def receive(port: String, message: Message): Unit = {
     // nop
   }
