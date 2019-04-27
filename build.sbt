@@ -7,6 +7,8 @@ homepage     := Some(url("https://jafpl.com/"))
 version      := "0.0.77"
 scalaVersion := "2.12.6"
 
+credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credential")
+
 buildInfoKeys ++= Seq[BuildInfoKey](
   BuildInfoKey.action("buildTime") {
     System.currentTimeMillis
