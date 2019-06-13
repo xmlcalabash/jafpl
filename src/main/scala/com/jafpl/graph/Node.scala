@@ -51,7 +51,11 @@ abstract class Node(val graph: Graph,
     */
   val id: String = UniqueId.nextId.toString
 
-  private var _loc = Option.empty[Location]
+  private var _loc = if (step.isDefined) {
+    step.get.location
+  } else {
+    Option.empty[Location]
+  }
 
   /** The node's location.
     *
