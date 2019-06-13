@@ -16,7 +16,11 @@ class JafplLoopDetected(location: Option[Location]) extends JafplException(Jafpl
       case bind: Binding =>
         // There will be only one...
         val edge = bind.graph.edgesFrom(bind).head
-        val label = edge.from.userLabel.getOrElse("ANONYMOUS")
+        var to = edge.to
+        while (to.isInstanceOf[Joiner]) {
+          to = to.graph.edgesFrom(to).head.to
+        }
+        val label = to.userLabel.getOrElse("ANONYMOUS")
         _nodes += new BindingNode(label, bind.name, bind.location)
       case _ => print("unknown", step)
     }
