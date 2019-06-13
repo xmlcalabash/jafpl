@@ -25,8 +25,8 @@ class JafplLoopDetected(location: Option[Location]) extends JafplException(Jafpl
   def nodes: List[LoopNode] = _nodes.toList
 
   override def toString: String = {
-    var loop = ""
-    var arrow = ""
+    var loop = "Loop detected:"
+    var arrow = " "
     for (pnode <- _nodes) {
       loop = loop + arrow + pnode
       arrow = "→"
@@ -43,6 +43,6 @@ class JafplLoopDetected(location: Option[Location]) extends JafplException(Jafpl
   }
 
   class BindingNode(val nodeLabel: String, label: String, location: Option[Location]) extends LoopNode(label, location) {
-    // nop
+    override def toString: String = nodeLabel + "/" + label
   }
 }
