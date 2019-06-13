@@ -1230,7 +1230,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     }
 
     if (path.contains(node)) {
-      val loopException = new JafplLoopDetected(this, node.location)
+      val loopException = new JafplLoopDetected(node.location)
       _valid = false
       var loop = ""
       var arrow = ""
