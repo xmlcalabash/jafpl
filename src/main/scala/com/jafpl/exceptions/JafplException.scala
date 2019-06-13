@@ -101,7 +101,7 @@ object JafplException {
   protected[jafpl] def unexpectedItemType(item: String, port: String, location: Option[Location]): JafplException = new JafplException(UNEXPECTED_ITEM_TYPE, location, List(item, port))
 }
 
-class JafplException private (val code: Any, val location: Option[Location], val details: List[Any]) extends RuntimeException {
+class JafplException protected (val code: Any, val location: Option[Location], val details: List[Any]) extends RuntimeException {
   override def getMessage: String = toString
 
   override def toString: String = {

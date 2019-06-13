@@ -3,7 +3,7 @@ package com.jafpl.graph
 import java.io.{File, PrintWriter}
 
 import com.jafpl.config.Jafpl
-import com.jafpl.exceptions.JafplException
+import com.jafpl.exceptions.{JafplException, JafplLoopDetected}
 import com.jafpl.graph.JoinMode.JoinMode
 import com.jafpl.steps.{Manifold, ManifoldSpecification, PortSpecification, Step, ViewportComposer}
 import com.jafpl.util.{ItemComparator, ItemTester, UniqueId}
@@ -1230,6 +1230,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     }
 
     if (path.contains(node)) {
+      val loopException = new JafplLoopDetected(this, node.location)
       _valid = false
       var loop = ""
       var arrow = ""
@@ -1237,12 +1238,14 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       for (pnode <- path) {
         started = started || (pnode == node)
         if (started) {
+          loopException.addNode(pnode)
           loop = loop + arrow + pnode
           arrow = "→"
         }
       }
+      loopException.addNode(node)
       loop = loop + arrow + node
-      error(JafplException.loopDetected(loop, node.location))
+      error(loopException)
     }
 
     if (valid) {
