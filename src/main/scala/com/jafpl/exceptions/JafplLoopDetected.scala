@@ -32,6 +32,6 @@ class JafplLoopDetected(graph: Graph, location: Option[Location]) extends JafplE
   }
 
   class LoopNode(val label: String, val location: Option[Location]) {
-    // nop
+    override def toString: String = label
   }
 }
