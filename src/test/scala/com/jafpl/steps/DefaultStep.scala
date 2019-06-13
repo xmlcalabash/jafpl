@@ -6,7 +6,7 @@ import com.jafpl.runtime.RuntimeConfiguration
 import com.jafpl.util.UniqueId
 
 class DefaultStep  extends Step {
-  protected var location = Option.empty[Location]
+  protected var _location = Option.empty[Location]
 
   override def inputSpec: PortSpecification = PortSpecification.ANY
   override def outputSpec: PortSpecification = PortSpecification.ANY
@@ -22,8 +22,9 @@ class DefaultStep  extends Step {
     this.consumer = Some(consumer)
   }
 
-  override def setLocation(location: Location): Unit = {
-    this.location = Some(location)
+  override def location: Option[Location] = _location
+  override def location_=(location: Location): Unit = {
+    _location = Some(location)
   }
 
   override def receive(port: String, message: Message): Unit = {

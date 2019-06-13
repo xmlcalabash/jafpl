@@ -27,6 +27,24 @@ import com.jafpl.runtime.RuntimeConfiguration
   */
 trait Step extends DataConsumer with ManifoldSpecification {
 
+  /** The location associated with this step.
+    *
+    * Many pipelines are constructed from an external, declarative description. In the event
+    * that constructing or running the pipeline results in an error, authors will be greatly
+    * relieved if the source of their error can be pinpointed exactly.
+    */
+  def location: Option[Location]
+
+  /** Set the location associated with this step.
+    *
+    * Many pipelines are constructed from an external, declarative description. In the event
+    * that constructing or running the pipeline results in an error, authors will be greatly
+    * relieved if the source of their error can be pinpointed exactly.
+    *
+    * @param location The location associated with this step.
+    */
+  def location_=(location: Location)
+
   /** The names of the variable bindings this step requires.
     *
     * This method returns the names of the variables for which
@@ -42,16 +60,6 @@ trait Step extends DataConsumer with ManifoldSpecification {
     * @param consumer The consumer.
     */
   def setConsumer(consumer: DataConsumer)
-
-  /** Set the location associated with this step.
-    *
-    * Many pipelines are constructed from an external, declarative description. In the event
-    * that constructing or running the pipeline results in an error, authors will be greatly
-    * relieved if the source of their error can be pinpointed exactly.
-    *
-    * @param location The location associated with this step.
-    */
-  def setLocation(location: Location)
 
   /** Receive a binding.
     *
