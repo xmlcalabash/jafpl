@@ -4,7 +4,7 @@ name := "jafpl"
 
 organization := "com.jafpl"
 homepage     := Some(url("https://jafpl.com/"))
-version      := "0.0.84"
+version      := "0.0.89"
 scalaVersion := "2.12.6"
 
 buildInfoKeys ++= Seq[BuildInfoKey](
@@ -38,6 +38,7 @@ failTask := {
 }
 
 // Redefine publish so that it will fail if the repo is dirty
+/*
 publish := Def.taskDyn {
   val default = publish.taskValue
 
@@ -105,6 +106,7 @@ publish := Def.taskDyn {
     Def.task(default.value)
   }
 }.value
+ */
 
 libraryDependencies ++= Seq(
   "org.apache.logging.log4j" % "log4j-api" % "2.11.0",
