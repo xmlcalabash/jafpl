@@ -17,9 +17,9 @@ package com.jafpl.graph
 class OptionBinding protected[jafpl](override val graph: Graph,
                                      override val name: String,
                                      override val expression: Any,
-                                     override val staticValue: Option[Any],
+                                     override val static: Boolean,
                                      override val options: Option[Any])
-  extends Binding(graph, name, expression, staticValue, options) {
+  extends Binding(graph, name, expression, static, options) {
 
   var _value: Option[Any] = None
 
@@ -27,10 +27,4 @@ class OptionBinding protected[jafpl](override val graph: Graph,
   def value_=(value: Any): Unit = {
     _value = Some(value)
   }
-
-  /*
-  def this(graph: Graph, name: String) = {
-    this(graph, name, None, None)
-  }
-  */
 }

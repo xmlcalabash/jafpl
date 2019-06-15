@@ -1,6 +1,7 @@
 package com.jafpl.test
 
 import com.jafpl.config.Jafpl
+import com.jafpl.exceptions.JafplException
 import com.jafpl.io.BufferConsumer
 import com.jafpl.messages.{ItemMessage, Metadata}
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
@@ -84,7 +85,7 @@ class BindingSpec extends FlatSpec {
     assert(bc.items.head == "twelve")
   }
 
-  "An external variable binding " should " be consumable" in {
+  "An option binding " should " be consumable" in {
     val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
@@ -108,6 +109,62 @@ class BindingSpec extends FlatSpec {
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "Spoon!")
+  }
+
+  "A static option binding " should " be consumable" in {
+    val graph    = Jafpl.newInstance().newGraph()
+
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
+    val binding  = pipeline.addStaticOption("foo")
+
+    val pb       = pipeline.addAtomic(new ProduceBinding("foo"), "pb")
+
+    graph.addBindingEdge(binding, pb)
+    graph.addEdge(pb, "result", pipeline, "result")
+    graph.addOutput(pipeline, "result")
+
+    graph.close()
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+
+    runtime.setStatic(binding, new ItemMessage("Spoon!", Metadata.STRING))
+
+    val bc = new BufferConsumer()
+    runtime.outputs("result").setConsumer(bc)
+
+    runtime.run()
+
+    assert(bc.items.size == 1)
+    assert(bc.items.head == "Spoon!")
+  }
+
+  "An unspecified static option binding " should " fail" in {
+    val graph    = Jafpl.newInstance().newGraph()
+
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
+    val binding  = pipeline.addStaticOption("foo")
+
+    val pb       = pipeline.addAtomic(new ProduceBinding("foo"), "pb")
+
+    graph.addBindingEdge(binding, pb)
+    graph.addEdge(pb, "result", pipeline, "result")
+    graph.addOutput(pipeline, "result")
+
+    graph.close()
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+
+    val bc = new BufferConsumer()
+    runtime.outputs("result").setConsumer(bc)
+
+    try {
+      runtime.run()
+      assert(false)
+    } catch {
+      case ex: JafplException =>
+        if (ex.code != JafplException.UNDEFINED_STATIC) {
+          throw ex
+        }
+        assert(true)
+    }
   }
 
   "Reading an external variable binding twice " should " work" in {

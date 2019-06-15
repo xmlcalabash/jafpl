@@ -302,19 +302,25 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * @return The node added.
     */
   def addOption(name: String, expression: Any): Binding = {
-    val binding = graph.addOption(name, expression, None, None)
+    val binding = graph.addOption(name, expression)
     addChild(binding)
     binding
   }
 
-  def addOption(name: String, expression: Any, staticValue: Option[Any]): Binding = {
-    val binding = graph.addOption(name, expression, staticValue, None)
+  def addOption(name: String, expression: Any, options: Any): Binding = {
+    val binding = graph.addOption(name, expression, Some(options))
     addChild(binding)
     binding
   }
 
-  def addOption(name: String, expression: Any, staticValue: Option[Any], options: Any): Binding = {
-    val binding = graph.addOption(name, expression, staticValue, Some(options))
+  def addStaticOption(name: String): Binding = {
+    val binding = graph.addStaticOption(name)
+    addChild(binding)
+    binding
+  }
+
+  def addStaticOption(name: String, options: Any): Binding = {
+    val binding = graph.addStaticOption(name, Some(options))
     addChild(binding)
     binding
   }
@@ -335,19 +341,25 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * @return The node added.
     */
   def addVariable(name: String, expression: Any): Binding = {
-    val binding = graph.addVariable(name, expression, None, None)
+    val binding = graph.addVariable(name, expression, None)
     addChild(binding)
     binding
   }
 
-  def addVariable(name: String, expression: Any, staticValue: Option[Any]): Binding = {
-    val binding = graph.addVariable(name, expression, staticValue, None)
+  def addStaticVariable(name: String): Binding = {
+    val binding = graph.addStaticVariable(name, None)
     addChild(binding)
     binding
   }
 
-  def addVariable(name: String, expression: Any, staticValue: Option[Any], options: Any): Binding = {
-    val binding = graph.addVariable(name, expression, staticValue, Some(options))
+  def addVariable(name: String, expression: Any, options: Any): Binding = {
+    val binding = graph.addVariable(name, expression, Some(options))
+    addChild(binding)
+    binding
+  }
+
+  def addStaticVariable(name: String, options: Any): Binding = {
+    val binding = graph.addStaticVariable(name, Some(options))
     addChild(binding)
     binding
   }

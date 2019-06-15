@@ -5,6 +5,7 @@ import java.io.{File, PrintWriter}
 import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.{JafplException, JafplLoopDetected}
 import com.jafpl.graph.JoinMode.JoinMode
+import com.jafpl.messages.Message
 import com.jafpl.steps.{Manifold, ManifoldSpecification, PortSpecification, Step, ViewportComposer}
 import com.jafpl.util.{ItemComparator, ItemTester, UniqueId}
 import org.slf4j.{Logger, LoggerFactory}
@@ -42,6 +43,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   private var exception = Option.empty[Throwable]
   private var _dumpGraphTransitions = false
   private var _dumpCount = 0
+
+  protected[jafpl] val statics = mutable.HashSet.empty[Binding]
 
   protected[graph] def error(cause: Throwable): Unit = {
     if (exception.isEmpty) {
@@ -144,26 +147,6 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     addEdge(node, port, reqdOutput, "source")
   }
 
-  /** Add a graph variable binding.
-    *
-    * Graph variable bindings are named variables for which some input must be
-    * provided at runtime.
-    *
-    * @param name The variable name.
-    * @return The constructed binding.
-    */
-  /*
-  def addBinding(name: String): Binding = {
-    checkOpen()
-
-    logger.debug("addBinding {}", name)
-
-    val binding = new Binding(this, name)
-    _nodes += binding
-    binding
-  }
-  */
-
   /**
     * FIXME: WRITE THIS
     * @param name The option name
@@ -171,34 +154,58 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     * @return The binding
     */
   def addOption(name: String, expression: Any): OptionBinding = {
-    addOption(name, expression, None, None)
+    addOption(name, expression, None, false)
   }
 
   /**
     * FIXME: WRITE THIS
     * @param name The option name
     * @param expression The default initializer for the option
-    * @param staticValue The statically computed value for the option
+    * @param options Any implementation-specific options you want to pass
     * @return The binding
     */
-  def addOption(name: String, expression: Any, staticValue: Option[Any]): OptionBinding = {
-    addOption(name, expression, staticValue, None)
+  def addOption(name: String, expression: Any, options: Option[Any]): OptionBinding = {
+    addOption(name, expression, options, false)
+  }
+
+  /**
+    * FIXME: WRITE THIS
+    * @param name The option name
+    * @return The binding
+    */
+  def addStaticOption(name: String): OptionBinding = {
+    addOption(name, None, None, true)
+  }
+
+  /**
+    * FIXME: WRITE THIS
+    * @param name The option name
+    * @param options Any implementation-specific options you want to pass
+    * @return The binding
+    */
+  def addStaticOption(name: String, options: Option[Any]): OptionBinding = {
+    addOption(name, None, options, true)
   }
 
   /**
     * FIXME: WRITE THIS
     * @param name The option name
     * @param expression The default initializer for the option
-    * @param staticValue The statically computed value for the option
     * @param options Any implementation specific options you want to pass
+    * @param static The option is statically computed before the graph runs
     * @return The binding
     */
-  def addOption(name: String, expression: Any, staticValue: Option[Any], options: Option[Any]): OptionBinding = {
+  private def addOption(name: String, expression: Any, options: Option[Any], static: Boolean): OptionBinding = {
     checkOpen()
     logger.debug("addOption {} {}", name, expression)
 
-    val binding = new OptionBinding(this, name, expression, staticValue, options)
+    val binding = new OptionBinding(this, name, expression, static, options)
     _nodes += binding
+
+    if (static) {
+      statics += binding
+    }
+
     binding
   }
 
@@ -491,12 +498,22 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     node
   }
 
-  protected[graph] def addVariable(name: String, expression: Any, staticValue: Option[Any], options: Option[Any]): Binding = {
+  protected[graph] def addVariable(name: String, expression: Any, options: Option[Any]): Binding = {
     checkOpen()
 
-    logger.debug(s"addVariable $name, $expression, $staticValue")
+    logger.debug(s"addVariable $name, $expression")
 
-    val binding = new Binding(this, name, expression, staticValue, options)
+    val binding = new Binding(this, name, expression, false, options)
+    _nodes += binding
+    binding
+  }
+
+  protected[graph] def addStaticVariable(name: String, options: Option[Any]): Binding = {
+    checkOpen()
+
+    logger.debug(s"addStaticVariable $name")
+
+    val binding = new Binding(this, name, None,true, options)
     _nodes += binding
     binding
   }
@@ -1098,9 +1115,11 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
         _valid = false
         error(JafplException.invalidOutputs(node.toString, node.location))
       }
-      if (node.parent.isEmpty) {
-        checkLoops(node, ListBuffer.empty[Node])
-      }
+
+      // FIXME: this redundantly checks the same paths more than once
+      // Note, however, that checking only nodes without parents (as used to be done here)
+      // isn't sufficient. Does starting with nodes with no inbound (binding or port) edges work?
+      checkLoops(node, ListBuffer.empty[Node])
     }
 
     for (edge <- _edges) {
@@ -1230,8 +1249,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     }
 
     if (path.contains(node)) {
-      val loopException = new JafplLoopDetected(node.location)
       _valid = false
+      val loopException = new JafplLoopDetected(node.location)
       var loop = ""
       var arrow = ""
       var started = false

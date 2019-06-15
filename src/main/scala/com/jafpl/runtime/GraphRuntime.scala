@@ -3,6 +3,7 @@ package com.jafpl.runtime
 import akka.actor.{ActorRef, ActorSystem, DeadLetter, Props}
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, EmptySource, FinallyStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopForStart, LoopUntilStart, LoopWhileStart, OptionBinding, PipelineStart, Sink, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
+import com.jafpl.messages.Message
 import com.jafpl.runtime.GraphMonitor.{GAbortExecution, GException, GNode, GRun, GWatchdog}
 import com.jafpl.runtime.Reaper.WatchMe
 import com.jafpl.steps.{BindingProvider, DataConsumerProxy, DataProvider}
@@ -39,6 +40,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   private val _graphOptions = mutable.HashMap.empty[String, OptionBinding]
   private var _graphOutputs = mutable.HashMap.empty[String, OutputProxy]
   private var _traceEventManager: TraceEventManager = new DefaultTraceEventManager()
+  private var _statics = mutable.HashMap.empty[Binding, Message]
 
   graph.close()
 
@@ -121,6 +123,17 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
     }
   }
 
+  def getStatic(binding: Binding): Message = {
+    if (_statics.contains(binding)) {
+      _statics(binding)
+    } else {
+      throw JafplException.undefinedStatic(binding.name, binding.location)
+    }
+  }
+
+  def setStatic(binding: Binding, message: Message): Unit = {
+    _statics.put(binding, message)
+  }
 
   protected[runtime] def finish(): Unit = {
     _finished = true
@@ -155,14 +168,12 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
     * To determine if execution has completed, check the `finished` value.
     */
   def runInBackground(): Unit = {
-    /*
-    for ((name, provider) <- _graphBindings) {
-      if (!provider.closed) {
-        provider.close()
-        logger.debug("No binding provided for " + name)
+    for (binding <- graph.statics) {
+      if (!_statics.contains(binding)) {
+        throw JafplException.undefinedStatic(binding.name, binding.location)
       }
     }
-    */
+
     _monitor ! GRun()
     _started = true
   }

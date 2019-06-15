@@ -1,6 +1,7 @@
 package com.jafpl.test
 
 import com.jafpl.config.Jafpl
+import com.jafpl.exceptions.JafplException
 import com.jafpl.io.BufferConsumer
 import com.jafpl.messages.{ItemMessage, Metadata}
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
@@ -65,7 +66,7 @@ class VariableBindingSpec extends FlatSpec {
     val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
 
     val static   = new ItemMessage("static", Metadata.STRING)
-    val bind     = pipeline.addVariable("fred", "some value", Some(static))
+    val bind     = pipeline.addStaticVariable("fred")
     val prodbind = pipeline.addAtomic(new ProduceBinding("fred"), "pb")
 
     graph.addBindingEdge(bind, prodbind)
@@ -76,12 +77,47 @@ class VariableBindingSpec extends FlatSpec {
     graph.close()
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
+
+    runtime.setStatic(bind, static)
+
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "static")
+  }
+
+  "An unspecified static variable binding " should " fail" in {
+    val graph    = Jafpl.newInstance().newGraph()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
+
+    val static   = new ItemMessage("static", Metadata.STRING)
+    val bind     = pipeline.addStaticVariable("fred")
+    val prodbind = pipeline.addAtomic(new ProduceBinding("fred"), "pb")
+
+    graph.addBindingEdge(bind, prodbind)
+    graph.addEdge(prodbind, "result", pipeline, "result")
+
+    graph.addOutput(pipeline, "result")
+
+    graph.close()
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+
+    val bc = new BufferConsumer()
+    runtime.outputs("result").setConsumer(bc)
+
+    try {
+      runtime.run()
+      assert(false)
+    } catch {
+      case ex: JafplException =>
+        if (ex.code != JafplException.UNDEFINED_STATIC) {
+          throw ex
+        }
+        assert(true)
+    }
   }
 
   "An unreferenced unbound variable " should " be fine" in {

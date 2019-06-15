@@ -13,7 +13,7 @@ package com.jafpl.graph
 class Binding protected[jafpl] (override val graph: Graph,
                                 val name: String,
                                 val expression: Any,
-                                val staticValue: Option[Any],
+                                val static: Boolean,
                                 val options: Option[Any])
   extends Node(graph, None, None) {
 
@@ -32,6 +32,19 @@ class Binding protected[jafpl] (override val graph: Graph,
     } else {
       super.outputs
     }
+  }
+
+  def bindingFor: Node = {
+    // This method assumes the graph is valid
+    // There will be only one outbound edge
+    val edge = graph.edgesFrom(this).head
+    // It will go to a Joiner or to the node the binding is for
+    var to = edge.to
+    while (to.isInstanceOf[Joiner]) {
+      to = to.graph.edgesFrom(to).head.to
+    }
+
+    to
   }
 
   private[graph] override def inputsOk(): Boolean = {

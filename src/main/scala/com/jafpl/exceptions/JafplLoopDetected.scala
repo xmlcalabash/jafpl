@@ -5,28 +5,19 @@ import com.jafpl.graph.{AtomicNode, Binding, Graph, Joiner, Location, Node, Spli
 import scala.collection.mutable.ListBuffer
 
 class JafplLoopDetected(location: Option[Location]) extends JafplException(JafplException.LOOP_IN_GRAPH, location, List.empty[Any]) {
-  private val _nodes = ListBuffer.empty[LoopNode]
+  private val _nodes = ListBuffer.empty[Node]
 
   protected[jafpl] def addNode(step: Node): Unit = {
+    // Don't report splitters and joiners; they're not useful to the pipeline author
     step match {
-      case atomic: AtomicNode =>
-        _nodes += new StepNode(atomic.userLabel.getOrElse("ANONYMOUS"), atomic.step.get.location)
       case join: Joiner => Unit
       case split: Splitter => Unit
-      case bind: Binding =>
-        // There will be only one...
-        val edge = bind.graph.edgesFrom(bind).head
-        var to = edge.to
-        while (to.isInstanceOf[Joiner]) {
-          to = to.graph.edgesFrom(to).head.to
-        }
-        val label = to.userLabel.getOrElse("ANONYMOUS")
-        _nodes += new BindingNode(label, bind.name, bind.location)
-      case _ => print("unknown", step)
+      case _ => _nodes += step
+
     }
   }
 
-  def nodes: List[LoopNode] = _nodes.toList
+  def nodes: List[Node] = _nodes.toList
 
   override def toString: String = {
     var loop = "Loop detected:"
@@ -36,17 +27,5 @@ class JafplLoopDetected(location: Option[Location]) extends JafplException(Jafpl
       arrow = "→"
     }
     loop
-  }
-
-  class LoopNode(val label: String, val location: Option[Location]) {
-    override def toString: String = label
-  }
-
-  class StepNode(label: String, location: Option[Location]) extends LoopNode(label, location) {
-    // nop
-  }
-
-  class BindingNode(val nodeLabel: String, label: String, location: Option[Location]) extends LoopNode(label, location) {
-    override def toString: String = nodeLabel + "/" + label
   }
 }
