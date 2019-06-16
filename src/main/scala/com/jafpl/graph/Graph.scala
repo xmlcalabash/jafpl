@@ -5,8 +5,7 @@ import java.io.{File, PrintWriter}
 import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.{JafplException, JafplLoopDetected}
 import com.jafpl.graph.JoinMode.JoinMode
-import com.jafpl.messages.Message
-import com.jafpl.steps.{Manifold, ManifoldSpecification, PortSpecification, Step, ViewportComposer}
+import com.jafpl.steps.{Manifold, ManifoldSpecification, Step, ViewportComposer}
 import com.jafpl.util.{ItemComparator, ItemTester, UniqueId}
 import org.slf4j.{Logger, LoggerFactory}
 
