@@ -3,7 +3,7 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{ContainerStart, Node}
-import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
+import com.jafpl.messages.{BindingMessage, ItemMessage, JoinGateMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GStopped}
 import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NFinally, NGuardResult, NInitialize, NInput, NLoop, NReset, NRestartLoop, NRunFinally, NStart, NStop, NTraceDisable, NTraceEnable, NViewportFinished}
 import com.jafpl.steps.{DataConsumer, Manifold, PortSpecification}
@@ -278,6 +278,10 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
             } else {
               trace("DELIVER↴", s"$node (no step).$port", TraceEvent.STEPIO)
             }
+          case message: JoinGateMessage =>
+            // Just pass this message through
+            val step = node.step.get
+            step.receive(port, message)
           case _ =>
             throw JafplException.unexpectedMessage(item.toString, port, node.location)
         }
