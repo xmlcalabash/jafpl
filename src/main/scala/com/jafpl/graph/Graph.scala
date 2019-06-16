@@ -552,6 +552,10 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     addEdge(from, fromName, to, toName, JoinMode.PRIORITY)
   }
 
+  def addGatedEdge(from: Node, fromName: String, to: Node, toName: String): Unit = {
+    addEdge(from, fromName, to, toName, JoinMode.GATED)
+  }
+
   private def addEdge(from: Node, fromName: String, to: Node, toName: String, mode: JoinMode): Unit = {
     checkOpen()
 

@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.graph.{JoinMode, Joiner, Node}
-import com.jafpl.messages.Message
+import com.jafpl.messages.{JoinGateMessage, Message}
 import com.jafpl.runtime.GraphMonitor.GOutput
 import com.jafpl.util.UniqueId
 
@@ -17,6 +17,7 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
   private val portBuffer = mutable.HashMap.empty[Int,ListBuffer[Message]]
   private var currentPort = 1
   private var hadPriorityInput = false
+  private var hadGatingInput = false
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
     trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
@@ -48,9 +49,21 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
 
   private def orderedInput(from: Node, fromPort: String, port: String, item: Message): Unit = {
     val pnum = portNo(port)
+    val gateMessage = item.isInstanceOf[JoinGateMessage]
 
-    hadPriorityInput = hadPriorityInput || (node.mode == JoinMode.PRIORITY && pnum == 1)
-    var writeOk = (pnum == currentPort) && ((currentPort == 1) || (node.mode != JoinMode.PRIORITY) || !hadPriorityInput)
+    if (!hadPriorityInput) {
+      hadPriorityInput = (node.mode == JoinMode.PRIORITY && pnum == 1)
+    }
+
+    if (!hadGatingInput) {
+      hadGatingInput = (node.mode == JoinMode.GATED && pnum == 1 && gateMessage)
+      if (hadGatingInput) {
+        // We never pass along the gating input
+        return
+      }
+    }
+
+    var writeOk = writeMessage(port, item)
 
     if (writeOk) {
       monitor ! GOutput(node, "result", item)
@@ -67,7 +80,7 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
     // messages that we can. If pnum == currentPort *now*, then we can
     // write it, subject to the priority constraints
 
-    writeOk = (pnum == currentPort) && ((node.mode != JoinMode.PRIORITY) || !hadPriorityInput)
+    writeOk = writeMessage(port, item)
 
     if (writeOk) {
       monitor ! GOutput(node, "result", item)
@@ -78,6 +91,25 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
     }
   }
 
+  private def writeMessage(port: String, item: Message): Boolean = {
+    val pnum = portNo(port)
+    val gateMessage = item.isInstanceOf[JoinGateMessage]
+
+    var writeOk = (pnum == currentPort)
+
+    if (currentPort != 1) {
+      node.mode match {
+        case JoinMode.PRIORITY =>
+          writeOk = writeOk && !hadPriorityInput
+        case JoinMode.GATED =>
+          writeOk = writeOk && hadGatingInput
+        case _ => Unit
+      }
+    }
+
+    writeOk
+  }
+
   private def drainBuffers(): Unit = {
     var port = currentPort
     var stillDraining = portClosed.getOrElse(port, false)
@@ -85,7 +117,19 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
       stillDraining = portClosed.getOrElse(port, false)
       val list = portBuffer.getOrElse(port, ListBuffer.empty[Message])
 
-      val allowWrite = (node.mode != JoinMode.PRIORITY) || (port == 1) || !hadPriorityInput
+      val allowWrite = if (port == 1) {
+        true
+      } else {
+        node.mode match {
+          case JoinMode.PRIORITY =>
+            !hadPriorityInput
+          case JoinMode.GATED =>
+            hadGatingInput
+          case _ =>
+            true
+        }
+      }
+
       if (allowWrite) {
         for (item <- list) {
           monitor ! GOutput(node, "result", item)

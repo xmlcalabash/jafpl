@@ -18,7 +18,7 @@ class ContainerSpec extends FlatSpec {
     val pipeline  = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1        = pipeline.addAtomic(new Producer(List("doc1")), "p1")
     val group     = pipeline.addGroup("group", Manifold.ALLOW_ANY)
-    val p2        = group.addAtomic(new Producer(List("doc2")), "p1")
+    val p2        = group.addAtomic(new Producer(List("doc2")), "p2")
     val ident     = group.addAtomic(new Identity(), "ident")
 
     graph.addEdge(p1, "result", group, "fred")

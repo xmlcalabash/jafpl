@@ -4,7 +4,7 @@ import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.JafplException
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, Identity, LiesAboutOutputBindings, Manifold, PortCardinality, Producer, Sink}
+import com.jafpl.steps.{BufferSink, Empty, Identity, LiesAboutOutputBindings, Manifold, PortCardinality, Producer, Sink}
 import org.scalatest.FlatSpec
 
 class CardinalitySpec extends FlatSpec {
@@ -13,7 +13,7 @@ class CardinalitySpec extends FlatSpec {
   val oneInput = new Manifold(Manifold.singlePort("source", PortCardinality.EXACTLY_ONE), Manifold.WILD)
   val oneInputOutput = new Manifold(Manifold.singlePort("source", PortCardinality.EXACTLY_ONE), Manifold.singlePort("result", PortCardinality.EXACTLY_ONE))
 
-  "Incorrect input cardinalities " should " cause the pipeline to fail" in {
+  "Overflow input cardinalities " should " cause the pipeline to fail" in {
     val graph    = Jafpl.newInstance().newGraph()
     val bc = new BufferSink()
 
@@ -32,6 +32,31 @@ class CardinalitySpec extends FlatSpec {
       runtime.run()
     } catch {
       case jex: JafplException => pass = true
+    }
+
+    assert(pass)
+  }
+
+  "Underflow input cardinalities " should " cause the pipeline to fail" in {
+    val graph    = Jafpl.newInstance().newGraph()
+    val bc = new BufferSink()
+
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
+    val p1       = pipeline.addAtomic(new Empty(), "producer")
+    val ident    = pipeline.addAtomic(new Identity(false), "identity")
+    val consumer = pipeline.addAtomic(bc, "consumer")
+
+    graph.addEdge(p1, "result", ident, "source")
+    graph.addEdge(ident, "result", pipeline, "result")
+    graph.addEdge(pipeline, "result", consumer, "source")
+
+    var pass = false
+    try {
+      val runtime = new GraphRuntime(graph, runtimeConfig)
+      runtime.run()
+    } catch {
+      case jex: JafplException =>
+        pass = jex.code == JafplException.INPUT_CARDINALITY_ERROR
     }
 
     assert(pass)
