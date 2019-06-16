@@ -154,6 +154,12 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       try {
         node.step.get.run()
 
+        for (input <- node.inputs.filter(!_.startsWith("#"))) {
+          val count = node.inputCardinalities.getOrElse(input, 0L)
+          val ispec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
+          ispec.inputSpec.checkInputCardinality(input, count)
+        }
+
         for (output <- node.outputs.filter(!_.startsWith("#"))) {
           val count = node.outputCardinalities.getOrElse(output, 0L)
           val ospec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
