@@ -40,6 +40,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   protected val openInputs = mutable.HashSet.empty[String]
   protected val bufferedInput: ListBuffer[InputBuffer] = ListBuffer.empty[InputBuffer]
   protected var readyToRun = false
+  protected var threwException = false
   protected var proxy = Option.empty[DataConsumer]
 
   def this(monitor: ActorRef, runtime: GraphRuntime, node: Node, consumer: DataConsumer) {
@@ -58,6 +59,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         node.step.get.initialize(runtime.runtime)
       } catch {
         case cause: Throwable =>
+          threwException = true
           monitor ! GException(Some(node), cause)
       }
     }
@@ -67,6 +69,8 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     trace("RESET", s"$node", TraceEvent.METHODS)
 
     readyToRun = false
+    threwException = false
+
     openInputs.clear()
     bufferedInput.clear()
     for (input <- node.inputs) {
@@ -82,6 +86,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         node.step.get.reset()
       } catch {
         case cause: Throwable =>
+          threwException = true
           monitor ! GException(Some(node), cause)
       }
     }
@@ -101,6 +106,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         node.step.get.abort()
       } catch {
         case cause: Throwable =>
+          threwException = true
           monitor ! GException(Some(node), cause)
       }
     } else {
@@ -117,6 +123,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         node.step.get.stop()
       } catch {
         case cause: Throwable =>
+          threwException = true
           monitor ! GException(Some(node), cause)
       }
     } else {
@@ -127,8 +134,8 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   private def runIfReady(): Unit = {
-    trace("RUNIFREADY", s"$node ready:$readyToRun inputs:${openInputs.isEmpty}", TraceEvent.METHODS)
-    if (readyToRun) {
+    trace("RUNIFREADY", s"$node ready:${readyToRun && !threwException} inputs:${openInputs.isEmpty}", TraceEvent.METHODS)
+    if (readyToRun && !threwException) {
       if (openInputs.isEmpty) {
         run()
       } else {
@@ -228,6 +235,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
             ispec.inputSpec.checkInputCardinality(port, count)
           } catch {
             case ex: JafplException =>
+              threwException = true
               monitor ! GException(Some(node), ex)
           }
         }
@@ -280,14 +288,15 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
             }
           case message: JoinGateMessage =>
             // Just pass this message through
-            val step = node.step.get
-            step.receive(port, message)
+            node.inputCardinalities.put(port, node.inputCardinalities.getOrElse(port, 0L) + 1)
+            node.step.get.receive(port, message)
           case _ =>
             throw JafplException.unexpectedMessage(item.toString, port, node.location)
         }
       }
     } catch {
       case t: Throwable =>
+        threwException = true
         monitor ! GException(None, t)
     }
   }
