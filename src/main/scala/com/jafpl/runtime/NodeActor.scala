@@ -39,6 +39,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
                                  protected val node: Node) extends TracingActor(runtime) {
   protected val openInputs = mutable.HashSet.empty[String]
   protected val bufferedInput: ListBuffer[InputBuffer] = ListBuffer.empty[InputBuffer]
+  protected val seenBindings = mutable.HashSet.empty[String]
   protected var readyToRun = false
   protected var threwException = false
   protected var proxy = Option.empty[DataConsumer]
@@ -73,6 +74,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
 
     openInputs.clear()
     bufferedInput.clear()
+    seenBindings.clear()
     for (input <- node.inputs) {
       openInputs.add(input)
     }
@@ -137,6 +139,15 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     trace("RUNIFREADY", s"$node ready:${readyToRun && !threwException} inputs:${openInputs.isEmpty}", TraceEvent.METHODS)
     if (readyToRun && !threwException) {
       if (openInputs.isEmpty) {
+        if (node.step.isDefined) {
+          // Pass any statics in as normal bindings
+          for ((binding,message) <- node.staticBindings) {
+            if (!seenBindings.contains(binding.name)) {
+              val bmsg = new BindingMessage(binding.name, message)
+              node.step.get.receiveBinding(bmsg)
+            }
+          }
+        }
         run()
       } else {
         for (port <- openInputs) {
@@ -262,6 +273,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
             for (inj <- node.stepInjectables) {
               inj.receiveBinding(binding)
             }
+            seenBindings += binding.name
             if (node.step.isDefined) {
               trace("BINDING→", s"$node: ${binding.name}=${binding.message}", TraceEvent.BINDINGS)
               node.step.get.receiveBinding(binding)

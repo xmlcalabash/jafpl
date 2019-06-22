@@ -41,6 +41,13 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
   }
 
   override protected def run(): Unit = {
+    // Pass any statics in as normal bindings
+    for ((binding,message) <- node.staticBindings) {
+      if (!bindings.contains(binding.name)) {
+        bindings.put(binding.name, message)
+      }
+    }
+
     trace("RUN", s"$node", TraceEvent.METHODS)
     if (runtime.traceEventManager.traceEnabled("Bindings")) {
       var sbindings = ""

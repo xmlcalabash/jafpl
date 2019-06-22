@@ -2,6 +2,7 @@ package com.jafpl.graph
 
 import com.jafpl.exceptions.JafplException
 import com.jafpl.injection.{PortInjectable, StepInjectable}
+import com.jafpl.messages.Message
 import com.jafpl.steps.{ManifoldSpecification, PortCardinality, Step}
 import com.jafpl.util.UniqueId
 import org.slf4j.{Logger, LoggerFactory}
@@ -27,8 +28,9 @@ abstract class Node(val graph: Graph,
   protected[jafpl] val inputInjectables: ListBuffer[PortInjectable] = ListBuffer.empty[PortInjectable]
   protected[jafpl] val outputInjectables: ListBuffer[PortInjectable] = ListBuffer.empty[PortInjectable]
   protected[jafpl] val stepInjectables: ListBuffer[StepInjectable] = ListBuffer.empty[StepInjectable]
-  protected[jafpl] val inputCardinalities: mutable.HashMap[String,Long] = mutable.HashMap.empty[String,Long]
-  protected[jafpl] val outputCardinalities: mutable.HashMap[String,Long] = mutable.HashMap.empty[String,Long]
+  protected[jafpl] val inputCardinalities = mutable.HashMap.empty[String,Long]
+  protected[jafpl] val outputCardinalities = mutable.HashMap.empty[String,Long]
+  protected[jafpl] val _staticBindings = mutable.HashMap.empty[Binding,Message]
   private var _manifold: Option[ManifoldSpecification] = if (step.isDefined) {
     step
   } else {
@@ -122,6 +124,26 @@ abstract class Node(val graph: Graph,
     * @return The variable names.
     */
   def bindings: Set[String] = graph.bindings(this)
+
+  /** Specify the static bindings that are in scope for this node.
+    *
+    * Static bindings are known at "compile time" and don't appear in the graph.
+    * (You aren't required to have statics in your graph.)
+    *
+    * This method provides the node with the set of static bindings that are in-scope.
+    *
+    * @param bindings The static bindings that are in-scope for this node.
+    */
+  def staticBindings_=(bindings: Map[Binding,Message]): Unit = {
+    _staticBindings.clear()
+    for ((bind,msg) <- bindings) {
+      _staticBindings.put(bind,msg)
+    }
+  }
+
+  def staticBindings: Map[Binding,Message] = {
+    _staticBindings.toMap
+  }
 
   protected[jafpl] def inputEdge(port: String): Edge = {
     graph.edgesTo(this, port).head

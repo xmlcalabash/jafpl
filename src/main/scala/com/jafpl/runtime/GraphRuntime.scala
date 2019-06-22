@@ -6,7 +6,7 @@ import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, Co
 import com.jafpl.messages.Message
 import com.jafpl.runtime.GraphMonitor.{GAbortExecution, GException, GNode, GRun, GWatchdog}
 import com.jafpl.runtime.Reaper.WatchMe
-import com.jafpl.steps.{BindingProvider, DataConsumerProxy, DataProvider}
+import com.jafpl.steps.{DataConsumerProxy, DataProvider}
 import com.jafpl.util.{DeadLetterListener, DefaultTraceEventManager, TraceEventManager, UniqueId}
 import org.slf4j.{Logger, LoggerFactory}
 
