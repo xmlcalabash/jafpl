@@ -382,6 +382,22 @@ on <a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerS
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.jafpl.graph.Node#_staticBindings" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="_staticBindings:scala.collection.mutable.HashMap[com.jafpl.graph.Binding,com.jafpl.messages.Message]"></a><a id="_staticBindings:HashMap[Binding,Message]"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Node.html#_staticBindings:scala.collection.mutable.HashMap[com.jafpl.graph.Binding,com.jafpl.messages.Message]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">_staticBindings</span><span class="result">: <span class="extype" name="scala.collection.mutable.HashMap">HashMap</span>[<a href="Binding.html" class="extype" name="com.jafpl.graph.Binding">Binding</a>, <a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../index.html" class="extype" name="com.jafpl">com.jafpl</a>] </dd></dl></div>
     </li><li name="com.jafpl.graph.Node#addInputInjectable" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="addInputInjectable(injectable:com.jafpl.injection.PortInjectable):Unit"></a><a id="addInputInjectable(PortInjectable):Unit"></a>
       <span class="permalink">
@@ -1013,6 +1029,40 @@ node is always appended to the label.</p></div></div>
       
       <p class="shortcomment cmt">This node's parent.</p><div class="fullcomment"><div class="comment cmt"><p>This node's parent.
 </p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>This node's parent.</p></dd></dl></div>
+    </li><li name="com.jafpl.graph.Node#staticBindings" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="staticBindings:Map[com.jafpl.graph.Binding,com.jafpl.messages.Message]"></a><a id="staticBindings:Map[Binding,Message]"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Node.html#staticBindings:Map[com.jafpl.graph.Binding,com.jafpl.messages.Message]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">staticBindings</span><span class="result">: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="Binding.html" class="extype" name="com.jafpl.graph.Binding">Binding</a>, <a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a>]</span>
+      </span>
+      
+      
+    </li><li name="com.jafpl.graph.Node#staticBindings_=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="staticBindings_=(bindings:Map[com.jafpl.graph.Binding,com.jafpl.messages.Message]):Unit"></a><a id="staticBindings_=(Map[Binding,Message]):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Node.html#staticBindings_=(bindings:Map[com.jafpl.graph.Binding,com.jafpl.messages.Message]):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: staticBindings_$eq" class="name">staticBindings_=</span><span class="params">(<span name="bindings">bindings: <span class="extype" name="scala.Predef.Map">Map</span>[<a href="Binding.html" class="extype" name="com.jafpl.graph.Binding">Binding</a>, <a href="../messages/Message.html" class="extype" name="com.jafpl.messages.Message">Message</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Specify the static bindings that are in scope for this node.</p><div class="fullcomment"><div class="comment cmt"><p>Specify the static bindings that are in scope for this node.</p><p>Static bindings are known at &quot;compile time&quot; and don't appear in the graph.
+(You aren't required to have statics in your graph.)</p><p>This method provides the node with the set of static bindings that are in-scope.
+</p></div><dl class="paramcmts block"><dt class="param">bindings</dt><dd class="cmt"><p>The static bindings that are in-scope for this node.</p></dd></dl></div>
     </li><li name="com.jafpl.graph.Node#step" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="step:Option[com.jafpl.steps.Step]"></a><a id="step:Option[Step]"></a>
       <span class="permalink">
