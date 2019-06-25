@@ -6,6 +6,8 @@
                 xmlns="http://jafpl.com/ns/dot"
                 version="2.0">
 
+<!-- JAFPL version 0.0.104 -->
+
 <!-- Yes, there's some irony in constructing a multi-stage pipeline directly
      in XSLT to support generation of diagrams for a pipeline language. -->
 
@@ -191,7 +193,12 @@
 
   <xsl:choose>
     <xsl:when test="$in-edge">
-      <edge from="{g:id($in-edge)}" to="{g:id($to-edge)}"/>
+      <xsl:for-each select="$in-edge">
+        <xsl:variable name="in" select="$in-edge"/>
+        <xsl:for-each select="$to-edge">
+          <edge from="{g:id($in)}" to="{g:id(.)}"/>
+        </xsl:for-each>
+      </xsl:for-each>
     </xsl:when>
     <xsl:otherwise>
       <xsl:variable name="here" select="."/>
