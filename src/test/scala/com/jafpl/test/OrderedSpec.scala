@@ -47,4 +47,39 @@ class OrderedSpec extends FlatSpec {
     assert(bc.items(2) == "TwoB")
     assert(bc.items(3) == "Three")
   }
+
+  "Splitting an ordered joiner " should " join inputs in the right order" in {
+    val graph    = Jafpl.newInstance().newGraph()
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
+
+    val p1 = pipeline.addAtomic(new Producer("One"), "one")
+    val p2 = pipeline.addAtomic(new Producer("Two"), "twoA")
+
+    val identity = pipeline.addAtomic(new Identity(), "identity")
+
+    graph.addOrderedEdge(p1, "result", identity, "source")
+    graph.addOrderedEdge(p2, "result", identity, "source")
+    graph.addOrderedEdge(p1, "result", identity, "source")
+    graph.addOrderedEdge(p2, "result", identity, "source")
+
+    graph.addEdge(identity, "result", pipeline, "result")
+
+    graph.addOutput(pipeline, "result")
+
+    graph.close()
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+    val bc = new BufferConsumer()
+    runtime.outputs("result").setConsumer(bc)
+
+    runtime.run()
+
+    print(bc.items)
+
+    assert(bc.items.length == 4)
+    assert(bc.items.head == "One")
+    assert(bc.items(1) == "Two")
+    assert(bc.items(2) == "One")
+    assert(bc.items(3) == "Two")
+  }
 }

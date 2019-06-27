@@ -916,16 +916,22 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
           }
 
           var count = 1
+          var jmode = JoinMode.MIXED
           for (edge <- edges) {
-            val oport = "result_" + count
-            // Special case; the addEdge method trips up in the bindings case.
-            val newEdge = new Edge(this, splitter, oport, edge.to, edge.toPort)
-            _edges += newEdge
-            count += 1
+            if (edge.mode != JoinMode.MIXED && jmode == JoinMode.MIXED) {
+              jmode = edge.mode
+            }
           }
 
           for (edge <- edges) {
-            _edges -= edge
+            val oport = "result_" + count
+            // Special case; the addEdge method trips up in the bindings case. Also, we
+            // need to preserve the order in which the edges appear in case they're JoinMode.ORDERED
+            val newEdge = new Edge(this, splitter, oport, edge.to, edge.toPort, jmode)
+            val pos = _edges.indexOf(edge)
+            _edges.insert(pos, newEdge)
+            _edges.remove(pos+1)
+            count += 1
           }
 
           debugDumpGraph()
