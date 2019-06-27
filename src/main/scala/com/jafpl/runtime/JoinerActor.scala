@@ -57,10 +57,11 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
 
     if (!hadGatingInput) {
       hadGatingInput = (node.mode == JoinMode.GATED && pnum == 1 && gateMessage)
-      if (hadGatingInput) {
-        // We never pass along the gating input
-        return
-      }
+    }
+
+    if (gateMessage) {
+      // We never pass along the gating input
+      return
     }
 
     var writeOk = writeMessage(port, item)
