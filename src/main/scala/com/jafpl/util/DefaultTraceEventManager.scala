@@ -48,7 +48,7 @@ class DefaultTraceEventManager() extends TraceEventManager {
 
   override def traceEnabled(event: String): Boolean = {
     val lcevent = event.toLowerCase()
-    enabledTraces.contains(lcevent) || (enabledTraces.contains(DefaultTraceEventManager.ALL) && !disabledTraces.contains(lcevent))
+    enabledTraces.contains(lcevent) || (enabledTraces.contains("all") && !disabledTraces.contains(lcevent))
   }
 
   override def trace(message: String, event: String): Unit = {
