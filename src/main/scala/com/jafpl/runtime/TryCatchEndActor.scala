@@ -11,9 +11,10 @@ private[runtime] class TryCatchEndActor(private val monitor: ActorRef,
   private var branchFinished = false
   private var ranFinally = false
   private var finblock = Option.empty[FinallyStart]
+  logEvent = TraceEvent.TRYEND
 
   override protected def reset(): Unit = {
-    trace("RESET", s"$node", TraceEvent.METHODS)
+    trace("RESET", s"$node", logEvent)
     super.reset()
 
     for (child <- unfinishedChildren) {
@@ -30,7 +31,7 @@ private[runtime] class TryCatchEndActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def finished(otherNode: Node): Unit = {
-    trace("FINISHED", s"$node $otherNode", TraceEvent.METHODS)
+    trace("FINISHED", s"$node $otherNode", logEvent)
 
     // Only one child of a try-catch will ever run, so if we get called, something succeeded
     // Well. Not if splitters or joiners get called.
@@ -48,7 +49,7 @@ private[runtime] class TryCatchEndActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def checkFinished(): Unit = {
-    trace("CHKFINISH", s"${node.start.get}/end ready:$readyToRun inputs:${openInputs.isEmpty} branch:$branchFinished fin:$ranFinally", TraceEvent.METHODS)
+    trace("CHKFINISH", s"${node.start.get}/end ready:$readyToRun inputs:${openInputs.isEmpty} branch:$branchFinished fin:$ranFinally", logEvent)
 
     if (!toldStart && branchFinished) {
       if (ranFinally) {

@@ -15,6 +15,10 @@ class StringComposer(location: Option[Location]) extends ViewportComposer {
     this(None)
   }
 
+  override def runtimeBindings(bindings: Map[String, Message]): Unit = {
+    // nop
+  }
+
   override def decompose(message: Message): List[ViewportItem] = {
     message match {
       case imsg: ItemMessage =>

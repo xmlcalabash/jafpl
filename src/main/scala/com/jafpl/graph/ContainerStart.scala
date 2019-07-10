@@ -307,24 +307,6 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     binding
   }
 
-  def addOption(name: String, expression: Any, options: Any): Binding = {
-    val binding = graph.addOption(name, expression, Some(options))
-    addChild(binding)
-    binding
-  }
-
-  def addStaticOption(name: String): Binding = {
-    val binding = graph.addStaticOption(name)
-    addChild(binding)
-    binding
-  }
-
-  def addStaticOption(name: String, options: Any): Binding = {
-    val binding = graph.addStaticOption(name, Some(options))
-    addChild(binding)
-    binding
-  }
-
   /** Add a variable to this container.
     *
     * This method inserts a variable binding into the container. This binding is
@@ -341,25 +323,7 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * @return The node added.
     */
   def addVariable(name: String, expression: Any): Binding = {
-    val binding = graph.addVariable(name, expression, None)
-    addChild(binding)
-    binding
-  }
-
-  def addStaticVariable(name: String): Binding = {
-    val binding = graph.addStaticVariable(name, None)
-    addChild(binding)
-    binding
-  }
-
-  def addVariable(name: String, expression: Any, options: Any): Binding = {
-    val binding = graph.addVariable(name, expression, Some(options))
-    addChild(binding)
-    binding
-  }
-
-  def addStaticVariable(name: String, options: Any): Binding = {
-    val binding = graph.addStaticVariable(name, Some(options))
+    val binding = graph.addVariable(name, expression)
     addChild(binding)
     binding
   }

@@ -19,15 +19,16 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
   var running = false
   var looped = false
   val bindings = mutable.HashMap.empty[String, Message]
+  logEvent = TraceEvent.LOOPUNTIL
 
   override protected def start(): Unit = {
-    trace("START", s"$node", TraceEvent.METHODS)
+    trace("START", s"$node", logEvent)
     commonStart()
     runIfReady()
   }
 
   override protected def reset(): Unit = {
-    trace("RESET", s"$node", TraceEvent.METHODS)
+    trace("RESET", s"$node", logEvent)
     super.reset()
     running = false
     readyToRun = true
@@ -36,7 +37,7 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
   }
 
   protected[runtime] def restartLoop(): Unit = {
-    trace("RSTRTLOOP", s"$node", TraceEvent.METHODS)
+    trace("RSTRTLOOP", s"$node", logEvent)
     super.reset() // yes, reset
     running = false
     readyToRun = true
@@ -45,12 +46,12 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
   }
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
+    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
     receive(port, item)
   }
 
   override def receive(port: String, item: Message): Unit = {
-    trace("RECEIVE", s"$node $port", TraceEvent.METHODS)
+    trace("RECEIVE", s"$node $port", logEvent)
     if (port == "source") {
       item match {
         case message: ItemMessage =>
@@ -79,18 +80,18 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
   }
 
   protected[runtime] def loop(item: ItemMessage): Unit = {
-    trace("LOOP", s"$node", TraceEvent.METHODS)
+    trace("LOOP", s"$node", logEvent)
     nextItem = Some(item)
     looped = true
   }
 
   override protected def close(port: String): Unit = {
-    trace("CLOSE", s"$node $port", TraceEvent.METHODS)
+    trace("CLOSE", s"$node $port", logEvent)
     runIfReady()
   }
 
   private def runIfReady(): Unit = {
-    trace("RUNIFREADY", s"$node ready:$readyToRun def:${currentItem.isDefined}", TraceEvent.METHODS)
+    trace("RUNIFREADY", s"$node ready:$readyToRun def:${currentItem.isDefined}", logEvent)
     if (!running && readyToRun && currentItem.isDefined) {
       running = true
 
@@ -107,7 +108,7 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
   override protected[runtime] def finished(): Unit = {
     val finished = node.comparator.areTheSame(currentItem.get.item, nextItem.get.item)
 
-    trace("FINISHED", s"$node ${currentItem.get}: ${nextItem.get}: $finished", TraceEvent.METHODS)
+    trace("FINISHED", s"$node ${currentItem.get}: ${nextItem.get}: $finished", logEvent)
 
     if (finished) {
       checkCardinalities("current")

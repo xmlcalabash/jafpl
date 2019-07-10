@@ -10,6 +10,8 @@ import com.jafpl.steps.Manifold
 private[runtime] class StartActor(private val monitor: ActorRef,
                                   override protected val runtime: GraphRuntime,
                                   override protected val node: ContainerStart) extends NodeActor(monitor, runtime, node)  {
+  logEvent = TraceEvent.START
+  
   protected def commonStart(): Unit = {
     readyToRun = true
     for (inj <- node.stepInjectables) {
@@ -24,7 +26,7 @@ private[runtime] class StartActor(private val monitor: ActorRef,
   }
 
   override protected def start(): Unit = {
-    trace("START", s"$node", TraceEvent.METHODS)
+    trace("START", s"$node", logEvent)
     commonStart()
     for (child <- node.children) {
       monitor ! GStart(child)
@@ -32,7 +34,7 @@ private[runtime] class StartActor(private val monitor: ActorRef,
   }
 
   override protected def abort(): Unit = {
-    trace("ABORT", s"$node", TraceEvent.METHODS)
+    trace("ABORT", s"$node", logEvent)
     for (child <- node.children) {
       monitor ! GAbort(child)
     }
@@ -40,7 +42,7 @@ private[runtime] class StartActor(private val monitor: ActorRef,
   }
 
   override protected def stop(): Unit = {
-    trace("STOP", s"$node", TraceEvent.METHODS)
+    trace("STOP", s"$node", logEvent)
     for (child <- node.children) {
       monitor ! GStop(child)
     }
@@ -49,7 +51,7 @@ private[runtime] class StartActor(private val monitor: ActorRef,
   }
 
   override protected def reset(): Unit = {
-    trace("RESET", s"$node", TraceEvent.METHODS)
+    trace("RESET", s"$node", logEvent)
     readyToRun = false
 
     monitor ! GReset(node.containerEnd)
@@ -59,7 +61,7 @@ private[runtime] class StartActor(private val monitor: ActorRef,
   }
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
+    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
 
     // Bindings on compound steps are only ever for injectables
     if (port == "#bindings") {
@@ -110,7 +112,7 @@ private[runtime] class StartActor(private val monitor: ActorRef,
   }
 
   protected[runtime] def finished(): Unit = {
-    trace("FINISHED", s"$node", TraceEvent.METHODS)
+    trace("FINISHED", s"$node", logEvent)
     checkCardinalities()
     for (output <- node.outputs) {
       monitor ! GClose(node, output)

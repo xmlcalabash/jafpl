@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.graph.{JoinMode, Joiner, Node}
-import com.jafpl.messages.{JoinGateMessage, Message}
+import com.jafpl.messages.Message
 import com.jafpl.runtime.GraphMonitor.GOutput
 import com.jafpl.util.UniqueId
 
@@ -18,9 +18,10 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
   private var currentPort = 1
   private var hadPriorityInput = false
   private var hadGatingInput = false
+  logEvent = TraceEvent.JOINER
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
+    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
     if (node.mode == JoinMode.MIXED) {
       monitor ! GOutput(node, "result", item)
     } else {
@@ -31,7 +32,7 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
   }
 
   override protected def close(port: String): Unit = {
-    trace("CLOSE", s"$node", TraceEvent.METHODS)
+    trace("CLOSE", s"$node", logEvent)
     if (node.mode != JoinMode.MIXED) {
       this.synchronized {
         portClosed.put(portNo(port),true)
@@ -49,19 +50,9 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
 
   private def orderedInput(from: Node, fromPort: String, port: String, item: Message): Unit = {
     val pnum = portNo(port)
-    val gateMessage = item.isInstanceOf[JoinGateMessage]
 
     if (!hadPriorityInput) {
       hadPriorityInput = (node.mode == JoinMode.PRIORITY && pnum == 1)
-    }
-
-    if (!hadGatingInput) {
-      hadGatingInput = (node.mode == JoinMode.GATED && pnum == 1 && gateMessage)
-    }
-
-    if (gateMessage) {
-      // We never pass along the gating input
-      return
     }
 
     var writeOk = writeMessage(port, item)
@@ -94,7 +85,6 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
 
   private def writeMessage(port: String, item: Message): Boolean = {
     val pnum = portNo(port)
-    val gateMessage = item.isInstanceOf[JoinGateMessage]
 
     var writeOk = (pnum == currentPort)
 
@@ -102,8 +92,6 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
       node.mode match {
         case JoinMode.PRIORITY =>
           writeOk = writeOk && !hadPriorityInput
-        case JoinMode.GATED =>
-          writeOk = writeOk && hadGatingInput
         case _ => Unit
       }
     }
@@ -124,8 +112,6 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
         node.mode match {
           case JoinMode.PRIORITY =>
             !hadPriorityInput
-          case JoinMode.GATED =>
-            hadGatingInput
           case _ =>
             true
         }

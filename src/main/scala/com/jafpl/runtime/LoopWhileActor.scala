@@ -20,15 +20,16 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
   var looped = false
   val bindings = mutable.HashMap.empty[String, Message]
   var initiallyTrue = true
+  logEvent = TraceEvent.LOOPWHILE
 
   override protected def start(): Unit = {
-    trace("START", s"$node", TraceEvent.METHODS)
+    trace("START", s"$node", logEvent)
     commonStart()
     runIfReady()
   }
 
   override protected def reset(): Unit = {
-    trace("RESET", s"$node", TraceEvent.METHODS)
+    trace("RESET", s"$node", logEvent)
     super.reset()
     running = false
     readyToRun = true
@@ -37,7 +38,7 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
   }
 
   protected[runtime] def restartLoop(): Unit = {
-    trace("RSTRTLOOP", s"$node", TraceEvent.METHODS)
+    trace("RSTRTLOOP", s"$node", logEvent)
     super.reset() // yes, reset
     running = false
     readyToRun = true
@@ -46,12 +47,12 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
   }
 
   override protected def input(from: Node, fromPort: String, port: String, msg: Message): Unit = {
-    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
+    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
     receive(port, msg)
   }
 
   override def receive(port: String, msg: Message): Unit = {
-    trace("RECEIVE", s"$node $port", TraceEvent.METHODS)
+    trace("RECEIVE", s"$node $port", logEvent)
     msg match {
       case item: ItemMessage =>
         if (currentItem.nonEmpty) {
@@ -63,7 +64,7 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
         val testItem = ListBuffer.empty[Message]
         testItem += currentItem.head
         initiallyTrue = node.tester.test(testItem.toList, bindings.toMap)
-        trace("RECVTRUE", s"$node while: $initiallyTrue", TraceEvent.METHODS)
+        trace("RECVTRUE", s"$node while: $initiallyTrue", logEvent)
       case item: BindingMessage =>
         bindings.put(item.name, item)
       case _ =>
@@ -75,19 +76,19 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
   }
 
   protected[runtime] def loop(item: ItemMessage): Unit = {
-    trace("LOOP", s"$node", TraceEvent.METHODS)
+    trace("LOOP", s"$node", logEvent)
     currentItem.clear()
     currentItem += item
     looped = true
   }
 
   override protected def close(port: String): Unit = {
-    trace("CLOSE", s"$node", TraceEvent.METHODS)
+    trace("CLOSE", s"$node", logEvent)
     runIfReady()
   }
 
   private def runIfReady(): Unit = {
-    trace("RUNIFREADY", s"$node ready:$readyToRun running:$running current:${currentItem.nonEmpty}", TraceEvent.METHODS)
+    trace("RUNIFREADY", s"$node ready:$readyToRun running:$running current:${currentItem.nonEmpty}", logEvent)
     if (!running && readyToRun && currentItem.nonEmpty) {
       running = true
 
@@ -109,7 +110,7 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
     testItem += currentItem.head
     val pass = node.tester.test(testItem.toList, bindings.toMap)
 
-    trace("FINISHED", s"$node $pass ${currentItem.head}", TraceEvent.METHODS)
+    trace("FINISHED", s"$node $pass ${currentItem.head}", logEvent)
 
     if (pass) {
       monitor ! GRestartLoop(node)

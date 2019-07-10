@@ -17,15 +17,16 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
   var running = false
   var looped = false
   val bindings = mutable.HashMap.empty[String, Any]
+  logEvent = TraceEvent.LOOPFOR
 
   override protected def start(): Unit = {
-    trace("START", s"$node", TraceEvent.METHODS)
+    trace("START", s"$node", logEvent)
     commonStart()
     runIfReady()
   }
 
   override protected def reset(): Unit = {
-    trace("RESET", s"$node", TraceEvent.METHODS)
+    trace("RESET", s"$node", logEvent)
     super.reset()
     running = false
     readyToRun = true
@@ -36,7 +37,7 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
   protected[runtime] def restartLoop(): Unit = {
     super.reset() // yes, reset
 
-    trace("RSTRTLOOP", s"$node", TraceEvent.METHODS)
+    trace("RSTRTLOOP", s"$node", logEvent)
     running = false
     readyToRun = true
     looped = false
@@ -44,23 +45,23 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
   }
 
   override protected def input(from: Node, fromPort: String, port: String, msg: Message): Unit = {
-    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
+    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
 
     throw JafplException.noInputOnLoop(port, node.location)
   }
 
   protected[runtime] def loop(item: ItemMessage): Unit = {
-    trace("LOOP", s"$node", TraceEvent.METHODS)
+    trace("LOOP", s"$node", logEvent)
     looped = true
   }
 
   override protected def close(port: String): Unit = {
-    trace("CLOSE", s"$node", TraceEvent.METHODS)
+    trace("CLOSE", s"$node", logEvent)
     throw JafplException.internalError("No port closures are expected on a for-loop", node.location)
   }
 
   private def runIfReady(): Unit = {
-    trace("RUNIFREADY", s"$node running:$running ready:$readyToRun", TraceEvent.METHODS)
+    trace("RUNIFREADY", s"$node running:$running ready:$readyToRun", logEvent)
 
     if (!running && readyToRun) {
       running = true
@@ -71,7 +72,7 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
         current >= node.countTo
       }
 
-      trace("INITFLOP", s"Initially: $initiallyTrue: $current", TraceEvent.METHODS)
+      trace("INITFLOP", s"Initially: $initiallyTrue: $current", logEvent)
 
       if (initiallyTrue) {
         for (port <- node.outputs) {
@@ -98,7 +99,7 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
       current >= node.countTo
     }
 
-    trace("FINISHED", s"$node $pass $current", TraceEvent.METHODS)
+    trace("FINISHED", s"$node $pass $current", logEvent)
 
     if (pass) {
       monitor ! GRestartLoop(node)

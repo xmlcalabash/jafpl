@@ -43,6 +43,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
   private val actors = mutable.HashMap.empty[Node, ActorRef]
   private var lastMessage = Instant.now()
   private var exception: Option[Throwable] = None
+  protected var logEvent = TraceEvent.MONITOR
 
   private def fmtSender(): String = {
     var str = sender().toString
@@ -64,7 +65,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
   }
 
   def stopPipeline(): Unit = {
-    trace("STOPPIPE", "", TraceEvent.METHODS)
+    trace("STOPPIPE", "", logEvent)
     for (node <- unstoppedNodes) {
       if (node.parent.isEmpty) {
         actors(node) ! NStop()
@@ -73,7 +74,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
   }
 
   def stoppedStep(node: Node): Unit = {
-    trace("STOPDSTEP", s"$node", TraceEvent.METHODS)
+    trace("STOPDSTEP", s"$node", logEvent)
     unstoppedNodes -= node
     actors(node) ! PoisonPill
     if (unstoppedNodes.isEmpty) {
@@ -86,7 +87,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
   }
 
   def crashAndBurn(cause: Throwable): Unit = {
-    trace("CRASHBURN", s"$cause", TraceEvent.METHODS)
+    trace("CRASHBURN", s"$cause", logEvent)
     exception = Some(cause)
     stopPipeline()
   }

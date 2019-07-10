@@ -3,7 +3,7 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{ContainerStart, Node}
-import com.jafpl.messages.{BindingMessage, ItemMessage, JoinGateMessage, Message}
+import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GStopped}
 import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NFinally, NGuardResult, NInitialize, NInput, NLoop, NReset, NRestartLoop, NRunFinally, NStart, NStop, NTraceDisable, NTraceEnable, NViewportFinished}
 import com.jafpl.steps.{DataConsumer, Manifold, PortSpecification}
@@ -43,6 +43,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   protected var readyToRun = false
   protected var threwException = false
   protected var proxy = Option.empty[DataConsumer]
+  protected var logEvent = TraceEvent.NODE
 
   def this(monitor: ActorRef, runtime: GraphRuntime, node: Node, consumer: DataConsumer) {
     this(monitor, runtime, node)
@@ -50,7 +51,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def initialize(): Unit = {
-    trace("INITACTOR", s"$node  step:${node.step.isDefined}", TraceEvent.METHODS)
+    trace("INITACTOR", s"$node  step:${node.step.isDefined}", logEvent)
 
     for (input <- node.inputs) {
       openInputs.add(input)
@@ -67,7 +68,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def reset(): Unit = {
-    trace("RESET", s"$node", TraceEvent.METHODS)
+    trace("RESET", s"$node", logEvent)
 
     readyToRun = false
     threwException = false
@@ -76,14 +77,17 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     bufferedInput.clear()
     seenBindings.clear()
     for (input <- node.inputs) {
-      openInputs.add(input)
+      // Bindings aren't buffered, so don't wait for them
+      if (input != "#bindings") {
+        openInputs.add(input)
+      }
     }
 
     node.inputCardinalities.clear()
     node.outputCardinalities.clear()
 
     if (node.step.isDefined) {
-      trace("RESETNODE", s"$node", TraceEvent.METHODS)
+      trace("RESETNODE", s"$node", logEvent)
       try {
         node.step.get.reset()
       } catch {
@@ -95,15 +99,15 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def start(): Unit = {
-    trace("START", s"$node", TraceEvent.METHODS)
+    trace("START", s"$node", logEvent)
     readyToRun = true
     runIfReady()
   }
 
   protected def abort(): Unit = {
-    trace("ABORT", s"$node", TraceEvent.METHODS)
+    trace("ABORT", s"$node", logEvent)
     if (node.step.isDefined) {
-      trace("ABORTSTEP", s"$node ${node.step.get}", TraceEvent.METHODS)
+      trace("ABORTSTEP", s"$node ${node.step.get}", logEvent)
       try {
         node.step.get.abort()
       } catch {
@@ -112,15 +116,15 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           monitor ! GException(Some(node), cause)
       }
     } else {
-      trace("ABORTSTEP!", s"$node", TraceEvent.METHODS)
+      trace("ABORTSTEP!", s"$node", logEvent)
     }
     monitor ! GFinished(node)
   }
 
   protected def stop(): Unit = {
-    trace("STOP", s"$node", TraceEvent.METHODS)
+    trace("STOP", s"$node", logEvent)
     if (node.step.isDefined) {
-      trace("STOPSTEP", s"$node ${node.step.get}", TraceEvent.METHODS)
+      trace("STOPSTEP", s"$node ${node.step.get}", logEvent)
       try {
         node.step.get.stop()
       } catch {
@@ -129,14 +133,14 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           monitor ! GException(Some(node), cause)
       }
     } else {
-      trace("STOPSTEP!", s"$node", TraceEvent.METHODS)
+      trace("STOPSTEP!", s"$node", logEvent)
     }
 
     monitor ! GStopped(node)
   }
 
   private def runIfReady(): Unit = {
-    trace("RUNIFREADY", s"$node ready:${readyToRun && !threwException} inputs:${openInputs.isEmpty}", TraceEvent.METHODS)
+    trace("RUNIFREADY", s"$node ready:${readyToRun && !threwException} inputs:${openInputs.isEmpty}", logEvent)
     if (readyToRun && !threwException) {
       if (openInputs.isEmpty) {
         if (node.step.isDefined) {
@@ -151,14 +155,14 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         run()
       } else {
         for (port <- openInputs) {
-          trace("...RWAITI", s"$node $port open", TraceEvent.METHODS)
+          trace("...RWAITI", s"$node $port open", logEvent)
         }
       }
     }
   }
 
   protected def run(): Unit = {
-    trace("RUN", s"$node", TraceEvent.METHODS)
+    trace("RUN", s"$node", logEvent)
 
     readyToRun = false
     var threwException = false
@@ -168,7 +172,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     }
 
     if (node.step.isDefined) {
-      trace("RUNSTEP", s"$node ${node.step.get}", TraceEvent.METHODS)
+      trace("RUNSTEP", s"$node ${node.step.get}", logEvent)
       try {
         node.step.get.run()
 
@@ -189,7 +193,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           monitor ! GException(Some(node), ex)
       }
 
-      trace("RAN", s"$node ${node.step.get} exception:$threwException", TraceEvent.METHODS)
+      trace("RAN", s"$node ${node.step.get} exception:$threwException", logEvent)
 
       if (!threwException) {
         for (output <- node.outputs) {
@@ -201,7 +205,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         }
       }
     } else {
-      trace("RUNSTEP!", s"$node", TraceEvent.METHODS)
+      trace("RUNSTEP!", s"$node", logEvent)
       node match {
         case start: ContainerStart =>
           // Close all our "input" ports so that children reading them can run
@@ -222,7 +226,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def close(port: String): Unit = {
-    trace("CLOSE", s"$node / $port", TraceEvent.METHODS)
+    trace("CLOSE", s"$node / $port", logEvent)
 
     openInputs -= port
     if (port == "#bindings" && bufferedInput.nonEmpty) {
@@ -257,7 +261,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    trace("INPUT", s"$node / $fromPort to $port", TraceEvent.METHODS)
+    trace("INPUT", s"$node / $fromPort to $port", logEvent)
     if (port != "#bindings" && openInputs.contains("#bindings")) {
       bufferedInput += new InputBuffer(from, fromPort, port, item)
       return
@@ -298,10 +302,6 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
             } else {
               trace("DELIVER↴", s"$node (no step).$port", TraceEvent.STEPIO)
             }
-          case message: JoinGateMessage =>
-            // Just pass this message through
-            node.inputCardinalities.put(port, node.inputCardinalities.getOrElse(port, 0L) + 1)
-            node.step.get.receive(port, message)
           case _ =>
             throw JafplException.unexpectedMessage(item.toString, port, node.location)
         }

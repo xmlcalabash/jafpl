@@ -25,6 +25,12 @@ import com.jafpl.messages.{ItemMessage, Message, Metadata}
   *
   */
 trait ViewportComposer {
+  /** Inform the composer of any in-scope bindings
+    *
+    * @param bindings The map of name/binding message pairs
+    */
+  def runtimeBindings(bindings: Map[String,Message]): Unit
+
   /** Decompose the specified item into sub-portions for viewport processing.
     *
     * @param message The message containing the item to be processed by the viewport.

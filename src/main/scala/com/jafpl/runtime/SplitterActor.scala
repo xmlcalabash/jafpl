@@ -15,14 +15,15 @@ private[runtime] class SplitterActor(private val monitor: ActorRef,
   extends NodeActor(monitor, runtime, node) with DataConsumer {
 
   var edges: Option[ListBuffer[Edge]] = None
-
+  logEvent = TraceEvent.SPLITTER
+  
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
+    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
     receive(port, item)
   }
 
   override def receive(port: String, item: Message): Unit = {
-    trace("RECEIVE", s"$node $port", TraceEvent.METHODS)
+    trace("RECEIVE", s"$node $port", logEvent)
     // Cache the edges for a small amount of efficiency
     if (edges.isEmpty) {
       val outbound = ListBuffer.empty[Edge]

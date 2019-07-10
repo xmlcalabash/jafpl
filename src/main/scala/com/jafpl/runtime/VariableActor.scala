@@ -16,14 +16,15 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
   extends NodeActor(monitor, runtime, binding) with DataConsumer {
   private var exprContext = ListBuffer.empty[Message]
   private val bindings = mutable.HashMap.empty[String, Message]
+  logEvent = TraceEvent.VARIABLE
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
+    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
     receive(port, item)
   }
 
   override def receive(port: String, item: Message): Unit = {
-    trace("RECEIVE", s"$port", TraceEvent.METHODS)
+    trace("RECEIVE", s"$port", logEvent)
 
     item match {
       case item: ItemMessage =>
@@ -48,7 +49,7 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
       }
     }
 
-    trace("RUN", s"$node", TraceEvent.METHODS)
+    trace("RUN", s"$node", logEvent)
     if (runtime.traceEventManager.traceEnabled("Bindings")) {
       var sbindings = ""
       for (name <- bindings.keySet) {
@@ -63,43 +64,13 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
       trace("COMPUTE", s"${binding.name}=${binding.expression}$sbindings", TraceEvent.BINDINGS)
     }
 
-    binding match {
-      case opt: OptionBinding =>
-        if (opt.value.isDefined) {
-          computedValue(opt.value.get)
-        } else {
-          computeValue()
-        }
-      case _ =>
-        computeValue()
-    }
+    computeValue()
   }
 
   private def computeValue(): Unit = {
     try {
       val expreval = runtime.runtime.expressionEvaluator.newInstance()
-      val answer = if (binding.static) {
-        runtime.getStatic(binding)
-      } else {
-        expreval.value(binding.expression, exprContext.toList, bindings.toMap, binding.options)
-      }
-
-      val msg = new BindingMessage(binding.name, answer)
-      monitor ! GOutput(binding, "result", msg)
-      monitor ! GClose(binding, "result")
-      monitor ! GFinished(binding)
-    } catch {
-      case t: Throwable =>
-        monitor ! GException(Some(binding), t)
-    }
-  }
-
-  private def computedValue(value: Any): Unit = {
-    // If a precomputed value is provided, it wins. Note that the caller is responsible
-    // for dealing with static vs. dynamic values in this case.
-    try {
-      val expreval = runtime.runtime.expressionEvaluator.newInstance()
-      val answer = expreval.precomputedValue(binding.expression, value, exprContext.toList, bindings.toMap, binding.options)
+      val answer = expreval.value(binding.expression, exprContext.toList, bindings.toMap, binding.params)
 
       val msg = new BindingMessage(binding.name, answer)
       monitor ! GOutput(binding, "result", msg)

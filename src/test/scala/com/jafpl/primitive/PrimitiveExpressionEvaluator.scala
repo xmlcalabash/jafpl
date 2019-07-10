@@ -1,6 +1,7 @@
 package com.jafpl.primitive
 
 import com.jafpl.exceptions.JafplException
+import com.jafpl.graph.BindingParams
 import com.jafpl.messages.{ItemMessage, Message, Metadata}
 import com.jafpl.runtime.{ExpressionEvaluator, RuntimeConfiguration}
 import org.slf4j.{Logger, LoggerFactory}
@@ -12,11 +13,11 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
     new PrimitiveExpressionEvaluator(config)
   }
 
-  override def value(expr: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Message = {
-    singletonValue(expr, context, bindings, options)
+  override def value(expr: Any, context: List[Message], bindings: Map[String,Message], params: Option[BindingParams]): Message = {
+    singletonValue(expr, context, bindings, params)
   }
 
-  override def singletonValue(expr: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Message = {
+  override def singletonValue(expr: Any, context: List[Message], bindings: Map[String,Message], params: Option[BindingParams]): Message = {
     if (context.size > 1) {
       throw JafplException.singletonContextExpected()
     }
@@ -82,7 +83,7 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
     }
   }
 
-  override def booleanValue(expr: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Boolean = {
+  override def booleanValue(expr: Any, context: List[Message], bindings: Map[String,Message], params: Option[BindingParams]): Boolean = {
     if (context.size > 1) {
       throw JafplException.singletonContextExpected()
     }
@@ -121,22 +122,6 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
         }
       case _ =>
         ! ( (strexpr == "") || (strexpr == "false") || (strexpr == "0") )
-    }
-  }
-
-  override def precomputedValue(expr: Any, value: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Message = {
-    if (context.size > 1) {
-      throw JafplException.singletonContextExpected()
-    }
-
-    value match {
-      case num: Integer =>
-        new ItemMessage(num, Metadata.NUMBER)
-      case str: String =>
-        new ItemMessage(str, Metadata.STRING)
-      case bool: Boolean =>
-        new ItemMessage(bool, Metadata.BOOLEAN)
-      case _ => throw JafplException.unexpectedValueObject(value.toString)
     }
   }
 }

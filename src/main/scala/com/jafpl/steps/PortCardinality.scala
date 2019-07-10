@@ -1,7 +1,5 @@
 package com.jafpl.steps
 
-import com.jafpl.exceptions.JafplException
-
 object PortCardinality {
   val UNBOUNDED = -1
   def ZERO_OR_MORE = new PortCardinality(0)

@@ -6,8 +6,13 @@ private[jafpl] class WhenStart(override val graph: Graph,
                                override protected val end: ContainerEnd,
                                override val userLabel: Option[String],
                                private val manspec: ManifoldSpecification,
-                               val testExpr: Any)
+                               val testExpr: Any,
+                               val params: Option[BindingParams])
   extends ContainerStart(graph, end, userLabel) {
+
+  def this(graph: Graph, end: ContainerEnd, userLabel: Option[String], manspec: ManifoldSpecification, testExpr: Any) {
+    this(graph, end, userLabel, manspec, testExpr, None)
+  }
 
   manifold = manspec
 

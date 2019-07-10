@@ -8,8 +8,10 @@ import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput, GStart}
 private[runtime] class CatchActor(private val monitor: ActorRef,
                                   override protected val runtime: GraphRuntime,
                                   override protected val node: ContainerStart) extends StartActor(monitor, runtime, node)  {
+  logEvent = TraceEvent.CATCH
+
   protected[runtime] def start(cause: Throwable): Unit = {
-    trace("START", s"$node $cause", TraceEvent.METHODS)
+    trace("START", s"$node $cause", logEvent)
 
     commonStart()
 

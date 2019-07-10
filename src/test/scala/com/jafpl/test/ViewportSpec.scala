@@ -82,4 +82,32 @@ class ViewportSpec extends FlatSpec {
 
     assert(bc.items.isEmpty)
   }
+
+  "A variable bindings " should " be passed to the viewport composer" in {
+    val graph    = Jafpl.newInstance().newGraph()
+    val bc = new BufferSink()
+
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
+
+    val bind     = pipeline.addVariable("fred", "some value")
+    val prod     = pipeline.addAtomic(new Producer(List("one two")), "prod")
+    val viewport = pipeline.addViewport(new StringComposer(), "viewport")
+    val uc       = viewport.addAtomic(new Uppercase(), "uc")
+    val consumer = pipeline.addAtomic(bc, "consumer")
+
+    graph.addBindingEdge(bind, viewport)
+
+    graph.addEdge(prod, "result", viewport, "source")
+    graph.addEdge(viewport, "current", uc, "source")
+    graph.addEdge(uc, "result", viewport, "result")
+    graph.addEdge(viewport, "result", pipeline, "result")
+    graph.addEdge(pipeline, "result", consumer, "source")
+
+    graph.close()
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.run()
+
+    assert(bc.items.size == 1)
+    assert(bc.items.head == "ONE TWO")
+  }
 }

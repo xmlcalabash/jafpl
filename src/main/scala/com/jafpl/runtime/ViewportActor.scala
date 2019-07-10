@@ -17,49 +17,57 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
 
   private val itemQueue = ListBuffer.empty[ViewportItem]
   private var running = false
-  private var sourceClosed = false
+  private var inputsClosed = false
   private var received = false
   private var index = 0
+  private var hasBindings = node.inputs.contains("#bindings")
+  private var bindingsClosed = !hasBindings
+  private var sourceClosed = false
+  private val bindings = mutable.HashMap.empty[String, Message]
+  private var sourceItem = Option.empty[ItemMessage]
+  logEvent = TraceEvent.VIEWPORT
 
   override protected def start(): Unit = {
-    trace("START", s"$node", TraceEvent.METHODS)
+    trace("START", s"$node", logEvent)
     commonStart()
     runIfReady()
   }
 
   override protected def reset(): Unit = {
-    trace("RESET", s"$node", TraceEvent.METHODS)
+    trace("RESET", s"$node", logEvent)
     super.reset()
     running = false
     readyToRun = true
+    bindings.clear()
+    sourceItem = None
     runIfReady()
   }
 
   override protected def input(from: Node, fromPort: String, port: String, msg: Message): Unit = {
-    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
+    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
     receive(port, msg)
   }
 
   override def receive(port: String, msg: Message): Unit = {
-    trace("RECEIVE", s"$node $port", TraceEvent.METHODS)
+    trace("RECEIVE", s"$node $port", logEvent)
 
     msg match {
-      case binding: BindingMessage => Unit
       case item: ItemMessage =>
-        if (port == "source") {
-          if (received) {
-            monitor ! GException(None,
-              JafplException.unexpectedSequence(node.toString, port, node.location))
-            return
-          }
-          received = true
-          for (item <- node.composer.decompose(item)) {
-            itemQueue += item
-          }
+        if (port != "source") {
+          monitor ! GException(None,
+            JafplException.unexpectedMessage(msg.toString, port, node.location))
+          return
         }
+        if (received) {
+          monitor ! GException(None,
+            JafplException.unexpectedSequence(node.toString, port, node.location))
+          return
+        }
+        received = true
+        sourceItem = Some(item)
+      case binding: BindingMessage =>
+        bindings.put(binding.name, binding.message)
       case _ =>
-        monitor ! GException(None,
-          JafplException.unexpectedMessage(msg.toString, port, node.location))
         return
     }
 
@@ -67,15 +75,28 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
   }
 
   override protected def close(port: String): Unit = {
-    trace("CLOSE", s"$node", TraceEvent.METHODS)
-    sourceClosed = true
+    trace("CLOSE", s"$node", logEvent)
+    if (port == "source") {
+      sourceClosed = true
+    } else {
+      bindingsClosed = true
+      node.composer.runtimeBindings(bindings.toMap)
+    }
+    if (sourceClosed && bindingsClosed) {
+      if (sourceItem.isDefined) {
+        for (item <- node.composer.decompose(sourceItem.get)) {
+          itemQueue += item
+        }
+      }
+      inputsClosed = true
+    }
     runIfReady()
   }
 
   private def runIfReady(): Unit = {
-    trace("RUNIFREADY", s"$node (running:$running ready:$readyToRun closed:$sourceClosed", TraceEvent.METHODS)
+    trace("RUNIFREADY", s"$node (running:$running ready:$readyToRun closed:$inputsClosed", logEvent)
 
-    if (!running && readyToRun && sourceClosed) {
+    if (!running && readyToRun && inputsClosed) {
       running = true
       if (itemQueue.nonEmpty) {
         val item = itemQueue(index)
@@ -112,21 +133,22 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def finished(): Unit = {
-    trace("FINISHED", s"$node source:$sourceClosed empty:${itemQueue.isEmpty}", TraceEvent.METHODS)
-    if (sourceClosed) {
+    trace("FINISHED", s"$node inputs:$inputsClosed empty:${itemQueue.isEmpty}", logEvent)
+    if (inputsClosed) {
       if (itemQueue.isEmpty) {
         monitor ! GClose(node, node.outputPort)
         monitor ! GFinished(node)
         commonFinished()
       } else {
         if (index >= itemQueue.size) {
-          trace("VFINISHED", s"$node source:$sourceClosed, index:$index size:${itemQueue.size}", TraceEvent.METHODS)
+          trace("VFINISHED", s"$node source:$inputsClosed, index:$index size:${itemQueue.size}", logEvent)
           // send the transformed result and close the output
           val recomposition = node.composer.recompose()
-          trace("VRECOMP", s"$node $recomposition", TraceEvent.METHODS)
+          trace("VRECOMP", s"$node $recomposition", logEvent)
           monitor ! GOutput(node, node.outputPort, recomposition)
           monitor ! GClose(node, node.outputPort)
           monitor ! GFinished(node)
+          index = 0
         } else {
           monitor ! GReset(node)
         }

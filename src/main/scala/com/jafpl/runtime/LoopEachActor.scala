@@ -17,9 +17,10 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
   private val queue = ListBuffer.empty[ItemMessage]
   private var running = false
   private var sourceClosed = false
+  logEvent = TraceEvent.LOOPEACH
 
   override protected def start(): Unit = {
-    trace("START", s"$node", TraceEvent.METHODS)
+    trace("START", s"$node", logEvent)
     running = false
     commonStart()
     runIfReady()
@@ -27,7 +28,7 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
 
   override protected def reset(): Unit = {
     super.reset()
-    trace("RESTART", s"$node", TraceEvent.METHODS)
+    trace("RESTART", s"$node", logEvent)
     running = false
     readyToRun = true
     sourceClosed = false
@@ -35,7 +36,7 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
   }
 
   protected[runtime] def restartLoop(): Unit = {
-    trace("RSTRTLOOP", s"$node", TraceEvent.METHODS)
+    trace("RSTRTLOOP", s"$node", logEvent)
     super.reset() // yes, reset
     running = false
     readyToRun = true
@@ -43,12 +44,12 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
   }
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
+    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
     receive(port, item)
   }
 
   override def receive(port: String, item: Message): Unit = {
-    trace("RECEIVE", s"$node $port", TraceEvent.METHODS)
+    trace("RECEIVE", s"$node $port", logEvent)
     item match {
       case message: ItemMessage =>
         queue += message
@@ -59,13 +60,13 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
   }
 
   override protected def close(port: String): Unit = {
-    trace("CLOSE", s"$node $port", TraceEvent.METHODS)
+    trace("CLOSE", s"$node $port", logEvent)
     sourceClosed = true
     runIfReady()
   }
 
   private def runIfReady(): Unit = {
-    trace("RUNIFREADY", s"$node ready:$readyToRun closed:$sourceClosed", TraceEvent.METHODS)
+    trace("RUNIFREADY", s"$node ready:$readyToRun closed:$sourceClosed", logEvent)
     if (!running && readyToRun && sourceClosed) {
       running = true
 
@@ -85,7 +86,7 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def finished(): Unit = {
-    trace("FINISHED", s"$node closed:$sourceClosed queue:${queue.isEmpty}", TraceEvent.METHODS)
+    trace("FINISHED", s"$node closed:$sourceClosed queue:${queue.isEmpty}", logEvent)
 
     if (sourceClosed && queue.isEmpty) {
       checkCardinalities("current")

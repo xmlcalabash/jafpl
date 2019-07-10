@@ -12,26 +12,27 @@ private[runtime] class SinkActor(private val monitor: ActorRef,
   extends NodeActor(monitor, runtime, node) with DataConsumer {
 
   var hasBeenReset = false
+  logEvent = TraceEvent.SINK
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
+    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
     receive(port, item)
   }
 
   override def receive(port: String, item: Message): Unit = {
-    trace("RECEIVE", s"$node $port (to /dev/null)", TraceEvent.METHODS)
+    trace("RECEIVE", s"$node $port (to /dev/null)", logEvent)
     // Oops, I dropped it on the floor
   }
 
   override protected def reset(): Unit = {
-    trace("RESET", s"$node", TraceEvent.METHODS)
+    trace("RESET", s"$node", logEvent)
     readyToRun = true
     hasBeenReset = true
     openInputs.clear()
   }
 
   override protected def run(): Unit = {
-    trace("RUN", s"$node", TraceEvent.METHODS)
+    trace("RUN", s"$node", logEvent)
     monitor ! GFinished(node)
   }
 

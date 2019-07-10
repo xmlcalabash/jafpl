@@ -12,21 +12,22 @@ private[runtime] class EmptySourceActor(private val monitor: ActorRef,
   extends NodeActor(monitor, runtime, node)  {
 
   var hasBeenReset = false
+  logEvent = TraceEvent.EMPTY
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    trace("INPUT", s"$node.$fromPort -> $port", TraceEvent.METHODS)
+    trace("INPUT", s"$node.$fromPort -> $port", logEvent)
     throw JafplException.inputOnEmptySource(from.toString, fromPort, port, item.toString, node.location)
   }
 
   override protected def reset(): Unit = {
-    trace("RESET", s"$node", TraceEvent.METHODS)
+    trace("RESET", s"$node", logEvent)
     readyToRun = true
     hasBeenReset = true
     openInputs.clear()
   }
 
   override protected def run(): Unit = {
-    trace("RUN", s"$node", TraceEvent.METHODS)
+    trace("RUN", s"$node", logEvent)
     monitor ! GClose(node, "result")
     monitor ! GFinished(node)
   }

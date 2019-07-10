@@ -85,6 +85,7 @@ class BindingSpec extends FlatSpec {
     assert(bc.items.head == "twelve")
   }
 
+  /*
   "An option binding " should " be consumable" in {
     val graph    = Jafpl.newInstance().newGraph()
 
@@ -110,7 +111,9 @@ class BindingSpec extends FlatSpec {
     assert(bc.items.size == 1)
     assert(bc.items.head == "Spoon!")
   }
+  */
 
+  /*
   "A static option binding " should " be consumable" in {
     val graph    = Jafpl.newInstance().newGraph()
 
@@ -166,7 +169,9 @@ class BindingSpec extends FlatSpec {
         assert(true)
     }
   }
+   */
 
+  /*
   "Reading an external variable binding twice " should " work" in {
     val graph    = Jafpl.newInstance().newGraph()
 
@@ -199,4 +204,6 @@ class BindingSpec extends FlatSpec {
     assert(bc.items.size == 1)
     assert(bc.items.head == 2)
   }
+
+   */
 }

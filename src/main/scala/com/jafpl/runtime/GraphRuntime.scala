@@ -109,32 +109,6 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
     */
   def outputs: Map[String, DataConsumerProxy] = Map() ++ _graphOutputs
 
-  /** Set the value of an option.
-    *
-    * @param option The option name
-    * @param value The value
-    */
-  def setOption(option: String, value: Any): Unit = {
-    val binding = _graphOptions.get(option)
-    if (binding.isDefined) {
-      binding.get.value = value
-    } else {
-      throw JafplException.setUnknownOption(option)
-    }
-  }
-
-  def getStatic(binding: Binding): Message = {
-    if (_statics.contains(binding)) {
-      _statics(binding)
-    } else {
-      throw JafplException.undefinedStatic(binding.name, binding.location)
-    }
-  }
-
-  def setStatic(binding: Binding, message: Message): Unit = {
-    _statics.put(binding, message)
-  }
-
   protected[runtime] def finish(): Unit = {
     _finished = true
   }
@@ -168,12 +142,6 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
     * To determine if execution has completed, check the `finished` value.
     */
   def runInBackground(): Unit = {
-    for (binding <- graph.statics) {
-      if (!_statics.contains(binding)) {
-        throw JafplException.undefinedStatic(binding.name, binding.location)
-      }
-    }
-
     _monitor ! GRun()
     _started = true
   }

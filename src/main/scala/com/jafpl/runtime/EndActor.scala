@@ -14,15 +14,16 @@ private[runtime] class EndActor(private val monitor: ActorRef,
                                 override protected val node: ContainerEnd) extends NodeActor(monitor, runtime, node)  {
   protected val unfinishedChildren = mutable.HashSet.empty[Node]
   protected var finished = false
+  logEvent = TraceEvent.END
 
   override protected def initialize(): Unit = {
-    trace("INIT", s"$node", TraceEvent.METHODS)
+    trace("INIT", s"$node", logEvent)
     super.initialize()
     reset()
   }
 
   override protected def reset(): Unit = {
-    trace("RESET", s"$node", TraceEvent.METHODS)
+    trace("RESET", s"$node", logEvent)
     unfinishedChildren.clear()
     for (child <- node.start.get.children) {
       unfinishedChildren.add(child)
@@ -32,7 +33,7 @@ private[runtime] class EndActor(private val monitor: ActorRef,
   }
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    trace("INPUT", s"$node.$fromPort -> $port", TraceEvent.METHODS)
+    trace("INPUT", s"$node.$fromPort -> $port", logEvent)
 
     // Container ends are special, they copy input they receive on "X" to the
     // output named "X" on the container start.
@@ -42,7 +43,7 @@ private[runtime] class EndActor(private val monitor: ActorRef,
   }
 
   override protected def close(port: String): Unit = {
-    trace("CLOSE", s"$node.$port", TraceEvent.METHODS)
+    trace("CLOSE", s"$node.$port", logEvent)
     try {
       // Are we closing an input or an output?
       val manifold = node.start.get.manifold
@@ -66,20 +67,20 @@ private[runtime] class EndActor(private val monitor: ActorRef,
   }
 
   override protected def run(): Unit = {
-    trace("RUN", s"$node", TraceEvent.METHODS)
+    trace("RUN", s"$node", logEvent)
     log.error(s"run() called on $node", "StepExec")
   }
 
   protected[runtime] def finished(otherNode: Node): Unit = {
-    trace("FINISHED", s"$node $otherNode", TraceEvent.METHODS)
+    trace("FINISHED", s"$node $otherNode", logEvent)
     unfinishedChildren -= otherNode
     checkFinished()
   }
 
   protected[runtime] def checkFinished(): Unit = {
-    trace("CHKFINISH", s"${node.start.get}/end ready:$readyToRun inputs:${openInputs.isEmpty} children:${unfinishedChildren.isEmpty} ${!finished}", "StepFinished", TraceEvent.METHODS)
+    trace("CHKFINISH", s"${node.start.get}/end ready:$readyToRun inputs:${openInputs.isEmpty} children:${unfinishedChildren.isEmpty} ${!finished}", "StepFinished", logEvent)
     for (child <- unfinishedChildren) {
-      trace(s"...UNFINSH", s"$child", TraceEvent.METHODS)
+      trace(s"...UNFINSH", s"$child", logEvent)
     }
     if (readyToRun && !finished) {
       if (openInputs.isEmpty && unfinishedChildren.isEmpty) {

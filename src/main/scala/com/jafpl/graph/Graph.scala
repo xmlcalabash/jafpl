@@ -43,8 +43,6 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   private var _dumpGraphTransitions = false
   private var _dumpCount = 0
 
-  protected[jafpl] val statics = mutable.HashSet.empty[Binding]
-
   protected[graph] def error(cause: Throwable): Unit = {
     if (exception.isEmpty) {
       exception = Some(cause)
@@ -153,57 +151,25 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     * @return The binding
     */
   def addOption(name: String, expression: Any): OptionBinding = {
-    addOption(name, expression, None, false)
+    addOption(name, expression, None)
   }
 
   /**
     * FIXME: WRITE THIS
     * @param name The option name
     * @param expression The default initializer for the option
-    * @param options Any implementation-specific options you want to pass
     * @return The binding
     */
-  def addOption(name: String, expression: Any, options: Option[Any]): OptionBinding = {
-    addOption(name, expression, options, false)
+  def addOption(name: String, expression: Any, params: BindingParams): OptionBinding = {
+    addOption(name, expression, Some(params))
   }
 
-  /**
-    * FIXME: WRITE THIS
-    * @param name The option name
-    * @return The binding
-    */
-  def addStaticOption(name: String): OptionBinding = {
-    addOption(name, None, None, true)
-  }
-
-  /**
-    * FIXME: WRITE THIS
-    * @param name The option name
-    * @param options Any implementation-specific options you want to pass
-    * @return The binding
-    */
-  def addStaticOption(name: String, options: Option[Any]): OptionBinding = {
-    addOption(name, None, options, true)
-  }
-
-  /**
-    * FIXME: WRITE THIS
-    * @param name The option name
-    * @param expression The default initializer for the option
-    * @param options Any implementation specific options you want to pass
-    * @param static The option is statically computed before the graph runs
-    * @return The binding
-    */
-  private def addOption(name: String, expression: Any, options: Option[Any], static: Boolean): OptionBinding = {
+  def addOption(name: String, expression: Any, params: Option[BindingParams]): OptionBinding = {
     checkOpen()
     logger.debug("addOption {} {}", name, expression)
 
-    val binding = new OptionBinding(this, name, expression, static, options)
+    val binding = new OptionBinding(this, name, expression, params)
     _nodes += binding
-
-    if (static) {
-      statics += binding
-    }
 
     binding
   }
@@ -497,22 +463,20 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     node
   }
 
-  protected[graph] def addVariable(name: String, expression: Any, options: Option[Any]): Binding = {
+  protected[graph] def addVariable(name: String, expression: Any): Binding = {
+    addVariable(name, expression, None)
+  }
+
+  protected[graph] def addVariable(name: String, expression: Any, params: BindingParams): Binding = {
+    addVariable(name, expression, Some(params))
+  }
+
+  private def addVariable(name: String, expression: Any, params: Option[BindingParams]): Binding = {
     checkOpen()
 
     logger.debug(s"addVariable $name, $expression")
 
-    val binding = new Binding(this, name, expression, false, options)
-    _nodes += binding
-    binding
-  }
-
-  protected[graph] def addStaticVariable(name: String, options: Option[Any]): Binding = {
-    checkOpen()
-
-    logger.debug(s"addStaticVariable $name")
-
-    val binding = new Binding(this, name, None,true, options)
+    val binding = new Binding(this, name, expression, params)
     _nodes += binding
     binding
   }
@@ -549,10 +513,6 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
   def addPriorityEdge(from: Node, fromName: String, to: Node, toName: String): Unit = {
     addEdge(from, fromName, to, toName, JoinMode.PRIORITY)
-  }
-
-  def addGatedEdge(from: Node, fromName: String, to: Node, toName: String): Unit = {
-    addEdge(from, fromName, to, toName, JoinMode.GATED)
   }
 
   private def addEdge(from: Node, fromName: String, to: Node, toName: String, mode: JoinMode): Unit = {
@@ -885,12 +845,20 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
           // Work out what container should contain the splitter
           var container = Option.empty[ContainerStart]
           node match {
-            case start: ContainerStart =>
-              var input = false
-              for (iport <- start.inputs) {
-                input = input || (iport == port)
+            case start: LoopStart =>
+              if (start.inputs.contains(port) || (port == "current")) {
+                container = Some(start)
               }
-              if (input) {
+            case start: CatchStart =>
+              if (start.inputs.contains(port) || (port == "errors")) {
+                container = Some(start)
+              }
+            case start: FinallyStart =>
+              if (start.inputs.contains(port) || (port == "errors")) {
+                container = Some(start)
+              }
+            case start: ContainerStart =>
+              if (start.inputs.contains(port)) {
                 container = Some(start)
               }
             case _ => Unit
@@ -947,8 +915,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
             val skipLoopSource = start.isInstanceOf[LoopStart] && (port == "source")
             val skipWhenCondition = start.isInstanceOf[WhenStart] && (port == "condition")
             val skipWhenBindings = start.isInstanceOf[WhenStart] && (port == "#bindings")
+            val skipViewportBindings = start.isInstanceOf[ViewportStart] && (port == "#bindings")
             val edges = edgesFrom(node, port)
-            if (edges.isEmpty && !skipLoopSource && !skipWhenCondition && ! skipWhenBindings) {
+            if (edges.isEmpty && !skipLoopSource && !skipWhenCondition && ! skipWhenBindings && !skipViewportBindings) {
               logger.debug(s"Input $port on $start unread, adding sink")
               val sink = start.addSink()
               addEdge(node, port, sink, "source")

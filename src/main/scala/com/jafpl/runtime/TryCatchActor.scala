@@ -12,9 +12,10 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
   var tryblock: Option[TryStart] = None
   var finblock: Option[FinallyStart] = None
   var cause = Option.empty[Throwable]
+  logEvent = TraceEvent.TRY
 
   override protected def start(): Unit = {
-    trace("START", s"$node", TraceEvent.METHODS)
+    trace("START", s"$node", logEvent)
     commonStart()
     runningTryBlock = true
 
@@ -35,12 +36,12 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
   }
 
   def runFinally(): Unit = {
-    trace("RUNFINAL", s"$node", TraceEvent.METHODS)
+    trace("RUNFINAL", s"$node", logEvent)
     monitor ! GRunFinally(finblock.get, cause)
   }
 
   def exception(cause: Throwable): Unit = {
-    trace("EXCEPTION", s"$node $cause", TraceEvent.METHODS)
+    trace("EXCEPTION", s"$node $cause", logEvent)
     this.cause = Some(cause)
 
     if (runningTryBlock) {
@@ -94,7 +95,7 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
   }
 
   private def stopUnselectedBranch(node: Node): Unit = {
-    trace("KILLBRANCH", s"${this.node} $node", TraceEvent.METHODS)
+    trace("KILLBRANCH", s"${this.node} $node", logEvent)
     monitor ! GAbort(node)
     for (output <- node.outputs) {
       monitor ! GClose(node, output)
@@ -102,7 +103,7 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def finished(): Unit = {
-    trace("FINISHED", s"$node finished successfully", TraceEvent.METHODS)
+    trace("FINISHED", s"$node finished successfully", logEvent)
     if (runningTryBlock) {
       // Yay, we succeeded, stop all the catch blocks
       for (child <- node.children) {

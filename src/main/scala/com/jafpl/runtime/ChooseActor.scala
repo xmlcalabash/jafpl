@@ -12,9 +12,10 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
   var chosen = Option.empty[Node]
   val guards = mutable.HashMap.empty[Node, Option[Boolean]]
   val stopped = mutable.HashMap.empty[Node, Option[Boolean]]
+  logEvent = TraceEvent.CHOOSE
 
   override protected def start(): Unit = {
-    trace("START", s"$node", TraceEvent.METHODS)
+    trace("START", s"$node", logEvent)
 
     commonStart()
 
@@ -35,7 +36,7 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
   }
 
   protected[runtime] def guardResult(when: Node, pass: Boolean): Unit = {
-    trace("GUARDRES", s"$node $when: $pass", TraceEvent.METHODS)
+    trace("GUARDRES", s"$node $when: $pass", logEvent)
 
     guards.put(when, Some(pass))
 
@@ -109,7 +110,7 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
   }
 
   private def stopUnselectedBranch(node: Node): Unit = {
-    trace("KILLBRANCH", s"${this.node} $node", TraceEvent.METHODS)
+    trace("KILLBRANCH", s"${this.node} $node", logEvent)
     monitor ! GAbort(node)
     for (output <- node.outputs) {
       monitor ! GClose(node, output)

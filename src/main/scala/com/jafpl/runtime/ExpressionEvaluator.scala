@@ -1,5 +1,6 @@
 package com.jafpl.runtime
 
+import com.jafpl.graph.BindingParams
 import com.jafpl.messages.Message
 
 /** Evaluate expressions (for variable bindings and the alternatives in a choose).
@@ -30,10 +31,9 @@ trait ExpressionEvaluator {
     * @param expr The expression to evaluate.
     * @param context The expression context.
     * @param bindings Any variable bindings that are provided for the expression.
-    * @param options Any additional options that should be considered by the evaluator
     * @return The computed value of the expression.
     */
-  def value(expr: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Message
+  def value(expr: Any, context: List[Message], bindings: Map[String,Message], params: Option[BindingParams]): Message
 
   /** Evaluate an expression that is expected to return a single value.
     *
@@ -43,10 +43,9 @@ trait ExpressionEvaluator {
     * @param expr The expression to evaluate.
     * @param context The expression context.
     * @param bindings Any variable bindings that are provided for the expression.
-    * @param options Any additional options that should be considered by the evaluator
     * @return The computed value of the expression.
     */
-  def singletonValue(expr: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Message
+  def singletonValue(expr: Any, context: List[Message], bindings: Map[String,Message], params: Option[BindingParams]): Message
 
   /**
     * Evaluate an expression and cast the result to a boolean.
@@ -54,11 +53,7 @@ trait ExpressionEvaluator {
     * @param expr The expression to evaluate.
     * @param context The expression context.
     * @param bindings Any variable bindings that are provided for the expression.
-    * @param options Any additional options that should be considered by the evaluator
     * @return The boolean value of the computed expression.
     */
-  def booleanValue(expr: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Boolean
-
-  def precomputedValue(expr: Any, value: Any, context: List[Message], bindings: Map[String,Message], options: Option[Any]): Message
-
+  def booleanValue(expr: Any, context: List[Message], bindings: Map[String,Message], params: Option[BindingParams]): Boolean
 }

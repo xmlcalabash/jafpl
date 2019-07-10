@@ -15,8 +15,8 @@ class DefaultTraceEventManager() extends TraceEventManager {
 
   private val prop = Option(System.getProperty("com.xmlcalabash.trace"))
   if (prop.isDefined) {
-    for (trace <- prop.get.split(",").map(_.trim)) {
-      var event = trace
+    for (trace <- prop.get.split(",")) {
+      var event = trace.trim()
       var enable = true
 
       if (trace.startsWith("-")) {
@@ -37,17 +37,18 @@ class DefaultTraceEventManager() extends TraceEventManager {
   }
 
   override def enableTrace(event: String): Unit = {
-    enabledTraces += event
-    disabledTraces -= event
+    enabledTraces += event.toLowerCase()
+    disabledTraces -= event.toLowerCase()
   }
 
   override def disableTrace(event: String): Unit = {
-    disabledTraces += event
-    enabledTraces -= event
+    disabledTraces += event.toLowerCase()
+    enabledTraces -= event.toLowerCase()
   }
 
   override def traceEnabled(event: String): Boolean = {
-    enabledTraces.contains(event) || (enabledTraces.contains(DefaultTraceEventManager.ALL) && !disabledTraces.contains(event))
+    val lcevent = event.toLowerCase()
+    enabledTraces.contains(lcevent) || (enabledTraces.contains(DefaultTraceEventManager.ALL) && !disabledTraces.contains(lcevent))
   }
 
   override def trace(message: String, event: String): Unit = {

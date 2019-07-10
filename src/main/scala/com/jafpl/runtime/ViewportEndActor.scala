@@ -11,15 +11,16 @@ private[runtime] class ViewportEndActor(private val monitor: ActorRef,
                                         override protected val runtime: GraphRuntime,
                                         override protected val node: ContainerEnd) extends EndActor(monitor, runtime, node)  {
   private val buffer = ListBuffer.empty[ItemMessage]
+  logEvent = TraceEvent.VIEWPORTEND
 
   override protected def reset(): Unit = {
-    trace("RESET", "$node", TraceEvent.METHODS)
+    trace("RESET", "$node", logEvent)
     super.reset()
     buffer.clear()
   }
 
   override protected def input(from: Node, fromPort: String, port: String, msg: Message): Unit = {
-    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
+    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
     msg match {
       case item: ItemMessage =>
         buffer += item
@@ -28,16 +29,16 @@ private[runtime] class ViewportEndActor(private val monitor: ActorRef,
   }
 
   override protected def close(port: String): Unit = {
-    trace("CLOSE", s"$node $port", TraceEvent.METHODS)
+    trace("CLOSE", s"$node $port", logEvent)
     openInputs -= port
     checkFinished()
     // Don't actually close the port...we're not done yet
   }
 
   override protected[runtime] def checkFinished(): Unit = {
-    trace("CHKFINISH", s"${node.start.get}/end ready:$readyToRun inputs:${openInputs.isEmpty} children:${unfinishedChildren.isEmpty}", TraceEvent.METHODS)
+    trace("CHKFINISH", s"${node.start.get}/end ready:$readyToRun inputs:${openInputs.isEmpty} children:${unfinishedChildren.isEmpty}", logEvent)
     for (child <- unfinishedChildren) {
-      trace(s"...UNFINIH", s"$child", TraceEvent.METHODS)
+      trace(s"...UNFINIH", s"$child", logEvent)
     }
     if (readyToRun) {
       if (openInputs.isEmpty && unfinishedChildren.isEmpty) {

@@ -12,15 +12,16 @@ private[runtime] class ConditionalEndActor(private val monitor: ActorRef,
                                            override protected val runtime: GraphRuntime,
                                            override protected val node: ContainerEnd) extends EndActor(monitor, runtime, node)  {
   val buffer = mutable.HashMap.empty[String, ListBuffer[Message]]
+  logEvent = TraceEvent.CHOOSE
 
   override protected def reset(): Unit = {
-    trace("RESET", s"$node", TraceEvent.METHODS)
+    trace("RESET", s"$node", logEvent)
     super.reset()
     buffer.clear()
   }
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    trace("INPUT", s"$from.$fromPort -> $port", TraceEvent.METHODS)
+    trace("INPUT", s"$from.$fromPort -> $port", logEvent)
 
     // Buffer everything in case it all goes bang
     if (!buffer.contains(port)) {
@@ -30,15 +31,15 @@ private[runtime] class ConditionalEndActor(private val monitor: ActorRef,
   }
 
   override protected def close(port: String): Unit = {
-    trace("CLOSE", s"$node", TraceEvent.METHODS)
+    trace("CLOSE", s"$node", logEvent)
     openInputs -= port
     checkFinished()
   }
 
   override protected[runtime] def checkFinished(): Unit = {
-    trace("CHKFINISH", s"${node.start.get}/end ready:$readyToRun inputs:${openInputs.isEmpty} children:${unfinishedChildren.isEmpty}", TraceEvent.METHODS)
+    trace("CHKFINISH", s"${node.start.get}/end ready:$readyToRun inputs:${openInputs.isEmpty} children:${unfinishedChildren.isEmpty}", logEvent)
     for (child <- unfinishedChildren) {
-      trace(s"...UNFINSH", s"$child", TraceEvent.METHODS)
+      trace(s"...UNFINSH", s"$child", logEvent)
     }
     if (readyToRun) {
       if (openInputs.isEmpty && unfinishedChildren.isEmpty) {

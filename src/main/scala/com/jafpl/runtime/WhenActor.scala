@@ -18,14 +18,15 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
   private var readyToCheck = false
   private var contextItem = ListBuffer.empty[Message]
   private val bindings = mutable.HashMap.empty[String, Message]
+  logEvent = TraceEvent.WHEN
 
   override protected def input(from: Node, fromPort: String, port: String, msg: Message): Unit = {
-    trace("INPUT", s"$node $from.$fromPort to $port", TraceEvent.METHODS)
+    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
     receive(port, msg)
   }
 
   override def receive(port: String, item: Message): Unit = {
-    trace("RECEIVE", s"$node $port", TraceEvent.METHODS)
+    trace("RECEIVE", s"$node $port", logEvent)
     item match {
       case item: ItemMessage =>
         assert(port == "condition")
@@ -41,13 +42,13 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
   }
 
   override protected def close(port: String): Unit = {
-    trace("CLOSE", s"$node $port", TraceEvent.METHODS)
+    trace("CLOSE", s"$node $port", logEvent)
     super.close(port)
     checkIfReady()
   }
 
   override protected def start(): Unit = {
-    trace("START", s"$node", TraceEvent.METHODS)
+    trace("START", s"$node", logEvent)
     commonStart()
     for (child <- node.children) {
       monitor ! GStart(child)
@@ -55,17 +56,17 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
   }
 
   protected[runtime] def checkGuard(): Unit = {
-    trace("CHKGUARD", s"$node", TraceEvent.METHODS)
+    trace("CHKGUARD", s"$node", logEvent)
     readyToCheck = true
     checkIfReady()
   }
 
   private def checkIfReady(): Unit = {
-    trace("CHKREADY", s"$node checkIfReady: ready:$readyToCheck inputs:${openInputs.isEmpty}", TraceEvent.METHODS)
+    trace("CHKREADY", s"$node checkIfReady: ready:$readyToCheck inputs:${openInputs.isEmpty}", logEvent)
     if (readyToCheck && openInputs.isEmpty) {
       try {
         val eval = runtime.runtime.expressionEvaluator.newInstance()
-        val pass = eval.booleanValue(node.testExpr, contextItem.toList, bindings.toMap, None)
+        val pass = eval.booleanValue(node.testExpr, contextItem.toList, bindings.toMap, node.params)
         monitor ! GGuardResult(node, pass)
       } catch {
         case ex: Exception =>
