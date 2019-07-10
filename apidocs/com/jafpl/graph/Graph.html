@@ -147,6 +147,12 @@ methods on those objects.</p></div><dl class="attributes block"> <dt>Definition 
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
+                        <a class="class" href="BindingParams.html" title=""></a>
+                        <a href="BindingParams.html" title="">
+                          BindingParams
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
                         <a class="class" href="CatchStart.html" title="The catch block of a try catch."></a>
                         <a href="CatchStart.html" title="The catch block of a try catch.">
                           CatchStart
@@ -576,22 +582,6 @@ the inner steps must provide outputs through their container.
       
       <p class="shortcomment cmt">Adds a for-each to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a for-each to the graph.
 </p></div><dl class="paramcmts block"><dt class="param">label</dt><dd class="cmt"><p>An optional, user-defined label.</p></dd><dt>returns</dt><dd class="cmt"><p>The constructed for-each.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
-    </li><li name="com.jafpl.graph.Graph#addGatedEdge" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="addGatedEdge(from:com.jafpl.graph.Node,fromName:String,to:com.jafpl.graph.Node,toName:String):Unit"></a><a id="addGatedEdge(Node,String,Node,String):Unit"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addGatedEdge(from:com.jafpl.graph.Node,fromName:String,to:com.jafpl.graph.Node,toName:String):Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">addGatedEdge</span><span class="params">(<span name="from">from: <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></span>, <span name="fromName">fromName: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="to">to: <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></span>, <span name="toName">toName: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      
     </li><li name="com.jafpl.graph.Graph#addGroup" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="addGroup(label:Option[String],manifold:com.jafpl.steps.ManifoldSpecification):com.jafpl.graph.ContainerStart"></a><a id="addGroup(Option[String],ManifoldSpecification):ContainerStart"></a>
       <span class="permalink">
@@ -659,10 +649,10 @@ ports into which data can be poured before the pipeline is run.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
-    </li><li name="com.jafpl.graph.Graph#addOption" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addOption(name:String,expression:Any,options:Option[Any]):com.jafpl.graph.OptionBinding"></a><a id="addOption(String,Any,Option[Any]):OptionBinding"></a>
+    </li><li name="com.jafpl.graph.Graph#addOption" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="addOption(name:String,expression:Any,params:Option[com.jafpl.graph.BindingParams]):com.jafpl.graph.OptionBinding"></a><a id="addOption(String,Any,Option[BindingParams]):OptionBinding"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addOption(name:String,expression:Any,options:Option[Any]):com.jafpl.graph.OptionBinding" title="Permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addOption(name:String,expression:Any,params:Option[com.jafpl.graph.BindingParams]):com.jafpl.graph.OptionBinding" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -671,10 +661,26 @@ ports into which data can be poured before the pipeline is run.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addOption</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Any">Any</span></span>, <span name="options">options: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <a href="OptionBinding.html" class="extype" name="com.jafpl.graph.OptionBinding">OptionBinding</a></span>
+        <span class="name">addOption</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Any">Any</span></span>, <span name="params">params: <span class="extype" name="scala.Option">Option</span>[<a href="BindingParams.html" class="extype" name="com.jafpl.graph.BindingParams">BindingParams</a>]</span>)</span><span class="result">: <a href="OptionBinding.html" class="extype" name="com.jafpl.graph.OptionBinding">OptionBinding</a></span>
       </span>
       
-      <p class="shortcomment cmt">FIXME: WRITE THIS</p><div class="fullcomment"><div class="comment cmt"><p>FIXME: WRITE THIS</p></div><dl class="paramcmts block"><dt class="param">name</dt><dd class="cmt"><p>The option name</p></dd><dt class="param">expression</dt><dd class="cmt"><p>The default initializer for the option</p></dd><dt class="param">options</dt><dd class="cmt"><p>Any implementation-specific options you want to pass</p></dd><dt>returns</dt><dd class="cmt"><p>The binding</p></dd></dl></div>
+      
+    </li><li name="com.jafpl.graph.Graph#addOption" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="addOption(name:String,expression:Any,params:com.jafpl.graph.BindingParams):com.jafpl.graph.OptionBinding"></a><a id="addOption(String,Any,BindingParams):OptionBinding"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addOption(name:String,expression:Any,params:com.jafpl.graph.BindingParams):com.jafpl.graph.OptionBinding" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addOption</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Any">Any</span></span>, <span name="params">params: <a href="BindingParams.html" class="extype" name="com.jafpl.graph.BindingParams">BindingParams</a></span>)</span><span class="result">: <a href="OptionBinding.html" class="extype" name="com.jafpl.graph.OptionBinding">OptionBinding</a></span>
+      </span>
+      
+      <p class="shortcomment cmt">FIXME: WRITE THIS</p><div class="fullcomment"><div class="comment cmt"><p>FIXME: WRITE THIS</p></div><dl class="paramcmts block"><dt class="param">name</dt><dd class="cmt"><p>The option name</p></dd><dt class="param">expression</dt><dd class="cmt"><p>The default initializer for the option</p></dd><dt>returns</dt><dd class="cmt"><p>The binding</p></dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addOption" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="addOption(name:String,expression:Any):com.jafpl.graph.OptionBinding"></a><a id="addOption(String,Any):OptionBinding"></a>
       <span class="permalink">
@@ -823,54 +829,6 @@ ports into which data can be poured before the pipeline is run.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
-    </li><li name="com.jafpl.graph.Graph#addStaticOption" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addStaticOption(name:String,options:Option[Any]):com.jafpl.graph.OptionBinding"></a><a id="addStaticOption(String,Option[Any]):OptionBinding"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addStaticOption(name:String,options:Option[Any]):com.jafpl.graph.OptionBinding" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">addStaticOption</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="options">options: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <a href="OptionBinding.html" class="extype" name="com.jafpl.graph.OptionBinding">OptionBinding</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">FIXME: WRITE THIS</p><div class="fullcomment"><div class="comment cmt"><p>FIXME: WRITE THIS</p></div><dl class="paramcmts block"><dt class="param">name</dt><dd class="cmt"><p>The option name</p></dd><dt class="param">options</dt><dd class="cmt"><p>Any implementation-specific options you want to pass</p></dd><dt>returns</dt><dd class="cmt"><p>The binding</p></dd></dl></div>
-    </li><li name="com.jafpl.graph.Graph#addStaticOption" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addStaticOption(name:String):com.jafpl.graph.OptionBinding"></a><a id="addStaticOption(String):OptionBinding"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addStaticOption(name:String):com.jafpl.graph.OptionBinding" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">addStaticOption</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <a href="OptionBinding.html" class="extype" name="com.jafpl.graph.OptionBinding">OptionBinding</a></span>
-      </span>
-      
-      <p class="shortcomment cmt">FIXME: WRITE THIS</p><div class="fullcomment"><div class="comment cmt"><p>FIXME: WRITE THIS</p></div><dl class="paramcmts block"><dt class="param">name</dt><dd class="cmt"><p>The option name</p></dd><dt>returns</dt><dd class="cmt"><p>The binding</p></dd></dl></div>
-    </li><li name="com.jafpl.graph.Graph#addStaticVariable" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addStaticVariable(name:String,options:Option[Any]):com.jafpl.graph.Binding"></a><a id="addStaticVariable(String,Option[Any]):Binding"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addStaticVariable(name:String,options:Option[Any]):com.jafpl.graph.Binding" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">addStaticVariable</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="options">options: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <a href="Binding.html" class="extype" name="com.jafpl.graph.Binding">Binding</a></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addTry" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="addTry(label:Option[String]):com.jafpl.graph.TryStart"></a><a id="addTry(Option[String]):TryStart"></a>
       <span class="permalink">
@@ -922,9 +880,9 @@ ports into which data can be poured before the pipeline is run.
       <p class="shortcomment cmt">Adds an until to the graph.</p><div class="fullcomment"><div class="comment cmt"><p>Adds an until to the graph.
 </p></div><dl class="paramcmts block"><dt class="param">comparator</dt><dd class="cmt"><p>The comparator.</p></dd><dt class="param">label</dt><dd class="cmt"><p>An optional, user-defined label.</p></dd><dt>returns</dt><dd class="cmt"><p>The constructed for-each.</p></dd></dl><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
     </li><li name="com.jafpl.graph.Graph#addVariable" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="addVariable(name:String,expression:Any,options:Option[Any]):com.jafpl.graph.Binding"></a><a id="addVariable(String,Any,Option[Any]):Binding"></a>
+      <a id="addVariable(name:String,expression:Any,params:com.jafpl.graph.BindingParams):com.jafpl.graph.Binding"></a><a id="addVariable(String,Any,BindingParams):Binding"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#addVariable(name:String,expression:Any,options:Option[Any]):com.jafpl.graph.Binding" title="Permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addVariable(name:String,expression:Any,params:com.jafpl.graph.BindingParams):com.jafpl.graph.Binding" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -933,7 +891,23 @@ ports into which data can be poured before the pipeline is run.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">addVariable</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Any">Any</span></span>, <span name="options">options: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Any">Any</span>]</span>)</span><span class="result">: <a href="Binding.html" class="extype" name="com.jafpl.graph.Binding">Binding</a></span>
+        <span class="name">addVariable</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Any">Any</span></span>, <span name="params">params: <a href="BindingParams.html" class="extype" name="com.jafpl.graph.BindingParams">BindingParams</a></span>)</span><span class="result">: <a href="Binding.html" class="extype" name="com.jafpl.graph.Binding">Binding</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
+    </li><li name="com.jafpl.graph.Graph#addVariable" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="addVariable(name:String,expression:Any):com.jafpl.graph.Binding"></a><a id="addVariable(String,Any):Binding"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/Graph.html#addVariable(name:String,expression:Any):com.jafpl.graph.Binding" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">addVariable</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="expression">expression: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <a href="Binding.html" class="extype" name="com.jafpl.graph.Binding">Binding</a></span>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd></dl></div>
@@ -1438,22 +1412,6 @@ if there is one.)</p><p>* After a graph is closed, no changes can be made to it.
       </span>
       <span class="symbol">
         <span class="name">outboundPorts</span><span class="params">(<span name="node">node: <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></span>)</span><span class="result">: <span class="extype" name="scala.Predef.Set">Set</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../index.html" class="extype" name="com.jafpl">com.jafpl</a>] </dd></dl></div>
-    </li><li name="com.jafpl.graph.Graph#statics" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="statics:scala.collection.mutable.HashSet[com.jafpl.graph.Binding]"></a><a id="statics:HashSet[Binding]"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/graph/Graph.html#statics:scala.collection.mutable.HashSet[com.jafpl.graph.Binding]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">statics</span><span class="result">: <span class="extype" name="scala.collection.mutable.HashSet">HashSet</span>[<a href="Binding.html" class="extype" name="com.jafpl.graph.Binding">Binding</a>]</span>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../index.html" class="extype" name="com.jafpl">com.jafpl</a>] </dd></dl></div>
