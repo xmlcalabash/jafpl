@@ -20,11 +20,11 @@ private[runtime] class FinallyActor(private val monitor: ActorRef,
 
     // If there's anyone reading from the errors port, send them the exception
     for (output <- node.outputs) {
-      if (output == "errors") {
+      if (output == "error") {
         if (cause.isDefined) {
-          monitor ! GOutput(node, "errors", new ExceptionMessage(cause.get))
+          monitor ! GOutput(node, "error", new ExceptionMessage(cause.get))
         }
-        monitor ! GClose(node, "errors")
+        monitor ! GClose(node, "error")
       }
     }
 

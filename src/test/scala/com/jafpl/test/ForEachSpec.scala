@@ -3,7 +3,7 @@ package com.jafpl.test
 import com.jafpl.config.Jafpl
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, Count, Identity, Manifold, Producer, Sink}
+import com.jafpl.steps.{BufferSink, Count, Identity, Manifold, ProduceBinding, Producer, Sink}
 import org.scalatest.FlatSpec
 
 class ForEachSpec extends FlatSpec {
@@ -96,6 +96,37 @@ class ForEachSpec extends FlatSpec {
     }
   }
 
+  "Varibles that cross a for-each " should " be buffered" in {
+    val graph    = Jafpl.newInstance().newGraph()
+
+    val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
+
+    val bind     = pipeline.addVariable("fred", "some value")
+    val lprod    = pipeline.addAtomic(new Producer(List("1", "2", "3")), "loop_producer")
+    val forEach  = pipeline.addForEach("for-each", Manifold.ALLOW_ANY)
+    val sink     = forEach.addAtomic(new Sink(), "sink")
+    val prodbind = forEach.addAtomic(new ProduceBinding("fred"), "pb")
+
+    val bc = new BufferSink()
+    val consumer = pipeline.addAtomic(bc, "consumer")
+
+    graph.addBindingEdge(bind, prodbind)
+
+    graph.addEdge(lprod, "result", forEach, "source")
+    graph.addEdge(forEach, "current", sink, "source")
+    graph.addEdge(prodbind, "result", forEach, "result")
+    graph.addEdge(forEach, "result", pipeline, "result")
+    graph.addEdge(pipeline, "result", consumer, "source")
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.run()
+
+    assert(bc.items.size == 3)
+    for (item <- bc.items) {
+      assert(item == "some value")
+    }
+  }
+
   "A for-each with no input " should " produce no output" in {
     val graph    = Jafpl.newInstance().newGraph()
 
@@ -118,5 +149,4 @@ class ForEachSpec extends FlatSpec {
 
     assert(bc.items.isEmpty)
   }
-
 }

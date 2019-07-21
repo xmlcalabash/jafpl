@@ -84,6 +84,7 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
     }
     if (sourceClosed && bindingsClosed) {
       if (sourceItem.isDefined) {
+        node.composer.runtimeBindings(bindings.toMap)
         for (item <- node.composer.decompose(sourceItem.get)) {
           itemQueue += item
         }

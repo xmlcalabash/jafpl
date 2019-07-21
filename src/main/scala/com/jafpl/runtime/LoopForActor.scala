@@ -109,7 +109,12 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
       // now close the outputs
       for (output <- node.outputs) {
         if (!node.inputs.contains(output)) {
-          monitor ! GClose(node, output)
+          // Don't close 'current'; it must have been closed to get here and re-closing
+          // it propagates the close event to the steps and they shouldn't see any more
+          // events!
+          if (output != "current") {
+            monitor ! GClose(node, output)
+          }
         }
       }
       monitor ! GFinished(node)

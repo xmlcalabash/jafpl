@@ -17,9 +17,9 @@ private[runtime] class CatchActor(private val monitor: ActorRef,
 
     // If there's anyone reading from the errors port, send them the exception
     for (output <- node.outputs) {
-      if (output == "errors") {
-        monitor ! GOutput(node, "errors", new ExceptionMessage(cause))
-        monitor ! GClose(node, "errors")
+      if (output == "error") {
+        monitor ! GOutput(node, "error", new ExceptionMessage(cause))
+        monitor ! GClose(node, "error")
       }
     }
 

@@ -205,7 +205,7 @@ class TryCatchSpec extends FlatSpec {
     graph.addEdge(ident2, "result", catch2, "result")
     graph.addEdge(catch2, "result", trycatch, "result")
 
-    graph.addEdge(fin, "errors", count, "source")
+    graph.addEdge(fin, "error", count, "source")
     graph.addEdge(count, "result", fin, "result")
     graph.addEdge(fin, "result", trycatch, "finally")
 
@@ -262,7 +262,7 @@ class TryCatchSpec extends FlatSpec {
     graph.addEdge(ident2, "result", catch2, "result")
     graph.addEdge(catch2, "result", trycatch, "result")
 
-    graph.addEdge(fin, "errors", count, "source")
+    graph.addEdge(fin, "error", count, "source")
     graph.addEdge(count, "result", fin, "result")
     graph.addEdge(fin, "result", trycatch, "finally")
 
@@ -309,7 +309,7 @@ class TryCatchSpec extends FlatSpec {
     graph.addEdge(raise, "result", try1, "result")
     graph.addEdge(try1, "result", trycatch, "result")
 
-    graph.addEdge(catchx, "errors", identx, "source")
+    graph.addEdge(catchx, "error", identx, "source")
     graph.addEdge(identx, "result", catchx, "result")
     graph.addEdge(catchx, "result", trycatch, "result")
 
@@ -343,7 +343,7 @@ class TryCatchSpec extends FlatSpec {
     graph.addEdge(raise, "result", try1, "result")
     graph.addEdge(try1, "result", trycatch, "result")
 
-    graph.addEdge(catchx, "errors", identx, "source")
+    graph.addEdge(catchx, "error", identx, "source")
     graph.addEdge(identx, "result", catchx, "result")
     graph.addEdge(catchx, "result", trycatch, "result")
 

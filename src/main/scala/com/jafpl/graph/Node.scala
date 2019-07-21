@@ -214,7 +214,7 @@ abstract class Node(val graph: Graph,
       case start: CatchStart =>
         inlist += xml.Text("\n")
         inlist += xml.Text(indent + "  ")
-        inlist += <in-edge input-port="errors"></in-edge>
+        inlist += <in-edge input-port="error"></in-edge>
       case start: LoopStart =>
         inlist += xml.Text("\n")
         inlist += xml.Text(indent + "  ")

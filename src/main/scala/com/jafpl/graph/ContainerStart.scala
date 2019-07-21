@@ -302,10 +302,25 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * @return The node added.
     */
   def addOption(name: String, expression: Any): Binding = {
-    val binding = graph.addOption(name, expression)
+    addOption(name, expression, None)
+  }
+
+  /**
+    * FIXME: WRITE THIS
+    * @param name The option name
+    * @param expression The default initializer for the option
+    * @return The binding
+    */
+  def addOption(name: String, expression: Any, params: BindingParams): OptionBinding = {
+    addOption(name, expression, Some(params))
+  }
+
+  private def addOption(name: String, expression: Any, params: Option[BindingParams]): OptionBinding = {
+    val binding = graph.addOption(name, expression, params)
     addChild(binding)
     binding
   }
+
 
   /** Add a variable to this container.
     *

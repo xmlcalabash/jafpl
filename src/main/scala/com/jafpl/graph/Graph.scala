@@ -42,6 +42,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   private var exception = Option.empty[Throwable]
   private var _dumpGraphTransitions = false
   private var _dumpCount = 0
+  private val _uid = UniqueId.nextId
 
   protected[graph] def error(cause: Throwable): Unit = {
     if (exception.isEmpty) {
@@ -60,6 +61,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
   /** True if the graph is known to be valid. */
   def valid: Boolean = _valid
+  def uid: Long = _uid
 
   def dumpGraphTransitions: Boolean = _dumpGraphTransitions
   def dumpGraphTransitions_=(dump: Boolean): Unit = {
@@ -87,7 +89,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   def addPipeline(label: Option[String], manifold: ManifoldSpecification): PipelineStart = {
     checkOpen()
 
-    logger.debug("addPipeline {}", label.getOrElse("ANONYMOUS"))
+    logger.debug(s"G$uid addPipeline ${label.getOrElse("ANONYMOUS")}")
 
     val end = new ContainerEnd(this)
     val start = new PipelineStart(this, end, manifold, label)
@@ -120,7 +122,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   def addInput(node: Node, port: String): Unit = {
     checkOpen()
 
-    logger.debug(s"addInput $node.$port")
+    logger.debug(s"G$uid addInput $node.$port")
 
     val reqdInput = new GraphInput(this, port, node)
     _nodes += reqdInput
@@ -137,7 +139,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   def addOutput(node: Node, port: String): Unit = {
     checkOpen()
 
-    logger.debug(s"addOutput $node.$port")
+    logger.debug(s"G$uid addOutput $node.$port")
 
     val reqdOutput = new GraphOutput(this, port, node)
     _nodes += reqdOutput
@@ -166,7 +168,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
   def addOption(name: String, expression: Any, params: Option[BindingParams]): OptionBinding = {
     checkOpen()
-    logger.debug("addOption {} {}", name, expression)
+    logger.debug(s"G$uid addOption $name $expression")
 
     val binding = new OptionBinding(this, name, expression, params)
     _nodes += binding
@@ -184,7 +186,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     checkOpen()
 
     val dlabel = label.getOrElse("")
-    logger.debug(s"addAtomic $step, $dlabel")
+    logger.debug(s"G$uid addAtomic $step, $dlabel")
 
     val node = new AtomicNode(this, Some(step), label)
     _nodes += node
@@ -200,7 +202,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     checkOpen()
 
     val dlabel = label.getOrElse("")
-    logger.debug(s"addGroup $dlabel")
+    logger.debug(s"G$uid addGroup $dlabel")
 
     val end = new ContainerEnd(this)
     val start = new GroupStart(this, end, manifold, label)
@@ -219,7 +221,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addChoose(label: Option[String]): ChooseStart = {
     checkOpen()
 
-    logger.debug("addChoose {}", label.getOrElse("ANONYMOUS"))
+    logger.debug(s"G$uid addChoose ${label.getOrElse("ANONYMOUS")}")
 
     val end = new ContainerEnd(this)
     val start = new ChooseStart(this, end, Manifold.ALLOW_ANY, label)
@@ -233,7 +235,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addWhen(expression: Any, label: Option[String], manifold: ManifoldSpecification): WhenStart = {
     checkOpen()
 
-    logger.debug("addWhen {} {}", label.getOrElse("ANONYMOUS"), expression)
+    logger.debug(s"G$uid addWhen ${label.getOrElse("ANONYMOUS")} $expression")
 
     val end = new ContainerEnd(this)
     val start = new WhenStart(this, end, label, manifold, expression)
@@ -252,7 +254,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addForEach(label: Option[String], manifold: ManifoldSpecification): LoopEachStart = {
     checkOpen()
 
-    logger.debug("addForEach {}", label.getOrElse("ANONYMOUS"))
+    logger.debug(s"G$uid addForEach ${label.getOrElse("ANONYMOUS")}")
 
     val end = new ContainerEnd(this)
     val start = new LoopEachStart(this, end, label, manifold)
@@ -272,7 +274,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addWhile(tester: ItemTester, label: Option[String], manifold: ManifoldSpecification): LoopWhileStart = {
     checkOpen()
 
-    logger.debug("addWhile {}", label.getOrElse("ANONYMOUS"))
+    logger.debug(s"G$uid addWhile ${label.getOrElse("ANONYMOUS")}")
 
     val end = new ContainerEnd(this)
     val start = new LoopWhileStart(this, end, label, manifold, tester)
@@ -292,7 +294,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addUntil(comparator: ItemComparator, label: Option[String], manifold: ManifoldSpecification): LoopUntilStart = {
     checkOpen()
 
-    logger.debug("addUntil {}", label.getOrElse("ANONYMOUS"))
+    logger.debug(s"G$uid addUntil ${label.getOrElse("ANONYMOUS")}")
 
     val end = new ContainerEnd(this)
     val start = new LoopUntilStart(this, end, label, manifold, comparator)
@@ -311,7 +313,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addFor(label: Option[String], countFrom: Long, countTo: Long, countBy: Long, manifold: ManifoldSpecification): LoopForStart = {
     checkOpen()
 
-    logger.debug("addFor {}", label.getOrElse("ANONYMOUS"))
+    logger.debug(s"G$uid addFor ${label.getOrElse("ANONYMOUS")}")
 
     val end = new ContainerEnd(this)
     val start = new LoopForStart(this, end, label, countFrom, countTo, countBy, manifold)
@@ -332,7 +334,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addViewport(composer: ViewportComposer, label: Option[String]): ViewportStart = {
     checkOpen()
 
-    logger.debug("addViewport {}", label.getOrElse("ANONYMOUS"))
+    logger.debug(s"G$uid addViewport ${label.getOrElse("ANONYMOUS")}")
 
     val end = new ContainerEnd(this)
     val start = new ViewportStart(this, end, label, composer)
@@ -351,7 +353,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addTryCatch(label: Option[String]): TryCatchStart = {
     checkOpen()
 
-    logger.debug("addTryCatch {}", label.getOrElse("ANONYMOUS"))
+    logger.debug(s"G$uid addTryCatch ${label.getOrElse("ANONYMOUS")}")
 
     val end = new ContainerEnd(this)
     val start = new TryCatchStart(this, end, label)
@@ -365,7 +367,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addTry(label: Option[String]): TryStart = {
     checkOpen()
 
-    logger.debug("addTry {}", label.getOrElse("ANONYMOUS"))
+    logger.debug(s"G$uid addTry ${label.getOrElse("ANONYMOUS")}")
 
     val end = new ContainerEnd(this)
     val start = new TryStart(this, end, label)
@@ -379,8 +381,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addCatch(label: Option[String], codes: List[Any]): CatchStart = {
     checkOpen()
 
-    val dlabel = label.getOrElse("")
-    logger.debug(s"addCatch $dlabel $codes")
+    val dlabel = label.getOrElse("ANONYMOUS")
+    logger.debug(s"G$uid addCatch $dlabel $codes")
 
     val end = new ContainerEnd(this)
     val start = new CatchStart(this, end, label, codes)
@@ -394,7 +396,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addFinally(label: Option[String]): FinallyStart = {
     checkOpen()
 
-    logger.debug("addFinally {}", label.getOrElse("ANONYMOUS"))
+    logger.debug(s"G$uid addFinally ${label.getOrElse("ANONYMOUS")}")
 
     val end = new ContainerEnd(this)
     val start = new FinallyStart(this, end, label)
@@ -408,7 +410,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addSplitter(): Splitter = {
     checkOpen()
 
-    logger.debug("addSplitter")
+    logger.debug(s"G$uid addSplitter")
 
     val node = new Splitter(this)
     _nodes += node
@@ -422,7 +424,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addJoiner(mode: JoinMode): Joiner = {
     checkOpen()
 
-    logger.debug("addJoiner")
+    logger.debug(s"G$uid addJoiner")
 
     val node = new Joiner(this, mode)
     _nodes += node
@@ -432,7 +434,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   private def addBuffer(loop: ContainerStart, edge: Edge): Unit = {
     checkOpen()
 
-    logger.debug("addBuffer")
+    logger.debug(s"G$uid addBuffer")
 
     val node = new Buffer(this)
     _nodes += node
@@ -446,7 +448,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addSink(): Sink = {
     checkOpen()
 
-    logger.debug("addSink")
+    logger.debug(s"G$uid addSink")
 
     val node = new Sink(this)
     _nodes += node
@@ -456,7 +458,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addEmptySource(): EmptySource = {
     checkOpen()
 
-    logger.debug("addEmptySource")
+    logger.debug(s"G$uid addEmptySource")
 
     val node = new EmptySource(this)
     _nodes += node
@@ -474,7 +476,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   private def addVariable(name: String, expression: Any, params: Option[BindingParams]): Binding = {
     checkOpen()
 
-    logger.debug(s"addVariable $name, $expression")
+    logger.debug(s"G$uid addVariable $name, $expression")
 
     val binding = new Binding(this, name, expression, params)
     _nodes += binding
@@ -518,7 +520,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   private def addEdge(from: Node, fromName: String, to: Node, toName: String, mode: JoinMode): Unit = {
     checkOpen()
 
-    logger.debug("addEdge {}.{} -> {}.{}", from, fromName, to, toName)
+    logger.debug(s"G$uid addEdge {}.{} -> {}.{}", from, fromName, to, toName)
 
     // If from and two aren't in the same graph...
     if (! (_nodes.contains(from) && _nodes.contains(to))) {
@@ -552,7 +554,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   def addBindingEdge(varname: String, to: Node): Unit = {
     checkOpen()
 
-    logger.debug(s"addBindingEdge $varname $to")
+    logger.debug(s"G$uid addBindingEdge $varname $to")
 
     // Find the variable
     val binding = findInScopeBinding(varname, to)
@@ -609,7 +611,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   def addBindingEdge(from: Binding, to: Node): Unit = {
     checkOpen()
 
-    logger.debug(s"addBindingEdge $from -> $to")
+    logger.debug(s"G$uid addBindingEdge $from -> $to")
 
     if (_nodes.contains(from) && _nodes.contains(to)) {
       val edge = new BindingEdge(this, from, to)
@@ -622,7 +624,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[graph] def addDependsEdge(from: Node, to: Node): Unit = {
     checkOpen()
 
-    logger.debug(s"addDependsEdge $from -> $to")
+    logger.debug(s"G$uid addDependsEdge $from -> $to")
 
     if (_nodes.contains(from) && _nodes.contains(to)) {
       val depid = UniqueId.nextId
@@ -640,10 +642,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     val ports = mutable.HashSet.empty[String]
     for (edge <- _edges) {
       if (edge.to == node) {
-        edge match {
-          //case bedge: BindingEdge => Unit
-          case _ => ports.add(edge.toPort)
-        }
+        ports.add(edge.toPort)
       }
     }
     ports.toSet
@@ -653,10 +652,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     val ports = mutable.HashSet.empty[String]
     for (edge <- _edges) {
       if (edge.from == node) {
-        edge match {
-          //case bedge: BindingEdge => Unit
-          case _ => ports.add(edge.fromPort)
-        }
+        ports.add(edge.fromPort)
       }
     }
     ports.toSet
@@ -753,10 +749,10 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     // Insert exception translators into each catch if the catch reads from the
     // error port and a translator has been provided.
     for (csnode <- nodes.filter(_.isInstanceOf[CatchStart]).filter(_.asInstanceOf[CatchStart].translator.isDefined)) {
-      val readers = edgesFrom(csnode, "errors")
+      val readers = edgesFrom(csnode, "error")
       if (readers.nonEmpty) {
         val catchStart = csnode.asInstanceOf[CatchStart]
-        logger.debug(s"addAtomic exception translator for ${csnode.step}")
+        logger.debug(s"G$uid addAtomic exception translator for ${csnode.step}")
         val node = new AtomicNode(this, catchStart.translator, None)
         _nodes += node
 
@@ -769,7 +765,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
           _edges -= edge
         }
 
-        val newEdge = new Edge(this, catchStart, "errors", node, "source")
+        val newEdge = new Edge(this, catchStart, "error", node, "source")
         _edges += newEdge
 
         debugDumpGraph()
@@ -841,7 +837,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       for (port <- node.outputs) {
         val edges = edgesFrom(node, port)
         if (edges.length > 1) {
-          logger.debug(s"$node.$port read by multiple steps; adding splitter")
+          logger.debug(s"G$uid $node.$port read by multiple steps; adding splitter")
           // Work out what container should contain the splitter
           var container = Option.empty[ContainerStart]
           node match {
@@ -850,11 +846,11 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
                 container = Some(start)
               }
             case start: CatchStart =>
-              if (start.inputs.contains(port) || (port == "errors")) {
+              if (start.inputs.contains(port) || (port == "error")) {
                 container = Some(start)
               }
             case start: FinallyStart =>
-              if (start.inputs.contains(port) || (port == "errors")) {
+              if (start.inputs.contains(port) || (port == "error")) {
                 container = Some(start)
               }
             case start: ContainerStart =>
@@ -918,7 +914,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
             val skipViewportBindings = start.isInstanceOf[ViewportStart] && (port == "#bindings")
             val edges = edgesFrom(node, port)
             if (edges.isEmpty && !skipLoopSource && !skipWhenCondition && ! skipWhenBindings && !skipViewportBindings) {
-              logger.debug(s"Input $port on $start unread, adding sink")
+              logger.debug(s"G$uid Input $port on $start unread, adding sink")
               val sink = start.addSink()
               addEdge(node, port, sink, "source")
               debugDumpGraph()
@@ -929,7 +925,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
           for (port <- node.inputs) {
             val skipLoopTest = start.isInstanceOf[LoopStart] && (port == "test")
             if (!start.outputs.contains(port) && !skipLoopTest) {
-              logger.debug(s"Output $port on $start unread, adding sink")
+              logger.debug(s"G$uid Output $port on $start unread, adding sink")
               val sink = if (start.parent.isDefined) {
                 start.parent.get.addSink()
               } else {
@@ -944,7 +940,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
             for (port <- atomic.step.get.outputSpec.ports) {
               val edges = edgesFrom(node, port)
               if (edges.isEmpty) {
-                logger.debug(s"Output $port on $atomic unread, adding sink")
+                logger.debug(s"G$uid Output $port on $atomic unread, adding sink")
                 val start = atomic.parent.get
                 val sink = start.addSink()
                 addEdge(node, port, sink, "source")
@@ -964,14 +960,14 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
           val end = start.containerEnd
 
           for (port <- start.outputs) {
-            val skipCatchErrors   = start.isInstanceOf[CatchStart] && (port == "errors")
-            val skipFinallyErrors = start.isInstanceOf[FinallyStart] && (port == "errors")
+            val skipCatchErrors   = start.isInstanceOf[CatchStart] && (port == "error")
+            val skipFinallyErrors = start.isInstanceOf[FinallyStart] && (port == "error")
             val skipLoopCurrent   = start.isInstanceOf[LoopStart] && (port == "current")
             val edges = edgesTo(node, port)
             if (edges.isEmpty && !skipCatchErrors && !skipFinallyErrors && !skipLoopCurrent) {
               val iedges = edgesTo(end, port)
               if (iedges.isEmpty) {
-                logger.debug(s"Adding empty source to feed output $start.$port")
+                logger.debug(s"G$uid Adding empty source to feed output $start.$port")
                 val source = start.addEmptySource()
                 addEdge(source, "result", end, port)
                 debugDumpGraph()
@@ -984,7 +980,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
             case start: LoopStart =>
               val edges = edgesFrom(node, "current")
               if (edges.isEmpty) {
-                logger.debug(s"Adding sink to consume $start.current")
+                logger.debug(s"G$uid Adding sink to consume $start.current")
                 val sink = start.addSink()
                 addEdge(node, "current", sink, "source")
                 debugDumpGraph()
@@ -1106,18 +1102,18 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
         val fromCard = edge.from.step.get.outputSpec.cardinality(edge.fromPort)
         val toCard = edge.to.step.get.inputSpec.cardinality(edge.toPort)
         if (fromCard.isEmpty) {
-          logger.debug(s"Step ${edge.from.step.get} has no output port named ${edge.fromPort}")
+          logger.debug(s"G$uid Step ${edge.from.step.get} has no output port named ${edge.fromPort}")
         } else if (toCard.isEmpty) {
-          logger.debug(s"Step ${edge.to.step.get} has no input port named ${edge.toPort}")
+          logger.debug(s"G$uid Step ${edge.to.step.get} has no input port named ${edge.toPort}")
         } else {
           if (fromCard.get.minimum >= toCard.get.minimum && fromCard.get.maximum <= toCard.get.maximum) {
             // this will be fine
           } else {
             if (fromCard.get.minimum < toCard.get.minimum) {
-              logger.debug(s"${edge.from}.${edge.fromPort} may produce fewer documents than ${edge.to}.${edge.toPort} requires")
+              logger.debug(s"G$uid ${edge.from}.${edge.fromPort} may produce fewer documents than ${edge.to}.${edge.toPort} requires")
             }
             if (fromCard.get.maximum > toCard.get.maximum) {
-              logger.debug(s"${edge.from}.${edge.fromPort} may produce more documents than ${edge.to}.${edge.toPort} allows")
+              logger.debug(s"G$uid ${edge.from}.${edge.fromPort} may produce more documents than ${edge.to}.${edge.toPort} allows")
             }
           }
         }

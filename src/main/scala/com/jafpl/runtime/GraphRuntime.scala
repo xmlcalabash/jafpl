@@ -192,7 +192,11 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   }
 
   private def makeActors(): Unit = {
-    _system = ActorSystem("jafpl-com-" + UniqueId.nextId)
+    val name = "jafpl-com-" + UniqueId.nextId
+
+    logger.debug(s"Creating $name for $graph ($this)")
+
+    _system = ActorSystem(name)
     _monitor = _system.actorOf(Props(new GraphMonitor(graph, this)), name = "monitor")
     reaper = _system.actorOf(Props(new Reaper(runtime)), name = "reaper")
 
@@ -249,9 +253,11 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
           _graphOutputs.put(req.name, op)
           _system.actorOf(Props(new OutputActor(_monitor, this, node, op)), actorName)
         case req: OptionBinding =>
+          /*
           if (_graphOptions.contains(req.name)) {
             throw JafplException.dupOptionName(req.name, req.location)
           }
+          */
           _graphOptions.put(req.name, req)
           _system.actorOf(Props(new VariableActor(_monitor, this, req)), actorName)
         case req: Binding =>

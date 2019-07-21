@@ -77,10 +77,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     bufferedInput.clear()
     seenBindings.clear()
     for (input <- node.inputs) {
-      // Bindings aren't buffered, so don't wait for them
-      if (input != "#bindings") {
-        openInputs.add(input)
-      }
+      openInputs.add(input)
     }
 
     node.inputCardinalities.clear()
@@ -172,7 +169,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     }
 
     if (node.step.isDefined) {
-      trace("RUNSTEP", s"$node ${node.step.get}", logEvent)
+      trace("RUNSTEP", s"$node ${node.step.get}", TraceEvent.RUNSTEP)
       try {
         node.step.get.run()
 

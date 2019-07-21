@@ -64,10 +64,6 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
       trace("COMPUTE", s"${binding.name}=${binding.expression}$sbindings", TraceEvent.BINDINGS)
     }
 
-    computeValue()
-  }
-
-  private def computeValue(): Unit = {
     try {
       val expreval = runtime.runtime.expressionEvaluator.newInstance()
       val answer = expreval.value(binding.expression, exprContext.toList, bindings.toMap, binding.params)
@@ -80,6 +76,14 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
       case t: Throwable =>
         monitor ! GException(Some(binding), t)
     }
+  }
+
+  override protected def reset(): Unit = {
+    super.reset()
+
+    // Setup for the next loop
+    exprContext.clear()
+    bindings.clear()
   }
 
   override protected def traceMessage(code: String, details: String): String = {
