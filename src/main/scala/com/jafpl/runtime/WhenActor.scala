@@ -16,6 +16,7 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
   extends StartActor(monitor, runtime, node) with DataConsumer {
 
   private var readyToCheck = false
+  private var abortCheck = false
   private var contextItem = ListBuffer.empty[Message]
   private val bindings = mutable.HashMap.empty[String, Message]
   logEvent = TraceEvent.WHEN
@@ -61,16 +62,27 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
     checkIfReady()
   }
 
+  protected[runtime] def abortGuard(): Unit = {
+    trace("ABTGUARD", s"$node", logEvent)
+    abortCheck = true
+    readyToCheck = true
+    checkIfReady()
+  }
+
   private def checkIfReady(): Unit = {
     trace("CHKREADY", s"$node checkIfReady: ready:$readyToCheck inputs:${openInputs.isEmpty}", logEvent)
     if (readyToCheck && openInputs.isEmpty) {
       try {
-        val eval = runtime.runtime.expressionEvaluator.newInstance()
-        val pass = eval.booleanValue(node.testExpr, contextItem.toList, bindings.toMap, node.params)
-        monitor ! GGuardResult(node, pass)
+        if (abortCheck) {
+          monitor ! GGuardResult(node, false)
+        } else {
+          val eval = runtime.runtime.expressionEvaluator.newInstance()
+          val pass = eval.booleanValue(node.testExpr, contextItem.toList, bindings.toMap, node.params)
+          monitor ! GGuardResult(node, pass)
+        }
       } catch {
         case ex: Exception =>
-          monitor ! GException(None, ex)
+          monitor ! GException(Some(node), ex)
       }
     }
   }

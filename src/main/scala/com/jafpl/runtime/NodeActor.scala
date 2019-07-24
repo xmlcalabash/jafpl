@@ -5,7 +5,7 @@ import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{ContainerStart, Node}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GStopped}
-import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NFinally, NGuardResult, NInitialize, NInput, NLoop, NReset, NRestartLoop, NRunFinally, NStart, NStop, NTraceDisable, NTraceEnable, NViewportFinished}
+import com.jafpl.runtime.NodeActor.{NAbort, NAbortGuard, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NFinally, NGuardResult, NInitialize, NInput, NLoop, NReset, NRestartLoop, NRunFinally, NStart, NStop, NTraceDisable, NTraceEnable, NViewportFinished}
 import com.jafpl.steps.{DataConsumer, Manifold, PortSpecification}
 
 import scala.collection.mutable
@@ -30,6 +30,7 @@ private[runtime] object NodeActor {
   case class NTraceEnable(event: String)
   case class NTraceDisable(event: String)
   case class NCheckGuard()
+  case class NAbortGuard()
   case class NGuardResult(when: Node, pass: Boolean)
   case class NException(cause: Throwable)
 }
@@ -441,6 +442,16 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         case _ =>
           monitor ! GException(None,
             JafplException.internalError(s"Attept to check guard expresson on something that isn't a when: $node", node.location))
+      }
+
+    case NAbortGuard() =>
+      trace("NABTGUARD", s"$node", TraceEvent.NMESSAGES)
+      this match {
+        case when: WhenActor =>
+          when.abortGuard()
+        case _ =>
+          monitor ! GException(None,
+            JafplException.internalError(s"Attept to abort guard expresson on something that isn't a when: $node", node.location))
       }
 
     case NGuardResult(when, pass) =>

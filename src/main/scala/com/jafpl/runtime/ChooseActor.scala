@@ -2,16 +2,15 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.graph.{ContainerStart, Joiner, Node, Sink, Splitter}
-import com.jafpl.runtime.GraphMonitor.{GAbort, GCheckGuard, GClose, GStart}
+import com.jafpl.runtime.GraphMonitor.{GAbort, GAbortGuard, GCheckGuard, GClose, GStart}
 
-import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 private[runtime] class ChooseActor(private val monitor: ActorRef,
                                    override protected val runtime: GraphRuntime,
                                    override protected val node: ContainerStart) extends StartActor(monitor, runtime, node) {
   var chosen = Option.empty[Node]
-  val guards = mutable.HashMap.empty[Node, Option[Boolean]]
-  val stopped = mutable.HashMap.empty[Node, Option[Boolean]]
+  val whenList = ListBuffer.empty[Node]
   logEvent = TraceEvent.CHOOSE
 
   override protected def start(): Unit = {
@@ -28,84 +27,39 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
         case sink: Sink =>
           monitor ! GStart(sink)
         case _ =>
-          guards.put(child, None)
-          stopped.put(child, None)
-          monitor ! GCheckGuard(child)
+          whenList += child
       }
     }
-  }
+
+    if (whenList.nonEmpty) {
+      val nextWhen = whenList.head
+      whenList.remove(0)
+      monitor ! GCheckGuard(nextWhen)
+    }
+ }
 
   protected[runtime] def guardResult(when: Node, pass: Boolean): Unit = {
     trace("GUARDRES", s"$node $when: $pass", logEvent)
 
-    guards.put(when, Some(pass))
-
-    var stillWaiting = false
-    if (chosen.isEmpty) {
-      // If we haven't picked one yet, loop through and find the first
-      // child that returned true. Note that results may be returned
-      // out of order, so if we encounter a child for whom we don't yet
-      // have results before we encounter a child for whom the result
-      // was 'pass', we have to wait until the next guard result
-      for (child <- node.children) {
-        child match {
-          case join: Joiner => Unit
-          case split: Splitter => Unit
-          case sink: Sink => Unit
-          case _ =>
-            val guard = guards(child)
-            stillWaiting = stillWaiting || guard.isEmpty
-
-            if (chosen.isEmpty && !stillWaiting) {
-              if (guard.get) {
-                chosen = Some(child)
-                monitor ! GStart(child)
-              }
-            }
-        }
+    if (pass) {
+      // Force all the rest of the branches to abort;
+      // this avoids dead letters, but I'm not sure it's
+      // the best solution.
+      for (child <- whenList) {
+        monitor ! GAbortGuard(child)
       }
-
-      if (chosen.isDefined) {
-        // If we just picked one, make sure we stop all the other
-        // children that we've seen but didn't select
-        for (child <- node.children) {
-          child match {
-            case join: Joiner => Unit
-            case split: Splitter => Unit
-            case sink: Sink => Unit
-            case _ =>
-              val fin = stopped(child)
-              if (fin.isEmpty) {
-                stopped.put(child, Some(child != chosen.get))
-                if (child != chosen.get) {
-                  stopUnselectedBranch(child)
-                }
-              }
-          }
-        }
-      } else {
-        // If we *haven't* picked one and we aren't still waiting for
-        // some results, then there was no condition which passed,
-        // stop all the branches
-        if (!stillWaiting) {
-          for (child <- node.children) {
-            child match {
-              case join: Joiner => Unit
-              case split: Splitter => Unit
-              case sink: Sink => Unit
-              case _ =>
-                val fin = stopped(child)
-                if (fin.isEmpty) {
-                  stopped.put(child, Some(true))
-                  stopUnselectedBranch(child)
-                }
-            }
-          }
-        }
-      }
+      // Run the one that passed
+      monitor ! GStart(when)
     } else {
-      // If we've already chosen, then stop this branch regardless
       stopUnselectedBranch(when)
+      if (whenList.isEmpty) {
+        // nop? What do we do if no branch passes?
+      } else {
+        val nextWhen = whenList.head
+        whenList.remove(0)
+        monitor ! GCheckGuard(nextWhen)
+      }
+
     }
   }
 
