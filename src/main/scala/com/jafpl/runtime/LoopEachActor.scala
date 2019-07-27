@@ -19,6 +19,9 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
   private var sourceClosed = false
   logEvent = TraceEvent.LOOPEACH
 
+  node.iterationPosition = 0L
+  node.iterationSize = 0L
+
   override protected def start(): Unit = {
     trace("START", s"$node", logEvent)
     running = false
@@ -32,6 +35,9 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
     running = false
     readyToRun = true
     sourceClosed = false
+    queue.clear()
+    node.iterationPosition = 0L
+    node.iterationSize = 0L
     runIfReady()
   }
 
@@ -69,10 +75,15 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
     trace("RUNIFREADY", s"$node ready:$readyToRun closed:$sourceClosed", logEvent)
     if (!running && readyToRun && sourceClosed) {
       running = true
+      if (node.iterationSize == 0) {
+        node.iterationSize = queue.size
+      }
 
       if (queue.nonEmpty) {
         val item = queue.head
         queue -= item
+        node.iterationPosition += 1
+
         val edge = node.outputEdge("current")
         monitor ! GOutput(node, edge.fromPort, item)
         monitor ! GClose(node, edge.fromPort)

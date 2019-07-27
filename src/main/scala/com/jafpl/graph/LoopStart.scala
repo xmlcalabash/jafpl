@@ -18,4 +18,16 @@ import scala.collection.mutable
 abstract class LoopStart(override val graph: Graph,
                          override protected val end: ContainerEnd,
                          override val userLabel: Option[String]) extends ContainerStart(graph, end, userLabel) {
+  private var _iterationSize = 0L
+  private var _iterationPosition = 0L
+
+  def iterationSize: Long = _iterationSize
+  protected[jafpl] def iterationSize_=(size: Long): Unit = {
+    _iterationSize = size
+  }
+
+  def iterationPosition: Long = _iterationPosition
+  protected[jafpl] def iterationPosition_=(pos: Long): Unit = {
+    _iterationPosition = pos
+  }
 }
