@@ -3,7 +3,7 @@ package com.jafpl.graph
 import com.jafpl.exceptions.JafplException
 
 private[jafpl] class ContainerEnd(override val graph: Graph) extends Node(graph, None, None) {
-  var _start: Option[ContainerStart] = None
+  private var _start: Option[ContainerStart] = None
 
   override def inputsOk() = true
   override def outputsOk() = true

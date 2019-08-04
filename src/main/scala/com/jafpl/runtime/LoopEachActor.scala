@@ -18,7 +18,6 @@ private[runtime] class LoopEachActor(private val monitor: ActorRef,
   private var running = false
   private var sourceClosed = false
   logEvent = TraceEvent.LOOPEACH
-
   node.iterationPosition = 0L
   node.iterationSize = 0L
 

@@ -185,7 +185,9 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * @param tester The test evaluator.
     * @return The node added.
     */
-  def addWhile(tester: ItemTester, manifold: ManifoldSpecification): LoopWhileStart = addWhile(tester, None, manifold)
+  def addWhile(tester: ItemTester, returnAll: Boolean, manifold: ManifoldSpecification): LoopWhileStart = {
+    addWhile(tester, returnAll, None, manifold)
+  }
 
   /** Add a new while container to this container.
     *
@@ -193,7 +195,9 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * @param label A user-defined label.
     * @return The node added.
     */
-  def addWhile(tester: ItemTester, label: String, manifold: ManifoldSpecification): LoopWhileStart = addWhile(tester, Some(label), manifold)
+  def addWhile(tester: ItemTester, returnAll: Boolean, label: String, manifold: ManifoldSpecification): LoopWhileStart = {
+    addWhile(tester, returnAll, Some(label), manifold)
+  }
 
   /** Add a new while container to this container.
     *
@@ -201,8 +205,8 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * @param label An optional, user-defined label.
     * @return The node added.
     */
-  def addWhile(tester: ItemTester, label: Option[String], manifold: ManifoldSpecification): LoopWhileStart = {
-    val node = graph.addWhile(tester, label, manifold)
+  def addWhile(tester: ItemTester, returnAll: Boolean, label: Option[String], manifold: ManifoldSpecification): LoopWhileStart = {
+    val node = graph.addWhile(tester, returnAll, label, manifold)
     addChild(node)
     node
   }
@@ -212,7 +216,9 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * @param comparator The comparator.
     * @return The node added.
     */
-  def addUntil(comparator: ItemComparator, manifold: ManifoldSpecification): LoopUntilStart = addUntil(comparator, None, manifold)
+  def addUntil(comparator: ItemComparator, returnAll: Boolean, manifold: ManifoldSpecification): LoopUntilStart = {
+    addUntil(comparator, returnAll, None, manifold)
+  }
 
   /** Add a new until container to this container.
     *
@@ -220,8 +226,8 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * @param label A user-defined label.
     * @return The node added.
     */
-  def addUntil(comparator: ItemComparator, label: String, manifold: ManifoldSpecification): LoopUntilStart =
-    addUntil(comparator, Some(label), manifold)
+  def addUntil(comparator: ItemComparator, returnAll: Boolean, label: String, manifold: ManifoldSpecification): LoopUntilStart =
+    addUntil(comparator, returnAll, Some(label), manifold)
 
   /** Add a new until container to this container.
     *
@@ -229,8 +235,8 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * @param label An optional, user-defined label.
     * @return The node added.
     */
-  def addUntil(comparator: ItemComparator, label: Option[String], manifold: ManifoldSpecification): LoopUntilStart = {
-    val node = graph.addUntil(comparator, label, manifold)
+  def addUntil(comparator: ItemComparator, returnAll: Boolean, label: Option[String], manifold: ManifoldSpecification): LoopUntilStart = {
+    val node = graph.addUntil(comparator, returnAll, label, manifold)
     addChild(node)
     node
   }

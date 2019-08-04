@@ -20,6 +20,8 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
   var looped = false
   val bindings = mutable.HashMap.empty[String, Message]
   logEvent = TraceEvent.LOOPUNTIL
+  node.iterationPosition = 0L
+  node.iterationSize = 0L
 
   override protected def start(): Unit = {
     trace("START", s"$node", logEvent)
@@ -33,6 +35,8 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
     running = false
     readyToRun = true
     looped = false
+    node.iterationPosition = 0L
+    node.iterationSize = 0L
     runIfReady()
   }
 
@@ -95,6 +99,9 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
     if (!running && readyToRun && currentItem.isDefined) {
       running = true
 
+      node.iterationPosition += 1
+      node.iterationSize += 1
+
       val edge = node.outputEdge("current")
       monitor ! GOutput(node, edge.fromPort, currentItem.get)
       monitor ! GClose(node, edge.fromPort)
@@ -106,15 +113,24 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def finished(): Unit = {
-    val finished = node.comparator.areTheSame(currentItem.get.item, nextItem.get.item)
+    val finished =  try {
+      node.comparator.areTheSame(currentItem.get.item, nextItem.get.item)
+    } catch {
+      case ex: Exception =>
+        trace("FINISHED", s"$node ${currentItem.head} threw $ex", logEvent)
+        monitor ! GException(Some(node), ex)
+        return
+    }
 
     trace("FINISHED", s"$node ${currentItem.get}: ${nextItem.get}: $finished", logEvent)
 
     if (finished) {
       checkCardinalities("current")
-      monitor ! GOutput(node, "result", nextItem.get)
       // now close the outputs
       for (output <- node.outputs) {
+        if (output != "test") {
+          monitor ! GOutput(node, output, nextItem.get)
+        }
         if (!node.inputs.contains(output)) {
           // Don't close 'current'; it must have been closed to get here and re-closing
           // it propagates the close event to the steps and they shouldn't see any more

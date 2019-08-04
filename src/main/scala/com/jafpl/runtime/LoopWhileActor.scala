@@ -15,12 +15,14 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
                                       override protected val node: LoopWhileStart)
   extends StartActor(monitor, runtime, node) with DataConsumer {
 
-  private val currentItem = ListBuffer.empty[ItemMessage]
+  var currentItem = Option.empty[ItemMessage]
   var running = false
   var looped = false
   val bindings = mutable.HashMap.empty[String, Message]
   var initiallyTrue = true
   logEvent = TraceEvent.LOOPWHILE
+  node.iterationPosition = 0L
+  node.iterationSize = 0L
 
   override protected def start(): Unit = {
     trace("START", s"$node", logEvent)
@@ -34,6 +36,8 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
     running = false
     readyToRun = true
     looped = false
+    node.iterationPosition = 0L
+    node.iterationSize = 0L
     runIfReady()
   }
 
@@ -60,10 +64,9 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
             JafplException.unexpectedSequence(node.toString, port, node.location))
           return
         }
-        currentItem += item
-        val testItem = ListBuffer.empty[Message]
-        testItem += currentItem.head
-        initiallyTrue = node.tester.test(testItem.toList, bindings.toMap)
+        currentItem = Some(item)
+        val testItem = List(item)
+        initiallyTrue = node.tester.test(testItem, bindings.toMap)
         trace("RECVTRUE", s"$node while: $initiallyTrue", logEvent)
       case item: BindingMessage =>
         bindings.put(item.name, item)
@@ -77,8 +80,7 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
 
   protected[runtime] def loop(item: ItemMessage): Unit = {
     trace("LOOP", s"$node", logEvent)
-    currentItem.clear()
-    currentItem += item
+    currentItem = Some(item)
     looped = true
   }
 
@@ -92,9 +94,12 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
     if (!running && readyToRun && currentItem.nonEmpty) {
       running = true
 
+      node.iterationPosition += 1
+      node.iterationSize += 1
+
       if (initiallyTrue) {
         val edge = node.outputEdge("current")
-        monitor ! GOutput(node, edge.fromPort, currentItem.head)
+        monitor ! GOutput(node, edge.fromPort, currentItem.get)
         monitor ! GClose(node, edge.fromPort)
         for (child <- node.children) {
           monitor ! GStart(child)
@@ -106,9 +111,14 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
   }
 
   override protected[runtime] def finished(): Unit = {
-    val testItem = ListBuffer.empty[Message]
-    testItem += currentItem.head
-    val pass = node.tester.test(testItem.toList, bindings.toMap)
+    val pass = try {
+      node.tester.test(List(currentItem.get), bindings.toMap)
+    } catch {
+      case ex: Exception =>
+        trace("FINISHED", s"$node ${currentItem.head} threw $ex", logEvent)
+        monitor ! GException(Some(node), ex)
+        return
+    }
 
     trace("FINISHED", s"$node $pass ${currentItem.head}", logEvent)
 
@@ -117,7 +127,14 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
     } else {
       checkCardinalities("current")
 
-      monitor ! GOutput(node, "result", currentItem.head)
+      for (port <- node.buffer.keySet) {
+        for (item <- node.buffer(port)) {
+          node.outputCardinalities.put(port, node.outputCardinalities.getOrElse(port, 0L) + 1)
+          monitor ! GOutput(node, port, item)
+        }
+      }
+      node.buffer.clear()
+
       // now close the outputs
       for (output <- node.outputs) {
         if (!node.inputs.contains(output)) {

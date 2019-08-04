@@ -271,13 +271,13 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     * @param label An optional, user-defined label.
     * @return The constructed for-each.
     */
-  protected[graph] def addWhile(tester: ItemTester, label: Option[String], manifold: ManifoldSpecification): LoopWhileStart = {
+  protected[graph] def addWhile(tester: ItemTester, returnAll: Boolean, label: Option[String], manifold: ManifoldSpecification): LoopWhileStart = {
     checkOpen()
 
     logger.debug(s"G$uid addWhile ${label.getOrElse("ANONYMOUS")}")
 
     val end = new ContainerEnd(this)
-    val start = new LoopWhileStart(this, end, label, manifold, tester)
+    val start = new LoopWhileStart(this, end, label, manifold, tester, returnAll)
     end.parent = start
     end.start = start
     _nodes += start
@@ -291,13 +291,13 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     * @param label An optional, user-defined label.
     * @return The constructed for-each.
     */
-  protected[graph] def addUntil(comparator: ItemComparator, label: Option[String], manifold: ManifoldSpecification): LoopUntilStart = {
+  protected[graph] def addUntil(comparator: ItemComparator, returnAll: Boolean, label: Option[String], manifold: ManifoldSpecification): LoopUntilStart = {
     checkOpen()
 
     logger.debug(s"G$uid addUntil ${label.getOrElse("ANONYMOUS")}")
 
     val end = new ContainerEnd(this)
-    val start = new LoopUntilStart(this, end, label, manifold, comparator)
+    val start = new LoopUntilStart(this, end, label, manifold, returnAll, comparator)
     end.parent = start
     end.start = start
     _nodes += start

@@ -8,6 +8,7 @@ private[jafpl] class LoopUntilStart(override val graph: Graph,
                                     override protected val end: ContainerEnd,
                                     override val userLabel: Option[String],
                                     private val manspec: ManifoldSpecification,
+                                    val returnAll: Boolean,
                                     val comparator: ItemComparator)
   extends LoopStart(graph, end, userLabel) {
 

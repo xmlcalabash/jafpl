@@ -2,36 +2,33 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
-import com.jafpl.graph.{ContainerEnd, Node}
+import com.jafpl.graph.{ContainerEnd, LoopWhileStart, Node}
 import com.jafpl.messages.{ItemMessage, Message}
-import com.jafpl.runtime.GraphMonitor.{GException, GFinished, GLoop, GOutput}
+import com.jafpl.runtime.GraphMonitor.{GException, GLoop, GOutput}
 
-import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 private[runtime] class LoopWhileEndActor(private val monitor: ActorRef,
                                          override protected val runtime: GraphRuntime,
-                                         override protected val node: ContainerEnd) extends LoopEndActor(monitor, runtime, node)  {
-  val buffer = mutable.HashMap.empty[String, ListBuffer[Message]]
+                                         override protected val node: ContainerEnd,
+                                         private val returnAll: Boolean) extends LoopEndActor(monitor, runtime, node)  {
   logEvent = TraceEvent.LOOPWHILEEND
 
   override protected def reset(): Unit = {
-    trace("RESET", s"$node", logEvent)
+    super.reset()
+
     // We got reset, so we're going around again.
     // That means the output we buffered on this loop is good.
-    for (port <- buffer.keySet) {
-      for (item <- buffer(port)) {
-        node.start.get.outputCardinalities.put(port, node.start.get.outputCardinalities.getOrElse(port, 0L) + 1)
-        monitor ! GOutput(node.start.get, port, item)
+    val whileStart = node.start.get.asInstanceOf[LoopWhileStart]
+    if (returnAll) {
+      for (port <- whileStart.buffer.keySet) {
+        for (item <- whileStart.buffer(port)) {
+          node.start.get.outputCardinalities.put(port, node.start.get.outputCardinalities.getOrElse(port, 0L) + 1)
+          monitor ! GOutput(node.start.get, port, item)
+        }
       }
     }
-    buffer.clear()
-
-    unfinishedChildren.clear()
-    for (child <- node.start.get.children) {
-      unfinishedChildren.add(child)
-    }
-    readyToRun = true
+    whileStart.buffer.clear()
   }
 
   override protected def input(from: Node, fromPort: String, port: String, msg: Message): Unit = {
@@ -47,11 +44,11 @@ private[runtime] class LoopWhileEndActor(private val monitor: ActorRef,
             JafplException.unexpectedMessage(msg.toString, port, node.location))
       }
     } else {
-      // Buffer everything in case this iteration was false
-      if (!buffer.contains(port)) {
-        buffer.put(port, ListBuffer.empty[Message])
+      val whileStart = node.start.get.asInstanceOf[LoopWhileStart]
+      if (!whileStart.buffer.contains(port)) {
+        whileStart.buffer.put(port, ListBuffer.empty[Message])
       }
-      buffer(port) += msg
+      whileStart.buffer(port) += msg
     }
   }
 

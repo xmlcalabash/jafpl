@@ -233,8 +233,9 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
             case act: CatchStart => _system.actorOf(Props(new ConditionalEndActor(_monitor, this, end)), actorName)
             case act: WhenStart => _system.actorOf(Props(new ConditionalEndActor(_monitor, this, end)), actorName)
             case act: LoopEachStart => _system.actorOf(Props(new LoopEachEndActor(_monitor, this, end)), actorName)
-            case act: LoopWhileStart => _system.actorOf(Props(new LoopWhileEndActor(_monitor, this, end)), actorName)
-            case act: LoopUntilStart => _system.actorOf(Props(new LoopUntilEndActor(_monitor, this, end)), actorName)
+            case act: LoopForStart => _system.actorOf(Props(new LoopForEndActor(_monitor, this, end)), actorName)
+            case act: LoopWhileStart => _system.actorOf(Props(new LoopWhileEndActor(_monitor, this, end, act.returnAll)), actorName)
+            case act: LoopUntilStart => _system.actorOf(Props(new LoopUntilEndActor(_monitor, this, end, act.returnAll)), actorName)
             case act: ViewportStart => _system.actorOf(Props(new ViewportEndActor(_monitor, this, end)), actorName)
             case _ => _system.actorOf(Props(new EndActor(_monitor, this, end)), actorName)
           }

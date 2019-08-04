@@ -18,6 +18,8 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
   var looped = false
   val bindings = mutable.HashMap.empty[String, Any]
   logEvent = TraceEvent.LOOPFOR
+  node.iterationPosition = 0L
+  node.iterationSize = 0L
 
   override protected def start(): Unit = {
     trace("START", s"$node", logEvent)
@@ -31,6 +33,8 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
     running = false
     readyToRun = true
     looped = false
+    node.iterationSize = 0L
+    node.iterationPosition = 0L
     runIfReady()
   }
 
@@ -66,6 +70,15 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
     if (!running && readyToRun) {
       running = true
 
+      if (node.iterationSize == 0) {
+        val diff = if (node.countFrom > node.countTo) {
+          node.countFrom - node.countTo + 1
+        } else {
+          node.countTo - node.countFrom + 1
+        }
+        node.iterationSize = (diff + node.countBy.abs - 1) / node.countBy.abs
+      }
+
       val initiallyTrue = if (node.countBy > 0) {
         current <= node.countTo
       } else {
@@ -75,6 +88,7 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
       trace("INITFLOP", s"Initially: $initiallyTrue: $current", logEvent)
 
       if (initiallyTrue) {
+        node.iterationPosition += 1
         for (port <- node.outputs) {
           if (port == "current") {
             monitor ! GOutput(node, port, new ItemMessage(current, Metadata.NUMBER))
@@ -105,6 +119,14 @@ private[runtime] class LoopForActor(private val monitor: ActorRef,
       monitor ! GRestartLoop(node)
     } else {
       checkCardinalities("current")
+
+      for (port <- node.buffer.keySet) {
+        for (item <- node.buffer(port)) {
+          node.outputCardinalities.put(port, node.outputCardinalities.getOrElse(port, 0L) + 1)
+          monitor ! GOutput(node, port, item)
+        }
+      }
+      node.buffer.clear()
 
       // now close the outputs
       for (output <- node.outputs) {
