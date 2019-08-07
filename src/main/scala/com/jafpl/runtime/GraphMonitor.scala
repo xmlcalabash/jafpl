@@ -2,13 +2,12 @@ package com.jafpl.runtime
 
 import java.time.{Duration, Instant}
 
-import akka.actor.{Actor, ActorRef, PoisonPill}
-import akka.event.Logging
+import akka.actor.{ActorRef, PoisonPill}
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{ContainerEnd, Graph, Node}
 import com.jafpl.messages.{ItemMessage, Message}
-import com.jafpl.runtime.GraphMonitor.{GAbort, GAbortExecution, GAbortGuard, GCatch, GCheckGuard, GClose, GException, GFinally, GFinished, GFinishedViewport, GGuardResult, GLoop, GNode, GOutput, GReset, GRestartLoop, GRun, GRunFinally, GStart, GStop, GStopped, GTrace, GWatchdog}
-import com.jafpl.runtime.NodeActor.{NAbort, NAbortGuard, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NFinally, NGuardResult, NInitialize, NInput, NLoop, NReset, NRestartLoop, NRunFinally, NStart, NStop, NViewportFinished}
+import com.jafpl.runtime.GraphMonitor.{GAbort, GAbortExecution, GCatch, GCheckGuard, GClose, GException, GFinally, GFinished, GFinishedViewport, GGuardResult, GLoop, GNode, GOutput, GReset, GRestartLoop, GRun, GRunFinally, GStart, GStop, GStopped, GTrace, GWatchdog}
+import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NFinally, NGuardResult, NInitialize, NInput, NLoop, NReset, NRestartLoop, NRunFinally, NStart, NStop, NViewportFinished}
 
 import scala.collection.mutable
 
@@ -33,7 +32,6 @@ private[runtime] object GraphMonitor {
   case class GStopped(node: Node)
   case class GTrace(event: String)
   case class GCheckGuard(node: Node)
-  case class GAbortGuard(node: Node)
   case class GGuardResult(when: Node, pass: Boolean)
   case class GWatchdog(millis: Long)
 }
@@ -176,9 +174,11 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
       if (node.hasOutputEdge(port)) {
         val edge = node.outputEdge(port)
         trace("SENDOUT→", s"$node.$port → ${edge.to}.${edge.toPort} from ${fmtSender()}", TraceEvent.STEPIO)
+        trace("MESSAGE→", s"$node.$port → ${edge.to}.${edge.toPort} $item", TraceEvent.MESSAGE)
         actors(edge.to) ! NInput(node, port, edge.toPort, item)
       } else {
         trace("DROPOUT↴", s"$node.$port from ${fmtSender()}", TraceEvent.STEPIO)
+        trace("MESSAGE↴", s"$node.$port $item", TraceEvent.MESSAGE)
       }
 
     case GLoop(node, item) =>
@@ -197,11 +197,6 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
       lastMessage = Instant.now()
       trace("GCHKGUARD", s"$node", TraceEvent.GMESSAGES)
       actors(node) ! NCheckGuard()
-
-    case GAbortGuard(node) =>
-      lastMessage = Instant.now()
-      trace("GABTGUARD", s"$node", TraceEvent.GMESSAGES)
-      actors(node) ! NAbortGuard()
 
     case GGuardResult(when, pass) =>
       lastMessage = Instant.now()

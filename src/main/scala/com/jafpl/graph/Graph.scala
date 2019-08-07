@@ -11,6 +11,7 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+import scala.reflect.ClassTag
 
 /** A pipeline graph.
   *
@@ -58,6 +59,14 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   }
 
   protected[jafpl] def nodes: List[Node] = _nodes.toList
+
+  // protected[model] def children[T <: Artifact](implicit tag: ClassTag[T]): List[T] = {
+  protected[jafpl] def tnodes[T <: Node](implicit tag: ClassTag[T]): List[T] = {
+    _nodes.toList.flatMap {
+      case n: T => Some(n)
+      case _ => None
+    }
+  }
 
   /** True if the graph is known to be valid. */
   def valid: Boolean = _valid

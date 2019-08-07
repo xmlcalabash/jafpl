@@ -3,8 +3,7 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.graph.{JoinMode, Joiner, Node}
 import com.jafpl.messages.Message
-import com.jafpl.runtime.GraphMonitor.GOutput
-import com.jafpl.util.UniqueId
+import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -12,124 +11,64 @@ import scala.collection.mutable.ListBuffer
 private[runtime] class JoinerActor(private val monitor: ActorRef,
                                    override protected val runtime: GraphRuntime,
                                    override protected val node: Joiner) extends NodeActor(monitor, runtime, node) {
-  private val id = UniqueId.nextId
-  private val portClosed = mutable.HashMap.empty[Int,Boolean]
-  private val portBuffer = mutable.HashMap.empty[Int,ListBuffer[Message]]
-  private var currentPort = 1
-  private var hadPriorityInput = false
-  private var hadGatingInput = false
+  // Joiner used to try to be clever, forwarding on messages as quickly as they arrived
+  // after assuring they were in the right order. This rewrite removes that feature.
+  // It now buffers until it has all the inputs. Motivation for this change is that
+  // a joiner inside a When that forwards messages before it's asked to run appears
+  // to cause extra messages to "leak" out of the When. Well, that's my current best
+  // guess for the odd behavior I'm seeing on ab-for-each-003.xml from the XProc 3.0
+  // test suite. //ndw 5 Aug 2019
+  private val buffered = mutable.HashMap.empty[String, ListBuffer[Message]]
   logEvent = TraceEvent.JOINER
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
-    if (node.mode == JoinMode.MIXED) {
-      monitor ! GOutput(node, "result", item)
+    if (buffered.contains(port)) {
+      buffered(port) += item
     } else {
-      this.synchronized {
-        orderedInput(from, fromPort, port, item)
-      }
+      val mbuf = ListBuffer.empty[Message]
+      mbuf += item
+      buffered(port) = mbuf
     }
+    println(s"Joiner $node received: $buffered")
   }
 
-  override protected def close(port: String): Unit = {
-    trace("CLOSE", s"$node", logEvent)
-    if (node.mode != JoinMode.MIXED) {
-      this.synchronized {
-        portClosed.put(portNo(port),true)
-        drainBuffers()
+  override protected def reset(): Unit = {
+    super.reset()
+    buffered.clear()
+    println(s"Joiner $node reset")
+  }
+
+  override protected def run(): Unit = {
+    trace("RUN", s"$node", logEvent)
+
+    readyToRun = false
+
+    println(s"Joiner $node runs ${node.mode}")
+    if (node.mode == JoinMode.PRIORITY && buffered.contains("source_1")) {
+      val port = s"source_1"
+      for (item <- buffered(port)) {
+        monitor ! GOutput(node, "result", item)
       }
     } else {
-      super.close(port)
-    }
-  }
-
-  private def portNo(port: String): Int = {
-    // port = "source_[nnn]"
-    port.substring(7).toInt
-  }
-
-  private def orderedInput(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    val pnum = portNo(port)
-
-    if (!hadPriorityInput) {
-      hadPriorityInput = (node.mode == JoinMode.PRIORITY && pnum == 1)
-    }
-
-    var writeOk = writeMessage(port, item)
-
-    if (writeOk) {
-      monitor ! GOutput(node, "result", item)
-      return
-    }
-
-    if (pnum < currentPort) {
-      throw new IllegalArgumentException(s"Received input from previous port: $id: $pnum")
-    }
-
-    drainBuffers()
-
-    // If we got here, then pnum > 1 and we've just drained all the queued
-    // messages that we can. If pnum == currentPort *now*, then we can
-    // write it, subject to the priority constraints
-
-    writeOk = writeMessage(port, item)
-
-    if (writeOk) {
-      monitor ! GOutput(node, "result", item)
-    } else {
-      val list = portBuffer.getOrElse(pnum, ListBuffer.empty[Message])
-      list += item
-      portBuffer.put(pnum, list)
-    }
-  }
-
-  private def writeMessage(port: String, item: Message): Boolean = {
-    val pnum = portNo(port)
-
-    var writeOk = (pnum == currentPort)
-
-    if (currentPort != 1) {
-      node.mode match {
-        case JoinMode.PRIORITY =>
-          writeOk = writeOk && !hadPriorityInput
-        case _ => Unit
-      }
-    }
-
-    writeOk
-  }
-
-  private def drainBuffers(): Unit = {
-    var port = currentPort
-    var stillDraining = portClosed.getOrElse(port, false)
-    while (stillDraining) {
-      stillDraining = portClosed.getOrElse(port, false)
-      val list = portBuffer.getOrElse(port, ListBuffer.empty[Message])
-
-      val allowWrite = if (port == 1) {
-        true
-      } else {
-        node.mode match {
-          case JoinMode.PRIORITY =>
-            !hadPriorityInput
-          case _ =>
-            true
+      println(s"Joiner $node: $buffered")
+      var portNum = 0
+      while (buffered.nonEmpty) {
+        portNum += 1
+        val port = s"source_$portNum"
+        if (buffered.contains(port)) {
+          for (item <- buffered(port)) {
+            println(s"Joiner $node/$port sends $item")
+            monitor ! GOutput(node, "result", item)
+          }
+          buffered.remove(port)
         }
       }
-
-      if (allowWrite) {
-        for (item <- list) {
-          monitor ! GOutput(node, "result", item)
-        }
-      }
-
-      portBuffer.remove(port)
-      if (stillDraining) {
-        super.close("source_" + port)
-        port += 1
-      }
     }
-    currentPort = port
+
+    for (output <- node.outputs) {
+      monitor ! GClose(node, output)
+    }
+    monitor ! GFinished(node)
   }
 
   override protected def traceMessage(code: String, details: String): String = {

@@ -4,7 +4,7 @@ name := "jafpl"
 
 organization := "com.jafpl"
 homepage     := Some(url("https://jafpl.com/"))
-version      := "0.1.36"
+version      := "0.1.65"
 scalaVersion := "2.12.6"
 
 buildInfoKeys ++= Seq[BuildInfoKey](

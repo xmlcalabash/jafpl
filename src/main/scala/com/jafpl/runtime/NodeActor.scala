@@ -5,7 +5,7 @@ import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{ContainerStart, Node}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GStopped}
-import com.jafpl.runtime.NodeActor.{NAbort, NAbortGuard, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NFinally, NGuardResult, NInitialize, NInput, NLoop, NReset, NRestartLoop, NRunFinally, NStart, NStop, NTraceDisable, NTraceEnable, NViewportFinished}
+import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NFinally, NGuardResult, NInitialize, NInput, NLoop, NReset, NRestartLoop, NRunFinally, NStart, NStop, NTraceDisable, NTraceEnable, NViewportFinished}
 import com.jafpl.steps.{DataConsumer, Manifold, PortSpecification}
 
 import scala.collection.mutable
@@ -30,7 +30,6 @@ private[runtime] object NodeActor {
   case class NTraceEnable(event: String)
   case class NTraceDisable(event: String)
   case class NCheckGuard()
-  case class NAbortGuard()
   case class NGuardResult(when: Node, pass: Boolean)
   case class NException(cause: Throwable)
 }
@@ -204,6 +203,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       }
     } else {
       trace("RUNSTEP!", s"$node", logEvent)
+      println(s"NA runs $node")
       node match {
         case start: ContainerStart =>
           // Close all our "input" ports so that children reading them can run
@@ -296,9 +296,11 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
             node.inputCardinalities.put(port, node.inputCardinalities.getOrElse(port, 0L) + 1)
             if (node.step.isDefined) {
               trace("DELIVER→", s"$node ${node.step.get}.$port", TraceEvent.STEPIO)
+              trace("MESSAGE→", s"$node ${node.step.get}.$port $item", TraceEvent.MESSAGE)
               node.step.get.receive(port, message)
             } else {
               trace("DELIVER↴", s"$node (no step).$port", TraceEvent.STEPIO)
+              trace("MESSAGE↴", s"$node (no step).$port $item", TraceEvent.MESSAGE)
             }
           case _ =>
             throw JafplException.unexpectedMessage(item.toString, port, node.location)
@@ -442,16 +444,6 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         case _ =>
           monitor ! GException(None,
             JafplException.internalError(s"Attept to check guard expresson on something that isn't a when: $node", node.location))
-      }
-
-    case NAbortGuard() =>
-      trace("NABTGUARD", s"$node", TraceEvent.NMESSAGES)
-      this match {
-        case when: WhenActor =>
-          when.abortGuard()
-        case _ =>
-          monitor ! GException(None,
-            JafplException.internalError(s"Attept to abort guard expresson on something that isn't a when: $node", node.location))
       }
 
     case NGuardResult(when, pass) =>
