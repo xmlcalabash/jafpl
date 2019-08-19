@@ -9,23 +9,26 @@ private[runtime] class CatchActor(private val monitor: ActorRef,
                                   override protected val runtime: GraphRuntime,
                                   override protected val node: ContainerStart) extends StartActor(monitor, runtime, node)  {
   logEvent = TraceEvent.CATCH
+  private var cause: Throwable = _
+
+  override protected def configureOpenPorts(): Unit = {
+    super.configureOpenPorts()
+    openOutputs -= "error" // this one doesn't count
+  }
 
   protected[runtime] def start(cause: Throwable): Unit = {
-    trace("START", s"$node $cause", logEvent)
+    this.cause = cause
+    super.start()
+  }
 
-    commonStart()
-
-    // If there's anyone reading from the errors port, send them the exception
+  override protected[runtime] def run(): Unit = {
     for (output <- node.outputs) {
       if (output == "error") {
         monitor ! GOutput(node, "error", new ExceptionMessage(cause))
         monitor ! GClose(node, "error")
       }
     }
-
-    for (child <- node.children) {
-      monitor ! GStart(child)
-    }
+    super.run()
   }
 
   override protected def traceMessage(code: String, details: String): String = {

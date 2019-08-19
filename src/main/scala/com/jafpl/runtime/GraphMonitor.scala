@@ -6,8 +6,8 @@ import akka.actor.{ActorRef, PoisonPill}
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{ContainerEnd, Graph, Node}
 import com.jafpl.messages.{ItemMessage, Message}
-import com.jafpl.runtime.GraphMonitor.{GAbort, GAbortExecution, GCatch, GCheckGuard, GClose, GException, GFinally, GFinished, GFinishedViewport, GGuardResult, GLoop, GNode, GOutput, GReset, GRestartLoop, GRun, GRunFinally, GStart, GStop, GStopped, GTrace, GWatchdog}
-import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NFinally, NGuardResult, NInitialize, NInput, NLoop, NReset, NRestartLoop, NRunFinally, NStart, NStop, NViewportFinished}
+import com.jafpl.runtime.GraphMonitor.{GAbort, GAbortExecution, GCatch, GCheckGuard, GClose, GException, GFinally, GFinished, GGuardResult, GLoop, GNode, GOutput, GReset, GResetFinished, GRestartLoop, GRun, GRunFinally, GStart, GStop, GStopped, GTrace, GWatchdog}
+import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NException, NFinally, NGuardResult, NInitialize, NInput, NLoop, NReset, NResetFinished, NRestartLoop, NRunFinally, NStart, NStop}
 
 import scala.collection.mutable
 
@@ -16,6 +16,7 @@ private[runtime] object GraphMonitor {
   case class GRun()
   case class GAbortExecution()
   case class GReset(node: Node)
+  case class GResetFinished(node: Node)
   case class GRestartLoop(node: Node)
   case class GStart(node: Node)
   case class GCatch(node: Node, cause: Throwable)
@@ -26,7 +27,6 @@ private[runtime] object GraphMonitor {
   case class GLoop(node: Node, item: ItemMessage)
   case class GClose(node: Node, port: String)
   case class GFinished(node: Node)
-  case class GFinishedViewport(node: Node, buffer: List[Message])
   case class GAbort(node: Node)
   case class GStop(node: Node)
   case class GStopped(node: Node)
@@ -44,7 +44,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
   private var exception: Option[Throwable] = None
   protected var logEvent = TraceEvent.MONITOR
 
-  private def fmtSender(): String = {
+  private def fmtSender: String = {
     var str = sender().toString
     var pos = str.indexOf("/user/")
     str = str.substring(pos+6)
@@ -59,6 +59,11 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
     trace("WATCHDOG", s"$millis", TraceEvent.WATCHDOG)
     for (node <- unfinishedNodes) {
       trace("...UNFINSH", s"$node", TraceEvent.WATCHDOG)
+    }
+    if (unfinishedNodes.isEmpty) {
+      for (node <- unstoppedNodes) {
+        trace("...UNSTOPD", s"$node", TraceEvent.WATCHDOG)
+      }
     }
     crashAndBurn(JafplException.watchdogTimeout())
   }
@@ -124,7 +129,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
 
     case GStop(node) =>
       lastMessage = Instant.now()
-      trace("GSTOP", s"$node", TraceEvent.GMESSAGES)
+      trace("GSTOP", s"$node from $fmtSender", TraceEvent.GMESSAGES)
       actors(node) ! NStop()
 
     case GStopped(node) =>
@@ -152,6 +157,13 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
       trace("GRESET", s"$node", TraceEvent.GMESSAGES)
       actors(node) ! NReset()
 
+    case GResetFinished(node) =>
+      lastMessage = Instant.now()
+      trace("GRESETF", s"$node", TraceEvent.GMESSAGES)
+      if (node.parent.isDefined) {
+        actors(node.parent.get) ! NResetFinished(node)
+      }
+
     case GRestartLoop(node) =>
       lastMessage = Instant.now()
       trace("GRSTRTLOOP", s"$node", TraceEvent.GMESSAGES)
@@ -159,8 +171,6 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
 
     case GOutput(node, port, item) =>
       lastMessage = Instant.now()
-      trace("GOUTPUT", s"$node.$port", TraceEvent.GMESSAGES)
-
       item match {
         case msg: ItemMessage =>
           for (inj <- node.outputInjectables) {
@@ -173,12 +183,12 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
 
       if (node.hasOutputEdge(port)) {
         val edge = node.outputEdge(port)
-        trace("SENDOUT→", s"$node.$port → ${edge.to}.${edge.toPort} from ${fmtSender()}", TraceEvent.STEPIO)
-        trace("MESSAGE→", s"$node.$port → ${edge.to}.${edge.toPort} $item", TraceEvent.MESSAGE)
+        trace("GOUTPUT", s"$node.$port → ${edge.to}.${edge.toPort} from $fmtSender", TraceEvent.STEPIO)
+        //trace("MESSAGE→", s"$node.$port → ${edge.to}.${edge.toPort} $item", TraceEvent.MESSAGE)
         actors(edge.to) ! NInput(node, port, edge.toPort, item)
       } else {
-        trace("DROPOUT↴", s"$node.$port from ${fmtSender()}", TraceEvent.STEPIO)
-        trace("MESSAGE↴", s"$node.$port $item", TraceEvent.MESSAGE)
+        trace("GOUTPUT", s"$node.$port from $fmtSender", TraceEvent.GMESSAGES)
+        //trace("MESSAGE↴", s"$node.$port $item", TraceEvent.MESSAGE)
       }
 
     case GLoop(node, item) =>
@@ -188,8 +198,11 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
 
     case GClose(node, port) =>
       lastMessage = Instant.now()
-      trace("GCLOSE", s"$node.$port", TraceEvent.GMESSAGES)
-      trace("GCLOSE", s"$node.$port from ${fmtSender()}", TraceEvent.STEPIO)
+      trace("GCLOSE", s"$node.$port from $fmtSender", TraceEvent.GMESSAGES)
+      if (!node.hasOutputEdge(port)) {
+        trace("BANG", s"$node.$port from $fmtSender", TraceEvent.GMESSAGES)
+        println("BANG")
+      }
       val edge = node.outputEdge(port)
       actors(edge.to) ! NClose(edge.toPort)
 
@@ -214,28 +227,8 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
         }
       }
 
-      node match {
-        case end: ContainerEnd =>
-          actors(end.start.get) ! NContainerFinished()
-        case _ =>
-          if (node.parent.isDefined) {
-            val end = node.parent.get.containerEnd
-            actors(end) ! NChildFinished(node)
-          }
-      }
-
-    case GFinishedViewport(node, buffer) =>
-      lastMessage = Instant.now()
-      trace("GFINVIEWPRT", s"$node", TraceEvent.GMESSAGES)
-
-      node match {
-        case end: ContainerEnd =>
-          actors(end.start.get) ! NViewportFinished(buffer)
-        case _ =>
-          if (node.parent.isDefined) {
-            val end = node.parent.get.containerEnd
-            actors(end) ! NChildFinished(node)
-          }
+      if (node.parent.isDefined) {
+        actors(node.parent.get) ! NChildFinished(node)
       }
 
     case GTrace(event) =>

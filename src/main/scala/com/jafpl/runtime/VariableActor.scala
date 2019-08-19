@@ -13,18 +13,13 @@ import scala.collection.mutable.ListBuffer
 private[runtime] class VariableActor(private val monitor: ActorRef,
                                      override protected val runtime: GraphRuntime,
                                      private val binding: Binding)
-  extends NodeActor(monitor, runtime, binding) with DataConsumer {
+  extends NodeActor(monitor, runtime, binding) {
   private var exprContext = ListBuffer.empty[Message]
   private val bindings = mutable.HashMap.empty[String, Message]
   logEvent = TraceEvent.VARIABLE
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
     trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
-    receive(port, item)
-  }
-
-  override def receive(port: String, item: Message): Unit = {
-    trace("RECEIVE", s"$port", logEvent)
 
     item match {
       case item: ItemMessage =>
@@ -69,6 +64,7 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
       val answer = expreval.value(binding.expression, exprContext.toList, bindings.toMap, binding.params)
 
       val msg = new BindingMessage(binding.name, answer)
+      node.state = NodeState.FINISHED
       monitor ! GOutput(binding, "result", msg)
       monitor ! GClose(binding, "result")
       monitor ! GFinished(binding)

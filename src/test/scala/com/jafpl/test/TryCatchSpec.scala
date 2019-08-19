@@ -28,7 +28,6 @@ class TryCatchSpec extends FlatSpec {
     val ident1   = catch1.addAtomic(new Identity(), "ident1")
     val catch2   = trycatch.addCatch("catch2")
     val ident2   = catch2.addAtomic(new Identity(), "ident2")
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(p1, "result", ident, "source")
     graph.addEdge(ident, "result", try1, "result")
@@ -43,9 +42,10 @@ class TryCatchSpec extends FlatSpec {
     graph.addEdge(catch2, "result", trycatch, "result")
 
     graph.addEdge(trycatch, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     assert(bc.items.size == 1)
@@ -303,7 +303,6 @@ class TryCatchSpec extends FlatSpec {
     val raise    = try1.addAtomic(new RaiseError("e3"), "e3")
     val catchx   = trycatch.addCatch("catchx")
     val identx   = catchx.addAtomic(new Identity(), "identx")
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(p1, "result", raise, "source")
     graph.addEdge(raise, "result", try1, "result")
@@ -314,9 +313,10 @@ class TryCatchSpec extends FlatSpec {
     graph.addEdge(catchx, "result", trycatch, "result")
 
     graph.addEdge(trycatch, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     assert(bc.items.size == 1)
@@ -336,7 +336,6 @@ class TryCatchSpec extends FlatSpec {
     val raise    = try1.addAtomic(new RaiseError("e3"), "e3")
     val catchx   = trycatch.addCatch("catchx")
     val identx   = catchx.addAtomic(new Identity(), "identx")
-    val consumer = pipeline.addAtomic(bc, "consumer")
     val xlate    = catchx.translator = new ExceptionTranslator()
 
     graph.addEdge(p1, "result", raise, "source")
@@ -348,9 +347,10 @@ class TryCatchSpec extends FlatSpec {
     graph.addEdge(catchx, "result", trycatch, "result")
 
     graph.addEdge(trycatch, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     assert(bc.items.size == 1)

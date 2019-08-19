@@ -12,10 +12,38 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
   val whenList = ListBuffer.empty[Node]
   logEvent = TraceEvent.CHOOSE
 
-  override protected def start(): Unit = {
-    trace("START", s"$node", logEvent)
+  // override protected def initialize(): Unit = {
 
-    commonStart()
+  // override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
+
+  // override protected def close(port: String): Unit = {
+
+  // override protected def start(): Unit = {
+
+  // override protected def finished(): Unit = {
+
+  // override protected def abort(): Unit = {
+
+  // override protected def stop(): Unit = {
+
+  override protected def reset(): Unit = {
+    whenList.clear()
+    super.reset()
+  }
+
+  // override protected def resetIfReady(): Unit = {
+
+  // override protected def resetFinished(): Unit = {
+
+  // override protected def runIfReady(): Unit = {
+
+  override protected def run(): Unit = {
+    trace("RUN", s"$node", logEvent)
+
+    for (child <- node.children) {
+      childState(child) = NodeState.STARTED
+    }
+    trace("CSTATE", s"$node / $childState", logEvent)
 
     for (child <- node.children) {
       child match {
@@ -36,11 +64,6 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
       monitor ! GCheckGuard(nextWhen)
     }
  }
-
-  override protected def reset(): Unit = {
-    super.reset()
-    whenList.clear()
-  }
 
   protected[runtime] def guardResult(when: Node, pass: Boolean): Unit = {
     trace("GUARDRES", s"$node $when: $pass", logEvent)

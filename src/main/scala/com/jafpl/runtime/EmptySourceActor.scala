@@ -21,13 +21,14 @@ private[runtime] class EmptySourceActor(private val monitor: ActorRef,
 
   override protected def reset(): Unit = {
     trace("RESET", s"$node", logEvent)
-    readyToRun = true
+    started = true
     hasBeenReset = true
     openInputs.clear()
   }
 
   override protected def run(): Unit = {
     trace("RUN", s"$node", logEvent)
+    node.state = NodeState.FINISHED
     monitor ! GClose(node, "result")
     monitor ! GFinished(node)
   }

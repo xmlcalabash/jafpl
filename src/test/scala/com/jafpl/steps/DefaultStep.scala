@@ -27,7 +27,7 @@ class DefaultStep  extends Step {
     _location = Some(location)
   }
 
-  override def receive(port: String, message: Message): Unit = {
+  override def consume(port: String, message: Message): Unit = {
     // nop
   }
 

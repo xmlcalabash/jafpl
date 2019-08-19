@@ -10,7 +10,7 @@ class ExceptionTranslator() extends DefaultStep {
     PortSpecification.RESULTSEQ
   }
 
-  override def receive(port: String, message: Message): Unit = {
-    consumer.get.receive("result", new ItemMessage("Caught one!", Metadata.STRING))
+  override def consume(port: String, message: Message): Unit = {
+    consumer.get.consume("result", new ItemMessage("Caught one!", Metadata.STRING))
   }
 }

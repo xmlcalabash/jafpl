@@ -1,7 +1,6 @@
 package com.jafpl.runtime
 
-import akka.actor.Actor
-import akka.event.Logging
+import akka.actor.{Actor, ActorLogging}
 import com.jafpl.runtime.TraceEvent.TraceEvent
 
 object TraceEvent extends Enumeration {
@@ -14,15 +13,21 @@ object TraceEvent extends Enumeration {
   DEBUG, MESSAGE = Value
 }
 
-abstract class TracingActor(protected val runtime: GraphRuntime) extends Actor {
-  protected val log = Logging(context.system, this)
-
+abstract class TracingActor(protected val runtime: GraphRuntime) extends Actor with ActorLogging {
   protected def trace(code: String, details: String, event: TraceEvent): Unit = {
     trace("info", code, details, event)
   }
 
+  /*
+  override def aroundReceive(receive: Receive, msg: Any): Unit = {
+    log.info(s"AR: $receive $msg $this")
+    super.aroundReceive(receive, msg)
+  }
+  */
+
   protected def trace(level: String, code: String, details: String, event: TraceEvent): Unit = {
     val message = traceMessage(code, details)
+
     // We don't use the traceEventManager.trace() call because we want to use the Akka logger
     if (runtime.traceEventManager.traceEnabled(event.toString.toLowerCase())) {
       level match {

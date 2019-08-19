@@ -17,13 +17,13 @@ class JoinerSpec extends FlatSpec {
     val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1 = pipeline.addAtomic(new Producer(List("A1","A2")), "Adocs")
     val p2 = pipeline.addAtomic(new Producer(List("B1","B2")), "Bdocs")
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(p1, "result", pipeline, "result")
     graph.addEdge(p2, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     assert(bc.items.size == 4)
@@ -36,13 +36,13 @@ class JoinerSpec extends FlatSpec {
     val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1 = pipeline.addAtomic(new Producer(List("A1","A2")), "Adocs")
     val p2 = pipeline.addAtomic(new Producer(List("B1","B2")), "Bdocs")
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addOrderedEdge(p1, "result", pipeline, "result")
     graph.addEdge(p2, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     assert(bc.items.size == 4)
@@ -59,13 +59,12 @@ class JoinerSpec extends FlatSpec {
     val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1 = pipeline.addAtomic(new Producer(List("A1","A2")), "Adocs")
     val p2 = pipeline.addAtomic(new Producer(List("B1","B2")), "Bdocs")
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     var pass = false
     try {
       graph.addEdge(p1, "result", pipeline, "result")
       graph.addPriorityEdge(p2, "result", pipeline, "result")
-      graph.addEdge(pipeline, "result", consumer, "source")
+      graph.addOutput(pipeline, "result")
     } catch {
       case g: JafplException => pass = true
     }
@@ -80,13 +79,13 @@ class JoinerSpec extends FlatSpec {
     val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1 = pipeline.addAtomic(new Producer(List("A1","A2")), "Adocs")
     val p2 = pipeline.addAtomic(new Producer(List("B1","B2")), "Bdocs")
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addPriorityEdge(p1, "result", pipeline, "result")
     graph.addEdge(p2, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     assert(bc.items.size == 2)
@@ -101,13 +100,13 @@ class JoinerSpec extends FlatSpec {
     val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1 = pipeline.addAtomic(new Producer(List()), "Adocs")
     val p2 = pipeline.addAtomic(new Producer(List("B1","B2")), "Bdocs")
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addPriorityEdge(p1, "result", pipeline, "result")
     graph.addEdge(p2, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     assert(bc.items.size == 2)
@@ -123,14 +122,14 @@ class JoinerSpec extends FlatSpec {
     val p1 = pipeline.addAtomic(new Producer(List("A1","A2")), "Adocs")
     val p2 = pipeline.addAtomic(new Producer(List("B1","B2")), "Bdocs")
     val p3 = pipeline.addAtomic(new Producer(List("C1","C2")), "Cdocs")
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addPriorityEdge(p1, "result", pipeline, "result")
     graph.addEdge(p2, "result", pipeline, "result")
     graph.addEdge(p3, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     assert(bc.items.size == 2)
@@ -146,14 +145,14 @@ class JoinerSpec extends FlatSpec {
     val p1 = pipeline.addAtomic(new Producer(List()), "Adocs")
     val p2 = pipeline.addAtomic(new Producer(List("B1","B2")), "Bdocs")
     val p3 = pipeline.addAtomic(new Producer(List("C1","C2")), "Cdocs")
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addPriorityEdge(p1, "result", pipeline, "result")
     graph.addEdge(p2, "result", pipeline, "result")
     graph.addEdge(p3, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     assert(bc.items.size == 4)

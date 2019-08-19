@@ -55,7 +55,6 @@ class BindingSpec extends FlatSpec {
 
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
-
     runtime.run()
 
     assert(bc.items.isEmpty)
@@ -70,15 +69,15 @@ class BindingSpec extends FlatSpec {
     val binding  = pipeline.addVariable("x", "twelve")
     val binding2 = pipeline.addVariable("y", "eleven")
     val pb       = pipeline.addAtomic(new ProduceBinding("x"), "pb")
-    val output   = pipeline.addAtomic(bc, "output")
 
     graph.addBindingEdge(binding, pb)
     graph.addBindingEdge(binding2, pb)
     graph.addEdge(pb, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", output, "source")
+    graph.addOutput(pipeline, "result")
 
     graph.close()
     val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     assert(bc.items.size == 1)

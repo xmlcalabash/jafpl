@@ -18,7 +18,6 @@ class CatchStart private[jafpl] (override val graph: Graph,
   extends ContainerStart(graph, end, userLabel) {
 
   private var _translator = Option.empty[Step]
-
   def translator: Option[Step] = _translator
   def translator_=(xlate: Step): Unit = {
     if (_translator.isDefined) {

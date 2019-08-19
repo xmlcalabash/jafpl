@@ -73,9 +73,6 @@ class OrderedSpec extends FlatSpec {
     runtime.outputs("result").setConsumer(bc)
 
     runtime.run()
-
-    print(bc.items)
-
     assert(bc.items.length == 4)
     assert(bc.items.head == "One")
     assert(bc.items(1) == "Two")

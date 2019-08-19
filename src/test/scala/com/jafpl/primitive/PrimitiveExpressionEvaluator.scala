@@ -1,5 +1,6 @@
 package com.jafpl.primitive
 
+import akka.event.Logging
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.BindingParams
 import com.jafpl.messages.{ItemMessage, Message, Metadata}

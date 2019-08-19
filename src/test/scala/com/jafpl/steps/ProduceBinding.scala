@@ -12,7 +12,7 @@ class ProduceBinding(varname: String) extends DefaultStep {
 
   override def receiveBinding(message: BindingMessage): Unit = {
     if (varname == message.name) {
-      consumer.get.receive("result", message.message)
+      consumer.get.consume("result", message.message)
     }
   }
 }

@@ -9,15 +9,19 @@ private[runtime] class FinallyActor(private val monitor: ActorRef,
                                     override protected val runtime: GraphRuntime,
                                     override protected val node: ContainerStart) extends StartActor(monitor, runtime, node)  {
   logEvent = TraceEvent.FINALLY
-  
-  override protected def start(): Unit = {
-    trace("START", s"$node", logEvent)
-    commonStart()
+  private var cause = Option.empty[Throwable]
+
+  override protected def configureOpenPorts(): Unit = {
+    super.configureOpenPorts()
+    openOutputs -= "error" // this one doesn't count
   }
 
   def startFinally(cause: Option[Throwable]) {
-    trace("STFINALLY", s"$node $cause", logEvent)
+    this.cause = cause
+    super.start()
+  }
 
+  override protected[runtime] def run(): Unit = {
     // If there's anyone reading from the errors port, send them the exception
     for (output <- node.outputs) {
       if (output == "error") {
@@ -28,9 +32,7 @@ private[runtime] class FinallyActor(private val monitor: ActorRef,
       }
     }
 
-    for (child <- node.children) {
-      monitor ! GStart(child)
-    }
+    super.run()
   }
 
   override protected def traceMessage(code: String, details: String): String = {

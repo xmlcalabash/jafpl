@@ -12,15 +12,11 @@ private[runtime] class InputActor(private val monitor: ActorRef,
   extends NodeActor(monitor, runtime, node, consumer) {
   logEvent = TraceEvent.INPUT
 
-  override protected def start(): Unit = {
-    trace("START", s"$node", logEvent)
-    readyToRun = true
-    runIfReady()
-  }
+  // override protected def start(): Unit = {
 
-  private def runIfReady(): Unit = {
-    trace("RUNIFREADY", s"$node ready:$readyToRun closed:${consumer.closed}", logEvent)
-    if (readyToRun && consumer.closed) {
+  override protected def runIfReady(): Unit = {
+    trace("RUNIFREADY", s"$node ready:$started closed:${consumer.closed}", logEvent)
+    if (started && consumer.closed) {
       for (item <- consumer.items) {
         monitor ! GOutput(node, "result", item)
       }

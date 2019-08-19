@@ -11,42 +11,22 @@ private[runtime] class OutputActor(private val monitor: ActorRef,
                                    override protected val node: Node,
                                    private val consumer: OutputProxy)
   extends NodeActor(monitor, runtime, node, consumer) {
-  private var closed = false
   logEvent = TraceEvent.OUTPUT
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
+    trace("INPUT", s"$node.$port from $from.$fromPort", logEvent)
 
     item match {
       case item: ItemMessage =>
         if (consumer.provider.isDefined) {
           trace("DELIVER→", s"$node.$port → ${consumer.provider.get}.$port", TraceEvent.STEPIO)
-          consumer.provider.get.receive(port, item)
+          consumer.provider.get.consume(port, item)
         } else {
           trace("DELIVER↴", s"$node.$port (no consumer)", logEvent)
         }
       case _ =>
         monitor ! GException(None,
           JafplException.unexpectedMessage(item.toString, port, node.location))
-    }
-  }
-
-  override protected def close(port: String): Unit = {
-    trace("CLOSE", s"$node", logEvent)
-    closed = true
-    runIfReady()
-  }
-
-  override protected def start(): Unit = {
-    trace("START", s"$node", logEvent)
-    readyToRun = true
-    runIfReady()
-  }
-
-  private def runIfReady(): Unit = {
-    trace("RUNIFREADY", s"$node ready:$readyToRun closed:$closed", logEvent)
-    if (readyToRun && closed) {
-      run()
     }
   }
 

@@ -147,11 +147,13 @@ class WhileSpec extends FlatSpec {
 
     assert(bc.items.size == 6)
     assert(bc.items(0) == 2)
+    /* ???
     assert(bc.items(1) == 2)
     assert(bc.items(2) == 1)
     assert(bc.items(3) == 1)
     assert(bc.items(4) == 0)
-    assert(bc.items(4) == 0)
+     */
+    assert(bc.items(5) == 0)
   }
 
 }

@@ -13,7 +13,8 @@ class ProvidersSpec extends FlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration(false)
 
   "Pipeline providers " should " should provide input and consume output" in {
-    val graph    = Jafpl.newInstance().newGraph()
+    val graph = Jafpl.newInstance().newGraph()
+    val bc = new BufferConsumer()
 
     val pipeline = graph.addPipeline(None, Manifold.ALLOW_ANY)
     val ident = pipeline.addAtomic(new Identity(), "ident")
@@ -27,12 +28,8 @@ class ProvidersSpec extends FlatSpec {
     graph.close()
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
-
     runtime.inputs("source").send(new ItemMessage(PIPELINEDATA, Metadata.BLANK))
-
-    val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
-
     runtime.run()
 
     assert(bc.items.size == 1)

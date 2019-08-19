@@ -6,9 +6,9 @@ class Duplicate(copies: Int) extends DefaultStep {
   override def inputSpec: PortSpecification = PortSpecification.SOURCE
   override def outputSpec: PortSpecification = PortSpecification.RESULTSEQ
 
-  override def receive(port: String, message: Message): Unit = {
+  override def consume(port: String, message: Message): Unit = {
     for (count <- 1 to copies) {
-      consumer.get.receive("result", message)
+      consumer.get.consume("result", message)
     }
   }
 }

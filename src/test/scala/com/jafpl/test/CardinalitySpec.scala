@@ -2,6 +2,7 @@ package com.jafpl.test
 
 import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.JafplException
+import com.jafpl.messages.{ItemMessage, Metadata}
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{BufferSink, Empty, Identity, LiesAboutOutputBindings, Manifold, PortCardinality, Producer, Sink}
@@ -20,15 +21,15 @@ class CardinalitySpec extends FlatSpec {
     val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1       = pipeline.addAtomic(new Producer(List("P1", "P2")), "producer")
     val ident    = pipeline.addAtomic(new Identity(false), "identity")
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(p1, "result", ident, "source")
     graph.addEdge(ident, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     var pass = false
     try {
       val runtime = new GraphRuntime(graph, runtimeConfig)
+      runtime.outputs("result").setConsumer(bc)
       runtime.run()
     } catch {
       case jex: JafplException => pass = true
@@ -44,15 +45,15 @@ class CardinalitySpec extends FlatSpec {
     val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1       = pipeline.addAtomic(new Empty(), "producer")
     val ident    = pipeline.addAtomic(new Identity(false), "identity")
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(p1, "result", ident, "source")
     graph.addEdge(ident, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     var pass = false
     try {
       val runtime = new GraphRuntime(graph, runtimeConfig)
+      runtime.outputs("result").setConsumer(bc)
       runtime.run()
     } catch {
       case jex: JafplException =>
@@ -69,15 +70,15 @@ class CardinalitySpec extends FlatSpec {
     val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val p1       = pipeline.addAtomic(new Producer(List("P1", "P2")), "producer")
     val liar     = pipeline.addAtomic(new LiesAboutOutputBindings(), "liar")
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(p1, "result", liar, "source")
     graph.addEdge(liar, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     var pass = false
     try {
       val runtime = new GraphRuntime(graph, runtimeConfig)
+      runtime.outputs("result").setConsumer(bc)
       runtime.run()
     } catch {
       case _: Throwable => pass = true
@@ -94,16 +95,16 @@ class CardinalitySpec extends FlatSpec {
     val p1       = pipeline.addAtomic(new Producer(List("P1", "P2", "P3")), "producer")
     val group    = pipeline.addGroup(oneOutput)
     val ident    = group.addAtomic(new Identity(), "identity")
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(p1, "result", ident, "source")
     graph.addEdge(ident, "result", group, "result")
     graph.addEdge(group, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     var pass = false
     try {
       val runtime = new GraphRuntime(graph, runtimeConfig)
+      runtime.outputs("result").setConsumer(bc)
       runtime.run()
     } catch {
       case jafpl: JafplException =>
@@ -122,16 +123,16 @@ class CardinalitySpec extends FlatSpec {
     val group    = pipeline.addGroup(oneOutput)
     val ident    = group.addAtomic(new Identity(), "identity")
     val sink     = group.addAtomic(new Sink(), "sink")
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(p1, "result", ident, "source")
     graph.addEdge(ident, "result", sink, "source")
     graph.addEdge(group, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     var pass = false
     try {
       val runtime = new GraphRuntime(graph, runtimeConfig)
+      runtime.outputs("result").setConsumer(bc)
       runtime.run()
     } catch {
       case jafpl: JafplException =>
@@ -148,18 +149,21 @@ class CardinalitySpec extends FlatSpec {
     val oneInput = new Manifold(Manifold.singlePort("psrc", PortCardinality.EXACTLY_ONE), Manifold.WILD)
 
     val pipeline = graph.addPipeline(oneInput)
-    val producer = pipeline.addAtomic(new Producer(List("P1", "P2", "P3")), "producer")
-    val ident    = pipeline.addAtomic(new Identity(), "identity")
-    val consumer = pipeline.addAtomic(bc, "consumer")
+    val ident    = pipeline.addAtomic(new Identity(false), "identity")
 
-    graph.addEdge(producer, "result", pipeline, "psrc")
     graph.addEdge(pipeline, "psrc", ident, "source")
     graph.addEdge(ident, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+
+    graph.addInput(pipeline, "psrc")
+    graph.addOutput(pipeline, "result")
 
     var pass = false
     try {
       val runtime = new GraphRuntime(graph, runtimeConfig)
+      runtime.inputs("psrc").send(new ItemMessage("P1", Metadata.BLANK))
+      runtime.inputs("psrc").send(new ItemMessage("P2", Metadata.BLANK))
+      runtime.inputs("psrc").send(new ItemMessage("P3", Metadata.BLANK))
+      runtime.outputs("result").setConsumer(bc)
       runtime.run()
     } catch {
       case jafpl: JafplException =>
@@ -177,16 +181,16 @@ class CardinalitySpec extends FlatSpec {
     val p1       = pipeline.addAtomic(new Producer(List("P1", "P2", "P3")), "producer")
     val group    = pipeline.addGroup(Manifold.ALLOW_ANY)
     val ident    = group.addAtomic(new Identity(), "identity")
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(p1, "result", ident, "source")
     graph.addEdge(ident, "result", group, "result")
     graph.addEdge(group, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     var pass = false
     try {
       val runtime = new GraphRuntime(graph, runtimeConfig)
+      runtime.outputs("result").setConsumer(bc)
       runtime.run()
     } catch {
       case jafpl: JafplException =>
@@ -205,21 +209,22 @@ class CardinalitySpec extends FlatSpec {
     val ident         = outerForEach.addAtomic(new Identity(), "ident")
 
     val bc = new BufferSink()
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(producer, "result", outerForEach, "source")
     graph.addEdge(outerForEach, "current", ident, "source")
     graph.addEdge(ident, "result", outerForEach, "result")
     graph.addEdge(outerForEach, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     var pass = false
     try {
       val runtime = new GraphRuntime(graph, runtimeConfig)
+      runtime.outputs("result").setConsumer(bc)
       runtime.run()
     } catch {
       case jafpl: JafplException =>
         pass = jafpl.code == JafplException.OUTPUT_CARDINALITY_ERROR
+        jafpl.printStackTrace()
     }
 
     assert(pass)
@@ -235,7 +240,6 @@ class CardinalitySpec extends FlatSpec {
     val ident         = innerForEach.addAtomic(new Identity(), "ident")
 
     val bc = new BufferSink()
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(producer, "result", outerForEach, "source")
     graph.addEdge(outerForEach, "current", innerForEach, "source")
@@ -243,9 +247,10 @@ class CardinalitySpec extends FlatSpec {
     graph.addEdge(ident, "result", innerForEach, "result")
     graph.addEdge(innerForEach, "result", outerForEach, "result")
     graph.addEdge(outerForEach, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     var count = 1

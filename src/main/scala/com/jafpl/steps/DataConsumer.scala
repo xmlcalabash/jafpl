@@ -17,5 +17,5 @@ trait DataConsumer {
     * @param port The output port.
     * @param message The message.
     */
-  def receive(port: String, message: Message): Unit
+  def consume(port: String, message: Message): Unit
 }

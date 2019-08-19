@@ -13,50 +13,94 @@ import scala.collection.mutable.ListBuffer
 private[runtime] class LoopWhileActor(private val monitor: ActorRef,
                                       override protected val runtime: GraphRuntime,
                                       override protected val node: LoopWhileStart)
-  extends StartActor(monitor, runtime, node) with DataConsumer {
+  extends LoopActor(monitor, runtime, node) with DataConsumer {
 
   var currentItem = Option.empty[ItemMessage]
-  var running = false
   var looped = false
-  val bindings = mutable.HashMap.empty[String, Message]
-  var initiallyTrue = true
+  var loopThisTime = true
   logEvent = TraceEvent.LOOPWHILE
   node.iterationPosition = 0L
   node.iterationSize = 0L
 
-  override protected def start(): Unit = {
-    trace("START", s"$node", logEvent)
-    commonStart()
-    runIfReady()
+  override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
+    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
+    if (port == "test") {
+      currentItem = Some(item.asInstanceOf[ItemMessage])
+      looped = true
+    } else {
+      if (node.returnAll || !openOutputs.contains(port)) {
+        super.input(from, fromPort, port, item)
+      }
+    }
   }
 
   override protected def reset(): Unit = {
-    trace("RESET", s"$node", logEvent)
-    super.reset()
-    running = false
-    readyToRun = true
-    looped = false
     node.iterationPosition = 0L
     node.iterationSize = 0L
-    runIfReady()
+    super.reset()
   }
 
-  protected[runtime] def restartLoop(): Unit = {
-    trace("RSTRTLOOP", s"$node", logEvent)
-    super.reset() // yes, reset
-    running = false
-    readyToRun = true
-    looped = false
-    runIfReady()
+  override protected[runtime] def finished(): Unit = {
+    val pass = try {
+      node.tester.test(List(currentItem.get), bindings.toMap)
+    } catch {
+      case ex: Exception =>
+        trace("FINISHED", s"$node ${currentItem.head} threw $ex", logEvent)
+        monitor ! GException(Some(node), ex)
+        return
+    }
+
+    if (pass) {
+      trace("ITERFIN", s"$node children:$childrenHaveFinished", logEvent)
+      monitor ! GRestartLoop(node)
+    } else {
+      trace("LOOPFIN", s"$node", logEvent)
+
+      if (!node.returnAll) {
+        monitor ! GOutput(node, "result", currentItem.get)
+      }
+
+      checkCardinalities("current")
+      // now close the outputs
+      for (output <- node.outputs) {
+        if (!node.inputs.contains(output)) {
+          // Don't close 'current'; it must have been closed to get here and re-closing
+          // it propagates the close event to the steps and they shouldn't see any more
+          // events!
+          if (output != "current" && output != "test") {
+            monitor ! GClose(node, output)
+          }
+        }
+      }
+
+      if (childrenHaveFinished) {
+        node.state = NodeState.FINISHED
+        monitor ! GFinished(node)
+        for (inj <- node.stepInjectables) {
+          inj.afterRun()
+        }
+      }
+    }
   }
 
-  override protected def input(from: Node, fromPort: String, port: String, msg: Message): Unit = {
-    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
-    receive(port, msg)
+  override protected def run(): Unit = {
+    running = true
+    node.state = NodeState.STARTED
+
+    trace("WHILERUN", s"$node: $childState : $openOutputs $loopThisTime", logEvent)
+
+    if (loopThisTime) {
+      node.iterationPosition += 1
+      monitor ! GOutput(node, "current", currentItem.get)
+      monitor ! GClose(node, "current")
+      super.run()
+    } else {
+      finishIfReady()
+    }
   }
 
-  override def receive(port: String, msg: Message): Unit = {
-    trace("RECEIVE", s"$node $port", logEvent)
+  override def consume(port: String, msg: Message): Unit = {
+    trace("CONSUME", s"$node $port", logEvent)
     msg match {
       case item: ItemMessage =>
         if (currentItem.nonEmpty) {
@@ -66,8 +110,8 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
         }
         currentItem = Some(item)
         val testItem = List(item)
-        initiallyTrue = node.tester.test(testItem, bindings.toMap)
-        trace("RECVTRUE", s"$node while: $initiallyTrue", logEvent)
+        loopThisTime = node.tester.test(testItem, bindings.toMap)
+        trace("RECVTRUE", s"$node while: $loopThisTime", logEvent)
       case item: BindingMessage =>
         bindings.put(item.name, item)
       case _ =>
@@ -82,73 +126,6 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
     trace("LOOP", s"$node", logEvent)
     currentItem = Some(item)
     looped = true
-  }
-
-  override protected def close(port: String): Unit = {
-    trace("CLOSE", s"$node", logEvent)
-    runIfReady()
-  }
-
-  private def runIfReady(): Unit = {
-    trace("RUNIFREADY", s"$node ready:$readyToRun running:$running current:${currentItem.nonEmpty}", logEvent)
-    if (!running && readyToRun && currentItem.nonEmpty) {
-      running = true
-
-      node.iterationPosition += 1
-      node.iterationSize += 1
-
-      if (initiallyTrue) {
-        val edge = node.outputEdge("current")
-        monitor ! GOutput(node, edge.fromPort, currentItem.get)
-        monitor ! GClose(node, edge.fromPort)
-        for (child <- node.children) {
-          monitor ! GStart(child)
-        }
-      } else {
-        finished()
-      }
-    }
-  }
-
-  override protected[runtime] def finished(): Unit = {
-    val pass = try {
-      node.tester.test(List(currentItem.get), bindings.toMap)
-    } catch {
-      case ex: Exception =>
-        trace("FINISHED", s"$node ${currentItem.head} threw $ex", logEvent)
-        monitor ! GException(Some(node), ex)
-        return
-    }
-
-    trace("FINISHED", s"$node $pass ${currentItem.head}", logEvent)
-
-    if (pass) {
-      monitor ! GRestartLoop(node)
-    } else {
-      checkCardinalities("current")
-
-      for (port <- node.buffer.keySet) {
-        for (item <- node.buffer(port)) {
-          node.outputCardinalities.put(port, node.outputCardinalities.getOrElse(port, 0L) + 1)
-          monitor ! GOutput(node, port, item)
-        }
-      }
-      node.buffer.clear()
-
-      // now close the outputs
-      for (output <- node.outputs) {
-        if (!node.inputs.contains(output)) {
-          // Don't close 'current'; it must have been closed to get here and re-closing
-          // it propagates the close event to the steps and they shouldn't see any more
-          // events!
-          if (output != "current") {
-            monitor ! GClose(node, output)
-          }
-        }
-      }
-      monitor ! GFinished(node)
-      commonFinished()
-    }
   }
 
   override protected def traceMessage(code: String, details: String): String = {

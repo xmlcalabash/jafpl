@@ -13,20 +13,20 @@ class ForEachSpec extends FlatSpec {
     val graph    = Jafpl.newInstance().newGraph()
 
     val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
-    val producer = pipeline.addAtomic(new Producer(List("1", "2", "3")), "producer")
+    val producer = pipeline.addAtomic(new Producer(List(1, 2, 3)), "producer")
     val forEach  = pipeline.addForEach("for-each", Manifold.ALLOW_ANY)
     val ident    = forEach.addAtomic(new Identity(), "ident")
 
     val bc = new BufferSink()
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(producer, "result", forEach, "source")
     graph.addEdge(forEach, "current", ident, "source")
     graph.addEdge(ident, "result", forEach, "result")
     graph.addEdge(forEach, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     var count = 1
@@ -48,16 +48,16 @@ class ForEachSpec extends FlatSpec {
     val count    = pipeline.addAtomic(new Count(), "count")
 
     val bc = new BufferSink()
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(producer, "result", forEach, "source")
     graph.addEdge(forEach, "current", ident, "source")
     graph.addEdge(ident, "result", forEach, "result")
     graph.addEdge(forEach, "result", count, "source")
     graph.addEdge(count, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     assert(bc.items.size == 1)
@@ -76,7 +76,6 @@ class ForEachSpec extends FlatSpec {
     val ident    = forEach.addAtomic(new Identity(), "ident")
 
     val bc = new BufferSink()
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(cprod, "result", count, "source")
     graph.addEdge(count, "result", ident, "source")
@@ -85,9 +84,10 @@ class ForEachSpec extends FlatSpec {
     graph.addEdge(forEach, "current", sink, "source")
     graph.addEdge(ident, "result", forEach, "result")
     graph.addEdge(forEach, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.outputs("result").setConsumer(bc)
     runtime.run()
 
     assert(bc.items.size == 3)
@@ -108,7 +108,6 @@ class ForEachSpec extends FlatSpec {
     val prodbind = forEach.addAtomic(new ProduceBinding("fred"), "pb")
 
     val bc = new BufferSink()
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addBindingEdge(bind, prodbind)
 
@@ -116,9 +115,12 @@ class ForEachSpec extends FlatSpec {
     graph.addEdge(forEach, "current", sink, "source")
     graph.addEdge(prodbind, "result", forEach, "result")
     graph.addEdge(forEach, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
+
+    runtime.outputs("result").setConsumer(bc)
+
     runtime.run()
 
     assert(bc.items.size == 3)
@@ -136,15 +138,17 @@ class ForEachSpec extends FlatSpec {
     val ident    = forEach.addAtomic(new Identity(), "ident")
 
     val bc = new BufferSink()
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(producer, "result", forEach, "source")
     graph.addEdge(forEach, "source", ident, "source")
     graph.addEdge(ident, "result", forEach, "result")
     graph.addEdge(forEach, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
+
+    runtime.outputs("result").setConsumer(bc)
+
     runtime.run()
 
     assert(bc.items.isEmpty)

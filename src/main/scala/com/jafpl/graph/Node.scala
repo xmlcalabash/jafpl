@@ -3,6 +3,8 @@ package com.jafpl.graph
 import com.jafpl.exceptions.JafplException
 import com.jafpl.injection.{PortInjectable, StepInjectable}
 import com.jafpl.messages.Message
+import com.jafpl.runtime.NodeState
+import com.jafpl.runtime.NodeState.NodeState
 import com.jafpl.steps.{ManifoldSpecification, PortCardinality, Step}
 import com.jafpl.util.UniqueId
 import org.slf4j.{Logger, LoggerFactory}
@@ -28,6 +30,14 @@ abstract class Node(val graph: Graph,
   protected[jafpl] val inputInjectables: ListBuffer[PortInjectable] = ListBuffer.empty[PortInjectable]
   protected[jafpl] val outputInjectables: ListBuffer[PortInjectable] = ListBuffer.empty[PortInjectable]
   protected[jafpl] val stepInjectables: ListBuffer[StepInjectable] = ListBuffer.empty[StepInjectable]
+
+  // After the graph is patched to remove the "end" nodes; inputs and outputs become muddled.
+  // Before doing that patch, we store the final sets in these variables so that the correct
+  // answers are available after the patch.
+  protected[jafpl] var openInputSet: Option[Set[String]] = None
+  protected[jafpl] var openOutputSet: Option[Set[String]] = None
+  private var _nodeState = NodeState.CREATED
+
   protected[jafpl] val inputCardinalities = mutable.HashMap.empty[String,Long]
   protected[jafpl] val outputCardinalities = mutable.HashMap.empty[String,Long]
   protected[jafpl] val _staticBindings = mutable.HashMap.empty[Binding,Message]
@@ -52,6 +62,11 @@ abstract class Node(val graph: Graph,
     * Every node has a unique identifier.
     */
   val id: String = UniqueId.nextId.toString
+
+  def state: NodeState = _nodeState
+  protected[jafpl] def state_=(nodeState: NodeState): Unit = {
+    _nodeState = nodeState
+  }
 
   private var _loc = if (step.isDefined) {
     step.get.location
@@ -109,13 +124,25 @@ abstract class Node(val graph: Graph,
     *
     * @return The input port names.
     */
-  def inputs: Set[String] = graph.inboundPorts(this)
+  def inputs: Set[String] = {
+    if (openInputSet.isEmpty) {
+      graph.inboundPorts(this)
+    } else {
+      openInputSet.get
+    }
+  }
 
   /** The names of this step's output ports.
     *
     * @return The output port names.
     */
-  def outputs: Set[String] = graph.outboundPorts(this)
+  def outputs: Set[String] = {
+    if (openOutputSet.isEmpty) {
+      graph.outboundPorts(this)
+    } else {
+      openOutputSet.get
+    }
+  }
 
   /** The names of this step's variable bindings.
     *

@@ -22,9 +22,9 @@ class OutputProxy(private val monitor: ActorRef,
     _provider = Some(provider)
   }
 
-  override def receive(port: String, message: Message): Unit = {
+  override def consume(port: String, message: Message): Unit = {
     if (_provider.isDefined) {
-      _provider.get.receive("source", message)
+      _provider.get.consume("source", message)
     }
   }
 }

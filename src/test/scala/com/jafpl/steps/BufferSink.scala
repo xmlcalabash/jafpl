@@ -10,8 +10,8 @@ class BufferSink() extends DefaultStep {
 
   def items: List[Any] = _items.toList
 
-  override def receive(port: String, message: Message): Unit = {
-    super.receive(port, message)
+  override def consume(port: String, message: Message): Unit = {
+    super.consume(port, message)
     message match {
       case item: ItemMessage =>
         _items += item.item

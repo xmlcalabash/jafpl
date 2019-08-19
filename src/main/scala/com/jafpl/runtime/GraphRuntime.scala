@@ -218,7 +218,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
         case act: WhenStart => _system.actorOf(Props(new WhenActor(_monitor, this, act)), actorName)
         case act: LoopForStart => _system.actorOf(Props(new LoopForActor(_monitor, this, act)), actorName)
         case act: TryCatchStart => _system.actorOf(Props(new TryCatchActor(_monitor, this, act)), actorName)
-        case act: TryStart => _system.actorOf(Props(new StartActor(_monitor, this, act)), actorName)
+        case act: TryStart => _system.actorOf(Props(new TryActor(_monitor, this, act)), actorName)
         case act: CatchStart => _system.actorOf(Props(new CatchActor(_monitor, this, act)), actorName)
         case act: FinallyStart => _system.actorOf(Props(new FinallyActor(_monitor, this, act)), actorName)
         case act: PipelineStart => _system.actorOf(Props(new PipelineActor(_monitor, this, act)), actorName)
@@ -226,19 +226,6 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
         case act: LoopWhileStart => _system.actorOf(Props(new LoopWhileActor(_monitor, this, act)), actorName)
         case act: LoopUntilStart => _system.actorOf(Props(new LoopUntilActor(_monitor, this, act)), actorName)
         case act: ContainerStart => throw JafplException.abstractContainer(act.toString, act.location)
-        case end: ContainerEnd =>
-          end.start.get match {
-            case act: TryCatchStart => _system.actorOf(Props(new TryCatchEndActor(_monitor, this, end)), actorName)
-            case act: TryStart => _system.actorOf(Props(new ConditionalEndActor(_monitor, this, end)), actorName)
-            case act: CatchStart => _system.actorOf(Props(new ConditionalEndActor(_monitor, this, end)), actorName)
-            case act: WhenStart => _system.actorOf(Props(new ConditionalEndActor(_monitor, this, end)), actorName)
-            case act: LoopEachStart => _system.actorOf(Props(new LoopEachEndActor(_monitor, this, end)), actorName)
-            case act: LoopForStart => _system.actorOf(Props(new LoopForEndActor(_monitor, this, end)), actorName)
-            case act: LoopWhileStart => _system.actorOf(Props(new LoopWhileEndActor(_monitor, this, end, act.returnAll)), actorName)
-            case act: LoopUntilStart => _system.actorOf(Props(new LoopUntilEndActor(_monitor, this, end, act.returnAll)), actorName)
-            case act: ViewportStart => _system.actorOf(Props(new ViewportEndActor(_monitor, this, end)), actorName)
-            case _ => _system.actorOf(Props(new EndActor(_monitor, this, end)), actorName)
-          }
         case req: GraphInput =>
           if (_graphInputs.contains(req.name)) {
             throw JafplException.dupInputPort(req.name, req.location)

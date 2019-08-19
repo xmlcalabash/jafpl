@@ -1162,6 +1162,51 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       }
     }
 
+    //println(asXML)
+
+    for (node <- _nodes) {
+      node match {
+        case start: ContainerStart =>
+          node.openInputSet = Some(node.inputs)
+          var outputs = Set.empty[String]
+          for (port <- node.outputs) {
+            if (!node.openInputSet.get.contains(port)) {
+              outputs += port
+            }
+          }
+          for (port <- start.containerEnd.inputs) {
+            outputs += port
+          }
+          node.openOutputSet = Some(outputs)
+        case _ =>
+          node.openInputSet = Some(node.inputs)
+          node.openOutputSet = Some(node.outputs)
+      }
+      //println(s"$node: I: ${node.openInputSet.get} O: ${node.openOutputSet.get}")
+    }
+
+    val patchEdges = ListBuffer.empty[Edge]
+    for (edge <- _edges) {
+      edge.to match {
+        case end: ContainerEnd =>
+          val newedge = new Edge(this, edge.from, edge.fromPort, end.start.get, edge.toPort)
+          patchEdges += newedge
+        case _ => patchEdges += edge
+      }
+    }
+    _edges.clear()
+    _edges ++= patchEdges
+
+    val patchNodes = ListBuffer.empty[Node]
+    for (node <- _nodes) {
+      node match {
+        case end: ContainerEnd => Unit
+        case _ => patchNodes += node
+      }
+    }
+    _nodes.clear()
+    _nodes ++= patchNodes
+
     open = false
     if (exception.isDefined) {
       _valid = false

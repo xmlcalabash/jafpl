@@ -5,7 +5,7 @@ import com.jafpl.steps.DataConsumer
 import com.jafpl.util.UniqueId
 
 class PrintingConsumer extends DataConsumer {
-  override def receive(port: String, message: Message): Unit = {
+  override def consume(port: String, message: Message): Unit = {
     println("#none: " + message)
   }
 }

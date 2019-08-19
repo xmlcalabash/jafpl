@@ -4,8 +4,7 @@ import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{Node, WhenStart}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
-import com.jafpl.runtime.GraphMonitor.{GException, GGuardResult, GStart}
-import com.jafpl.steps.DataConsumer
+import com.jafpl.runtime.GraphMonitor.{GException, GGuardResult}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -13,20 +12,35 @@ import scala.collection.mutable.ListBuffer
 private[runtime] class WhenActor(private val monitor: ActorRef,
                                  override protected val runtime: GraphRuntime,
                                  override protected val node: WhenStart)
-  extends StartActor(monitor, runtime, node) with DataConsumer {
+  extends StartActor(monitor, runtime, node) {
 
   private var readyToCheck = false
   private var contextItem = ListBuffer.empty[Message]
-  private val bindings = mutable.HashMap.empty[String, Message]
   logEvent = TraceEvent.WHEN
 
-  override protected def input(from: Node, fromPort: String, port: String, msg: Message): Unit = {
-    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
-    receive(port, msg)
+  override protected def readyToRun: Boolean = {
+    super.readyToRun && node.state != NodeState.CHECKGUARD
   }
 
-  override def receive(port: String, item: Message): Unit = {
-    trace("RECEIVE", s"$node $port", logEvent)
+  override protected def reset(): Unit = {
+    trace("WHENRST", s"$node.condition", logEvent)
+    readyToCheck = false
+    contextItem.clear()
+    openInputs.add("condition")
+    super.reset()
+  }
+
+  override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
+    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
+    if (port == "condition") {
+      consume(port, item)
+    } else {
+      super.input(from, fromPort, port, item)
+    }
+  }
+
+  override def consume(port: String, item: Message): Unit = {
+    trace("CONSUME", s"$node $port (${contextItem.size})", logEvent)
     item match {
       case item: ItemMessage =>
         assert(port == "condition")
@@ -42,34 +56,26 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
   }
 
   override protected def close(port: String): Unit = {
-    trace("CLOSE", s"$node $port", logEvent)
-    super.close(port)
-    checkIfReady()
-  }
-
-  override protected def start(): Unit = {
-    trace("START", s"$node", logEvent)
-    commonStart()
-    for (child <- node.children) {
-      monitor ! GStart(child)
+    if (port == "condition") {
+      openInputs -= "condition"
+      checkIfReady()
+    } else {
+      super.close(port)
     }
-  }
-
-  override protected def reset(): Unit = {
-    super.reset()
-    readyToCheck = false
-    openInputs.add("condition")
   }
 
   protected[runtime] def checkGuard(): Unit = {
     trace("CHKGUARD", s"$node", logEvent)
     readyToCheck = true
+    node.state = NodeState.CHECKGUARD
     checkIfReady()
   }
 
   private def checkIfReady(): Unit = {
     trace("CHKREADY", s"$node checkIfReady: ready:$readyToCheck inputs:${openInputs.isEmpty}", logEvent)
     if (readyToCheck && openInputs.isEmpty) {
+      readyToCheck = false
+      node.state = NodeState.STARTED
       try {
         val eval = runtime.runtime.expressionEvaluator.newInstance()
         val pass = eval.booleanValue(node.testExpr, contextItem.toList, bindings.toMap, node.params)

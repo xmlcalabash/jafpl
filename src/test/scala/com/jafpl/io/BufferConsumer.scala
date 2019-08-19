@@ -14,7 +14,7 @@ class BufferConsumer extends DataConsumer {
   def items: List[Any] = _items.toList
   def metas: List[Any] = _items.toList
 
-  override def receive(port: String, message: Message): Unit = {
+  override def consume(port: String, message: Message): Unit = {
     message match {
       case item: ItemMessage =>
         _items += item.item

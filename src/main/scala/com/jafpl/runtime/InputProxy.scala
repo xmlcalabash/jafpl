@@ -22,10 +22,10 @@ class InputProxy(private val monitor: ActorRef,
 
   override def send(message: Message): Unit = {
     // In fact the port name is irrelevant in the input proxy case...which is the whole point of send()!
-    receive("source", message)
+    consume("source", message)
   }
 
-  override def receive(port: String, message: Message): Unit = {
+  override def consume(port: String, message: Message): Unit = {
     _items += message
   }
 

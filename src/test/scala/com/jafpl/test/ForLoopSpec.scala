@@ -21,7 +21,6 @@ class ForLoopSpec extends FlatSpec {
     graph.addEdge(forloop, "current", ident, "source")
     graph.addEdge(ident, "result", forloop, "result")
     graph.addEdge(forloop, "result", pipeline, "result")
-
     graph.addOutput(pipeline, "result")
 
     graph.close()

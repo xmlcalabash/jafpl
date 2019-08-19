@@ -7,8 +7,8 @@ class LiesAboutOutputBindings extends DefaultStep {
   override def outputSpec: PortSpecification = PortSpecification.RESULT
 
   override def run(): Unit = {
-    consumer.get.receive("result", new ItemMessage("one", Metadata.STRING))
+    consumer.get.consume("result", new ItemMessage("one", Metadata.STRING))
     // But we asserted we'd send only one result!
-    consumer.get.receive("result", new ItemMessage("two", Metadata.STRING))
+    consumer.get.consume("result", new ItemMessage("two", Metadata.STRING))
   }
 }

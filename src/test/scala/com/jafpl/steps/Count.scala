@@ -9,11 +9,11 @@ class Count extends DefaultStep {
   override def inputSpec: PortSpecification = PortSpecification.SOURCESEQ
   override def outputSpec: PortSpecification = PortSpecification.RESULT
 
-  override def receive(port: String, message: Message): Unit = {
+  override def consume(port: String, message: Message): Unit = {
     count += 1
   }
 
   override def run(): Unit = {
-    consumer.get.receive("result", new ItemMessage(count, Metadata.BLANK))
+    consumer.get.consume("result", new ItemMessage(count, Metadata.BLANK))
   }
 }

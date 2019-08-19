@@ -22,6 +22,8 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
   logEvent = TraceEvent.JOINER
 
   override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
+    //println(s"Joiner $node recives $item from $from on $fromPort to $port")
+
     if (buffered.contains(port)) {
       buffered(port) += item
     } else {
@@ -29,41 +31,37 @@ private[runtime] class JoinerActor(private val monitor: ActorRef,
       mbuf += item
       buffered(port) = mbuf
     }
-    println(s"Joiner $node received: $buffered")
   }
 
   override protected def reset(): Unit = {
+    trace("RESET", s"$node", logEvent)
     super.reset()
     buffered.clear()
-    println(s"Joiner $node reset")
   }
 
   override protected def run(): Unit = {
     trace("RUN", s"$node", logEvent)
 
-    readyToRun = false
-
-    println(s"Joiner $node runs ${node.mode}")
     if (node.mode == JoinMode.PRIORITY && buffered.contains("source_1")) {
       val port = s"source_1"
       for (item <- buffered(port)) {
         monitor ! GOutput(node, "result", item)
       }
     } else {
-      println(s"Joiner $node: $buffered")
       var portNum = 0
       while (buffered.nonEmpty) {
         portNum += 1
         val port = s"source_$portNum"
         if (buffered.contains(port)) {
           for (item <- buffered(port)) {
-            println(s"Joiner $node/$port sends $item")
             monitor ! GOutput(node, "result", item)
           }
           buffered.remove(port)
         }
       }
     }
+
+    node.state = NodeState.FINISHED
 
     for (output <- node.outputs) {
       monitor ! GClose(node, output)
