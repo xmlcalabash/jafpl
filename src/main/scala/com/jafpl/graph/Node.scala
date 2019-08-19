@@ -212,11 +212,15 @@ abstract class Node(val graph: Graph,
     s"{$label}"
   }
 
-  protected[graph] def dumpChildren(depth: Int): xml.Node = {
+  protected[graph] def dumpOpenChildren(depth: Int): xml.Node = {
     xml.Text("")
   }
 
-  protected[graph] def dump(depth: Int): xml.Elem = {
+  protected[graph] def dumpClosedChildren(depth: Int): xml.Node = {
+    xml.Text("")
+  }
+
+  protected[graph] def dumpOpen(depth: Int): xml.Elem = {
     val indent = " " * depth
     val nodes = ListBuffer.empty[xml.Node]
     nodes += xml.Text("\n")
@@ -296,7 +300,7 @@ abstract class Node(val graph: Graph,
     }
 
     nodes += xml.Text("\n" + indent)
-    nodes += dumpChildren(depth)
+    nodes += dumpOpenChildren(depth)
 
     // Hack for closing indent
     if (indent.length >= 2) {
@@ -331,6 +335,133 @@ abstract class Node(val graph: Graph,
       new UnprefixedAttribute("label", xml.Text(label),
         new UnprefixedAttribute("className", xml.Text(className),
           new UnprefixedAttribute("name", xml.Text(shortName), extraAttr))))
+    new xml.Elem(null, nodeName, attrs, xml.TopScope, false, nodes:_*)
+  }
+
+  protected[graph] def dumpClosed(depth: Int): xml.Elem = {
+    val indent = " " * depth
+    val nodes = ListBuffer.empty[xml.Node]
+    nodes += xml.Text("\n")
+
+    val inlist = ListBuffer.empty[xml.Node]
+    for (input <- inputs) {
+      for (edge <- graph.edgesTo(this, input)) {
+        inlist += xml.Text("\n")
+        inlist += xml.Text(indent + "  ")
+        inlist += <in-edge source={ edge.from.id } output-port={ edge.fromPort } input-port={ edge.toPort }></in-edge>
+      }
+    }
+    if (bindings.nonEmpty) {
+      for (edge <- graph.edgesTo(this, "#bindings")) {
+        inlist += xml.Text("\n")
+        inlist += xml.Text(indent + "  ")
+        inlist += <in-edge source={ edge.from.id } output-port={ edge.fromPort } input-port={ edge.toPort }></in-edge>
+      }
+    }
+
+    val outlist = ListBuffer.empty[xml.Node]
+    for (output <- outputs) {
+      for (edge <- graph.edgesFrom(this, output)) {
+        val ancestor = graph.commonAncestor(this, edge.to)
+        if (ancestor.isDefined && ancestor.get == this) {
+          inlist += xml.Text("\n")
+          inlist += xml.Text(indent + "  ")
+          inlist += <out-edge output-port={ edge.fromPort } input-port={ edge.toPort } destination={ edge.to.id }></out-edge>
+        } else {
+          outlist += xml.Text("\n")
+          outlist += xml.Text(indent + "  ")
+          outlist += <out-edge output-port={ edge.fromPort } input-port={ edge.toPort } destination={ edge.to.id }></out-edge>
+        }
+      }
+    }
+
+    this match {
+      case _: LoopWhileStart =>
+        outlist += xml.Text("\n")
+        outlist += xml.Text(indent + "  ")
+        outlist += <out-edge output-port="test"></out-edge>
+      case _: LoopUntilStart =>
+        outlist += xml.Text("\n")
+        outlist += xml.Text(indent + "  ")
+        outlist += <out-edge output-port="test"></out-edge>
+        /*
+      case _: CatchStart =>
+        inlist += xml.Text("\n")
+        inlist += xml.Text(indent + "  ")
+        inlist += <in-edge input-port="error"></in-edge>
+      case _: LoopStart =>
+        inlist += xml.Text("\n")
+        inlist += xml.Text(indent + "  ")
+        inlist += <in-edge input-port="current"></in-edge>
+         */
+      case _ => Unit
+    }
+
+    if (inlist.nonEmpty) {
+      inlist += xml.Text("\n" + indent)
+      nodes += xml.Text(indent)
+      nodes += <inputs>{ inlist }</inputs>
+    }
+
+    if (outputs.nonEmpty) {
+      if (inputs.nonEmpty) {
+        nodes += xml.Text("\n")
+      }
+
+      outlist += xml.Text("\n" + indent)
+      nodes += xml.Text(indent)
+      nodes += <outputs>{ outlist }</outputs>
+    }
+
+    this match {
+      case _: Binding =>
+        if (inputs.nonEmpty) {
+          nodes += xml.Text("\n")
+        }
+
+        val outlist = ListBuffer.empty[xml.Node]
+        for (edge <- graph.edgesFrom(this)) {
+          if (edge.fromPort == "result") {
+            outlist += xml.Text("\n")
+            outlist += xml.Text(indent + "  ")
+            outlist += <out-edge output-port={ edge.fromPort } input-port={ edge.toPort } destination={ edge.to.id }></out-edge>
+          } else {
+            logger.error(s"Binding has output edge named ${edge.fromPort}")
+          }
+        }
+        outlist += xml.Text("\n" + indent)
+        nodes += xml.Text(indent)
+        nodes += <outputs>{ outlist }</outputs>
+      case _ => Unit
+    }
+
+    nodes += xml.Text("\n" + indent)
+    nodes += dumpClosedChildren(depth)
+
+    // Hack for closing indent
+    if (indent.length >= 2) {
+      nodes += xml.Text("\n" + indent.substring(2))
+    } else {
+      nodes += xml.Text("\n")
+    }
+
+    val className = if (step.isDefined) {
+      step.get.getClass.getName
+    } else {
+      this.getClass.getName
+    }
+    val shortName = className.split("\\.").last
+
+    val nodeName = this match {
+      case _: ContainerStart => "container"
+      case _ => "node"
+    }
+
+    // Ba-ar-af. My $DEITY this is ugly.
+    val attrs = new xml.UnprefixedAttribute("id", xml.Text(id),
+      new UnprefixedAttribute("label", xml.Text(label),
+        new UnprefixedAttribute("className", xml.Text(className),
+          new UnprefixedAttribute("name", xml.Text(shortName), xml.Null))))
     new xml.Elem(null, nodeName, attrs, xml.TopScope, false, nodes:_*)
   }
 

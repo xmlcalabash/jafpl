@@ -1162,8 +1162,6 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       }
     }
 
-    //println(asXML)
-
     for (node <- _nodes) {
       node match {
         case start: ContainerStart =>
@@ -1182,7 +1180,6 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
           node.openInputSet = Some(node.inputs)
           node.openOutputSet = Some(node.outputs)
       }
-      //println(s"$node: I: ${node.openInputSet.get} O: ${node.openOutputSet.get}")
     }
 
     val patchEdges = ListBuffer.empty[Edge]
@@ -1229,10 +1226,10 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     while (!done) {
       done = true
       node match {
-        case s: Splitter =>
+        case _: Splitter =>
           node = node.parent.get
           done = false
-        case j: Joiner =>
+        case _: Joiner =>
           node = node.parent.get
           done = false
         case _ => Unit
@@ -1251,7 +1248,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     depth
   }
 
-  private def commonAncestor(node1: Node, node2: Node): Option[Node] = {
+  protected[graph] def commonAncestor(node1: Node, node2: Node): Option[Node] = {
     if (node1 == node2) {
       return Some(node1)
     }
@@ -1343,15 +1340,14 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       //println(node)
       if (node.parent.isEmpty) {
         xmlNodes += xml.Text("  ")
-        xmlNodes += node.dump(4)
+        if (open) {
+          xmlNodes += node.dumpOpen(4)
+        } else {
+          xmlNodes += node.dumpClosed(4)
+        }
         xmlNodes += xml.Text("\n")
       }
     }
-    /*
-    for (edge <- _edges) {
-      println(edge)
-    }
-    */
     <graph xmlns="http://jafpl.com/ns/graph">{ xmlNodes }</graph>
   }
 }

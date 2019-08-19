@@ -373,15 +373,35 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     node
   }
 
-  override protected[graph] def dumpChildren(depth: Int): xml.Node = {
+  override protected[graph] def dumpOpenChildren(depth: Int): xml.Node = {
     val indent = " " * depth
     val nodes = ListBuffer.empty[xml.Node]
     for (node <- children) {
       nodes += xml.Text("\n" + indent)
-      nodes += node.dump(depth + 2)
+      nodes += node.dumpOpen(depth + 2)
     }
     nodes += xml.Text("\n" + indent)
-    nodes += end.dump(depth + 2)
+    nodes += end.dumpOpen(depth + 2)
+
+    // Hack for closing indent
+    if (depth >= 2) {
+      nodes += xml.Text("\n" + (" " * (depth - 2)))
+    } else {
+      nodes += xml.Text("\n")
+    }
+
+    <children>{ nodes }</children>
+  }
+
+  override protected[graph] def dumpClosedChildren(depth: Int): xml.Node = {
+    val indent = " " * depth
+    val nodes = ListBuffer.empty[xml.Node]
+    for (node <- children) {
+      nodes += xml.Text("\n" + indent)
+      nodes += node.dumpClosed(depth + 2)
+    }
+    nodes += xml.Text("\n" + indent)
+    nodes += end.dumpClosed(depth + 2)
 
     // Hack for closing indent
     if (depth >= 2) {
