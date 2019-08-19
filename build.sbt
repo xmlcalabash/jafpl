@@ -4,7 +4,7 @@ name := "jafpl"
 
 organization := "com.jafpl"
 homepage     := Some(url("https://jafpl.com/"))
-version      := "0.1.65"
+version      := "0.2.0"
 scalaVersion := "2.12.6"
 
 buildInfoKeys ++= Seq[BuildInfoKey](
@@ -112,8 +112,8 @@ libraryDependencies ++= Seq(
   "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.11.0",
   "org.slf4j" % "jcl-over-slf4j" % "1.7.25",
   "org.slf4j" % "slf4j-api" % "1.7.25",
-  "com.typesafe.akka" %% "akka-actor" % "2.5.13",
-  "com.typesafe.akka" %% "akka-testkit" % "2.5.13" % Test,
+  "com.typesafe.akka" %% "akka-actor" % "2.5.24",
+  "com.typesafe.akka" %% "akka-testkit" % "2.5.24" % Test,
   "org.scalactic" %% "scalactic" % "3.0.5",
   "org.scalatest" %% "scalatest" % "3.0.5" % "test",
   "org.scala-lang.modules" %% "scala-xml" % "1.1.0",
