@@ -219,6 +219,12 @@ methods on those objects.</p></div><dl class="attributes block"> <dt>Definition 
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
+                        <a class="object" href="NodeState$.html" title=""></a>
+                        <a href="NodeState$.html" title="">
+                          NodeState
+                        </a>
+                      </li><li class="current-entities indented3">
+                        <span class="separator"></span>
                         <a class="class" href="OptionBinding.html" title="An option binding."></a>
                         <a href="OptionBinding.html" title="An option binding.">
                           OptionBinding
@@ -1124,6 +1130,22 @@ the expression.</p><p>At runtime, the computed values are provided to steps thro
       
       <p class="shortcomment cmt">The names of this step's variable bindings.</p><div class="fullcomment"><div class="comment cmt"><p>The names of this step's variable bindings.</p><p>This method returns the names of the variables for which this step will receive bindings at runtime.
 </p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>The variable names.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
+    </li><li name="com.jafpl.graph.FinallyStart#cause" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="cause:Option[Exception]"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/FinallyStart.html#cause:Option[Exception]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">cause</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Exception">Exception</span>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../index.html" class="extype" name="com.jafpl">com.jafpl</a>] </dd></dl></div>
     </li><li name="com.jafpl.graph.ContainerStart#children" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="children:List[com.jafpl.graph.Node]"></a><a id="children:List[Node]"></a>
       <span class="permalink">
@@ -1198,10 +1220,10 @@ data flow establishes dependencies automatically. If step A consumes the output 
 the pipeline will assure that step B runs before step A.</p><p>In cases where there is no data flow dependency, but it's still necessary to force an
 order, you can impose one by saying that <code>A.dependsOn(B)</code>.
 </p></div><dl class="paramcmts block"><dt class="param">node</dt><dd class="cmt"><p>The node in the graph which must be run before this one</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
-    </li><li name="com.jafpl.graph.Node#dump" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="dump(depth:Int):scala.xml.Elem"></a><a id="dump(Int):Elem"></a>
+    </li><li name="com.jafpl.graph.Node#dumpClosed" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="dumpClosed(depth:Int):scala.xml.Elem"></a><a id="dumpClosed(Int):Elem"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/FinallyStart.html#dump(depth:Int):scala.xml.Elem" title="Permalink">
+      <a href="../../../com/jafpl/graph/FinallyStart.html#dumpClosed(depth:Int):scala.xml.Elem" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -1210,14 +1232,14 @@ order, you can impose one by saying that <code>A.dependsOn(B)</code>.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">dump</span><span class="params">(<span name="depth">depth: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.xml.Elem">Elem</span></span>
+        <span class="name">dumpClosed</span><span class="params">(<span name="depth">depth: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.xml.Elem">Elem</span></span>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd><dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
-    </li><li name="com.jafpl.graph.ContainerStart#dumpChildren" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="dumpChildren(depth:Int):scala.xml.Node"></a><a id="dumpChildren(Int):scala.xml.Node"></a>
+    </li><li name="com.jafpl.graph.ContainerStart#dumpClosedChildren" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="dumpClosedChildren(depth:Int):scala.xml.Node"></a><a id="dumpClosedChildren(Int):scala.xml.Node"></a>
       <span class="permalink">
-      <a href="../../../com/jafpl/graph/FinallyStart.html#dumpChildren(depth:Int):scala.xml.Node" title="Permalink">
+      <a href="../../../com/jafpl/graph/FinallyStart.html#dumpClosedChildren(depth:Int):scala.xml.Node" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -1226,7 +1248,39 @@ order, you can impose one by saying that <code>A.dependsOn(B)</code>.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">dumpChildren</span><span class="params">(<span name="depth">depth: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.xml.Node">scala.xml.Node</span></span>
+        <span class="name">dumpClosedChildren</span><span class="params">(<span name="depth">depth: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.xml.Node">scala.xml.Node</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd><dt>Definition Classes</dt><dd><a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">ContainerStart</a> → <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
+    </li><li name="com.jafpl.graph.Node#dumpOpen" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="dumpOpen(depth:Int):scala.xml.Elem"></a><a id="dumpOpen(Int):Elem"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/FinallyStart.html#dumpOpen(depth:Int):scala.xml.Elem" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">dumpOpen</span><span class="params">(<span name="depth">depth: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.xml.Elem">Elem</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd><dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
+    </li><li name="com.jafpl.graph.ContainerStart#dumpOpenChildren" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="dumpOpenChildren(depth:Int):scala.xml.Node"></a><a id="dumpOpenChildren(Int):scala.xml.Node"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/FinallyStart.html#dumpOpenChildren(depth:Int):scala.xml.Node" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">dumpOpenChildren</span><span class="params">(<span name="depth">depth: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.xml.Node">scala.xml.Node</span></span>
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="index.html" class="extype" name="com.jafpl.graph">com.jafpl.graph</a>] </dd><dt>Definition Classes</dt><dd><a href="ContainerStart.html" class="extype" name="com.jafpl.graph.ContainerStart">ContainerStart</a> → <a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
@@ -1722,6 +1776,38 @@ node is always appended to the label.</p></div><dl class="attributes block"> <dt
       
       <p class="shortcomment cmt">This node's parent.</p><div class="fullcomment"><div class="comment cmt"><p>This node's parent.
 </p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>This node's parent.</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
+    </li><li name="com.jafpl.graph.Node#state" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="state:com.jafpl.graph.NodeState.NodeState"></a><a id="state:NodeState"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/FinallyStart.html#state:com.jafpl.graph.NodeState.NodeState" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">state</span><span class="result">: <a href="NodeState$.html#NodeState=com.jafpl.graph.NodeState.Value" class="extmbr" name="com.jafpl.graph.NodeState.NodeState">NodeState</a></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
+    </li><li name="com.jafpl.graph.Node#state_=" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="state_=(nodeState:com.jafpl.graph.NodeState.NodeState):Unit"></a><a id="state_=(NodeState):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/graph/FinallyStart.html#state_=(nodeState:com.jafpl.graph.NodeState.NodeState):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: state_$eq" class="name">state_=</span><span class="params">(<span name="nodeState">nodeState: <a href="NodeState$.html#NodeState=com.jafpl.graph.NodeState.Value" class="extmbr" name="com.jafpl.graph.NodeState.NodeState">NodeState</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../index.html" class="extype" name="com.jafpl">com.jafpl</a>] </dd><dt>Definition Classes</dt><dd><a href="Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></dd></dl></div>
     </li><li name="com.jafpl.graph.Node#staticBindings" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="staticBindings:Map[com.jafpl.graph.Binding,com.jafpl.messages.Message]"></a><a id="staticBindings:Map[Binding,Message]"></a>
       <span class="permalink">

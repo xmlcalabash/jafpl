@@ -201,7 +201,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">TracingActor</span><span class="result"> extends <span class="extype" name="akka.actor.Actor">Actor</span></span>
+        <span class="name">TracingActor</span><span class="result"> extends <span class="extype" name="akka.actor.Actor">Actor</span> with <span class="extype" name="akka.actor.ActorLogging">ActorLogging</span></span>
       </span>
       </h4>
 
@@ -210,7 +210,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="akka.actor.Actor">Actor</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="akka.actor.ActorLogging">ActorLogging</span>, <span class="extype" name="akka.actor.Actor">Actor</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -236,7 +236,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.jafpl.runtime.TracingActor"><span>TracingActor</span></li><li class="in" name="akka.actor.Actor"><span>Actor</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.jafpl.runtime.TracingActor"><span>TracingActor</span></li><li class="in" name="akka.actor.ActorLogging"><span>ActorLogging</span></li><li class="in" name="akka.actor.Actor"><span>Actor</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -571,6 +571,22 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.jafpl.runtime.TracingActor#fmtSender" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="fmtSender:String"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#fmtSender:String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">fmtSender</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
@@ -619,7 +635,7 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.jafpl.runtime.TracingActor#log" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="akka.actor.ActorLogging#log" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="log:akka.event.LoggingAdapter"></a><a id="log:LoggingAdapter"></a>
       <span class="permalink">
       <a href="../../../com/jafpl/runtime/TracingActor.html#log:akka.event.LoggingAdapter" title="Permalink">
@@ -628,13 +644,13 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
     </span>
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">val</span>
+        <span class="kind">def</span>
       </span>
       <span class="symbol">
         <span class="name">log</span><span class="result">: <span class="extype" name="akka.event.LoggingAdapter">LoggingAdapter</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>ActorLogging</dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -651,6 +667,22 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.jafpl.runtime.TracingActor#nodeState" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="nodeState(node:com.jafpl.graph.Node):String"></a><a id="nodeState(Node):String"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#nodeState(node:com.jafpl.graph.Node):String" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">nodeState</span><span class="params">(<span name="node">node: <a href="../graph/Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
@@ -819,6 +851,22 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Actor</dd></dl></div>
+    </li><li name="com.jafpl.runtime.TracingActor#stateChange" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="stateChange(node:com.jafpl.graph.Node,state:com.jafpl.graph.NodeState.NodeState):Unit"></a><a id="stateChange(Node,NodeState):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/jafpl/runtime/TracingActor.html#stateChange(node:com.jafpl.graph.Node,state:com.jafpl.graph.NodeState.NodeState):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">stateChange</span><span class="params">(<span name="node">node: <a href="../graph/Node.html" class="extype" name="com.jafpl.graph.Node">Node</a></span>, <span name="state">state: <a href="../graph/NodeState$.html#NodeState=com.jafpl.graph.NodeState.Value" class="extmbr" name="com.jafpl.graph.NodeState.NodeState">NodeState</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="akka.actor.Actor#supervisorStrategy" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="supervisorStrategy:akka.actor.SupervisorStrategy"></a><a id="supervisorStrategy:SupervisorStrategy"></a>
       <span class="permalink">
@@ -867,22 +915,6 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.jafpl.runtime.TracingActor#trace" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="trace(level:String,code:String,details:String,event:com.jafpl.runtime.TraceEvent.TraceEvent):Unit"></a><a id="trace(String,String,String,TraceEvent):Unit"></a>
-      <span class="permalink">
-      <a href="../../../com/jafpl/runtime/TracingActor.html#trace(level:String,code:String,details:String,event:com.jafpl.runtime.TraceEvent.TraceEvent):Unit" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">trace</span><span class="params">(<span name="level">level: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="code">code: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="details">details: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="event">event: <a href="TraceEvent$.html#TraceEvent=com.jafpl.runtime.TraceEvent.Value" class="extmbr" name="com.jafpl.runtime.TraceEvent.TraceEvent">TraceEvent</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
     </li><li name="com.jafpl.runtime.TracingActor#trace" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="trace(code:String,details:String,event:com.jafpl.runtime.TraceEvent.TraceEvent):Unit"></a><a id="trace(String,String,TraceEvent):Unit"></a>
       <span class="permalink">
@@ -1007,7 +1039,9 @@ process them.</p><p>See <a href="http://jafpl.com/" target="_blank">http://jafpl
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="akka.actor.Actor">
+        <div class="parent" name="akka.actor.ActorLogging">
+              <h3>Inherited from <span class="extype" name="akka.actor.ActorLogging">ActorLogging</span></h3>
+            </div><div class="parent" name="akka.actor.Actor">
               <h3>Inherited from <span class="extype" name="akka.actor.Actor">Actor</span></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
