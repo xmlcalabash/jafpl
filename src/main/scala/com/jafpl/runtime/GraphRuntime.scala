@@ -1,5 +1,7 @@
 package com.jafpl.runtime
 
+import java.time.{Duration, Instant}
+
 import akka.actor.{ActorRef, ActorSystem, DeadLetter, Props}
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerStart, EmptySource, FinallyStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopForStart, LoopUntilStart, LoopWhileStart, OptionBinding, PipelineStart, Sink, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
@@ -29,8 +31,8 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   protected[jafpl] val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private val actorList = ListBuffer.empty[ActorRef]
-  private var _system: ActorSystem = _
-  private var _monitor: ActorRef = _
+  private var system: ActorSystem = _
+  private var monitor: ActorRef = _
   private var reaper: ActorRef = _
   private val sleepInterval = 100
   private var _started = false
@@ -40,6 +42,11 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   private val _graphOptions = mutable.HashMap.empty[String, OptionBinding]
   private var _traceEventManager: TraceEventManager = new DefaultTraceEventManager()
   private var _exception = Option.empty[Exception]
+
+  // I'm not absolutely certain this is necessary, but ...
+  // The other way to do this would be to just pass messages for it.
+  private[this] val messageLock = new Object()
+  private var lastMessage = Instant.now()
 
   graph.close()
 
@@ -52,7 +59,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   } catch {
     case ex: Exception =>
       for (actor <- actorList) {
-        _system.stop(actor)
+        system.stop(actor)
       }
       throw ex
   }
@@ -141,7 +148,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
     * To determine if execution has completed, check the `finished` value.
     */
   def runInBackground(): Unit = {
-    _monitor ! NRunIfReady()
+    monitor ! NRunIfReady()
     _started = true
   }
 
@@ -160,17 +167,18 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
 
   private def waitForTeardown(): Unit = {
     if (!finished) {
-      val watchdog = runtime.watchdogTimeout + 1000 //FIXME:
+      val watchdog = runtime.watchdogTimeout
       if (watchdog < 0) {
-        _monitor ! NWatchdogTimeout()
+        monitor ! NWatchdogTimeout()
       }
 
       var ticker = watchdog
       while (!_finished) {
         if (ticker <= 0) {
           ticker = watchdog
+          // Ignore the watchdog if it'ss set to zero
           if (watchdog != 0) {
-            _monitor ! NWatchdog(ticker)
+            monitor ! NWatchdog(ticker)
           }
         }
         Thread.sleep(sleepInterval)
@@ -184,8 +192,18 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   }
 
   def stop(): Unit = {
-    _monitor ! NAbortExecution()
+    monitor ! NAbortExecution()
     waitForTeardown()
+  }
+
+  protected[runtime] def noteMessageTime(): Unit = {
+    messageLock.synchronized {
+      lastMessage = Instant.now()
+    }
+  }
+
+  protected[runtime] def lastMessageAge: Long = {
+    Duration.between(lastMessage, Instant.now()).toMillis
   }
 
   private def makeActors(): Unit = {
@@ -193,57 +211,57 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
 
     logger.debug(s"Creating $name for $graph ($this)")
 
-    _system = ActorSystem(name)
-    _monitor = _system.actorOf(Props(new GraphMonitor(graph, this)), name = "monitor")
-    reaper = _system.actorOf(Props(new Reaper(runtime)), name = "reaper")
+    system = ActorSystem(name)
+    monitor = system.actorOf(Props(new GraphMonitor(graph, this)), name = "monitor")
+    reaper = system.actorOf(Props(new Reaper(runtime)), name = "reaper")
 
-    val listener = _system.actorOf(Props[DeadLetterListener])
-    _system.eventStream.subscribe(listener, classOf[DeadLetter])
+    val listener = system.actorOf(Props[DeadLetterListener])
+    system.eventStream.subscribe(listener, classOf[DeadLetter])
 
     for (node <- graph.nodes) {
       var actorName = "_" * (7 - node.id.length) + node.id
 
       val actor = node match {
-        case act: PipelineStart => _system.actorOf(Props(new PipelineActor(_monitor, this, act)), actorName)
-        case act: Splitter => _system.actorOf(Props(new SplitterActor(_monitor, this, act)), actorName)
-        case act: Joiner => _system.actorOf(Props(new JoinerActor(_monitor, this, act)), actorName)
-        case act: GroupStart => _system.actorOf(Props(new GroupActor(_monitor, this, act)), actorName)
-        case act: LoopEachStart => _system.actorOf(Props(new LoopForEachActor(_monitor, this, act)), actorName)
-        case act: LoopForStart => _system.actorOf(Props(new LoopForCountActor(_monitor, this, act)), actorName)
-        case act: Buffer => _system.actorOf(Props(new BufferActor(_monitor, this, act)), actorName)
-        case act: Sink => _system.actorOf(Props(new SinkActor(_monitor, this, act)), actorName)
-        case act: EmptySource => _system.actorOf(Props(new EmptySourceActor(_monitor, this, act)), actorName)
-        case act: LoopWhileStart => _system.actorOf(Props(new LoopWhileActor(_monitor, this, act)), actorName)
-        case act: LoopUntilStart => _system.actorOf(Props(new LoopUntilActor(_monitor, this, act)), actorName)
-        case act: ChooseStart => _system.actorOf(Props(new ChooseActor(_monitor, this, act)), actorName)
-        case act: WhenStart => _system.actorOf(Props(new WhenActor(_monitor, this, act)), actorName)
-        case act: TryCatchStart => _system.actorOf(Props(new TryCatchActor(_monitor, this, act)), actorName)
-        case act: TryStart => _system.actorOf(Props(new TryActor(_monitor, this, act)), actorName)
-        case act: CatchStart => _system.actorOf(Props(new CatchActor(_monitor, this, act)), actorName)
-        case act: FinallyStart => _system.actorOf(Props(new FinallyActor(_monitor, this, act)), actorName)
-        case act: ViewportStart => _system.actorOf(Props(new ViewportActor(_monitor, this, act)), actorName)
+        case act: PipelineStart => system.actorOf(Props(new PipelineActor(monitor, this, act)), actorName)
+        case act: Splitter => system.actorOf(Props(new SplitterActor(monitor, this, act)), actorName)
+        case act: Joiner => system.actorOf(Props(new JoinerActor(monitor, this, act)), actorName)
+        case act: GroupStart => system.actorOf(Props(new GroupActor(monitor, this, act)), actorName)
+        case act: LoopEachStart => system.actorOf(Props(new LoopForEachActor(monitor, this, act)), actorName)
+        case act: LoopForStart => system.actorOf(Props(new LoopForCountActor(monitor, this, act)), actorName)
+        case act: Buffer => system.actorOf(Props(new BufferActor(monitor, this, act)), actorName)
+        case act: Sink => system.actorOf(Props(new SinkActor(monitor, this, act)), actorName)
+        case act: EmptySource => system.actorOf(Props(new EmptySourceActor(monitor, this, act)), actorName)
+        case act: LoopWhileStart => system.actorOf(Props(new LoopWhileActor(monitor, this, act)), actorName)
+        case act: LoopUntilStart => system.actorOf(Props(new LoopUntilActor(monitor, this, act)), actorName)
+        case act: ChooseStart => system.actorOf(Props(new ChooseActor(monitor, this, act)), actorName)
+        case act: WhenStart => system.actorOf(Props(new WhenActor(monitor, this, act)), actorName)
+        case act: TryCatchStart => system.actorOf(Props(new TryCatchActor(monitor, this, act)), actorName)
+        case act: TryStart => system.actorOf(Props(new TryActor(monitor, this, act)), actorName)
+        case act: CatchStart => system.actorOf(Props(new CatchActor(monitor, this, act)), actorName)
+        case act: FinallyStart => system.actorOf(Props(new FinallyActor(monitor, this, act)), actorName)
+        case act: ViewportStart => system.actorOf(Props(new ViewportActor(monitor, this, act)), actorName)
         case act: ContainerStart => throw JafplException.abstractContainer(act.toString, act.location)
         case req: GraphInput =>
           if (_graphInputs.contains(req.name)) {
             throw JafplException.dupInputPort(req.name, req.location)
           }
-          val ip = new InputProxy(_monitor, this, node)
+          val ip = new InputProxy(monitor, this, node)
           _graphInputs.put(req.name, ip)
-          _system.actorOf(Props(new InputActor(_monitor, this, req, ip)), actorName)
+          system.actorOf(Props(new InputActor(monitor, this, req, ip)), actorName)
         case req: GraphOutput =>
           if (_graphOutputs.contains(req.name)) {
             throw JafplException.dupOutputPort(req.name, req.location)
           }
-          val op = new OutputProxy(_monitor, this, node)
+          val op = new OutputProxy(monitor, this, node)
           _graphOutputs.put(req.name, op)
-          _system.actorOf(Props(new OutputActor(_monitor, this, req, op)), actorName)
+          system.actorOf(Props(new OutputActor(monitor, this, req, op)), actorName)
         case req: OptionBinding =>
           _graphOptions.put(req.name, req)
-          _system.actorOf(Props(new VariableActor(_monitor, this, req)), actorName)
+          system.actorOf(Props(new VariableActor(monitor, this, req)), actorName)
         case req: Binding =>
-          _system.actorOf(Props(new VariableActor(_monitor, this, req)), actorName)
+          system.actorOf(Props(new VariableActor(monitor, this, req)), actorName)
         case atomic: AtomicNode =>
-          _system.actorOf(Props(new AtomicActor(_monitor, this, atomic)), actorName)
+          system.actorOf(Props(new AtomicActor(monitor, this, atomic)), actorName)
 
         case _ =>
           throw JafplException.unexpecteStepType(node.toString, node.location)
@@ -251,7 +269,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
 
       actorList += actor
       reaper ! WatchMe(actor)
-      _monitor ! NNode(node, actor)
+      monitor ! NNode(node, actor)
     }
   }
 }

@@ -341,6 +341,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   final def receive: PartialFunction[Any, Unit] = {
     LoggingReceive {
       case NInitialize(parent, actors, outputs) =>
+        runtime.noteMessageTime()
         trace("INIT", s"$node", TraceEvent.NMESSAGES)
         if (parent.isDefined) {
           this.parent = parent.get
@@ -351,48 +352,63 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         this.outputs = outputs
         initialize()
       case NInput(fromNode, fromPort, port, message) =>
+        runtime.noteMessageTime()
         trace("INPUT", s"$fromNode.$fromPort -> $node.$port: $message", TraceEvent.NMESSAGES)
         bufferInput(port, message)
       case NClose(fromNode, fromPort, port) =>
+        runtime.noteMessageTime()
         trace("CLOSE", s"$fromNode.$fromPort -> $node.$port", TraceEvent.NMESSAGES)
         protectedArity1(protectedClose, port)
       case NStart() =>
+        runtime.noteMessageTime()
         trace("START", s"$node", TraceEvent.NMESSAGES)
         configurePorts()
         start()
       case NStarted(node) =>
+        runtime.noteMessageTime()
         trace("STARTED", s"$node", TraceEvent.NMESSAGES)
         started(node)
       case NReady(node) =>
+        runtime.noteMessageTime()
         trace("READY", s"$node", TraceEvent.NMESSAGES)
         ready(node)
       case NRunIfReady() =>
+        runtime.noteMessageTime()
         protectedArity0(() => NodeActor.this.protectedRunIfReady())
       case NStop() =>
+        runtime.noteMessageTime()
         trace("STOP", s"$node", TraceEvent.NMESSAGES)
         stop()
       case NStopped(node) =>
+        runtime.noteMessageTime()
         trace("STOPPED", s"$node", TraceEvent.NMESSAGES)
         stopped(node)
       case NAbort() =>
+        runtime.noteMessageTime()
         trace("ABORT", s"$node", TraceEvent.NMESSAGES)
         abort()
       case NAborted(node) =>
+        runtime.noteMessageTime()
         trace("ABORTED", s"$node", TraceEvent.NMESSAGES)
         aborted(node)
       case NReset() =>
+        runtime.noteMessageTime()
         trace("RESET", s"$node", TraceEvent.NMESSAGES)
         reset()
       case NResetted(node) =>
+        runtime.noteMessageTime()
         trace("HAVERST", s"$node", TraceEvent.NMESSAGES)
         resetted(node)
       case NFinished(node) =>
+        runtime.noteMessageTime()
         trace("FINISHED", s"$node", TraceEvent.NMESSAGES)
         finished(node)
       case NGuardCheck() =>
+        runtime.noteMessageTime()
         trace("GUARDCHK", s"$node", TraceEvent.NMESSAGES)
         protectedArity0(() => NodeActor.this.protectedGuardCheck())
       case NGuardReport(node, pass) =>
+        runtime.noteMessageTime()
         trace("GUARDRPT", s"$node: $pass", TraceEvent.NMESSAGES)
         this match {
           case choose: ChooseActor =>
@@ -401,8 +417,10 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
             throw new RuntimeException(s"Attempt to check guard on $this")
         }
       case NException(child, ex) =>
+        runtime.noteMessageTime()
         protectedExceptionHandler(child, ex)
       case m: Any =>
+        runtime.noteMessageTime()
         trace("ERROR", s"$m", TraceEvent.NMESSAGES)
         log.error(s"UNEXPECT $m")
     }

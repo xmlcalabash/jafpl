@@ -13,7 +13,6 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
   protected val allNodes = mutable.HashSet.empty[Node]
   protected val topLevelNodes = mutable.HashSet.empty[Node]
   private val actors = mutable.HashMap.empty[Node, ActorRef]
-  private var lastMessage = Instant.now()
   private var exception: Option[Exception] = None
   protected var logEvent = TraceEvent.MONITOR
 
@@ -124,13 +123,12 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
   final def receive: PartialFunction[Any, Unit] = {
     case NWatchdog(millis) =>
       trace("WATCHDOG", s"$millis", TraceEvent.WATCHDOG)
-      val ns = Duration.between(lastMessage, Instant.now()).toMillis
-      if (ns > millis) {
+      if (runtime.lastMessageAge > millis) {
         watchdog(millis)
       }
 
     case NRunIfReady() =>
-      lastMessage = Instant.now()
+      runtime.noteMessageTime()
       trace("RUN", "", TraceEvent.GMESSAGES)
       for (node <- graph.nodes) {
         initialize(node)
@@ -140,35 +138,35 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
       }
 
     case NNode(node,actor) =>
-      lastMessage = Instant.now()
+      runtime.noteMessageTime()
       trace("NODE", s"$node", TraceEvent.GMESSAGES)
       actors.put(node, actor)
       allNodes += node
 
     case NInitialized(node: Node) =>
-      lastMessage = Instant.now()
+      runtime.noteMessageTime()
       initialized(node)
 
     case NStarted(node: Node) =>
-      lastMessage = Instant.now()
+      runtime.noteMessageTime()
       started(node)
 
     case NReady(node: Node) =>
-      lastMessage = Instant.now()
+      runtime.noteMessageTime()
       ready(node)
 
     case NRunning(node: Node) =>
-      lastMessage = Instant.now()
+      runtime.noteMessageTime()
       trace("RUNNING", s"$node", TraceEvent.GMESSAGES)
       running(node)
 
     case NStopped(node: Node) =>
-      lastMessage = Instant.now()
+      runtime.noteMessageTime()
       trace("STOPPED", s"$node", TraceEvent.GMESSAGES)
       stopped(node)
 
     case NFinished(node: Node) =>
-      lastMessage = Instant.now()
+      runtime.noteMessageTime()
       trace("FINISHED", s"$node", TraceEvent.GMESSAGES)
       finished(node)
 
@@ -182,7 +180,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
       crashAndBurn(JafplException.watchdogTimeout())
 
     case m: Any =>
-      lastMessage = Instant.now()
+      runtime.noteMessageTime()
       trace("ERROR", s"$m", TraceEvent.GMESSAGES)
       log.error(s"UNEXPECT $m")
   }
