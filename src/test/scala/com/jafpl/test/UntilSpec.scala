@@ -28,9 +28,6 @@ class UntilSpec extends FlatSpec {
     graph.addEdge(ustep, "result", pipeline, "result")
 
     graph.addOutput(pipeline, "result")
-
-    graph.close()
-
     val runtime = new GraphRuntime(graph, runtimeConfig)
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)

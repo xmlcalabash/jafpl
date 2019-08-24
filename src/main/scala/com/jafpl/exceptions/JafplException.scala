@@ -53,6 +53,7 @@ object JafplException {
   val OUTPUT_CARDINALITY_ERROR = 47
   val UNEXPECTED_ITEM_TYPE = 48
   val UNDEFINED_STATIC = 49
+  val USER_ABORT = 50
 
   protected[jafpl] def childForbidden(parent: String, child: String, location: Option[Location]): JafplException = new JafplException(CHILD_FORBIDDEN, location, List(parent, child))
   protected[jafpl] def badContainerEnd(expectedEnd: String, actualEnd: String, location: Option[Location]): JafplException = new JafplException(BAD_CONTAINER_END, location, List(expectedEnd, actualEnd))
@@ -101,6 +102,7 @@ object JafplException {
   protected[jafpl] def badPort(port: String): JafplException = new JafplException(BAD_PORT, None, List(port))
   protected[jafpl] def unexpectedItemType(item: String, port: String, location: Option[Location]): JafplException = new JafplException(UNEXPECTED_ITEM_TYPE, location, List(item, port))
   protected[jafpl] def undefinedStatic(item: String, location: Option[Location]): JafplException = new JafplException(UNDEFINED_STATIC, location, List(item))
+  protected[jafpl] def userAbort(): JafplException = new JafplException(USER_ABORT, None, List())
 }
 
 class JafplException protected (val code: Any, val location: Option[Location], val details: List[Any]) extends RuntimeException {

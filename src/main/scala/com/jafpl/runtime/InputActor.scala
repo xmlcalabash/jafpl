@@ -1,32 +1,18 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.graph.Node
-import com.jafpl.messages.{Metadata, PipelineMessage}
-import com.jafpl.runtime.GraphMonitor.{GClose, GFinished, GOutput}
+import com.jafpl.graph.AtomicNode
 
 private[runtime] class InputActor(private val monitor: ActorRef,
                                   override protected val runtime: GraphRuntime,
-                                  override protected val node: Node,
-                                  private val consumer: InputProxy)
-  extends NodeActor(monitor, runtime, node, consumer) {
+                                  override protected val node: AtomicNode,
+                                  private val consumer: InputProxy) extends AtomicActor(monitor, runtime, node) {
   logEvent = TraceEvent.INPUT
 
-  // override protected def start(): Unit = {
-
-  override protected def runIfReady(): Unit = {
-    trace("RUNIFREADY", s"$node ready:$started closed:${consumer.closed}", logEvent)
-    if (started && consumer.closed) {
-      for (item <- consumer.items) {
-        monitor ! GOutput(node, "result", item)
-      }
-      consumer.clear()
-      monitor ! GClose(node, "result")
-      monitor ! GFinished(node)
+  override protected def run(): Unit = {
+    for (message <- consumer.items) {
+      sendMessage("result", message)
     }
-  }
-
-  override protected def traceMessage(code: String, details: String): String = {
-    s"$code          ".substring(0, 10) + details + " [Input]"
+    super.run()
   }
 }

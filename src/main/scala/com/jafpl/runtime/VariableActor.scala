@@ -2,37 +2,29 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
-import com.jafpl.graph.{Binding, Node, OptionBinding}
-import com.jafpl.messages.{BindingMessage, ItemMessage, Message, Metadata}
-import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput}
-import com.jafpl.steps.DataConsumer
+import com.jafpl.graph.Binding
+import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 private[runtime] class VariableActor(private val monitor: ActorRef,
                                      override protected val runtime: GraphRuntime,
-                                     private val binding: Binding)
-  extends NodeActor(monitor, runtime, binding) {
-  private var exprContext = ListBuffer.empty[Message]
+                                     private val binding: Binding) extends AtomicActor(monitor, runtime, binding) {
+  private val exprContext = ListBuffer.empty[Message]
   private val bindings = mutable.HashMap.empty[String, Message]
   logEvent = TraceEvent.VARIABLE
 
-  override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
-
+  override protected def input(port: String, item: Message): Unit = {
     item match {
       case item: ItemMessage =>
         assert(port == "source")
-        trace("RECVBCTX", "", TraceEvent.BINDINGS)
         exprContext += item
       case binding: BindingMessage =>
         assert(port == "#bindings")
-        trace("RECVBIND", s"${binding.name}=${binding.message}", TraceEvent.BINDINGS)
         bindings.put(binding.name, binding.message)
       case _ =>
-        monitor ! GException(None,
-          JafplException.unexpectedMessage(item.toString, port, binding.location))
+        throw JafplException.unexpectedMessage(item.toString, port, binding.location)
     }
   }
 
@@ -44,7 +36,6 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
       }
     }
 
-    trace("RUN", s"$node", logEvent)
     if (runtime.traceEventManager.traceEnabled("Bindings")) {
       var sbindings = ""
       for (name <- bindings.keySet) {
@@ -59,19 +50,12 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
       trace("COMPUTE", s"${binding.name}=${binding.expression}$sbindings", TraceEvent.BINDINGS)
     }
 
-    try {
-      val expreval = runtime.runtime.expressionEvaluator.newInstance()
-      val answer = expreval.value(binding.expression, exprContext.toList, bindings.toMap, binding.params)
+    val expreval = runtime.runtime.expressionEvaluator.newInstance()
+    val answer = expreval.value(binding.expression, exprContext.toList, bindings.toMap, binding.params)
 
-      val msg = new BindingMessage(binding.name, answer)
-      node.state = NodeState.FINISHED
-      monitor ! GOutput(binding, "result", msg)
-      monitor ! GClose(binding, "result")
-      monitor ! GFinished(binding)
-    } catch {
-      case t: Throwable =>
-        monitor ! GException(Some(binding), t)
-    }
+    val msg = new BindingMessage(binding.name, answer)
+    sendMessage("result", msg)
+    super.run()
   }
 
   override protected def reset(): Unit = {

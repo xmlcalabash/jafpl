@@ -13,7 +13,7 @@ class DefaultTraceEventManager() extends TraceEventManager {
   protected val enabledTraces = mutable.HashSet.empty[String]
   protected val disabledTraces = mutable.HashSet.empty[String]
 
-  private val prop = Option(System.getProperty("com.xmlcalabash.trace"))
+  private val prop = Option(System.getProperty("com.jafpl.trace"))
   if (prop.isDefined) {
     for (trace <- prop.get.split(",")) {
       var event = trace.trim()

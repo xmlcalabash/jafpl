@@ -34,8 +34,13 @@ class WhileSpec extends FlatSpec {
     runtime.run()
 
     assert(bc.items.size == 7)
-    assert(bc.items.head == 6)
-    assert(bc.items.last == 0)
+    assert(bc.items(0) == 6)
+    assert(bc.items(1) == 5)
+    assert(bc.items(2) == 4)
+    assert(bc.items(3) == 3)
+    assert(bc.items(4) == 2)
+    assert(bc.items(5) == 1)
+    assert(bc.items(6) == 0)
   }
 
   "A while " should " iterate until finished and return 1" in {

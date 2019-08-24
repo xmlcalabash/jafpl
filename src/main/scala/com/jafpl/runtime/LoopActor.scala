@@ -1,9 +1,8 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.graph.{ContainerStart, Node}
-import com.jafpl.messages.Message
-import com.jafpl.runtime.GraphMonitor.{GClose, GReset}
+import com.jafpl.graph.{ContainerStart, Node, NodeState}
+import com.jafpl.runtime.NodeActor.NResetted
 
 private[runtime] class LoopActor(private val monitor: ActorRef,
                                  override protected val runtime: GraphRuntime,
@@ -12,78 +11,33 @@ private[runtime] class LoopActor(private val monitor: ActorRef,
 
   protected var running = false
 
-  override protected def configureOpenPorts(): Unit = {
-    super.configureOpenPorts()
+  override protected def configurePorts(): Unit = {
+    super.configurePorts()
     openOutputs -= "current" // this one doesn't count
   }
 
-  override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
-    if (port == "source") {
-      consume(port, item)
-    } else {
-      super.input(from, fromPort, port, item)
-    }
-  }
-
   override protected def close(port: String): Unit = {
-    if (port == "source") {
-      openInputs -= port
-      // The source port on loops is magic; it's not connected to anything
-      // else so closing it doesn't work.
-      runIfReady()
+    if (openInputs.contains(port)) {
+      super.close(port)
     } else {
-      // nop; don't close outputs until loop ends
-      // super.close(port)
+      // nop; don't close loop outputs until we're done looping
     }
   }
 
-  override protected def finishIfReady(): Unit = {
-    trace("FINRDY", s"$node children: $childrenHaveFinished  outputs: n/a", logEvent)
-    if (childrenHaveFinished) {
-      finished()
+  override protected def resetted(child: Node): Unit = {
+    stateChange(child, NodeState.RESET)
+    var reset = true
+    for (cnode <- node.children) {
+      reset = reset && cnode.state == NodeState.RESET
     }
-  }
-
-  override protected def resetFinished(child: Node): Unit = {
-    if (childState.contains(child)) {
-      childState(child) = NodeState.RESET
-      trace("LOOPRSET", s"$node/$child $childState", logEvent)
-      if (node.state == NodeState.RESTARTING) {
-        runIfReady()
+    if (reset) {
+      if (node.state == NodeState.LOOPING) {
+        run()
       } else {
-        resetIfReady()
+        parent ! NResetted(node)
       }
     } else {
-      throw new RuntimeException(s"Illegal state: $child is not a child of $node")
+      trace("UNFINISH", s"${nodeState(node)}", TraceEvent.STATECHANGE)
     }
-  }
-
-  protected[runtime] def restartLoop(): Unit = {
-    trace("RSTRTLOOP", s"$node", logEvent)
-    node.state = NodeState.RESTARTING
-
-    running = false
-    started = true
-    threwException = false
-
-    for (output <- node.outputs) {
-      openOutputs.add(output)
-    }
-    if (openOutputs.contains("current")) {
-      openOutputs -= "current" // this one doesn't count
-    }
-
-    for (child <- node.children) {
-      childState(child) = NodeState.RESETTING
-      child.state = NodeState.RESETTING
-      monitor ! GReset(child)
-    }
-
-    runIfReady()
-  }
-
-  override protected def traceMessage(code: String, details: String): String = {
-    s"$code          ".substring(0, 10) + details + " [LoopFor]"
   }
 }

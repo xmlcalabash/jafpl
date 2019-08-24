@@ -66,7 +66,7 @@ class JoinerSpec extends FlatSpec {
       graph.addPriorityEdge(p2, "result", pipeline, "result")
       graph.addOutput(pipeline, "result")
     } catch {
-      case g: JafplException => pass = true
+      case _: JafplException => pass = true
     }
 
     assert(pass)

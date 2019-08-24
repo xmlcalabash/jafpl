@@ -400,4 +400,45 @@ class ChooseSpec extends FlatSpec {
     assert(bc.items(3) == 3)
     assert(bc.items(4) == "WHEN3")
   }
+
+  "If a test expression raises an error, the choose " should " fail" in {
+    val graph    = Jafpl.newInstance().newGraph()
+
+    val pipeline = graph.addPipeline(None, Manifold.ALLOW_ANY)
+    val producer = pipeline.addAtomic(new Producer(List("SomeDocument")), "producer")
+    val choose = pipeline.addChoose("choose")
+    val when1 = choose.addWhen("ERROR", "when1", Manifold.ALLOW_ANY)
+    val when2 = choose.addWhen("true", "when2", Manifold.ALLOW_ANY)
+
+    val p1 = when1.addAtomic(new Producer(List("WHEN1")), "p1")
+    val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")
+
+    val bc = new BufferSink()
+
+    graph.addEdge(producer, "result", when1, "condition")
+    graph.addEdge(producer, "result", when2, "condition")
+
+    graph.addEdge(p1, "result", when1, "result")
+    graph.addEdge(p2, "result", when2, "result")
+
+    graph.addEdge(when1, "result", choose, "result")
+    graph.addEdge(when2, "result", choose, "result")
+
+    graph.addEdge(choose, "result", pipeline, "result")
+    graph.addOutput(pipeline, "result")
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+
+    var pass = false
+    try {
+      runtime.outputs("result").setConsumer(bc)
+      runtime.run()
+    } catch {
+      case _: Exception =>
+        pass = true
+    }
+
+    assert(pass)
+  }
+
 }

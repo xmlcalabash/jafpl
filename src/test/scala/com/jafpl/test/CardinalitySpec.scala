@@ -168,6 +168,7 @@ class CardinalitySpec extends FlatSpec {
     } catch {
       case jafpl: JafplException =>
         pass = jafpl.code == JafplException.INPUT_CARDINALITY_ERROR
+        pass = pass || jafpl.code == JafplException.OUTPUT_CARDINALITY_ERROR
     }
 
     assert(pass)

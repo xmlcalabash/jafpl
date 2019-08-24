@@ -13,8 +13,7 @@ package com.jafpl.graph
 class Binding protected[jafpl] (override val graph: Graph,
                                 val name: String,
                                 val expression: Any,
-                                val params: Option[BindingParams])
-  extends Node(graph, None, None) {
+                                val params: Option[BindingParams]) extends AtomicNode(graph, None, None) {
 
   protected var _start: Option[ContainerStart] = None
   protected val _label = s"$name-$id"

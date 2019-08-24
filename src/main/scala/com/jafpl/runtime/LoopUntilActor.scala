@@ -2,32 +2,47 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
-import com.jafpl.graph.{LoopUntilStart, Node}
-import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
-import com.jafpl.runtime.GraphMonitor.{GClose, GException, GFinished, GOutput, GRestartLoop}
-
-import scala.collection.mutable
+import com.jafpl.graph.{LoopUntilStart, Node, NodeState}
+import com.jafpl.messages.{ItemMessage, Message}
+import com.jafpl.runtime.NodeActor.{NFinished, NReset, NRunIfReady}
 
 private[runtime] class LoopUntilActor(private val monitor: ActorRef,
-                                      override protected val runtime: GraphRuntime,
-                                      override protected val node: LoopUntilStart)
+                                       override protected val runtime: GraphRuntime,
+                                       override protected val node: LoopUntilStart)
   extends LoopActor(monitor, runtime, node) {
 
-  var currentItem = Option.empty[ItemMessage]
-  var nextItem = Option.empty[ItemMessage]
-  var looped = false
+  private var currentItem = Option.empty[ItemMessage]
+  private var nextItem = Option.empty[ItemMessage]
+  private var lastItem = Option.empty[Message]
   logEvent = TraceEvent.LOOPUNTIL
   node.iterationPosition = 0L
   node.iterationSize = 0L
 
-  override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    trace("INPUT", s"$node $from.$fromPort to $port", logEvent)
-    if (port == "test") {
-      nextItem = Some(item.asInstanceOf[ItemMessage])
-      looped = true
+  override protected def configurePorts(): Unit = {
+    super.configurePorts()
+    openInputs -= "test"
+  }
+
+  override protected def input(port: String, message: Message): Unit = {
+    if (port == "source" || port == "test") {
+      message match {
+        case item: ItemMessage =>
+          if (currentItem.isEmpty) {
+            currentItem = Some(item)
+          } else {
+            nextItem = Some(item)
+          }
+        case _ =>
+          throw JafplException.unexpectedMessage(message.toString, port, node.location)
+      }
     } else {
-      if (node.returnAll || !openOutputs.contains(port)) {
-        super.input(from, fromPort, port, item)
+      if (openOutputs.contains(port)) {
+        if (node.returnAll) {
+          super.input(port, message)
+        } else {
+          // FIXME: what about multiple output ports?
+          lastItem = Some(message)
+        }
       }
     }
   }
@@ -38,101 +53,52 @@ private[runtime] class LoopUntilActor(private val monitor: ActorRef,
     super.reset()
   }
 
-  override protected[runtime] def finished(): Unit = {
-    val finished =  try {
-      node.comparator.areTheSame(currentItem.get.item, nextItem.get.item)
-    } catch {
-      case ex: Exception =>
-        trace("FINISHED", s"$node ${currentItem.head} threw $ex", logEvent)
-        monitor ! GException(Some(node), ex)
-        return
-    }
-
-    if (finished) {
-      trace("LOOPFIN", s"$node", logEvent)
-
-      if (!node.returnAll) {
-        monitor ! GOutput(node, "result", currentItem.get)
-      }
-
-      checkCardinalities("current")
-      // now close the outputs
-      for (output <- node.outputs) {
-        if (!node.inputs.contains(output)) {
-          // Don't close 'current'; it must have been closed to get here and re-closing
-          // it propagates the close event to the steps and they shouldn't see any more
-          // events!
-          if (output != "current" && output != "test") {
-            monitor ! GClose(node, output)
-          }
-        }
-      }
-
-      if (childrenHaveFinished) {
-        node.state = NodeState.FINISHED
-        monitor ! GFinished(node)
-        for (inj <- node.stepInjectables) {
-          inj.afterRun()
-        }
-      }
-    } else {
-      trace("ITERFIN", s"$node children:$childrenHaveFinished", logEvent)
-      currentItem = nextItem
-      nextItem = None
-      monitor ! GRestartLoop(node)
-    }
-  }
-
   override protected def run(): Unit = {
-    running = true
-    node.state = NodeState.STARTED
-
-    if (currentItem.isDefined) {
-      node.iterationPosition += 1
-      monitor ! GOutput(node, "current", currentItem.get)
-      monitor ! GClose(node, "current")
-      super.run()
-    } else {
-      finishIfReady()
+    stateChange(node, NodeState.RUNNING)
+    node.iterationPosition += 1
+    sendMessage("current", currentItem.get)
+    sendClose("current")
+    for (cnode <- node.children) {
+      actors(cnode) ! NRunIfReady()
     }
   }
 
-  override def consume(port: String, item: Message): Unit = {
-    trace("CONSUME", s"$node $port", logEvent)
-    if (port == "source") {
-      item match {
-        case message: ItemMessage =>
-          if (currentItem.isDefined) {
-            monitor ! GException(None,
-              JafplException.unexpectedSequence(node.toString, port, node.location))
-            return
+  override protected def closeOutputs(): Unit = {
+    for (port <- openOutputs) {
+      if (port != "test") {
+        sendClose(port)
+      }
+      openOutputs -= port
+    }
+  }
+
+  override protected def finished(child: Node): Unit = {
+    stateChange(child, NodeState.FINISHED)
+    var finished = true
+    for (cnode <- node.children) {
+      finished = finished && cnode.state == NodeState.FINISHED
+    }
+    if (finished) {
+      val theSame = node.comparator.areTheSame(currentItem.get.item, nextItem.get.item)
+      if (theSame) {
+        trace("UNTILC", s"${currentItem.get} == ${nextItem.get}", TraceEvent.NMESSAGES)
+        if (lastItem.isDefined) {
+          for (port <- openOutputs) {
+            sendMessage(port, lastItem.get)
           }
-          currentItem = Some(message)
-        case _ =>
-          monitor ! GException(None,
-            JafplException.unexpectedMessage(item.toString, port, node.location))
-          return
+        }
+        closeOutputs()
+        parent ! NFinished(node)
+      } else {
+        trace("UNTILC", s"${currentItem.get} != ${nextItem.get}", TraceEvent.NMESSAGES)
+        stateChange(node, NodeState.LOOPING)
+        currentItem = nextItem
+        for (child <- node.children) {
+          actors(child) ! NReset()
+        }
       }
-    } else if (port == "#bindings") {
-      item match {
-        case msg: BindingMessage =>
-          bindings.put(msg.name, msg)
-        case _ =>
-          monitor ! GException(None,
-            JafplException.unexpectedMessage(item.toString, port, node.location))
-          return
-      }
+    } else {
+      trace("UNFINISH", s"${nodeState(node)}", TraceEvent.STATECHANGE)
     }
-    runIfReady()
-  }
-
-  protected[runtime] def loop(item: ItemMessage): Unit = {
-    trace("LOOP", s"$node", logEvent)
-    nextItem = Some(item)
-    looped = true
-  }
-
-  override protected def traceMessage(code: String, details: String): String = {
-    s"$code          ".substring(0, 10) + details + " [LoopUntil]"
   }
 }

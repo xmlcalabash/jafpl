@@ -1,8 +1,5 @@
 package com.jafpl.runtime
 
-import com.jafpl.messages.{ItemMessage, Message}
-import com.jafpl.steps.{DataConsumer, Step}
-
 /** The runtime configuration for pipeline execution.
   *
   * This object provides configuration information to the pipeline execution engine.

@@ -1,6 +1,7 @@
 package com.jafpl.runtime
 
 import akka.actor.{Actor, ActorRef, Terminated}
+import com.jafpl.runtime.Reaper.WatchMe
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable.ArrayBuffer
@@ -11,12 +12,9 @@ object Reaper {
 
 class Reaper(runtime: RuntimeConfiguration) extends Actor {
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
-
-  import Reaper._
-
   private val watched = ArrayBuffer.empty[ActorRef]
 
-  final def receive = {
+  final def receive: PartialFunction[Any, Unit] = {
     case WatchMe(ref) =>
       if (runtime.traceEnabled("reaper")) {
         logger.debug("The reaper is watching you, " + ref)

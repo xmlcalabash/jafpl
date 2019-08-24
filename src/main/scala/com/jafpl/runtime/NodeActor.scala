@@ -3,101 +3,63 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import akka.event.LoggingReceive
 import com.jafpl.exceptions.JafplException
-import com.jafpl.graph.{ContainerStart, Node}
-import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
-import com.jafpl.runtime.GraphMonitor.{GAbort, GClose, GException, GFinished, GResetFinished, GStopped}
-import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NContainerFinished, NException, NFinally, NGuardResult, NInitialize, NInput, NLoop, NReset, NResetFinished, NRestartLoop, NRunFinally, NStart, NStop, NTraceDisable, NTraceEnable}
-import com.jafpl.runtime.NodeState.NodeState
+import com.jafpl.graph.{Node, NodeState, WhenStart}
+import com.jafpl.messages.{BindingMessage, Message}
+import com.jafpl.runtime.NodeActor.{NAbort, NAborted, NClose, NException, NFinished, NGuardCheck, NGuardReport, NInitialize, NInitialized, NInput, NReady, NReset, NResetted, NRunIfReady, NStart, NStarted, NStop, NStopped}
 import com.jafpl.runtime.TraceEvent.TraceEvent
-import com.jafpl.steps.{DataConsumer, Manifold}
+import com.jafpl.steps.Manifold
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
 private[runtime] object NodeActor {
-  case class NInitialize()
+  case class NWatchdog(millis: Long)
+  case class NWatchdogTimeout()
+  case class NInitialize(parent: Option[ActorRef], children: Map[Node,ActorRef], outputs: Map[String,(String,ActorRef)])
+  case class NInitialized(node: Node)
   case class NStart()
-  case class NAbort()
-  case class NStop()
-  case class NCatch(cause: Throwable)
-  case class NFinally()
-  case class NRunFinally(cause: Option[Throwable])
+  case class NStarted(node: Node)
+  case class NRunIfReady()
+  case class NReady(node: Node)
+  case class NRunning(node: Node)
   case class NReset()
-  case class NResetFinished(node: Node)
-  case class NRestartLoop()
-  case class NInput(from: Node, fromPort: String, toPort: String, item: Message)
-  case class NLoop(item: ItemMessage)
-  case class NClose(port: String)
-  case class NChildFinished(otherNode: Node)
-  case class NContainerFinished()
-  case class NTraceEnable(event: String)
-  case class NTraceDisable(event: String)
-  case class NCheckGuard()
-  case class NGuardResult(when: Node, pass: Boolean)
-  case class NException(cause: Throwable)
+  case class NResetted(node: Node)
+  case class NFinished(node: Node)
+  case class NStop()
+  case class NStopped(node: Node)
+  case class NAbort()
+  case class NAborted(node: Node)
+  case class NInput(fromNode: Node, fromPort: String, toPort: String, message: Message)
+  case class NClose(fromNode: Node, fromPort: String, port: String)
+  case class NGuardCheck()
+  case class NGuardReport(node: Node, pass: Boolean)
+  case class NNode(node: Node, actor: ActorRef)
+  case class NException(node: Node, cause: Exception)
+  case class NAbortExecution()
 }
 
 private[runtime] class NodeActor(private val monitor: ActorRef,
                                  override protected val runtime: GraphRuntime,
                                  protected val node: Node) extends TracingActor(runtime) {
+  protected var parent: ActorRef = _
+  protected var actors: Map[Node,ActorRef] = Map()
+  protected var outputs: Map[String,(String,ActorRef)] = Map()
+  protected var logEvent: TraceEvent = TraceEvent.NODE
   protected val openInputs = mutable.HashSet.empty[String]
   protected val openOutputs = mutable.HashSet.empty[String]
-  protected val childState = mutable.HashMap.empty[Node, NodeState]
+  protected var inputBuffer = new IOBuffer()
+  protected var outputBuffer = new IOBuffer()
+  protected var receivedBindings = mutable.HashSet.empty[String]
 
-  protected val bufferedInput: ListBuffer[InputBuffer] = ListBuffer.empty[InputBuffer]
-  protected val receivedBindings = mutable.HashSet.empty[String]
-
-  protected var started = false
-  protected var threwException = false
-  protected var aborted = false
-
-  protected var proxy = Option.empty[DataConsumer]
-  protected var logEvent: TraceEvent = TraceEvent.NODE
-
-  def this(monitor: ActorRef, runtime: GraphRuntime, node: Node, consumer: DataConsumer) {
-    this(monitor, runtime, node)
-    proxy = Some(consumer)
-  }
-
-  protected def childrenHaveReset: Boolean = {
-    for (state <- childState.values) {
-      if (state != NodeState.RESET && state != NodeState.FINISHED) {
-        return false
-      }
-    }
-    true
-  }
-
-  protected def childrenHaveFinished: Boolean = {
-    for (state <- childState.values) {
-      if (state != NodeState.FINISHED && state != NodeState.STOPPED && state != NodeState.ABORTED) {
-        return false
-      }
-    }
-    true
-  }
-
-  protected def readyToRun: Boolean = {
-    // startedChildren has to be empty, right? What would it mean if it wasn't?
-   started && !aborted && !threwException && openInputs.isEmpty && childrenHaveReset
+  if (node.step.isDefined) {
+    node.step.get.setConsumer(outputBuffer)
   }
 
   protected def initialize(): Unit = {
-    configureOpenPorts()
-
-    node.state = NodeState.INIT
-    if (node.step.isDefined) {
-      try {
-        node.step.get.initialize(runtime.runtime)
-      } catch {
-        case cause: Throwable =>
-          threwException = true
-          monitor ! GException(Some(node), cause)
-      }
-    }
+    // sender() *not* parent
+    sender() ! NInitialized(node)
   }
 
-  protected def configureOpenPorts(): Unit = {
+  protected def configurePorts(): Unit = {
     openInputs.clear()
     openOutputs.clear()
 
@@ -116,415 +78,333 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     node.outputCardinalities.clear()
   }
 
-  protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-    trace("INPUT", s"$node / $fromPort to $port", logEvent)
+  private def bufferInput(port: String, message: Message): Unit = {
+    try {
+      if (port != "#bindings" && openInputs.contains("#bindings")) {
+        inputBuffer.consume(port, message)
+        return
+      }
 
-    if (port != "#bindings" && openInputs.contains("#bindings")) {
-      bufferedInput += new InputBuffer(from, fromPort, port, item)
+      // What if we have been buffering and the #bindings port has just been closed?
+      if (inputBuffer.ports.nonEmpty) {
+        for (port <- inputBuffer.ports) {
+          for (message <- inputBuffer.messages(port)) {
+            node.inputCardinalities.put(port, node.inputCardinalities.getOrElse(port, 0L) + 1)
+            input(port, message)
+          }
+        }
+        inputBuffer.reset()
+      }
+
+      port match {
+        case "#bindings" =>
+          message match {
+            case binding: BindingMessage =>
+              receivedBindings += binding.name
+              input(port, message)
+            case _ =>
+              input(port, message)
+          }
+        case _ =>
+          input(port, message)
+      }
+    } catch {
+      case ex: Exception =>
+        parent ! NException(node, ex)
+    }
+  }
+
+  protected def incrementCardinality(port: String): Unit = {
+    if (port.startsWith("#")) {
       return
     }
 
-    try {
-      if (port == "#bindings") {
-        item match {
-          case binding: BindingMessage =>
-            for (inj <- node.inputInjectables ++ node.outputInjectables) {
-              inj.receiveBinding(binding)
-            }
-            for (inj <- node.stepInjectables) {
-              inj.receiveBinding(binding)
-            }
-            receivedBindings += binding.name
-            if (node.step.isDefined) {
-              trace("BINDING→", s"$node: ${binding.name}=${binding.message}", TraceEvent.BINDINGS)
-              node.step.get.receiveBinding(binding)
-            } else {
-              trace("BINDING↴", s"$node: ${binding.name}=${binding.message}", TraceEvent.BINDINGS)
-            }
-          case _ =>
-            throw JafplException.unexpectedMessage(item.toString, "#bindings", node.location)
+    if (openInputs.contains(port)) {
+      val count = node.inputCardinalities.getOrElse(port, 0L) + 1
+      node.inputCardinalities.put(port, count)
+    } else {
+      val count = node.outputCardinalities.getOrElse(port, 0L) + 1
+      node.outputCardinalities.put(port, count)
+    }
+
+    checkCardinality(port)
+  }
+
+  protected def checkCardinality(port: String): Unit = {
+    if (port.startsWith("#")) {
+      return
+    }
+
+    if (node.state == NodeState.CREATED || node.state == NodeState.STARTED) {
+      // If it never ran, its cardinalities don't need checking
+      return
+    }
+
+    if (openInputs.contains(port)) {
+      val count = node.inputCardinalities.getOrElse(port, 0L)
+      trace("→CARD", s"$node $port $count", TraceEvent.NMESSAGES)
+
+      try {
+        val ospec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
+        if (ospec.inputSpec.cardinality(port).isDefined) {
+          ospec.inputSpec.checkInputCardinality(port, count)
         }
-      } else {
-        item match {
-          case message: ItemMessage =>
-            for (inj <- node.inputInjectables) {
-              if (inj.port == port) {
-                inj.run(message)
-              }
-            }
-            node.inputCardinalities.put(port, node.inputCardinalities.getOrElse(port, 0L) + 1)
-            if (node.step.isDefined) {
-              trace("DELIVER→", s"$node ${node.step.get}.$port", TraceEvent.STEPIO)
-              trace("MESSAGE→", s"$node ${node.step.get}.$port $item", TraceEvent.MESSAGE)
-              node.step.get.consume(port, message)
-            } else {
-              trace("DELIVER↴", s"$node (no step).$port", TraceEvent.STEPIO)
-              trace("MESSAGE↴", s"$node (no step).$port $item", TraceEvent.MESSAGE)
-            }
-          case _ =>
-            throw JafplException.unexpectedMessage(item.toString, port, node.location)
-        }
+      } catch {
+        case jafpl: JafplException =>
+          if (jafpl.code == JafplException.INPUT_CARDINALITY_ERROR) {
+            trace("CARD!", s"$node $port $count", TraceEvent.NMESSAGES)
+          }
+          throw jafpl
       }
-    } catch {
-      case t: Throwable =>
-        threwException = true
-        monitor ! GException(None, t)
+    } else {
+      val count = node.outputCardinalities.getOrElse(port, 0L)
+      trace("CARD→", s"$node $port $count", TraceEvent.NMESSAGES)
+
+      try {
+        val ospec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
+        if (ospec.outputSpec.cardinality(port).isDefined) {
+          ospec.outputSpec.checkOutputCardinality(port, count)
+        }
+      } catch {
+        case jafpl: JafplException =>
+          if (jafpl.code == JafplException.OUTPUT_CARDINALITY_ERROR) {
+            trace("CARD!", s"$node $port $count", TraceEvent.NMESSAGES)
+          }
+          throw jafpl
+      }
+    }
+  }
+
+  protected def input(port: String, message: Message): Unit = {
+    if (outputs.contains(port)) {
+      incrementCardinality(port)
+
+      val output = outputs(port)
+      val inputport = output._1
+      val receiver = output._2
+      receiver ! NInput(node, port, inputport, message)
+    } else {
+      trace("DROPPED", s"$node.$port", TraceEvent.NMESSAGES)
     }
   }
 
   protected def close(port: String): Unit = {
-    trace("CLOSEI", s"$node / $port", logEvent)
-
-    openInputs -= port
-    if (port == "#bindings" && bufferedInput.nonEmpty) {
-      for (buf <- bufferedInput) {
-        input(buf.from, buf.fromPort, buf.port, buf.item)
-      }
-      bufferedInput.clear()
+    checkCardinality(port)
+    if (openInputs.contains(port)) {
+      trace("CLOSEI", s"$node: $port", TraceEvent.NMESSAGES)
+      openInputs -= port
+    } else {
+      trace("CLOSE?", s"$node: $port", TraceEvent.NMESSAGES)
     }
-
     runIfReady()
   }
 
-  protected def start(): Unit = {
-    for (inj <- node.stepInjectables) {
-      inj.beforeRun()
-    }
-    node.state = NodeState.STARTED
-    started = true
-    runIfReady()
-  }
-
-  protected def abort(): Unit = {
-    trace("ABORT", s"$node", logEvent)
-    node.state = NodeState.ABORTED
-    aborted = true
-
-    if (node.step.isDefined) {
-      trace("ABORTSTEP", s"$node ${node.step.get}", logEvent)
-      try {
-        node.step.get.abort()
-      } catch {
-        case cause: Throwable =>
-          threwException = true
-          monitor ! GException(Some(node), cause)
-      }
+  protected def sendMessage(outputport: String, item: Message): Unit = {
+    if (outputs.contains(outputport)) {
+      incrementCardinality(outputport)
+      val t = outputs(outputport)
+      val inputport = t._1
+      val receiver = t._2
+      receiver ! NInput(node, outputport, inputport, item)
     } else {
-      trace("ABORTSTEP!", s"$node", logEvent)
+      trace("DROPPED", s"$node.$outputport", TraceEvent.NMESSAGES)
     }
-
-    monitor ! GFinished(node)
   }
 
-  protected def stop(): Unit = {
-    node.state = NodeState.STOPPED
+  protected def sendClose(outputport: String): Unit = {
+    val t = outputs(outputport)
+    val inputport = t._1
+    val receiver = t._2
+    receiver ! NClose(node, outputport, inputport)
+  }
 
-    if (node.step.isDefined) {
-      trace("STOPSTEP", s"$node ${node.step.get}", logEvent)
-      try {
-        node.step.get.stop()
-      } catch {
-        case cause: Throwable =>
-          threwException = true
-          monitor ! GException(Some(node), cause)
-      }
-    } else {
-      trace("STOPSTEP!", s"$node", logEvent)
+  protected def closeOutputs(): Unit = {
+    for (port <- openOutputs) {
+      sendClose(port)
+      openOutputs -= port
     }
-
-    monitor ! GStopped(node)
   }
 
-  protected def reset(): Unit = {
-    node.state = NodeState.RESETTING
-    started = false
-    aborted = false
-    threwException = false
-
-    bufferedInput.clear()
-    receivedBindings.clear()
-
-    configureOpenPorts()
-
-    if (node.step.isDefined) {
-      trace("RESETNODE", s"$node", logEvent)
-      try {
-        node.step.get.reset()
-      } catch {
-        case cause: Throwable =>
-          threwException = true
-          monitor ! GException(Some(node), cause)
-      }
-    }
-
-    resetIfReady()
-  }
-
-  protected def resetIfReady(): Unit = {
-    monitor ! GResetFinished(node)
-  }
-
-  protected def resetFinished(node: Node): Unit = {
-    node.state = NodeState.RESET
+  protected def readyToRun: Boolean = {
+    openInputs.isEmpty && node.state == NodeState.READY
   }
 
   protected def runIfReady(): Unit = {
-    val iready = openInputs.isEmpty
-
-    trace("RUNIFREADY", s"$node ready: $readyToRun a:$aborted s:$started, c:$childrenHaveReset inputs: $iready resets: $childrenHaveReset", logEvent)
-
-    if (openInputs.nonEmpty) {
-      for (port <- openInputs) {
-        trace("...RWAITI", s"$node $port open", logEvent)
-      }
+    if (readyToRun) {
+      run()
+    } else {
+      trace("!RDYTORUN", s"$node $openInputs ${node.state}", TraceEvent.NMESSAGES)
     }
+  }
 
-    for ((node,state) <- childState) {
-      if (state != NodeState.RESET) {
-        trace("...RWAITR", s"$node resetting ($state)", logEvent)
-      }
-    }
+  protected def start(): Unit = {
+    parent ! NStarted(node)
+  }
 
-    if (!readyToRun) {
-      return
-    }
+  protected def started(node: Node): Unit = {
+    stateChange(node, NodeState.STARTED)
+  }
 
-    if (node.step.isDefined) {
-      // Pass any statics in as normal bindings
-      for ((binding,message) <- node.staticBindings) {
-        if (!receivedBindings.contains(binding.name)) {
-          val bmsg = new BindingMessage(binding.name, message)
-          node.step.get.receiveBinding(bmsg)
-        }
-      }
-    }
+  protected def reset(): Unit = {
+    inputBuffer.reset()
+    outputBuffer.reset()
+    receivedBindings.clear()
+    configurePorts()
+    parent ! NResetted(node)
+  }
 
-    run()
+  protected def ready(node: Node): Unit = {
+    stateChange(node, NodeState.READY)
   }
 
   protected def run(): Unit = {
-    trace("RUN", s"$node", logEvent)
+    parent ! NFinished(node)
+  }
 
-    started = false
-    node.state = NodeState.FINISHED
+  protected def resetted(node: Node): Unit = {
+    configurePorts()
+    stateChange(node, NodeState.RESET)
+  }
 
-    for (inj <- node.stepInjectables) {
-      inj.beforeRun()
-    }
+  protected def stop(): Unit = {
+    parent ! NStopped(node)
+  }
 
-    if (node.step.isDefined) {
-      try {
-        for (port <- node.inputs.filter(!_.startsWith("#"))) {
-          val count = node.inputCardinalities.getOrElse(port, 0L)
-          val ispec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
-          trace("CARD", s"$node input $port: $count", TraceEvent.CARDINALITY)
-          ispec.inputSpec.checkInputCardinality(port, count)
-        }
+  protected def stopped(node: Node): Unit = {
+    stateChange(node, NodeState.STOPPED)
+  }
 
-        node.step.get.run()
+  protected def abort(): Unit = {
+    closeOutputs()
+    parent ! NAborted(node)
+  }
 
-        for (port <- node.outputs.filter(!_.startsWith("#"))) {
-          val count = node.outputCardinalities.getOrElse(port, 0L)
-          val ospec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
-          ospec.outputSpec.checkOutputCardinality(port, count)
-        }
-      } catch {
-        case ex: Exception =>
-          threwException = true
-          monitor ! GException(Some(node), ex)
-      }
+  protected def aborted(node: Node): Unit = {
+    stateChange(node, NodeState.ABORTED)
+  }
 
-      if (!threwException) {
-        for (inj <- node.stepInjectables) {
-          inj.afterRun()
-        }
-      }
-    } else {
-      node match {
-        case _: ContainerStart =>
-          // Close all our "input" ports so that children reading them can run
-          for (output <- node.outputs) {
-            if (node.inputs.contains(output)) {
-              monitor ! GClose(node, output)
-            }
-          }
-        case _ => Unit
-      }
-    }
+  protected def finished(node: Node): Unit = {
+    stateChange(node, NodeState.FINISHED)
+  }
 
-    for (output <- node.outputs) {
-      monitor ! GClose(node, output)
-    }
+  protected def exceptionHandler(child: Node, ex: Exception): Unit = {
+    parent ! NException(node, ex)
+  }
 
-    if (threwException) {
-      monitor ! GAbort(node)
-    } else {
-      monitor ! GFinished(node)
+  private def protectedArity0(fx: () => Unit): Unit = {
+    try {
+      fx()
+    } catch {
+      case ex: Exception =>
+        parent ! NException(node, ex)
     }
   }
 
-  private def fmtSender: String = {
-    var str = sender().toString
-    var pos = str.indexOf("/user/")
-    str = str.substring(pos+6)
-    pos = str.indexOf("#")
-    str = str.substring(0, pos)
-    str
+  private def protectedArity1(fx: (String) => Unit, arg: String): Unit = {
+    try {
+      fx(arg)
+    } catch {
+      case ex: Exception =>
+        parent ! NException(node, ex)
+    }
+  }
+
+  private def protectedGuardCheck(): Unit = {
+    this match {
+      case when: WhenActor =>
+        when.guardCheck()
+      case _ =>
+        throw new RuntimeException(s"Attempt to check guard on $this")
+    }
+  }
+
+  private def protectedClose(port: String): Unit = {
+    close(port)
+  }
+
+  private def protectedRunIfReady(): Unit = {
+    trace("RUNIFRDY", s"$node", TraceEvent.NMESSAGES)
+    stateChange(node, NodeState.READY)
+    runIfReady()
+  }
+
+  private def protectedExceptionHandler(child: Node, ex: Exception): Unit = {
+    trace("EXCEPTION", s"$child: ${ex.getMessage}", TraceEvent.NMESSAGES)
+    try {
+      exceptionHandler(child, ex)
+    } catch {
+      case ex: Exception =>
+        parent ! NException(node, ex)
+    }
   }
 
   final def receive: PartialFunction[Any, Unit] = {
     LoggingReceive {
-      case NInitialize() =>
-        trace("NINIT", s"$node", TraceEvent.NMESSAGES)
+      case NInitialize(parent, actors, outputs) =>
+        trace("INIT", s"$node", TraceEvent.NMESSAGES)
+        if (parent.isDefined) {
+          this.parent = parent.get
+        } else {
+          this.parent = sender()
+        }
+        this.actors = actors
+        this.outputs = outputs
         initialize()
-
-      case NInput(from, fromPort, port, item) =>
-        trace("NINPUT", s"$node $from.$fromPort → $port", TraceEvent.NMESSAGES)
-        trace("RECEIVE→",s"$node.$port from $fmtSender ITEM: $item", TraceEvent.STEPIO)
-        input(from, fromPort, port, item)
-
-      case NLoop(item) =>
-        trace("NLOOP", s"$node $item", TraceEvent.NMESSAGES)
-        this match {
-          case loop: LoopUntilActor =>
-            loop.loop(item)
-          case loop: LoopWhileActor =>
-            loop.loop(item)
-          case _ =>
-            monitor ! GException(None, JafplException.internalError(s"Invalid loop to $node", node.location))
-        }
-
-      case NClose(port) =>
-        trace("NCLOSE", s"$node $port", TraceEvent.NMESSAGES)
-        close(port)
-
+      case NInput(fromNode, fromPort, port, message) =>
+        trace("INPUT", s"$fromNode.$fromPort -> $node.$port: $message", TraceEvent.NMESSAGES)
+        bufferInput(port, message)
+      case NClose(fromNode, fromPort, port) =>
+        trace("CLOSE", s"$fromNode.$fromPort -> $node.$port", TraceEvent.NMESSAGES)
+        protectedArity1(protectedClose, port)
       case NStart() =>
-        trace("NSTART", s"$node", TraceEvent.NMESSAGES)
+        trace("START", s"$node", TraceEvent.NMESSAGES)
+        configurePorts()
         start()
-
-      case NAbort() =>
-        trace("NABORT", s"$node", TraceEvent.NMESSAGES)
-        abort()
-
+      case NStarted(node) =>
+        trace("STARTED", s"$node", TraceEvent.NMESSAGES)
+        started(node)
+      case NReady(node) =>
+        trace("READY", s"$node", TraceEvent.NMESSAGES)
+        ready(node)
+      case NRunIfReady() =>
+        protectedArity0(() => NodeActor.this.protectedRunIfReady())
       case NStop() =>
-        trace("NSTOP", s"$node", TraceEvent.NMESSAGES)
+        trace("STOP", s"$node", TraceEvent.NMESSAGES)
         stop()
-
-      case NCatch(cause) =>
-        trace("NCATCH", s"$node", TraceEvent.NMESSAGES)
-        this match {
-          case catchStep: CatchActor =>
-            catchStep.start(cause)
-          case _ =>
-            monitor ! GException(None,
-              JafplException.internalError("Attempt to send exception to something that's not a catch", node.location))
-        }
-
-      case NFinally() =>
-        trace("NFINALLY", s"$node", TraceEvent.NMESSAGES)
-        this match {
-          case block: TryCatchActor =>
-            block.runFinally()
-          case _ =>
-            monitor ! GException(None,
-              JafplException.internalError("Attempt to send finally to something that's not a try/catch", node.location))
-        }
-
-      case NRunFinally(cause) =>
-        trace("NRUNFINAL", s"$node $cause", TraceEvent.NMESSAGES)
-        this match {
-          case block: FinallyActor =>
-            block.startFinally(cause)
-          case _ =>
-            monitor ! GException(None,
-              JafplException.internalError("Attempt to send run_finally to something that's not a finally", node.location))
-        }
-
+      case NStopped(node) =>
+        trace("STOPPED", s"$node", TraceEvent.NMESSAGES)
+        stopped(node)
+      case NAbort() =>
+        trace("ABORT", s"$node", TraceEvent.NMESSAGES)
+        abort()
+      case NAborted(node) =>
+        trace("ABORTED", s"$node", TraceEvent.NMESSAGES)
+        aborted(node)
       case NReset() =>
-        trace("NRESET", s"$node", TraceEvent.NMESSAGES)
+        trace("RESET", s"$node", TraceEvent.NMESSAGES)
         reset()
-
-      case NResetFinished(child) =>
-        trace("NRESETF", s"$child", TraceEvent.NMESSAGES)
-        resetFinished(child)
-
-      case NRestartLoop() =>
-        trace("NRSTRTLOOP", s"$node", TraceEvent.NMESSAGES)
-        this match {
-          case loop: LoopEachActor => loop.restartLoop()
-          case loop: LoopForActor => loop.restartLoop()
-          case loop: LoopUntilActor => loop.restartLoop()
-          case loop: LoopWhileActor => loop.restartLoop()
-          case loop: ViewportActor => loop.restartLoop()
-          case _ =>
-            monitor ! GException(None, JafplException.internalError(s"Attempt to restart non-loop $node", node.location))
-        }
-
-      case NContainerFinished() =>
-        trace("NCONTFNSHD", s"$node", TraceEvent.NMESSAGES)
-        this match {
-          case start: StartActor =>
-            start.finished()
-          case _ =>
-            monitor ! GException(None,
-              JafplException.internalError(s"Container finish message sent to something that isn't a start: $node", node.location))
-        }
-
-      case NChildFinished(otherNode) =>
-        trace("NCHLDFNSH ", s"$node $otherNode / ${otherNode.state}", TraceEvent.NMESSAGES)
-        this match {
-          case start: StartActor =>
-            start.childFinished(otherNode)
-          case _ =>
-            monitor ! GException(None,
-              JafplException.internalError(s"Child finish message sent to something that isn't an end: $node", node.location))
-        }
-
-      case NCheckGuard() =>
-        trace("NCHKGUARD", s"$node", TraceEvent.NMESSAGES)
-        this match {
-          case when: WhenActor =>
-            when.checkGuard()
-          case _ =>
-            monitor ! GException(None,
-              JafplException.internalError(s"Attept to check guard expresson on something that isn't a when: $node", node.location))
-        }
-
-      case NGuardResult(when, pass) =>
-        trace("NGUARDRES", s"$node $when: $pass", TraceEvent.NMESSAGES)
+      case NResetted(node) =>
+        trace("HAVERST", s"$node", TraceEvent.NMESSAGES)
+        resetted(node)
+      case NFinished(node) =>
+        trace("FINISHED", s"$node", TraceEvent.NMESSAGES)
+        finished(node)
+      case NGuardCheck() =>
+        trace("GUARDCHK", s"$node", TraceEvent.NMESSAGES)
+        protectedArity0(() => NodeActor.this.protectedGuardCheck())
+      case NGuardReport(node, pass) =>
+        trace("GUARDRPT", s"$node: $pass", TraceEvent.NMESSAGES)
         this match {
           case choose: ChooseActor =>
-            choose.guardResult(when, pass)
+            choose.guardReport(node.asInstanceOf[WhenStart], pass)
           case _ =>
-            monitor ! GException(None,
-              JafplException.internalError(s"Attempt to pass guard result to something that isn't a when: $node", node.location))
+            throw new RuntimeException(s"Attempt to check guard on $this")
         }
-
-      case NException(cause) =>
-        trace("NEXCEPT", s"$node $cause ($this)", TraceEvent.NMESSAGES)
-        this match {
-          case trycatch: TryCatchActor =>
-            trycatch.exception(cause)
-          case tryblock: TryActor =>
-            tryblock.exception(cause)
-          case _ =>
-            monitor ! GException(node.parent, cause)
-        }
-
-      case NTraceEnable(event) =>
-        trace("TRACE+", s"$node $event", TraceEvent.TRACES)
-        runtime.traceEventManager.enableTrace(event)
-
-      case NTraceDisable(event) =>
-        trace("TRACE-", s"$node $event", TraceEvent.TRACES)
-        runtime.traceEventManager.disableTrace(event)
-
+      case NException(child, ex) =>
+        protectedExceptionHandler(child, ex)
       case m: Any =>
-        trace("NERROR", s"$node $fmtSender: $m", TraceEvent.NMESSAGES)
-        log.error(s"Unexpected message: $m")
+        trace("ERROR", s"$m", TraceEvent.NMESSAGES)
+        log.error(s"UNEXPECT $m")
     }
-  }
-
-  protected class InputBuffer(val from: Node, val fromPort: String, val port: String, val item: Message) {
   }
 }

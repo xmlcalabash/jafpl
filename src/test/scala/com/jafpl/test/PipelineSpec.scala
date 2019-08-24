@@ -149,7 +149,7 @@ class PipelineSpec extends FlatSpec {
       runtime.run()
       pass = false
     } catch {
-      case t: Throwable =>
+      case _: Throwable =>
         runtime.stop()
     }
 

@@ -1,8 +1,8 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.graph.{GraphInput, Node}
-import com.jafpl.messages.{Message, Metadata, PipelineMessage}
+import com.jafpl.graph.Node
+import com.jafpl.messages.Message
 import com.jafpl.steps.{DataConsumer, DataProvider}
 
 import scala.collection.mutable

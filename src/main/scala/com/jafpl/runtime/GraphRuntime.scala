@@ -2,9 +2,8 @@ package com.jafpl.runtime
 
 import akka.actor.{ActorRef, ActorSystem, DeadLetter, Props}
 import com.jafpl.exceptions.JafplException
-import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, EmptySource, FinallyStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopForStart, LoopUntilStart, LoopWhileStart, OptionBinding, PipelineStart, Sink, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
-import com.jafpl.messages.Message
-import com.jafpl.runtime.GraphMonitor.{GAbortExecution, GException, GNode, GRun, GWatchdog}
+import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerStart, EmptySource, FinallyStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopForStart, LoopUntilStart, LoopWhileStart, OptionBinding, PipelineStart, Sink, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
+import com.jafpl.runtime.NodeActor.{NAbortExecution, NNode, NRunIfReady, NWatchdog, NWatchdogTimeout}
 import com.jafpl.runtime.Reaper.WatchMe
 import com.jafpl.steps.{DataConsumerProxy, DataProvider}
 import com.jafpl.util.{DeadLetterListener, DefaultTraceEventManager, TraceEventManager, UniqueId}
@@ -28,6 +27,7 @@ import scala.collection.mutable.ListBuffer
   */
 class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   protected[jafpl] val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
   private val actorList = ListBuffer.empty[ActorRef]
   private var _system: ActorSystem = _
   private var _monitor: ActorRef = _
@@ -35,12 +35,11 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   private val sleepInterval = 100
   private var _started = false
   private var _finished = false
-  private var _exception = Option.empty[Throwable]
-  private var _graphInputs = mutable.HashMap.empty[String, InputProxy]
+  private val _graphInputs = mutable.HashMap.empty[String, InputProxy]
+  private val _graphOutputs = mutable.HashMap.empty[String, OutputProxy]
   private val _graphOptions = mutable.HashMap.empty[String, OptionBinding]
-  private var _graphOutputs = mutable.HashMap.empty[String, OutputProxy]
   private var _traceEventManager: TraceEventManager = new DefaultTraceEventManager()
-  private var _statics = mutable.HashMap.empty[Binding, Message]
+  private var _exception = Option.empty[Exception]
 
   graph.close()
 
@@ -113,7 +112,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
     _finished = true
   }
 
-  protected[runtime] def finish(cause: Throwable): Unit = {
+  protected[runtime] def finish(cause: Exception): Unit = {
     _exception = Some(cause)
     finish()
   }
@@ -124,7 +123,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
     *
     */
   def run(): Unit = {
-    for ((port, proxy) <- inputs) {
+    for (proxy <- inputs.values) {
       proxy.asInstanceOf[InputProxy].close()
     }
 
@@ -142,10 +141,9 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
     * To determine if execution has completed, check the `finished` value.
     */
   def runInBackground(): Unit = {
-    _monitor ! GRun()
+    _monitor ! NRunIfReady()
     _started = true
   }
-
 
   /** Wait for pipeline execution to complete.
     *
@@ -162,10 +160,9 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
 
   private def waitForTeardown(): Unit = {
     if (!finished) {
-      val watchdog = runtime.watchdogTimeout
+      val watchdog = runtime.watchdogTimeout + 1000 //FIXME:
       if (watchdog < 0) {
-        _monitor ! GException(None,
-          JafplException.invalidConfigurationValue("watchdog timer", watchdog.toString))
+        _monitor ! NWatchdogTimeout()
       }
 
       var ticker = watchdog
@@ -173,7 +170,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
         if (ticker <= 0) {
           ticker = watchdog
           if (watchdog != 0) {
-            _monitor ! GWatchdog(ticker)
+            _monitor ! NWatchdog(ticker)
           }
         }
         Thread.sleep(sleepInterval)
@@ -187,7 +184,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   }
 
   def stop(): Unit = {
-    _monitor ! GAbortExecution()
+    _monitor ! NAbortExecution()
     waitForTeardown()
   }
 
@@ -207,24 +204,24 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
       var actorName = "_" * (7 - node.id.length) + node.id
 
       val actor = node match {
+        case act: PipelineStart => _system.actorOf(Props(new PipelineActor(_monitor, this, act)), actorName)
         case act: Splitter => _system.actorOf(Props(new SplitterActor(_monitor, this, act)), actorName)
         case act: Joiner => _system.actorOf(Props(new JoinerActor(_monitor, this, act)), actorName)
+        case act: GroupStart => _system.actorOf(Props(new GroupActor(_monitor, this, act)), actorName)
+        case act: LoopEachStart => _system.actorOf(Props(new LoopForEachActor(_monitor, this, act)), actorName)
+        case act: LoopForStart => _system.actorOf(Props(new LoopForCountActor(_monitor, this, act)), actorName)
         case act: Buffer => _system.actorOf(Props(new BufferActor(_monitor, this, act)), actorName)
         case act: Sink => _system.actorOf(Props(new SinkActor(_monitor, this, act)), actorName)
         case act: EmptySource => _system.actorOf(Props(new EmptySourceActor(_monitor, this, act)), actorName)
-        case act: LoopEachStart => _system.actorOf(Props(new LoopEachActor(_monitor, this, act)), actorName)
-        case act: ViewportStart => _system.actorOf(Props(new ViewportActor(_monitor, this, act)), actorName)
+        case act: LoopWhileStart => _system.actorOf(Props(new LoopWhileActor(_monitor, this, act)), actorName)
+        case act: LoopUntilStart => _system.actorOf(Props(new LoopUntilActor(_monitor, this, act)), actorName)
         case act: ChooseStart => _system.actorOf(Props(new ChooseActor(_monitor, this, act)), actorName)
         case act: WhenStart => _system.actorOf(Props(new WhenActor(_monitor, this, act)), actorName)
-        case act: LoopForStart => _system.actorOf(Props(new LoopForActor(_monitor, this, act)), actorName)
         case act: TryCatchStart => _system.actorOf(Props(new TryCatchActor(_monitor, this, act)), actorName)
         case act: TryStart => _system.actorOf(Props(new TryActor(_monitor, this, act)), actorName)
         case act: CatchStart => _system.actorOf(Props(new CatchActor(_monitor, this, act)), actorName)
         case act: FinallyStart => _system.actorOf(Props(new FinallyActor(_monitor, this, act)), actorName)
-        case act: PipelineStart => _system.actorOf(Props(new PipelineActor(_monitor, this, act)), actorName)
-        case act: GroupStart => _system.actorOf(Props(new StartActor(_monitor, this, act)), actorName)
-        case act: LoopWhileStart => _system.actorOf(Props(new LoopWhileActor(_monitor, this, act)), actorName)
-        case act: LoopUntilStart => _system.actorOf(Props(new LoopUntilActor(_monitor, this, act)), actorName)
+        case act: ViewportStart => _system.actorOf(Props(new ViewportActor(_monitor, this, act)), actorName)
         case act: ContainerStart => throw JafplException.abstractContainer(act.toString, act.location)
         case req: GraphInput =>
           if (_graphInputs.contains(req.name)) {
@@ -232,32 +229,21 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
           }
           val ip = new InputProxy(_monitor, this, node)
           _graphInputs.put(req.name, ip)
-          _system.actorOf(Props(new InputActor(_monitor, this, node, ip)), actorName)
+          _system.actorOf(Props(new InputActor(_monitor, this, req, ip)), actorName)
         case req: GraphOutput =>
           if (_graphOutputs.contains(req.name)) {
             throw JafplException.dupOutputPort(req.name, req.location)
           }
           val op = new OutputProxy(_monitor, this, node)
           _graphOutputs.put(req.name, op)
-          _system.actorOf(Props(new OutputActor(_monitor, this, node, op)), actorName)
+          _system.actorOf(Props(new OutputActor(_monitor, this, req, op)), actorName)
         case req: OptionBinding =>
-          /*
-          if (_graphOptions.contains(req.name)) {
-            throw JafplException.dupOptionName(req.name, req.location)
-          }
-          */
           _graphOptions.put(req.name, req)
           _system.actorOf(Props(new VariableActor(_monitor, this, req)), actorName)
         case req: Binding =>
           _system.actorOf(Props(new VariableActor(_monitor, this, req)), actorName)
         case atomic: AtomicNode =>
-          if (node.step.isDefined) {
-            val cp = new ConsumingProxy(_monitor, this, node)
-            node.step.get.setConsumer(cp)
-            _system.actorOf(Props(new NodeActor(_monitor, this, node, cp)), actorName)
-          } else {
-            _system.actorOf(Props(new NodeActor(_monitor, this, node)), actorName)
-          }
+          _system.actorOf(Props(new AtomicActor(_monitor, this, atomic)), actorName)
 
         case _ =>
           throw JafplException.unexpecteStepType(node.toString, node.location)
@@ -265,7 +251,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
 
       actorList += actor
       reaper ! WatchMe(actor)
-      _monitor ! GNode(node, actor)
+      _monitor ! NNode(node, actor)
     }
   }
 }

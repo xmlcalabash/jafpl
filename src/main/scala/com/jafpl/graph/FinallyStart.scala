@@ -10,7 +10,6 @@ package com.jafpl.graph
   */
 class FinallyStart private[jafpl](override val graph: Graph,
                                   override protected val end: ContainerEnd,
-                                  override val userLabel: Option[String])
-  extends ContainerStart(graph, end, userLabel) {
-
+                                  override val userLabel: Option[String]) extends ContainerStart(graph, end, userLabel) {
+  protected[jafpl] var cause = Option.empty[Exception]
 }

@@ -4,7 +4,7 @@ name := "jafpl"
 
 organization := "com.jafpl"
 homepage     := Some(url("https://jafpl.com/"))
-version      := "0.2.0"
+version      := "0.2.3"
 scalaVersion := "2.12.6"
 
 buildInfoKeys ++= Seq[BuildInfoKey](
@@ -126,5 +126,5 @@ libraryDependencies ++= Seq(
 target in Compile in doc := baseDirectory.value / "build/pages/apidocs"
 scalacOptions in (Compile, doc) ++= Seq(
   "-doc-root-content", baseDirectory.value+"/docs/apidocs/root.md",
-  "-no-link-warnings"
+  "-no-link-warnings", "-deprecation"
 )

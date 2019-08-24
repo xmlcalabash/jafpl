@@ -3,8 +3,8 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.Node
-import com.jafpl.messages.{Message, Metadata}
-import com.jafpl.runtime.GraphMonitor.GException
+import com.jafpl.messages.Message
+import com.jafpl.runtime.NodeActor.NException
 import com.jafpl.steps.{DataConsumer, DataConsumerProxy}
 
 class OutputProxy(private val monitor: ActorRef,
@@ -16,7 +16,7 @@ class OutputProxy(private val monitor: ActorRef,
 
   override def setConsumer(provider: DataConsumer): Unit = {
     if (_provider.isDefined) {
-      monitor ! GException(None,
+      monitor ! NException(node,
         JafplException.internalError(s"Attempt to reset provider: $node", node.location))
     }
     _provider = Some(provider)

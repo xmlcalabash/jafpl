@@ -1,10 +1,9 @@
 package com.jafpl.graph
 
 import com.jafpl.exceptions.JafplException
+import com.jafpl.graph.NodeState.NodeState
 import com.jafpl.injection.{PortInjectable, StepInjectable}
 import com.jafpl.messages.Message
-import com.jafpl.runtime.NodeState
-import com.jafpl.runtime.NodeState.NodeState
 import com.jafpl.steps.{ManifoldSpecification, PortCardinality, Step}
 import com.jafpl.util.UniqueId
 import org.slf4j.{Logger, LoggerFactory}
@@ -34,8 +33,8 @@ abstract class Node(val graph: Graph,
   // After the graph is patched to remove the "end" nodes; inputs and outputs become muddled.
   // Before doing that patch, we store the final sets in these variables so that the correct
   // answers are available after the patch.
-  protected[jafpl] var openInputSet: Option[Set[String]] = None
-  protected[jafpl] var openOutputSet: Option[Set[String]] = None
+  //protected[jafpl] var openInputSet: Option[Set[String]] = None
+  //protected[jafpl] var openOutputSet: Option[Set[String]] = None
   private var _nodeState = NodeState.CREATED
 
   protected[jafpl] val inputCardinalities = mutable.HashMap.empty[String,Long]
@@ -125,11 +124,14 @@ abstract class Node(val graph: Graph,
     * @return The input port names.
     */
   def inputs: Set[String] = {
+    graph.inboundPorts(this)
+    /*
     if (openInputSet.isEmpty) {
       graph.inboundPorts(this)
     } else {
       openInputSet.get
     }
+     */
   }
 
   /** The names of this step's output ports.
@@ -137,11 +139,14 @@ abstract class Node(val graph: Graph,
     * @return The output port names.
     */
   def outputs: Set[String] = {
+    graph.outboundPorts(this)
+    /*
     if (openOutputSet.isEmpty) {
       graph.outboundPorts(this)
     } else {
       openOutputSet.get
     }
+     */
   }
 
   /** The names of this step's variable bindings.

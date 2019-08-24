@@ -1,12 +1,11 @@
 package com.jafpl.test
 
 import com.jafpl.config.Jafpl
-import com.jafpl.exceptions.JafplException
 import com.jafpl.io.BufferConsumer
 import com.jafpl.messages.{ItemMessage, Metadata}
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{BufferSink, Count, Identity, Manifold, ProduceBinding}
+import com.jafpl.steps.{BufferSink, Identity, Manifold, ProduceBinding}
 import org.scalatest.FlatSpec
 
 class BindingSpec extends FlatSpec {
@@ -23,14 +22,11 @@ class BindingSpec extends FlatSpec {
     graph.addEdge(ident, "result", pipeline, "result")
     graph.addOutput(pipeline, "result")
 
-    graph.close()
     val runtime = new GraphRuntime(graph, runtimeConfig)
-
     runtime.inputs("source").send(new ItemMessage("Hello, World", Metadata.STRING))
 
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
-
     runtime.run()
 
     assert(bc.items.size == 1)

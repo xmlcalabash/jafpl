@@ -1,104 +1,117 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.graph.{ContainerStart, Joiner, Node, Sink, Splitter, WhenStart}
-import com.jafpl.runtime.GraphMonitor.{GAbort, GCheckGuard, GClose, GStart}
+import com.jafpl.graph.{ChooseStart, Node, NodeState, WhenStart}
+import com.jafpl.runtime.NodeActor.{NAbort, NAborted, NFinished, NGuardCheck, NRunIfReady}
 
 import scala.collection.mutable.ListBuffer
 
 private[runtime] class ChooseActor(private val monitor: ActorRef,
-                                   override protected val runtime: GraphRuntime,
-                                   override protected val node: ContainerStart) extends StartActor(monitor, runtime, node) {
-  val whenList = ListBuffer.empty[Node]
-  logEvent = TraceEvent.CHOOSE
+                                    override protected val runtime: GraphRuntime,
+                                    override protected val node: ChooseStart) extends StartActor(monitor, runtime, node) {
+  private val whenList = ListBuffer.empty[WhenStart]
+  private var aborting = false
 
-  // override protected def initialize(): Unit = {
-
-  // override protected def input(from: Node, fromPort: String, port: String, item: Message): Unit = {
-
-  // override protected def close(port: String): Unit = {
-
-  // override protected def start(): Unit = {
-
-  // override protected def finished(): Unit = {
-
-  // override protected def abort(): Unit = {
-
-  // override protected def stop(): Unit = {
+  override protected def initialize(): Unit = {
+    for (node <- node.children) {
+      node match {
+        case when: WhenStart =>
+          whenList += when
+        case _ => Unit
+      }
+    }
+    super.initialize()
+  }
 
   override protected def reset(): Unit = {
+    aborting = false
     whenList.clear()
+    for (node <- node.children) {
+      node match {
+        case when: WhenStart =>
+          whenList += when
+        case _ => Unit
+      }
+    }
     super.reset()
   }
 
-  // override protected def resetIfReady(): Unit = {
-
-  // override protected def resetFinished(): Unit = {
-
-  // override protected def runIfReady(): Unit = {
-
   override protected def run(): Unit = {
-    trace("RUN", s"$node", logEvent)
+    stateChange(node, NodeState.RUNNING)
 
-    for (child <- node.children) {
-      childState(child) = NodeState.STARTED
-    }
-    trace("CSTATE", s"$node / $childState", logEvent)
+    for (cnode <- node.children) {
+      cnode match {
+        case _: WhenStart => Unit
+        case _ => actors(cnode) ! NRunIfReady()
 
-    for (child <- node.children) {
-      child match {
-        case join: Joiner =>
-          monitor ! GStart(join)
-        case split: Splitter =>
-          monitor ! GStart(split)
-        case sink: Sink =>
-          monitor ! GStart(sink)
-        case _ =>
-          whenList += child
       }
     }
 
-    if (whenList.nonEmpty) {
-      val nextWhen = whenList.head
-      whenList.remove(0)
-      monitor ! GCheckGuard(nextWhen)
-    }
- }
+    testNextCondition()
+  }
 
-  protected[runtime] def guardResult(when: Node, pass: Boolean): Unit = {
-    trace("GUARDRES", s"$node $when: $pass", logEvent)
-
-    if (pass) {
-      // Force all the rest of the branches to abort;
-      // this avoids dead letters, but I'm not sure it's
-      // the best solution.
-      for (child <- whenList) {
-        stopUnselectedBranch(child)
-      }
-      // Run the one that passed
-      monitor ! GStart(when)
+  private def testNextCondition(): Unit = {
+    if (whenList.isEmpty) {
+      parent ! NFinished(node)
     } else {
-      stopUnselectedBranch(when)
-      if (whenList.isEmpty) {
-        // nop? What do we do if no branch passes?
-        trace("NOBRANCH", "Ran off the end of the whenList", logEvent)
+      val when = whenList.head
+      whenList -= when
+      actors(when) ! NGuardCheck()
+    }
+  }
+
+  def guardReport(when: WhenStart, pass: Boolean): Unit = {
+    if (pass) {
+      actors(when) ! NRunIfReady()
+      for (branch <- whenList) {
+        actors(branch) ! NAbort()
+      }
+      whenList.clear()
+    } else {
+      actors(when) ! NAbort()
+      testNextCondition()
+    }
+  }
+
+  override protected def abort(): Unit = {
+    aborting = true
+    super.abort()
+  }
+
+  override protected def aborted(child: Node): Unit = {
+    stateChange(child, NodeState.ABORTED)
+    var aborted = true
+    for (cnode <- node.children) {
+      aborted = aborted && cnode.state == NodeState.ABORTED
+    }
+
+    if (aborting) {
+      if (aborted) {
+        parent ! NAborted(node)
+      }
+    } else {
+      var finished = true
+      for (cnode <- node.children) {
+        finished = finished && (cnode.state == NodeState.FINISHED || cnode.state == NodeState.ABORTED)
+      }
+      if (finished) {
+        parent ! NFinished(node)
       } else {
-        val nextWhen = whenList.head
-        whenList.remove(0)
-        monitor ! GCheckGuard(nextWhen)
+        trace("UNFINISH", s"${nodeState(node)}", TraceEvent.STATECHANGE)
       }
     }
   }
 
-  private def stopUnselectedBranch(node: Node): Unit = {
-    trace("KILLBRANCH", s"${this.node} $node", logEvent)
-    monitor ! GAbort(node)
-    for (output <- node.outputs) {
-      monitor ! GClose(node, output)
+  override protected def finished(child: Node): Unit = {
+    stateChange(child, NodeState.FINISHED)
+    var finished = true
+    for (cnode <- node.children) {
+      finished = finished && (cnode.state == NodeState.FINISHED || cnode.state == NodeState.ABORTED)
     }
-  }
-
-  override protected def traceMessage(code: String, details: String): String = {
-    s"$code          ".substring(0, 10) + details + " [Choose]"
+    if (finished) {
+      parent ! NFinished(node)
+    } else {
+      trace("UNFINISH", s"${nodeState(node)}", TraceEvent.STATECHANGE)
+    }
   }
 }

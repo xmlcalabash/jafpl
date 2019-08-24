@@ -3,7 +3,6 @@ package com.jafpl.steps
 import com.jafpl.graph.Location
 import com.jafpl.messages.{BindingMessage, Message}
 import com.jafpl.runtime.RuntimeConfiguration
-import com.jafpl.util.UniqueId
 
 class DefaultStep  extends Step {
   protected var _location = Option.empty[Location]

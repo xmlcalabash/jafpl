@@ -784,6 +784,17 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     // Make sure all the required edges exist
     for (node <- nodes) {
       node match {
+        case bind: Binding =>
+          if (edgesFrom(bind).isEmpty) {
+            val sink = if (bind.parent.isDefined) {
+              bind.parent.get.addSink()
+            } else {
+              // This is a top-level binding that's unread...
+              this.addSink()
+            }
+            addEdge(bind, "result", sink, "result")
+          }
+
         case atomic: AtomicNode =>
           if (atomic.step.isDefined) {
             var map = mutable.HashSet.empty[String] ++ atomic.step.get.inputSpec.ports
@@ -810,6 +821,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
               error(JafplException.requiredVariableBindingMissing(varname.toString, atomic.toString, node.location))
             }
           }
+
         case loop: LoopEachStart =>
           for (in <- loop.inputs) {
             if (in != "source") {
@@ -817,16 +829,6 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
             }
           }
 
-        case bind: Binding =>
-          if (edgesFrom(bind).isEmpty) {
-            val sink = if (bind.parent.isDefined) {
-              bind.parent.get.addSink()
-            } else {
-              // This is a top-level binding that's unread...
-              this.addSink()
-            }
-            addEdge(bind, "result", sink, "result")
-          }
         case when: WhenStart =>
           if (edgesTo(when, "condition").isEmpty) {
             val choose = when.parent.get
@@ -1162,6 +1164,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       }
     }
 
+/*
     for (node <- _nodes) {
       node match {
         case start: ContainerStart =>
@@ -1181,6 +1184,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
           node.openOutputSet = Some(node.outputs)
       }
     }
+*/
 
     val patchEdges = ListBuffer.empty[Edge]
     for (edge <- _edges) {
@@ -1205,6 +1209,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     _nodes ++= patchNodes
 
     open = false
+
+    //println(asXML)
+
     if (exception.isDefined) {
       _valid = false
       throw exception.get

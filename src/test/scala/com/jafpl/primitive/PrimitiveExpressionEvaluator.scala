@@ -1,6 +1,5 @@
 package com.jafpl.primitive
 
-import akka.event.Logging
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.BindingParams
 import com.jafpl.messages.{ItemMessage, Message, Metadata}
@@ -92,6 +91,10 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
     val strexpr = expr match {
       case str: String => str
       case _ => throw JafplException.unexpectedExpressionObject(expr.toString)
+    }
+
+    if (strexpr == "ERROR") {
+      throw new RuntimeException("Expression went bang")
     }
 
     val patn = ". ([<=>]) ([0-9]+)".r

@@ -4,84 +4,55 @@ import java.time.{Duration, Instant}
 
 import akka.actor.{ActorRef, PoisonPill}
 import com.jafpl.exceptions.JafplException
-import com.jafpl.graph.{ContainerEnd, Graph, Node}
-import com.jafpl.messages.{ItemMessage, Message}
-import com.jafpl.runtime.GraphMonitor.{GAbort, GAbortExecution, GCatch, GCheckGuard, GClose, GException, GFinally, GFinished, GGuardResult, GLoop, GNode, GOutput, GReset, GResetFinished, GRestartLoop, GRun, GRunFinally, GStart, GStop, GStopped, GTrace, GWatchdog}
-import com.jafpl.runtime.NodeActor.{NAbort, NCatch, NCheckGuard, NChildFinished, NClose, NException, NFinally, NGuardResult, NInitialize, NInput, NLoop, NReset, NResetFinished, NRestartLoop, NRunFinally, NStart, NStop}
+import com.jafpl.graph.{ContainerStart, Graph, Node, NodeState}
+import com.jafpl.runtime.NodeActor.{NAbortExecution, NException, NFinished, NInitialize, NInitialized, NNode, NReady, NRunIfReady, NRunning, NStart, NStarted, NStop, NStopped, NWatchdog, NWatchdogTimeout}
 
 import scala.collection.mutable
 
-private[runtime] object GraphMonitor {
-  case class GNode(node: Node, actor: ActorRef)
-  case class GRun()
-  case class GAbortExecution()
-  case class GReset(node: Node)
-  case class GResetFinished(node: Node)
-  case class GRestartLoop(node: Node)
-  case class GStart(node: Node)
-  case class GCatch(node: Node, cause: Throwable)
-  case class GFinally(node: Node)
-  case class GRunFinally(node: Node, cause: Option[Throwable])
-  case class GException(node: Option[Node], cause: Throwable)
-  case class GOutput(node: Node, port: String, item: Message)
-  case class GLoop(node: Node, item: ItemMessage)
-  case class GClose(node: Node, port: String)
-  case class GFinished(node: Node)
-  case class GAbort(node: Node)
-  case class GStop(node: Node)
-  case class GStopped(node: Node)
-  case class GTrace(event: String)
-  case class GCheckGuard(node: Node)
-  case class GGuardResult(when: Node, pass: Boolean)
-  case class GWatchdog(millis: Long)
-}
-
 private[runtime] class GraphMonitor(private val graph: Graph, override protected val runtime: GraphRuntime) extends TracingActor(runtime) {
-  protected val unfinishedNodes = mutable.HashSet.empty[Node]
-  protected val unstoppedNodes = mutable.HashSet.empty[Node]
+  protected val allNodes = mutable.HashSet.empty[Node]
+  protected val topLevelNodes = mutable.HashSet.empty[Node]
   private val actors = mutable.HashMap.empty[Node, ActorRef]
   private var lastMessage = Instant.now()
-  private var exception: Option[Throwable] = None
+  private var exception: Option[Exception] = None
   protected var logEvent = TraceEvent.MONITOR
-
-  private def fmtSender: String = {
-    var str = sender().toString
-    var pos = str.indexOf("/user/")
-    str = str.substring(pos+6)
-    pos = str.indexOf("#")
-    if (pos > 0) {
-      str = str.substring(0, pos)
-    }
-    str
-  }
 
   def watchdog(millis: Long): Unit = {
     trace("WATCHDOG", s"$millis", TraceEvent.WATCHDOG)
-    for (node <- unfinishedNodes) {
-      trace("...UNFINSH", s"$node", TraceEvent.WATCHDOG)
-    }
-    if (unfinishedNodes.isEmpty) {
-      for (node <- unstoppedNodes) {
-        trace("...UNSTOPD", s"$node", TraceEvent.WATCHDOG)
-      }
+    for (node <- allNodes) {
+      trace("...WATCHDOG", s"$node: ${node.state}", TraceEvent.WATCHDOG)
     }
     crashAndBurn(JafplException.watchdogTimeout())
   }
 
-  def stopPipeline(): Unit = {
-    trace("STOPPIPE", "", logEvent)
-    for (node <- unstoppedNodes) {
-      if (node.parent.isEmpty) {
-        actors(node) ! NStop()
-      }
+  def crashAndBurn(cause: Exception): Unit = {
+    trace("CRASHBURN", s"$cause", logEvent)
+    exception = Some(cause)
+    stopPipeline()
+  }
+
+  def stop(): Unit = {
+    stopPipeline()
+
+    // What if we got stopped before we really got started?
+    if (topLevelNodes.isEmpty) {
+      runtime.finish()
     }
   }
 
-  def stoppedStep(node: Node): Unit = {
-    trace("STOPDSTEP", s"$node", logEvent)
-    unstoppedNodes -= node
+  def stopPipeline(): Unit = {
+    trace("STOPPIPE", "", logEvent)
+    for (node <- topLevelNodes) {
+      stateChange(node, NodeState.STOPPING)
+      actors(node) ! NStop()
+    }
+  }
+
+  def stopped(node: Node): Unit = {
+    stateChange(node, NodeState.STOPPED)
+    topLevelNodes -= node
     actors(node) ! PoisonPill
-    if (unstoppedNodes.isEmpty) {
+    if (topLevelNodes.isEmpty) {
       if (exception.isDefined) {
         runtime.finish(exception.get)
       } else {
@@ -90,176 +61,129 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
     }
   }
 
-  def crashAndBurn(cause: Throwable): Unit = {
-    trace("CRASHBURN", s"$cause", logEvent)
-    exception = Some(cause)
-    stopPipeline()
+  def finished(node: Node): Unit = {
+    stateChange(node, NodeState.STOPPING)
+    actors(node) ! NStop()
+  }
+
+  def initialize(node: Node): Unit = {
+    val pref: Option[ActorRef] = if (node.parent.isDefined) {
+      Some(actors(node.parent.get))
+    } else {
+      None
+    }
+
+    val pmap = mutable.HashMap.empty[String,(String,ActorRef)]
+    for (port <- node.outputs) {
+      if (node.hasOutputEdge(port)) {
+        val edge = node.outputEdge(port)
+        pmap(port) = (edge.toPort, actors(edge.to))
+      }
+    }
+
+    node match {
+      case start: ContainerStart =>
+        val cmap = mutable.HashMap.empty[Node,ActorRef]
+        for (child <- start.children) {
+          cmap(child) = actors(child)
+        }
+        actors(node) ! NInitialize(pref, cmap.toMap, pmap.toMap)
+      case _ =>
+        actors(node) ! NInitialize(pref, Map(), pmap.toMap)
+    }
+
+  }
+
+  def initialized(node: Node): Unit = {
+    stateChange(node, NodeState.INIT)
+    var ready = true
+    for (node <- allNodes) {
+      ready = ready && node.state == NodeState.INIT
+    }
+    if (ready) {
+      for (node <- topLevelNodes) {
+        stateChange(node, NodeState.STARTING)
+        actors(node) ! NStart()
+      }
+    }
+  }
+
+  def ready(node: Node): Unit = {
+    actors(node) ! NRunIfReady()
+  }
+
+  def started(node: Node): Unit = {
+    stateChange(node, NodeState.STARTED)
+    ready(node)
+  }
+
+  def running(node: Node): Unit = {
+    stateChange(node, NodeState.RUNNING)
   }
 
   final def receive: PartialFunction[Any, Unit] = {
-    case GWatchdog(millis) =>
-      trace("GWATCHDOG", s"$millis", TraceEvent.WATCHDOG)
+    case NWatchdog(millis) =>
+      trace("WATCHDOG", s"$millis", TraceEvent.WATCHDOG)
       val ns = Duration.between(lastMessage, Instant.now()).toMillis
       if (ns > millis) {
         watchdog(millis)
       }
 
-    case GRun() =>
+    case NRunIfReady() =>
       lastMessage = Instant.now()
-      trace("GRUN", "", TraceEvent.GMESSAGES)
+      trace("RUN", "", TraceEvent.GMESSAGES)
       for (node <- graph.nodes) {
-        actors(node) ! NInitialize()
+        initialize(node)
         if (node.parent.isEmpty) {
-          unfinishedNodes += node
-        }
-      }
-      for (node <- unfinishedNodes) {
-        actors(node) ! NStart()
-      }
-
-    case GStart(node) =>
-      lastMessage = Instant.now()
-      trace("GSTART", s"$node", TraceEvent.GMESSAGES)
-      actors(node) ! NStart()
-
-    case GAbort(node) =>
-      lastMessage = Instant.now()
-      trace("GABORT", s"$node", TraceEvent.GMESSAGES)
-      actors(node) ! NAbort()
-
-    case GStop(node) =>
-      lastMessage = Instant.now()
-      trace("GSTOP", s"$node from $fmtSender", TraceEvent.GMESSAGES)
-      actors(node) ! NStop()
-
-    case GStopped(node) =>
-      lastMessage = Instant.now()
-      trace("GSTOPPED", s"$node", TraceEvent.GMESSAGES)
-      stoppedStep(node)
-
-    case GCatch(node, cause) =>
-      lastMessage = Instant.now()
-      trace("GCATCH", s"$node $cause", TraceEvent.GMESSAGES)
-      actors(node) ! NCatch(cause)
-
-    case GFinally(node) =>
-      lastMessage = Instant.now()
-      trace("GFINALLY", s"$node", TraceEvent.GMESSAGES)
-      actors(node) ! NFinally()
-
-    case GRunFinally(node, cause) =>
-      lastMessage = Instant.now()
-      trace("GRUNFINAL", s"$node $cause", TraceEvent.GMESSAGES)
-      actors(node) ! NRunFinally(cause)
-
-    case GReset(node) =>
-      lastMessage = Instant.now()
-      trace("GRESET", s"$node", TraceEvent.GMESSAGES)
-      actors(node) ! NReset()
-
-    case GResetFinished(node) =>
-      lastMessage = Instant.now()
-      trace("GRESETF", s"$node", TraceEvent.GMESSAGES)
-      if (node.parent.isDefined) {
-        actors(node.parent.get) ! NResetFinished(node)
-      }
-
-    case GRestartLoop(node) =>
-      lastMessage = Instant.now()
-      trace("GRSTRTLOOP", s"$node", TraceEvent.GMESSAGES)
-      actors(node) ! NRestartLoop()
-
-    case GOutput(node, port, item) =>
-      lastMessage = Instant.now()
-      item match {
-        case msg: ItemMessage =>
-          for (inj <- node.outputInjectables) {
-            if (inj.port == port) {
-              inj.run(msg)
-            }
-          }
-        case _ => Unit
-      }
-
-      if (node.hasOutputEdge(port)) {
-        val edge = node.outputEdge(port)
-        trace("GOUTPUT", s"$node.$port → ${edge.to}.${edge.toPort} from $fmtSender", TraceEvent.STEPIO)
-        //trace("MESSAGE→", s"$node.$port → ${edge.to}.${edge.toPort} $item", TraceEvent.MESSAGE)
-        actors(edge.to) ! NInput(node, port, edge.toPort, item)
-      } else {
-        trace("GOUTPUT", s"$node.$port from $fmtSender", TraceEvent.GMESSAGES)
-        //trace("MESSAGE↴", s"$node.$port $item", TraceEvent.MESSAGE)
-      }
-
-    case GLoop(node, item) =>
-      lastMessage = Instant.now()
-      trace("GLOOP", s"$node ($item)", TraceEvent.GMESSAGES)
-      actors(node) ! NLoop(item)
-
-    case GClose(node, port) =>
-      lastMessage = Instant.now()
-      trace("GCLOSE", s"$node.$port from $fmtSender", TraceEvent.GMESSAGES)
-      if (!node.hasOutputEdge(port)) {
-        trace("BANG", s"$node.$port from $fmtSender", TraceEvent.GMESSAGES)
-        println("BANG")
-      }
-      val edge = node.outputEdge(port)
-      actors(edge.to) ! NClose(edge.toPort)
-
-    case GCheckGuard(node) =>
-      lastMessage = Instant.now()
-      trace("GCHKGUARD", s"$node", TraceEvent.GMESSAGES)
-      actors(node) ! NCheckGuard()
-
-    case GGuardResult(when, pass) =>
-      lastMessage = Instant.now()
-      trace("GGUARDRES", s"$when: $pass", TraceEvent.GMESSAGES)
-      actors(when.parent.get) ! NGuardResult(when, pass)
-
-    case GFinished(node) =>
-      lastMessage = Instant.now()
-      trace("GFINISHED", s"$node", TraceEvent.GMESSAGES)
-
-      if (unfinishedNodes.contains(node)) {
-        unfinishedNodes -= node
-        if (unfinishedNodes.isEmpty) {
-          stopPipeline()
+          topLevelNodes += node
         }
       }
 
-      if (node.parent.isDefined) {
-        actors(node.parent.get) ! NChildFinished(node)
-      }
-
-    case GTrace(event) =>
+    case NNode(node,actor) =>
       lastMessage = Instant.now()
-      trace("GTRACE", s"$event", TraceEvent.TRACES)
-      runtime.traceEventManager.enableTrace(event)
-
-    case GNode(node,actor) =>
-      lastMessage = Instant.now()
-      trace("GNODE", s"$node", TraceEvent.GMESSAGES)
+      trace("NODE", s"$node", TraceEvent.GMESSAGES)
       actors.put(node, actor)
-      unstoppedNodes += node
+      allNodes += node
 
-    case GException(node, cause) =>
+    case NInitialized(node: Node) =>
       lastMessage = Instant.now()
-      trace("GEXCEPT", s"$node $cause", TraceEvent.GMESSAGES)
+      initialized(node)
 
-      if (node.isDefined) {
-        actors(node.get) ! NException(cause)
-      } else {
-        crashAndBurn(cause)
-      }
-
-    case GAbortExecution() =>
+    case NStarted(node: Node) =>
       lastMessage = Instant.now()
-      trace("GABORTEXEC", "", TraceEvent.GMESSAGES)
-      stopPipeline()
+      started(node)
+
+    case NReady(node: Node) =>
+      lastMessage = Instant.now()
+      ready(node)
+
+    case NRunning(node: Node) =>
+      lastMessage = Instant.now()
+      trace("RUNNING", s"$node", TraceEvent.GMESSAGES)
+      running(node)
+
+    case NStopped(node: Node) =>
+      lastMessage = Instant.now()
+      trace("STOPPED", s"$node", TraceEvent.GMESSAGES)
+      stopped(node)
+
+    case NFinished(node: Node) =>
+      lastMessage = Instant.now()
+      trace("FINISHED", s"$node", TraceEvent.GMESSAGES)
+      finished(node)
+
+    case NException(node, ex) =>
+      crashAndBurn(ex)
+
+    case NAbortExecution() =>
+      stop()
+
+    case NWatchdogTimeout() =>
+      crashAndBurn(JafplException.watchdogTimeout())
 
     case m: Any =>
       lastMessage = Instant.now()
-      trace("GERROR", s"$m", TraceEvent.GMESSAGES)
+      trace("ERROR", s"$m", TraceEvent.GMESSAGES)
       log.error(s"UNEXPECT $m")
   }
 }

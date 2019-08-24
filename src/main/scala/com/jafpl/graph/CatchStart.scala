@@ -14,8 +14,8 @@ import com.jafpl.steps.Step
 class CatchStart private[jafpl] (override val graph: Graph,
                                  override protected val end: ContainerEnd,
                                  override val userLabel: Option[String],
-                                 val codes: List[Any])
-  extends ContainerStart(graph, end, userLabel) {
+                                 val codes: List[Any]) extends ContainerStart(graph, end, userLabel) {
+  protected[jafpl] var cause = Option.empty[Exception]
 
   private var _translator = Option.empty[Step]
   def translator: Option[Step] = _translator

@@ -1,6 +1,7 @@
 package com.jafpl.primitive
 
 import com.jafpl.runtime.{ExpressionEvaluator, RuntimeConfiguration}
+import com.jafpl.runtime.RuntimeConfiguration
 
 import scala.collection.mutable
 
@@ -13,7 +14,7 @@ class PrimitiveRuntimeConfiguration(val traceAll: Boolean) extends RuntimeConfig
     this(false)
   }
 
-  private val prop = Option(System.getProperty("com.xmlcalabash.trace"))
+  private val prop = Option(System.getProperty("com.jafpl.trace"))
   if (prop.isDefined) {
     for (trace <- prop.get.split(",").map(_.trim)) {
       var event = trace
