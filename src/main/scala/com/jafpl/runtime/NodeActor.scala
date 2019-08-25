@@ -156,8 +156,8 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       return
     }
 
-    if (node.state == NodeState.STARTED || node.state == NodeState.READY) {
-      // If the step never actually ran, we don't care about its input cardinalities
+    if (node.state == NodeState.STARTED || node.state == NodeState.ABORTING || node.state == NodeState.ABORTED) {
+      // If the step never actually ran, or crashed, we don't care about its input cardinalities
       return
     }
 
@@ -184,6 +184,12 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
 
   protected def checkOutputCardinality(node: Node, port: String): Unit = {
     if (port.startsWith("#")) {
+      return
+    }
+
+    if (node.state == NodeState.STARTED || node.state == NodeState.READY
+      || node.state == NodeState.ABORTING || node.state == NodeState.ABORTED) {
+      // If the step never actually ran, or crashed, we don't care about its input cardinalities
       return
     }
 
@@ -364,6 +370,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   private def protectedExceptionHandler(child: Node, ex: Exception): Unit = {
     trace("EXCEPTION", s"$child: ${ex.getMessage}", TraceEvent.NMESSAGES)
     try {
+      stateChange(child, NodeState.ABORTED)
       exceptionHandler(child, ex)
     } catch {
       case ex: Exception =>
@@ -388,7 +395,11 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         runtime.noteMessageTime()
         trace("INPUT", s"$fromNode.$fromPort -> $node.$port", TraceEvent.NMESSAGES)
         incrementOutputCardinality(fromNode, fromPort)
-        incrementInputCardinality(node, port)
+        if (openInputs.contains(port)) {
+          incrementInputCardinality(node, port)
+        } else {
+          incrementOutputCardinality(node, port)
+        }
         bufferInput(port, message)
       case NClose(fromNode, fromPort, port) =>
         runtime.noteMessageTime()

@@ -108,7 +108,9 @@ private[runtime] class StartActor(private val monitor: ActorRef,
 
   override protected def abort(): Unit = {
     for (child <- node.children) {
-      stateChange(child, NodeState.ABORTING)
+      if (child.state != NodeState.ABORTED) {
+        stateChange(child, NodeState.ABORTING)
+      }
       actors(child) ! NAbort()
     }
   }

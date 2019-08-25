@@ -19,6 +19,10 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
     // nop
   }
 
+  override protected def checkOutputCardinality(node: Node, port: String): Unit = {
+    // nop
+  }
+
   override protected def input(port: String, item: Message): Unit = {
     item match {
       case item: ItemMessage =>

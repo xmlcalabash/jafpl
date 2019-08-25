@@ -36,7 +36,7 @@ abstract class TracingActor(protected val runtime: GraphRuntime) extends Actor w
         trace("CHANGEST=", s"$node: ${node.state} already $state", TraceEvent.STATECHANGE)
       } else {
         trace("CHANGEST", s"$node: ${node.state} → $state", TraceEvent.STATECHANGE)
-        node.state = state
+        node.stateTransition(state)
       }
     }
   }

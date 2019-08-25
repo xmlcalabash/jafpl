@@ -63,8 +63,8 @@ abstract class Node(val graph: Graph,
   val id: String = UniqueId.nextId.toString
 
   def state: NodeState = _nodeState
-  protected[jafpl] def state_=(nodeState: NodeState): Unit = {
-    _nodeState = nodeState
+  def stateTransition(newState: NodeState): Unit = {
+    _nodeState = newState
   }
 
   private var _loc = if (step.isDefined) {
