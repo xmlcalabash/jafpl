@@ -14,7 +14,7 @@ import scala.collection.mutable
 private[runtime] object NodeActor {
   case class NWatchdog(millis: Long)
   case class NWatchdogTimeout()
-  case class NInitialize(parent: Option[ActorRef], children: Map[Node,ActorRef], outputs: Map[String,(String,ActorRef)])
+  case class NInitialize(parent: Option[ActorRef], actors: Map[Node,ActorRef], outputs: Map[String,(String,ActorRef)])
   case class NInitialized(node: Node)
   case class NStart()
   case class NStarted(node: Node)
@@ -89,7 +89,6 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       if (inputBuffer.ports.nonEmpty) {
         for (port <- inputBuffer.ports) {
           for (message <- inputBuffer.messages(port)) {
-            node.inputCardinalities.put(port, node.inputCardinalities.getOrElse(port, 0L) + 1)
             input(port, message)
           }
         }
@@ -114,7 +113,21 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     }
   }
 
-  protected def incrementCardinality(port: String): Unit = {
+  private def deliverBufferedInputs(port: String): Unit = {
+    try {
+      if (inputBuffer.ports.contains(port)) {
+        for (message <- inputBuffer.messages(port)) {
+          input(port, message)
+        }
+        inputBuffer.reset(port)
+      }
+    } catch {
+      case ex: Exception =>
+        parent ! NException(node, ex)
+    }
+  }
+
+  private def incrementInputCardinality(node: Node, port: String): Unit = {
     if (port.startsWith("#")) {
       return
     }
@@ -122,21 +135,29 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     if (openInputs.contains(port)) {
       val count = node.inputCardinalities.getOrElse(port, 0L) + 1
       node.inputCardinalities.put(port, count)
-    } else {
-      val count = node.outputCardinalities.getOrElse(port, 0L) + 1
-      node.outputCardinalities.put(port, count)
+      checkInputCardinality(node, port)
     }
-
-    checkCardinality(port)
   }
 
-  protected def checkCardinality(port: String): Unit = {
+  private def incrementOutputCardinality(node: Node, port: String): Unit = {
     if (port.startsWith("#")) {
       return
     }
 
-    if (node.state == NodeState.CREATED || node.state == NodeState.STARTED) {
-      // If it never ran, its cardinalities don't need checking
+    if (openOutputs.contains(port)) {
+      val count = node.outputCardinalities.getOrElse(port, 0L) + 1
+      node.outputCardinalities.put(port, count)
+      checkOutputCardinality(node, port)
+    }
+  }
+
+  protected def checkInputCardinality(node: Node, port: String): Unit = {
+    if (port.startsWith("#")) {
+      return
+    }
+
+    if (node.state == NodeState.STARTED || node.state == NodeState.READY) {
+      // If the step never actually ran, we don't care about its input cardinalities
       return
     }
 
@@ -154,9 +175,19 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           if (jafpl.code == JafplException.INPUT_CARDINALITY_ERROR) {
             trace("CARD!", s"$node $port $count", TraceEvent.NMESSAGES)
           }
-          throw jafpl
+          actors(node) ! NException(node, jafpl)
+        case ex: Exception =>
+          actors(node) ! NException(node, ex)
       }
-    } else {
+    }
+  }
+
+  protected def checkOutputCardinality(node: Node, port: String): Unit = {
+    if (port.startsWith("#")) {
+      return
+    }
+
+    if (openOutputs.contains(port)) {
       val count = node.outputCardinalities.getOrElse(port, 0L)
       trace("CARD→", s"$node $port $count", TraceEvent.NMESSAGES)
 
@@ -170,15 +201,15 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           if (jafpl.code == JafplException.OUTPUT_CARDINALITY_ERROR) {
             trace("CARD!", s"$node $port $count", TraceEvent.NMESSAGES)
           }
-          throw jafpl
+          actors(node) ! NException(node, jafpl)
+        case ex: Exception =>
+          actors(node) ! NException(node, ex)
       }
     }
   }
 
   protected def input(port: String, message: Message): Unit = {
     if (outputs.contains(port)) {
-      incrementCardinality(port)
-
       val output = outputs(port)
       val inputport = output._1
       val receiver = output._2
@@ -189,7 +220,6 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def close(port: String): Unit = {
-    checkCardinality(port)
     if (openInputs.contains(port)) {
       trace("CLOSEI", s"$node: $port", TraceEvent.NMESSAGES)
       openInputs -= port
@@ -201,7 +231,6 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
 
   protected def sendMessage(outputport: String, item: Message): Unit = {
     if (outputs.contains(outputport)) {
-      incrementCardinality(outputport)
       val t = outputs(outputport)
       val inputport = t._1
       val receiver = t._2
@@ -231,7 +260,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
 
   protected def runIfReady(): Unit = {
     if (readyToRun) {
-      run()
+      protectedRun()
     } else {
       trace("!RDYTORUN", s"$node $openInputs ${node.state}", TraceEvent.NMESSAGES)
     }
@@ -325,7 +354,11 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   private def protectedRunIfReady(): Unit = {
     trace("RUNIFRDY", s"$node", TraceEvent.NMESSAGES)
     stateChange(node, NodeState.READY)
-    runIfReady()
+    protectedArity0(() => runIfReady())
+  }
+
+  private def protectedRun(): Unit = {
+    protectedArity0(() => run())
   }
 
   private def protectedExceptionHandler(child: Node, ex: Exception): Unit = {
@@ -353,11 +386,20 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         initialize()
       case NInput(fromNode, fromPort, port, message) =>
         runtime.noteMessageTime()
-        trace("INPUT", s"$fromNode.$fromPort -> $node.$port: $message", TraceEvent.NMESSAGES)
+        trace("INPUT", s"$fromNode.$fromPort -> $node.$port", TraceEvent.NMESSAGES)
+        incrementOutputCardinality(fromNode, fromPort)
+        incrementInputCardinality(node, port)
         bufferInput(port, message)
       case NClose(fromNode, fromPort, port) =>
         runtime.noteMessageTime()
+        deliverBufferedInputs(port)
         trace("CLOSE", s"$fromNode.$fromPort -> $node.$port", TraceEvent.NMESSAGES)
+        checkOutputCardinality(fromNode, fromPort)
+        if (openInputs.contains(port)) {
+          checkInputCardinality(node, port)
+        } else {
+          checkOutputCardinality(node, port)
+        }
         protectedArity1(protectedClose, port)
       case NStart() =>
         runtime.noteMessageTime()
@@ -374,7 +416,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         ready(node)
       case NRunIfReady() =>
         runtime.noteMessageTime()
-        protectedArity0(() => NodeActor.this.protectedRunIfReady())
+        protectedRunIfReady()
       case NStop() =>
         runtime.noteMessageTime()
         trace("STOP", s"$node", TraceEvent.NMESSAGES)

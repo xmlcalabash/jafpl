@@ -26,6 +26,10 @@ private[runtime] class IOBuffer extends DataConsumer {
     buffer.clear()
   }
 
+  def reset(port: String): Unit = {
+    buffer -= port
+  }
+
   def ports: Set[String] = buffer.keySet.toSet
 
   def messages(port: String): List[Message] = {

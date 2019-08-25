@@ -57,7 +57,7 @@ class CardinalitySpec extends FlatSpec {
       runtime.run()
     } catch {
       case jex: JafplException =>
-        pass = jex.code == JafplException.INPUT_CARDINALITY_ERROR
+        pass = jex.code == JafplException.OUTPUT_CARDINALITY_ERROR
     }
 
     assert(pass)

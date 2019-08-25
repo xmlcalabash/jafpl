@@ -12,7 +12,6 @@ private[runtime] class OutputActor(private val monitor: ActorRef,
   logEvent = TraceEvent.OUTPUT
 
   override protected def input(port: String, message: Message): Unit = {
-    incrementCardinality(port)
     consumer.consume(port, message)
   }
 }

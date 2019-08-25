@@ -4,15 +4,20 @@ import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{AtomicNode, NodeState}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
-import com.jafpl.runtime.NodeActor.{NFinished, NStarted}
+import com.jafpl.runtime.NodeActor.{NFinished, NInitialized, NStarted}
 
 private[runtime] class AtomicActor(private val monitor: ActorRef,
                                     override protected val runtime: GraphRuntime,
                                     override protected val node: AtomicNode) extends NodeActor(monitor, runtime, node) {
 
+  override protected def initialize(): Unit = {
+    if (node.step.isDefined) {
+      node.step.get.initialize(runtime.runtime)
+    }
+    super.initialize()
+  }
 
   override protected def input(port: String, message: Message): Unit = {
-    incrementCardinality(port)
     port match {
       case "#bindings" =>
         message match {

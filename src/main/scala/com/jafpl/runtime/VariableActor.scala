@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
-import com.jafpl.graph.Binding
+import com.jafpl.graph.{Binding, Node}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
 
 import scala.collection.mutable
@@ -14,6 +14,10 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
   private val exprContext = ListBuffer.empty[Message]
   private val bindings = mutable.HashMap.empty[String, Message]
   logEvent = TraceEvent.VARIABLE
+
+  override protected def checkInputCardinality(node: Node, port: String): Unit = {
+    // nop
+  }
 
   override protected def input(port: String, item: Message): Unit = {
     item match {
@@ -59,11 +63,10 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
   }
 
   override protected def reset(): Unit = {
-    super.reset()
-
     // Setup for the next loop
     exprContext.clear()
     bindings.clear()
+    super.reset()
   }
 
   override protected def traceMessage(code: String, details: String): String = {

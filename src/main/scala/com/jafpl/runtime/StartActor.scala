@@ -50,7 +50,6 @@ private[runtime] class StartActor(private val monitor: ActorRef,
     if (openInputs.contains(port)) {
       super.close(port)
     } else {
-      checkCardinality(port)
       if (openOutputs.contains(port)) {
         trace("CLOSEO", s"$node: $port", TraceEvent.NMESSAGES)
         sendClose(port)
