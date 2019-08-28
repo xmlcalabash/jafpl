@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{LoopEachStart, Node, NodeState}
 import com.jafpl.messages.{ItemMessage, Message}
-import com.jafpl.runtime.NodeActor.{NFinished, NReset, NRunIfReady}
+import com.jafpl.runtime.NodeActor.{NFinished, NReset, NRun}
 
 import scala.collection.mutable.ListBuffer
 
@@ -31,12 +31,6 @@ private[runtime] class LoopForEachActor(private val monitor: ActorRef,
     }
   }
 
-  override protected def reset(): Unit = {
-    node.iterationPosition = 0L
-    node.iterationSize = 0L
-    super.reset()
-  }
-
   override protected def run(): Unit = {
     if (node.iterationPosition == 0) {
       node.iterationSize = queue.size
@@ -44,13 +38,15 @@ private[runtime] class LoopForEachActor(private val monitor: ActorRef,
 
     if (queue.nonEmpty) {
       node.iterationPosition += 1
-      stateChange(node, NodeState.RUNNING)
       val item = queue.head
       queue -= item
       sendMessage("current", item)
       sendClose("current")
       for (cnode <- node.children) {
-        actors(cnode) ! NRunIfReady()
+        if (cnode.state == NodeState.READY) {
+          stateChange(cnode, NodeState.RUNNING)
+          actors(cnode) ! NRun()
+        }
       }
     } else {
       closeOutputs()

@@ -13,7 +13,7 @@ object TraceEvent extends Enumeration {
   LOOPEACH, LOOPEACHEND, LOOPFOR, LOOPFOREND, LOOPUNTIL, LOOPUNTILEND,
   LOOPWHILE, LOOPWHILEEND, LOOPEND, END, NODE, OUTPUT, PIPELINE, SINK, SPLITTER,
   START, TRY, TRYEND, VARIABLE, VIEWPORT, VIEWPORTEND, WHEN, EMPTY,
-  GMESSAGES, NMESSAGES, STEPIO, TRACES, CARDINALITY, RUNSTEP, BINDINGS, WATCHDOG,
+  GMESSAGES, NMESSAGES, STEPIO, TRACES, INCRCARDINALITY, CARDINALITY, RUNSTEP, BINDINGS, WATCHDOG,
   DEBUG, MESSAGE, STATECHANGE = Value
 }
 
@@ -30,12 +30,16 @@ abstract class TracingActor(protected val runtime: GraphRuntime) extends Actor w
 
   protected def stateChange(node: Node, state: NodeState): Unit = {
     if (node.state == NodeState.STOPPED) {
-      trace("CHANGEST!", s"$node: ${node.state} ignores $state", TraceEvent.STATECHANGE)
+      trace("CHGSTATE!", s"$node: ${node.state} ignores $state", TraceEvent.STATECHANGE)
     } else {
+      if (node.state == NodeState.RUNNING && state == NodeState.READY) {
+        println("bang")
+      }
+
       if (node.state == state) {
-        trace("CHANGEST=", s"$node: ${node.state} already $state", TraceEvent.STATECHANGE)
+        trace("CHGSTATE=", s"$node: ${node.state} already $state", TraceEvent.STATECHANGE)
       } else {
-        trace("CHANGEST", s"$node: ${node.state} → $state", TraceEvent.STATECHANGE)
+        trace("CHGSTATE", s"$node: ${node.state} → $state", TraceEvent.STATECHANGE)
         node.stateTransition(state)
       }
     }

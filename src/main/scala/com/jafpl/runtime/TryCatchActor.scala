@@ -3,22 +3,28 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplExceptionCode
 import com.jafpl.graph.{CatchStart, FinallyStart, Node, NodeState, TryCatchStart, TryStart}
-import com.jafpl.runtime.NodeActor.{NAbort, NAborted, NFinished, NRunIfReady}
+import com.jafpl.runtime.NodeActor.{NAbort, NAborted, NFinished, NReady, NRun}
 
 import scala.collection.mutable.ListBuffer
 
 private[runtime] class TryCatchActor(private val monitor: ActorRef,
                                       override protected val runtime: GraphRuntime,
                                       override protected val node: TryCatchStart) extends StartActor(monitor, runtime, node) {
+  private var tryStart: TryStart = _
   private val catchList = ListBuffer.empty[CatchStart]
+  private var finallyStart = Option.empty[FinallyStart]
   private var cause = Option.empty[Exception]
   private var aborting = false
 
   override protected def initialize(): Unit = {
     for (node <- node.children) {
       node match {
+        case trys: TryStart =>
+          tryStart = trys
         case ctch: CatchStart =>
           catchList += ctch
+        case fin: FinallyStart =>
+          finallyStart = Some(fin)
         case _ => Unit
       }
     }
@@ -39,15 +45,52 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
     super.reset()
   }
 
-  override protected def run(): Unit = {
-    stateChange(node, NodeState.RUNNING)
+  override protected def ready(child: Node): Unit = {
+    stateChange(child, NodeState.READY)
+    var ready = true
     for (cnode <- node.children) {
       cnode match {
-        case _: CatchStart => Unit
-        case _: FinallyStart => Unit
-        case _ => actors(cnode) ! NRunIfReady()
+        case _: TryStart => ready = ready && cnode.state == NodeState.READY
+        case _: CatchStart => ready = ready && cnode.state == NodeState.READY
+        case _: FinallyStart => ready = ready && cnode.state == NodeState.READY
+        case _ => ready = ready && (cnode.state == NodeState.READY || cnode.state == NodeState.RESET)
       }
     }
+    if (ready) {
+      parent ! NReady(node)
+    }
+
+    if (node.state == NodeState.RUNNING) {
+      // TryCatch doesn't automatically run its when children, even if they're ready
+      child match {
+        case _: TryStart => Unit
+        case _: CatchStart => Unit
+        case _: FinallyStart => Unit
+        case _ =>
+          if (child.state == NodeState.READY) {
+            stateChange(child, NodeState.RUNNING)
+            actors(child) ! NRun()
+          }
+      }
+    }
+  }
+
+  override protected def run(): Unit = {
+    for (cnode <- node.children) {
+      cnode match {
+        case _: TryStart => Unit
+        case _: CatchStart => Unit
+        case _: FinallyStart => Unit
+        case _ =>
+          if (cnode.state == NodeState.READY) {
+            stateChange(cnode, NodeState.RUNNING)
+            actors(cnode) ! NRun()
+          }
+      }
+    }
+
+    stateChange(tryStart, NodeState.RUNNING)
+    actors(tryStart) ! NRun()
   }
 
   override protected def exceptionHandler(child: Node, cause: Exception): Unit = {
@@ -89,7 +132,8 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
       }
       this.cause = Some(cause)
       useCatch.get.cause = this.cause
-      actors(useCatch.get) ! NRunIfReady()
+      stateChange(useCatch.get, NodeState.RUNNING)
+      actors(useCatch.get) ! NRun()
     } else {
       super.exceptionHandler(child, cause)
     }
@@ -151,7 +195,8 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
         unfinishedNode.get match {
           case fin: FinallyStart =>
             fin.cause = cause
-            actors(fin) ! NRunIfReady()
+            stateChange(fin, NodeState.RUNNING)
+            actors(fin) ! NRun()
           case _ => Unit
         }
       }

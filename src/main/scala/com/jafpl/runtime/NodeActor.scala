@@ -5,7 +5,7 @@ import akka.event.LoggingReceive
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{Node, NodeState, WhenStart}
 import com.jafpl.messages.{BindingMessage, Message}
-import com.jafpl.runtime.NodeActor.{NAbort, NAborted, NClose, NException, NFinished, NGuardCheck, NGuardReport, NInitialize, NInitialized, NInput, NReady, NReset, NResetted, NRunIfReady, NStart, NStarted, NStop, NStopped}
+import com.jafpl.runtime.NodeActor.{NAbort, NAborted, NChkReady, NClose, NException, NFinished, NGuardCheck, NGuardReport, NInitialize, NInitialized, NInput, NReady, NReset, NResetted, NRun, NStart, NStarted, NStop, NStopped}
 import com.jafpl.runtime.TraceEvent.TraceEvent
 import com.jafpl.steps.Manifold
 
@@ -18,9 +18,9 @@ private[runtime] object NodeActor {
   case class NInitialized(node: Node)
   case class NStart()
   case class NStarted(node: Node)
-  case class NRunIfReady()
+  case class NRun()
+  case class NChkReady()
   case class NReady(node: Node)
-  case class NRunning(node: Node)
   case class NReset()
   case class NResetted(node: Node)
   case class NFinished(node: Node)
@@ -132,11 +132,9 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       return
     }
 
-    if (openInputs.contains(port)) {
-      val count = node.inputCardinalities.getOrElse(port, 0L) + 1
-      node.inputCardinalities.put(port, count)
-      checkInputCardinality(node, port)
-    }
+    val count = node.inputCardinalities.getOrElse(port, 0L) + 1
+    node.inputCardinalities.put(port, count)
+    checkInputCardinality(node, port, TraceEvent.INCRCARDINALITY)
   }
 
   private def incrementOutputCardinality(node: Node, port: String): Unit = {
@@ -144,73 +142,66 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       return
     }
 
-    if (openOutputs.contains(port)) {
-      val count = node.outputCardinalities.getOrElse(port, 0L) + 1
-      node.outputCardinalities.put(port, count)
-      checkOutputCardinality(node, port)
-    }
+    val count = node.outputCardinalities.getOrElse(port, 0L) + 1
+    node.outputCardinalities.put(port, count)
+    checkOutputCardinality(node, port, TraceEvent.INCRCARDINALITY)
   }
 
-  protected def checkInputCardinality(node: Node, port: String): Unit = {
+  protected def checkInputCardinality(node: Node, port: String, event: TraceEvent): Unit = {
     if (port.startsWith("#")) {
       return
     }
 
-    if (node.state == NodeState.STARTED || node.state == NodeState.ABORTING || node.state == NodeState.ABORTED) {
+    if (node.state == NodeState.ABORTING || node.state == NodeState.ABORTED) {
       // If the step never actually ran, or crashed, we don't care about its input cardinalities
       return
     }
 
-    if (openInputs.contains(port)) {
-      val count = node.inputCardinalities.getOrElse(port, 0L)
-      trace("→CARD", s"$node $port $count", TraceEvent.NMESSAGES)
+    val count = node.inputCardinalities.getOrElse(port, 0L)
+    trace("CARD↓", s"$node $port $count", event)
 
-      try {
-        val ospec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
-        if (ospec.inputSpec.cardinality(port).isDefined) {
-          ospec.inputSpec.checkInputCardinality(port, count)
-        }
-      } catch {
-        case jafpl: JafplException =>
-          if (jafpl.code == JafplException.INPUT_CARDINALITY_ERROR) {
-            trace("CARD!", s"$node $port $count", TraceEvent.NMESSAGES)
-          }
-          actors(node) ! NException(node, jafpl)
-        case ex: Exception =>
-          actors(node) ! NException(node, ex)
+    try {
+      val ospec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
+      if (ospec.inputSpec.cardinality(port).isDefined) {
+        ospec.inputSpec.checkInputCardinality(port, count)
       }
+    } catch {
+      case jafpl: JafplException =>
+        if (jafpl.code == JafplException.INPUT_CARDINALITY_ERROR) {
+          trace("CARD!", s"$node $port $count", TraceEvent.CARDINALITY)
+        }
+        actors(node) ! NException(node, jafpl)
+      case ex: Exception =>
+        actors(node) ! NException(node, ex)
     }
   }
 
-  protected def checkOutputCardinality(node: Node, port: String): Unit = {
+  protected def checkOutputCardinality(node: Node, port: String, event: TraceEvent): Unit = {
     if (port.startsWith("#")) {
       return
     }
 
-    if (node.state == NodeState.STARTED || node.state == NodeState.READY
-      || node.state == NodeState.ABORTING || node.state == NodeState.ABORTED) {
+    if (node.state == NodeState.ABORTING || node.state == NodeState.ABORTED) {
       // If the step never actually ran, or crashed, we don't care about its input cardinalities
       return
     }
 
-    if (openOutputs.contains(port)) {
-      val count = node.outputCardinalities.getOrElse(port, 0L)
-      trace("CARD→", s"$node $port $count", TraceEvent.NMESSAGES)
+    val count = node.outputCardinalities.getOrElse(port, 0L)
+    trace("CARD→", s"$node $port $count", event)
 
-      try {
-        val ospec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
-        if (ospec.outputSpec.cardinality(port).isDefined) {
-          ospec.outputSpec.checkOutputCardinality(port, count)
-        }
-      } catch {
-        case jafpl: JafplException =>
-          if (jafpl.code == JafplException.OUTPUT_CARDINALITY_ERROR) {
-            trace("CARD!", s"$node $port $count", TraceEvent.NMESSAGES)
-          }
-          actors(node) ! NException(node, jafpl)
-        case ex: Exception =>
-          actors(node) ! NException(node, ex)
+    try {
+      val ospec = node.manifold.getOrElse(Manifold.ALLOW_ANY)
+      if (ospec.outputSpec.cardinality(port).isDefined) {
+        ospec.outputSpec.checkOutputCardinality(port, count)
       }
+    } catch {
+      case jafpl: JafplException =>
+        if (jafpl.code == JafplException.OUTPUT_CARDINALITY_ERROR) {
+          trace("CARD!", s"$node $port $count", TraceEvent.CARDINALITY)
+        }
+        actors(node) ! NException(node, jafpl)
+      case ex: Exception =>
+        actors(node) ! NException(node, ex)
     }
   }
 
@@ -232,7 +223,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     } else {
       trace("CLOSE?", s"$node: $port", TraceEvent.NMESSAGES)
     }
-    runIfReady()
+    checkIfReady()
   }
 
   protected def sendMessage(outputport: String, item: Message): Unit = {
@@ -261,14 +252,14 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def readyToRun: Boolean = {
-    openInputs.isEmpty && node.state == NodeState.READY
+    openInputs.isEmpty && (node.state == NodeState.STARTED || node.state == NodeState.RESET)
   }
 
-  protected def runIfReady(): Unit = {
+  protected def checkIfReady(): Unit = {
     if (readyToRun) {
-      protectedRun()
+      parent ! NReady(node)
     } else {
-      trace("!RDYTORUN", s"$node $openInputs ${node.state}", TraceEvent.NMESSAGES)
+      trace("¬READY", s"$node $openInputs ${node.state}", TraceEvent.NMESSAGES)
     }
   }
 
@@ -280,6 +271,10 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     stateChange(node, NodeState.STARTED)
   }
 
+  protected def ready(node: Node): Unit = {
+    stateChange(node, NodeState.READY)
+  }
+
   protected def reset(): Unit = {
     inputBuffer.reset()
     outputBuffer.reset()
@@ -288,17 +283,14 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     parent ! NResetted(node)
   }
 
-  protected def ready(node: Node): Unit = {
-    stateChange(node, NodeState.READY)
+  protected def resetted(node: Node): Unit = {
+    // This should never happen, nodes should report that they've been
+    // reset only to containers
+    throw new RuntimeException("resetted called on NodeActor")
   }
 
   protected def run(): Unit = {
     parent ! NFinished(node)
-  }
-
-  protected def resetted(node: Node): Unit = {
-    configurePorts()
-    stateChange(node, NodeState.RESET)
   }
 
   protected def stop(): Unit = {
@@ -357,12 +349,6 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
     close(port)
   }
 
-  private def protectedRunIfReady(): Unit = {
-    trace("RUNIFRDY", s"$node", TraceEvent.NMESSAGES)
-    stateChange(node, NodeState.READY)
-    protectedArity0(() => runIfReady())
-  }
-
   private def protectedRun(): Unit = {
     protectedArity0(() => run())
   }
@@ -380,22 +366,11 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
 
   final def receive: PartialFunction[Any, Unit] = {
     LoggingReceive {
-      case NInitialize(parent, actors, outputs) =>
-        runtime.noteMessageTime()
-        trace("INIT", s"$node", TraceEvent.NMESSAGES)
-        if (parent.isDefined) {
-          this.parent = parent.get
-        } else {
-          this.parent = sender()
-        }
-        this.actors = actors
-        this.outputs = outputs
-        initialize()
       case NInput(fromNode, fromPort, port, message) =>
         runtime.noteMessageTime()
         trace("INPUT", s"$fromNode.$fromPort -> $node.$port", TraceEvent.NMESSAGES)
         incrementOutputCardinality(fromNode, fromPort)
-        if (openInputs.contains(port)) {
+        if (openInputs.contains(port) || (fromNode.parent.isDefined && fromNode.parent.get == node)) {
           incrementInputCardinality(node, port)
         } else {
           incrementOutputCardinality(node, port)
@@ -405,12 +380,14 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         runtime.noteMessageTime()
         deliverBufferedInputs(port)
         trace("CLOSE", s"$fromNode.$fromPort -> $node.$port", TraceEvent.NMESSAGES)
-        checkOutputCardinality(fromNode, fromPort)
+        checkOutputCardinality(fromNode, fromPort, TraceEvent.CARDINALITY)
+        /*
         if (openInputs.contains(port)) {
-          checkInputCardinality(node, port)
+          checkInputCardinality(node, port, TraceEvent.CARDINALITY)
         } else {
-          checkOutputCardinality(node, port)
+          checkOutputCardinality(node, port, TraceEvent.CARDINALITY)
         }
+         */
         protectedArity1(protectedClose, port)
       case NStart() =>
         runtime.noteMessageTime()
@@ -425,9 +402,12 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         runtime.noteMessageTime()
         trace("READY", s"$node", TraceEvent.NMESSAGES)
         ready(node)
-      case NRunIfReady() =>
+      case NChkReady() =>
+        checkIfReady()
+      case NRun() =>
         runtime.noteMessageTime()
-        protectedRunIfReady()
+        trace("RUN", s"$node: ${nodeState(node)}", TraceEvent.NMESSAGES)
+        protectedRun()
       case NStop() =>
         runtime.noteMessageTime()
         trace("STOP", s"$node", TraceEvent.NMESSAGES)
@@ -450,7 +430,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         reset()
       case NResetted(node) =>
         runtime.noteMessageTime()
-        trace("HAVERST", s"$node", TraceEvent.NMESSAGES)
+        trace("RESETTED", s"$node", TraceEvent.NMESSAGES)
         resetted(node)
       case NFinished(node) =>
         runtime.noteMessageTime()
@@ -469,6 +449,17 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
           case _ =>
             throw new RuntimeException(s"Attempt to check guard on $this")
         }
+      case NInitialize(parent, actors, outputs) =>
+        runtime.noteMessageTime()
+        trace("INIT", s"$node", TraceEvent.NMESSAGES)
+        if (parent.isDefined) {
+          this.parent = parent.get
+        } else {
+          this.parent = sender()
+        }
+        this.actors = actors
+        this.outputs = outputs
+        initialize()
       case NException(child, ex) =>
         runtime.noteMessageTime()
         protectedExceptionHandler(child, ex)

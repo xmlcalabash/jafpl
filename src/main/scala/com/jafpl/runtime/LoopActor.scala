@@ -1,12 +1,12 @@
 package com.jafpl.runtime
 
 import akka.actor.ActorRef
-import com.jafpl.graph.{ContainerStart, Node, NodeState}
+import com.jafpl.graph.{LoopStart, Node, NodeState}
 import com.jafpl.runtime.NodeActor.NResetted
 
 private[runtime] class LoopActor(private val monitor: ActorRef,
                                  override protected val runtime: GraphRuntime,
-                                 override protected val node: ContainerStart)
+                                 override protected val node: LoopStart)
   extends StartActor(monitor, runtime, node)  {
 
   protected var running = false
@@ -24,20 +24,28 @@ private[runtime] class LoopActor(private val monitor: ActorRef,
     }
   }
 
+  override protected def reset(): Unit = {
+    node.iterationPosition = 0L
+    node.iterationSize = 0L
+    super.reset()
+  }
+
   override protected def resetted(child: Node): Unit = {
     stateChange(child, NodeState.RESET)
     var reset = true
     for (cnode <- node.children) {
-      reset = reset && cnode.state == NodeState.RESET
+      // Buffers can go from RESET to READY immediately
+      reset = reset && (cnode.state == NodeState.RESET || cnode.state == NodeState.READY)
     }
     if (reset) {
       if (node.state == NodeState.LOOPING) {
+        stateChange(node, NodeState.RUNNING)
         run()
       } else {
         parent ! NResetted(node)
       }
     } else {
-      trace("UNFINISH", s"${nodeState(node)}", TraceEvent.STATECHANGE)
+      trace("UNRESET", s"${nodeState(node)}", TraceEvent.STATECHANGE)
     }
   }
 }

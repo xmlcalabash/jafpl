@@ -2,14 +2,13 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
-import com.jafpl.graph.{AtomicNode, NodeState}
+import com.jafpl.graph.AtomicNode
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
-import com.jafpl.runtime.NodeActor.{NFinished, NInitialized, NStarted}
+import com.jafpl.runtime.NodeActor.{NFinished, NReady, NStarted}
 
 private[runtime] class AtomicActor(private val monitor: ActorRef,
                                     override protected val runtime: GraphRuntime,
                                     override protected val node: AtomicNode) extends NodeActor(monitor, runtime, node) {
-
   override protected def initialize(): Unit = {
     if (node.step.isDefined) {
       node.step.get.initialize(runtime.runtime)
@@ -66,11 +65,12 @@ private[runtime] class AtomicActor(private val monitor: ActorRef,
 
   override protected def start(): Unit = {
     parent ! NStarted(node)
+    if (openInputs.isEmpty) {
+      parent ! NReady(node)
+    }
   }
 
   override protected def run(): Unit = {
-    trace("RUNNING", s"$node", TraceEvent.NMESSAGES)
-    stateChange(node, NodeState.RUNNING)
     if (node.step.isDefined) {
       node.step.get.run()
     }
@@ -84,9 +84,9 @@ private[runtime] class AtomicActor(private val monitor: ActorRef,
   }
 
   override protected def reset(): Unit = {
+    super.reset()
     if (node.step.isDefined) {
       node.step.get.reset()
     }
-    super.reset()
   }
 }

@@ -5,7 +5,7 @@ import java.time.{Duration, Instant}
 import akka.actor.{ActorRef, ActorSystem, DeadLetter, Props}
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerStart, EmptySource, FinallyStart, Graph, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopForStart, LoopUntilStart, LoopWhileStart, OptionBinding, PipelineStart, Sink, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
-import com.jafpl.runtime.NodeActor.{NAbortExecution, NNode, NRunIfReady, NWatchdog, NWatchdogTimeout}
+import com.jafpl.runtime.NodeActor.{NAbortExecution, NNode, NRun, NWatchdog, NWatchdogTimeout}
 import com.jafpl.runtime.Reaper.WatchMe
 import com.jafpl.steps.{DataConsumerProxy, DataProvider}
 import com.jafpl.util.{DeadLetterListener, DefaultTraceEventManager, TraceEventManager, UniqueId}
@@ -148,7 +148,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
     * To determine if execution has completed, check the `finished` value.
     */
   def runInBackground(): Unit = {
-    monitor ! NRunIfReady()
+    monitor ! NRun()
     _started = true
   }
 

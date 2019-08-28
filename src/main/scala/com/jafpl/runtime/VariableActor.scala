@@ -4,6 +4,7 @@ import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{Binding, Node}
 import com.jafpl.messages.{BindingMessage, ItemMessage, Message}
+import com.jafpl.runtime.TraceEvent.TraceEvent
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -15,11 +16,11 @@ private[runtime] class VariableActor(private val monitor: ActorRef,
   private val bindings = mutable.HashMap.empty[String, Message]
   logEvent = TraceEvent.VARIABLE
 
-  override protected def checkInputCardinality(node: Node, port: String): Unit = {
+  override protected def checkInputCardinality(node: Node, port: String, event: TraceEvent): Unit = {
     // nop
   }
 
-  override protected def checkOutputCardinality(node: Node, port: String): Unit = {
+  override protected def checkOutputCardinality(node: Node, port: String, event: TraceEvent): Unit = {
     // nop
   }
 

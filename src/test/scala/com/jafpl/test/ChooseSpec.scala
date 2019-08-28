@@ -67,9 +67,7 @@ class ChooseSpec extends FlatSpec {
     graph.addOutput(pipeline, "result")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
-
     runtime.outputs("result").setConsumer(bc)
-
     runtime.run()
 
     assert(bc.items.size == 1)

@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{LoopWhileStart, Node, NodeState}
 import com.jafpl.messages.{ItemMessage, Message}
-import com.jafpl.runtime.NodeActor.{NFinished, NReset, NRunIfReady}
+import com.jafpl.runtime.NodeActor.{NFinished, NReset, NRun}
 
 private[runtime] class LoopWhileActor(private val monitor: ActorRef,
                                        override protected val runtime: GraphRuntime,
@@ -42,12 +42,6 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
     }
   }
 
-  override protected def reset(): Unit = {
-    node.iterationPosition = 0L
-    node.iterationSize = 0L
-    super.reset()
-  }
-
   override protected def run(): Unit = {
     val pass = currentItem.isDefined && node.tester.test(List(currentItem.get), bindings.toMap)
     if (pass) {
@@ -56,7 +50,10 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
       sendMessage("current", currentItem.get)
       sendClose("current")
       for (cnode <- node.children) {
-        actors(cnode) ! NRunIfReady()
+        if (cnode.state == NodeState.READY) {
+          stateChange(cnode, NodeState.RUNNING)
+          actors(cnode) ! NRun()
+        }
       }
     } else {
       closeOutputs()

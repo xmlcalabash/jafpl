@@ -3,7 +3,7 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.graph.Buffer
 import com.jafpl.messages.Message
-import com.jafpl.runtime.NodeActor.NResetted
+import com.jafpl.runtime.NodeActor.{NReady, NResetted}
 
 import scala.collection.mutable.ListBuffer
 
@@ -20,6 +20,7 @@ private[runtime] class BufferActor(private val monitor: ActorRef,
     configurePorts()
     openInputs.clear() // buffered
     parent ! NResetted(node)
+    parent ! NReady(node)
   }
 
   override protected def input(port: String, item: Message): Unit = {

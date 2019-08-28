@@ -2,10 +2,11 @@ package com.jafpl.runtime
 
 import akka.actor.{ActorRef, PoisonPill}
 import com.jafpl.exceptions.JafplException
-import com.jafpl.graph.{ContainerStart, Graph, Node, NodeState}
-import com.jafpl.runtime.NodeActor.{NAbortExecution, NException, NFinished, NInitialize, NInitialized, NNode, NReady, NRunIfReady, NRunning, NStart, NStarted, NStop, NStopped, NWatchdog, NWatchdogTimeout}
+import com.jafpl.graph.{Graph, Node, NodeState}
+import com.jafpl.runtime.NodeActor.{NAbortExecution, NException, NFinished, NInitialize, NInitialized, NNode, NReady, NRun, NStart, NStarted, NStop, NStopped, NWatchdog, NWatchdogTimeout}
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 private[runtime] class GraphMonitor(private val graph: Graph, override protected val runtime: GraphRuntime) extends TracingActor(runtime) {
   protected val unstoppedNodes = mutable.HashSet.empty[Node]
@@ -48,7 +49,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
   def stopped(node: Node): Unit = {
     stateChange(node, NodeState.STOPPED)
     topLevelNodes -= node
-    trace("POISON", s"$node", TraceEvent.NMESSAGES)
+    trace("TERMINATE", s"$node", TraceEvent.NMESSAGES)
     actors(node) ! PoisonPill
     unstoppedNodes -= node
     if (topLevelNodes.isEmpty) {
@@ -63,7 +64,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
 
   def poisonUnstoppedNodes(): Unit = {
     for (node <- unstoppedNodes) {
-      trace("POISON", s"$node", TraceEvent.NMESSAGES)
+      trace("TERMINATE", s"$node", TraceEvent.NMESSAGES)
       actors(node) ! PoisonPill
     }
     unstoppedNodes.clear()
@@ -93,13 +94,16 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
   }
 
   def initialized(node: Node): Unit = {
-    stateChange(node, NodeState.INIT)
-    var ready = true
+    stateChange(node, NodeState.INITIALIZED)
+    val notReady = ListBuffer.empty[Node]
     // unstoppedNodes == all nodes at the moment
     for (node <- unstoppedNodes) {
-      ready = ready && node.state == NodeState.INIT
+      if (node.state != NodeState.INITIALIZED) {
+        notReady += node
+      }
     }
-    if (ready) {
+    if (notReady.isEmpty) {
+      trace("TOPLEVEL", s"${topLevelNodes.mkString(", ")}", TraceEvent.GMESSAGES)
       for (node <- topLevelNodes) {
         stateChange(node, NodeState.STARTING)
         actors(node) ! NStart()
@@ -107,17 +111,25 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
     }
   }
 
-  def ready(node: Node): Unit = {
-    actors(node) ! NRunIfReady()
-  }
-
   def started(node: Node): Unit = {
     stateChange(node, NodeState.STARTED)
-    ready(node)
   }
 
-  def running(node: Node): Unit = {
+  def ready(node: Node): Unit = {
     stateChange(node, NodeState.RUNNING)
+    actors(node) ! NRun()
+  }
+
+  def run(): Unit = {
+    for (node <- graph.nodes) {
+      if (node.parent.isEmpty) {
+        topLevelNodes += node
+      }
+    }
+
+    for (node <- graph.nodes) {
+      initialize(node)
+    }
   }
 
   final def receive: PartialFunction[Any, Unit] = {
@@ -127,15 +139,10 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
         watchdog(millis)
       }
 
-    case NRunIfReady() =>
+    case NRun() =>
       runtime.noteMessageTime()
       trace("RUN", "", TraceEvent.GMESSAGES)
-      for (node <- graph.nodes) {
-        initialize(node)
-        if (node.parent.isEmpty) {
-          topLevelNodes += node
-        }
-      }
+      run()
 
     case NNode(node,actor) =>
       runtime.noteMessageTime()
@@ -153,12 +160,8 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
 
     case NReady(node: Node) =>
       runtime.noteMessageTime()
+      trace("READY", s"$node", TraceEvent.GMESSAGES)
       ready(node)
-
-    case NRunning(node: Node) =>
-      runtime.noteMessageTime()
-      trace("RUNNING", s"$node", TraceEvent.GMESSAGES)
-      running(node)
 
     case NStopped(node: Node) =>
       runtime.noteMessageTime()

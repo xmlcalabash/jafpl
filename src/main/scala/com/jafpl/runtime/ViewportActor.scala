@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{Node, NodeState, ViewportStart}
 import com.jafpl.messages.{ItemMessage, Message, PipelineMessage}
-import com.jafpl.runtime.NodeActor.{NFinished, NReset, NRunIfReady}
+import com.jafpl.runtime.NodeActor.{NFinished, NReset}
 import com.jafpl.steps.ViewportItem
 
 import scala.collection.mutable
@@ -64,13 +64,10 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
 
     if (itemQueue.nonEmpty) {
       node.iterationPosition += 1
-      stateChange(node, NodeState.RUNNING)
       val item = itemQueue(index)
       sendMessage("current", new PipelineMessage(item.getItem, item.getMetadata))
       sendClose("current")
-      for (cnode <- node.children) {
-        actors(cnode) ! NRunIfReady()
-      }
+      super.run()
     } else {
       closeOutputs()
       parent ! NFinished(node)

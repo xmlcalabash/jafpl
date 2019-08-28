@@ -3,7 +3,7 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.graph.{ContainerStart, Node, NodeState}
 import com.jafpl.messages.Message
-import com.jafpl.runtime.NodeActor.{NAbort, NAborted, NFinished, NReady, NReset, NResetted, NRunIfReady, NStart, NStarted, NStop, NStopped}
+import com.jafpl.runtime.NodeActor.{NAbort, NAborted, NChkReady, NFinished, NReady, NReset, NResetted, NRun, NStart, NStarted, NStop, NStopped}
 
 import scala.collection.mutable
 
@@ -22,27 +22,28 @@ private[runtime] class StartActor(private val monitor: ActorRef,
 
   override protected def started(child: Node): Unit = {
     stateChange(child, NodeState.STARTED)
+    actors(child) ! NChkReady()
     var ready = true
     for (cnode <- node.children) {
-      ready = ready && cnode.state == NodeState.STARTED
+      ready = ready && cnode.state == NodeState.STARTED || cnode.state == NodeState.READY
     }
     if (ready) {
       parent ! NStarted(node)
+      if (openInputs.isEmpty) {
+          parent ! NReady(node)
+      }
     } else {
-      trace("UNSTART", s"${nodeState(node)}", TraceEvent.STATECHANGE)
+      trace("¬STARTED", s"${nodeState(node)}", TraceEvent.STATECHANGE)
     }
   }
 
   override protected def ready(child: Node): Unit = {
-    stateChange(child, NodeState.READY)
-    var ready = true
-    for (cnode <- node.children) {
-      ready = ready && cnode.state == NodeState.READY
-    }
-    if (ready) {
-      parent ! NReady(node)
-    } else {
-      trace("UNREADY", s"${nodeState(node)}", TraceEvent.STATECHANGE)
+    if (child.state == NodeState.STARTED || child.state == NodeState.RESET) {
+      stateChange(child, NodeState.READY)
+      if (node.state == NodeState.RUNNING) {
+        stateChange(child, NodeState.RUNNING)
+        actors(child) ! NRun()
+      }
     }
   }
 
@@ -60,9 +61,15 @@ private[runtime] class StartActor(private val monitor: ActorRef,
   }
 
   override protected def run(): Unit = {
-    stateChange(node, NodeState.RUNNING)
     for (cnode <- node.children) {
-      actors(cnode) ! NRunIfReady()
+      cnode.state match {
+        case NodeState.READY =>
+          stateChange(cnode, NodeState.RUNNING)
+          actors(cnode) ! NRun()
+        case NodeState.RESET =>
+          actors(cnode) ! NChkReady()
+        case _ => Unit
+      }
     }
   }
 
@@ -85,6 +92,8 @@ private[runtime] class StartActor(private val monitor: ActorRef,
     }
     if (reset) {
       parent ! NResetted(node)
+    } else {
+      trace("UNRESET", s"${nodeState(node)}", TraceEvent.STATECHANGE)
     }
   }
 

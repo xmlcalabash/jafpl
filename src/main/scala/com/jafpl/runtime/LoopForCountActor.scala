@@ -3,7 +3,7 @@ package com.jafpl.runtime
 import akka.actor.ActorRef
 import com.jafpl.graph.{LoopForStart, Node, NodeState}
 import com.jafpl.messages.{ItemMessage, Metadata}
-import com.jafpl.runtime.NodeActor.{NFinished, NReset, NRunIfReady}
+import com.jafpl.runtime.NodeActor.{NFinished, NReset, NRun}
 
 private[runtime] class LoopForCountActor(private val monitor: ActorRef,
                                           override protected val runtime: GraphRuntime,
@@ -14,12 +14,6 @@ private[runtime] class LoopForCountActor(private val monitor: ActorRef,
   logEvent = TraceEvent.LOOPFOR
   node.iterationPosition = 0L
   node.iterationSize = 0L
-
-  override protected def reset(): Unit = {
-    node.iterationPosition = 0L
-    node.iterationSize = 0L
-    super.reset()
-  }
 
   override protected def run(): Unit = {
     if (node.iterationSize == 0) {
@@ -43,7 +37,10 @@ private[runtime] class LoopForCountActor(private val monitor: ActorRef,
       sendMessage("current", new ItemMessage(current, Metadata.NUMBER))
       sendClose("current")
       for (cnode <- node.children) {
-        actors(cnode) ! NRunIfReady()
+        if (cnode.state == NodeState.READY) {
+          stateChange(cnode, NodeState.RUNNING)
+          actors(cnode) ! NRun()
+        }
       }
     } else {
       closeOutputs()
