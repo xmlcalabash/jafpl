@@ -2,8 +2,8 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.graph.{ContainerStart, Node, NodeState}
-import com.jafpl.messages.Message
-import com.jafpl.runtime.NodeActor.{NAbort, NAborted, NChkReady, NFinished, NReady, NReset, NResetted, NRun, NStart, NStarted, NStop, NStopped}
+import com.jafpl.messages.{BindingMessage, Message}
+import com.jafpl.runtime.NodeActor.{NAbort, NAborted, NChkReady, NFinished, NInput, NReady, NReset, NResetted, NRun, NStart, NStarted, NStop, NStopped}
 
 import scala.collection.mutable
 
@@ -12,6 +12,22 @@ private[runtime] class StartActor(private val monitor: ActorRef,
                                   override protected val node: ContainerStart) extends NodeActor(monitor, runtime, node) {
   protected val bindings = mutable.HashMap.empty[String, Message]
   logEvent = TraceEvent.START
+
+  override protected def input(port: String, message: Message): Unit = {
+    if (port == "#bindings") {
+      message match {
+        case b: BindingMessage =>
+          bindings.put(b.name, b.message)
+        case _ =>
+          trace("BADBIND", "$node: $message", TraceEvent.NMESSAGES)
+      }
+      if (outputs.contains(port)) {
+        super.input(port, message)
+      }
+    } else {
+      super.input(port, message)
+    }
+  }
 
   override protected def start(): Unit = {
     for (child <- node.children) {
