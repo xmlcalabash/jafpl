@@ -2,32 +2,12 @@ package com.jafpl.runtime
 
 import akka.actor.ActorRef
 import com.jafpl.graph.{ContainerStart, Node, NodeState}
-import com.jafpl.messages.{BindingMessage, Message}
-import com.jafpl.runtime.NodeActor.{NAbort, NAborted, NChkReady, NFinished, NInput, NReady, NReset, NResetted, NRun, NStart, NStarted, NStop, NStopped}
-
-import scala.collection.mutable
+import com.jafpl.runtime.NodeActor.{NAbort, NAborted, NChkReady, NFinished, NReset, NResetted, NRun, NStart, NStarted, NStop, NStopped}
 
 private[runtime] class StartActor(private val monitor: ActorRef,
                                   override protected val runtime: GraphRuntime,
                                   override protected val node: ContainerStart) extends NodeActor(monitor, runtime, node) {
-  protected val bindings = mutable.HashMap.empty[String, Message]
   logEvent = TraceEvent.START
-
-  override protected def input(port: String, message: Message): Unit = {
-    if (port == "#bindings") {
-      message match {
-        case b: BindingMessage =>
-          bindings.put(b.name, b.message)
-        case _ =>
-          trace("BADBIND", "$node: $message", TraceEvent.NMESSAGES)
-      }
-      if (outputs.contains(port)) {
-        super.input(port, message)
-      }
-    } else {
-      super.input(port, message)
-    }
-  }
 
   override protected def start(): Unit = {
     for (child <- node.children) {
@@ -45,9 +25,6 @@ private[runtime] class StartActor(private val monitor: ActorRef,
     }
     if (ready) {
       parent ! NStarted(node)
-      if (openInputs.isEmpty) {
-          parent ! NReady(node)
-      }
     } else {
       trace("¬STARTED", s"${nodeState(node)}", TraceEvent.STATECHANGE)
     }
@@ -57,6 +34,7 @@ private[runtime] class StartActor(private val monitor: ActorRef,
     if (child.state == NodeState.STARTED || child.state == NodeState.RESET) {
       stateChange(child, NodeState.READY)
       if (node.state == NodeState.RUNNING) {
+        trace("SETRUN", s"1: ${nodeState(child)}", TraceEvent.NMESSAGES)
         stateChange(child, NodeState.RUNNING)
         actors(child) ! NRun()
       }
@@ -80,6 +58,7 @@ private[runtime] class StartActor(private val monitor: ActorRef,
     for (cnode <- node.children) {
       cnode.state match {
         case NodeState.READY =>
+          trace("SETRUN", s"2: ${nodeState(cnode)}", TraceEvent.NMESSAGES)
           stateChange(cnode, NodeState.RUNNING)
           actors(cnode) ! NRun()
         case NodeState.RESET =>

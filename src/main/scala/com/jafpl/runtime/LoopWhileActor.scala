@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{LoopWhileStart, Node, NodeState}
 import com.jafpl.messages.{ItemMessage, Message}
-import com.jafpl.runtime.NodeActor.{NFinished, NReset, NRun}
+import com.jafpl.runtime.NodeActor.{NAbort, NFinished, NReset, NRun}
 
 private[runtime] class LoopWhileActor(private val monitor: ActorRef,
                                        override protected val runtime: GraphRuntime,
@@ -43,7 +43,7 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
   }
 
   override protected def run(): Unit = {
-    val pass = currentItem.isDefined && node.tester.test(List(currentItem.get), bindings.toMap)
+    val pass = currentItem.isDefined && node.tester.test(List(currentItem.get), receivedBindings.toMap)
     if (pass) {
       stateChange(node, NodeState.RUNNING)
       node.iterationPosition += 1
@@ -56,6 +56,12 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
         }
       }
     } else {
+      // If we're not going to run at all, abort the children so that
+      // any input or output cardinality errors don't raise exceptions
+      for (cnode <- node.children) {
+        stateChange(cnode, NodeState.ABORTING)
+        actors(cnode) ! NAbort()
+      }
       closeOutputs()
       parent ! NFinished(node)
     }
@@ -77,7 +83,7 @@ private[runtime] class LoopWhileActor(private val monitor: ActorRef,
       finished = finished && cnode.state == NodeState.FINISHED
     }
     if (finished) {
-      val loopAgain = node.tester.test(List(currentItem.get), bindings.toMap)
+      val loopAgain = node.tester.test(List(currentItem.get), receivedBindings.toMap)
       if (loopAgain) {
         stateChange(node, NodeState.LOOPING)
         for (child <- node.children) {

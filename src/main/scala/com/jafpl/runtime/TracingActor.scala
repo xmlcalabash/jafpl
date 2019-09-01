@@ -32,15 +32,15 @@ abstract class TracingActor(protected val runtime: GraphRuntime) extends Actor w
     if (node.state == NodeState.STOPPED) {
       trace("CHGSTATE!", s"$node: ${node.state} ignores $state", TraceEvent.STATECHANGE)
     } else {
-      if (node.state == NodeState.RUNNING && state == NodeState.READY) {
-        println("bang")
-      }
-
       if (node.state == state) {
         trace("CHGSTATE=", s"$node: ${node.state} already $state", TraceEvent.STATECHANGE)
       } else {
-        trace("CHGSTATE", s"$node: ${node.state} → $state", TraceEvent.STATECHANGE)
-        node.stateTransition(state)
+        if (node.state == NodeState.ABORTED && state == NodeState.STOPPING) {
+          trace("CHGSTATE!", s"$node: ${node.state} ignores $state", TraceEvent.STATECHANGE)
+        } else {
+          trace("CHGSTATE", s"$node: ${node.state} → $state", TraceEvent.STATECHANGE)
+          node.stateTransition(state)
+        }
       }
     }
   }
@@ -64,6 +64,8 @@ abstract class TracingActor(protected val runtime: GraphRuntime) extends Actor w
 
   private def trace(level: String, code: String, details: String, event: TraceEvent): Unit = {
     val message = traceMessage(code, details)
+
+    //System.err.println(message)
 
     // We don't use the traceEventManager.trace() call because we want to use the Akka logger
     if (runtime.traceEventManager.traceEnabled(event.toString.toLowerCase())) {

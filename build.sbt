@@ -4,8 +4,10 @@ name := "jafpl"
 
 organization := "com.jafpl"
 homepage     := Some(url("https://jafpl.com/"))
-version      := "0.2.20"
+version      := "0.2.39"
 scalaVersion := "2.12.6"
+
+buildInfoUsePackageAsPath := true
 
 buildInfoKeys ++= Seq[BuildInfoKey](
   BuildInfoKey.action("buildTime") {

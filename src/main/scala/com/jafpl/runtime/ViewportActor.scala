@@ -53,7 +53,7 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
   override protected def run(): Unit = {
     if (node.iterationPosition == 0) {
       if (sourceItem.isDefined) {
-        node.composer.runtimeBindings(bindings.toMap)
+        node.composer.runtimeBindings(receivedBindings.toMap)
         for (item <- node.composer.decompose(sourceItem.get)) {
           itemQueue += item
         }

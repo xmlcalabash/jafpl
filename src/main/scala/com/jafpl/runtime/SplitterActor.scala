@@ -14,14 +14,16 @@ private[runtime] class SplitterActor(private val monitor: ActorRef,
   private val edges = ListBuffer.empty[Edge]
   logEvent = TraceEvent.SPLITTER
 
-  override protected def start(): Unit = {
+  override protected def initialize(): Unit = {
     for (port <- node.outputs) {
       edges += node.outputEdge(port)
     }
-    super.start()
+    super.initialize()
+    trace("SEDGES", s"$node $edges", TraceEvent.NMESSAGES)
   }
 
   override protected def input(port: String, item: Message): Unit = {
+    trace("SINPUT", s"$node $port ($edges)", TraceEvent.NMESSAGES)
     for (edge <- edges) {
       sendMessage(edge.fromPort, item)
     }

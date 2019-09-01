@@ -48,7 +48,8 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   protected val openOutputs = mutable.HashSet.empty[String]
   protected var inputBuffer = new IOBuffer()
   protected var outputBuffer = new IOBuffer()
-  protected var receivedBindings = mutable.HashSet.empty[String]
+  protected var receivedBindings =  mutable.HashMap.empty[String, Message]
+  protected var aborted = false
 
   if (node.step.isDefined) {
     node.step.get.setConsumer(outputBuffer)
@@ -56,6 +57,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
 
   protected def initialize(): Unit = {
     // sender() *not* parent
+    configurePorts()
     sender() ! NInitialized(node)
   }
 
@@ -76,6 +78,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
 
     node.inputCardinalities.clear()
     node.outputCardinalities.clear()
+    trace("CONFPORT", s"$node: $openInputs", TraceEvent.NMESSAGES)
   }
 
   private def bufferInput(port: String, message: Message): Unit = {
@@ -89,6 +92,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       if (inputBuffer.ports.nonEmpty) {
         for (port <- inputBuffer.ports) {
           for (message <- inputBuffer.messages(port)) {
+            trace("DELBUF", "$node $port", TraceEvent.NMESSAGES)
             input(port, message)
           }
         }
@@ -99,12 +103,15 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         case "#bindings" =>
           message match {
             case binding: BindingMessage =>
-              receivedBindings += binding.name
+              receivedBindings(binding.name) = binding.message
+              trace("DELBIND", s"$node $port", TraceEvent.NMESSAGES)
               input(port, message)
             case _ =>
+              trace("DEL!BIND", s"$node $port", TraceEvent.NMESSAGES)
               input(port, message)
           }
         case _ =>
+          trace("DELOTHER", s"$node $port", TraceEvent.NMESSAGES)
           input(port, message)
       }
     } catch {
@@ -167,11 +174,13 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       }
     } catch {
       case jafpl: JafplException =>
+        aborted = true
         if (jafpl.code == JafplException.INPUT_CARDINALITY_ERROR) {
           trace("CARD!", s"$node $port $count", TraceEvent.CARDINALITY)
         }
         actors(node) ! NException(node, jafpl)
       case ex: Exception =>
+        aborted = true
         actors(node) ! NException(node, ex)
     }
   }
@@ -196,16 +205,22 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
       }
     } catch {
       case jafpl: JafplException =>
+        aborted = true
         if (jafpl.code == JafplException.OUTPUT_CARDINALITY_ERROR) {
           trace("CARD!", s"$node $port $count", TraceEvent.CARDINALITY)
         }
         actors(node) ! NException(node, jafpl)
       case ex: Exception =>
+        aborted = true
         actors(node) ! NException(node, ex)
     }
   }
 
   protected def input(port: String, message: Message): Unit = {
+    if (aborted) {
+      return
+    }
+
     if (outputs.contains(port)) {
       val output = outputs(port)
       val inputport = output._1
@@ -217,6 +232,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def close(port: String): Unit = {
+    // Even if we abort, we have to close the outputs
     if (openInputs.contains(port)) {
       trace("CLOSEI", s"$node: $port", TraceEvent.NMESSAGES)
       openInputs -= port
@@ -227,6 +243,9 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def sendMessage(outputport: String, item: Message): Unit = {
+    if (aborted) {
+      return
+    }
     if (outputs.contains(outputport)) {
       val t = outputs(outputport)
       val inputport = t._1
@@ -238,6 +257,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def sendClose(outputport: String): Unit = {
+    // Even if we abort, we have to close the outputs
     val t = outputs(outputport)
     val inputport = t._1
     val receiver = t._2
@@ -245,6 +265,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def closeOutputs(): Unit = {
+    // Even if we abort, we have to close the outputs
     for (port <- openOutputs) {
       sendClose(port)
       openOutputs -= port
@@ -252,11 +273,12 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def readyToRun: Boolean = {
-    openInputs.isEmpty && (node.state == NodeState.STARTED || node.state == NodeState.RESET)
+    !aborted && openInputs.isEmpty && (node.state == NodeState.STARTED || node.state == NodeState.RESET)
   }
 
   protected def checkIfReady(): Unit = {
     if (readyToRun) {
+      trace("READY", s"$node $openInputs ${node.state}", TraceEvent.NMESSAGES)
       parent ! NReady(node)
     } else {
       trace("¬READY", s"$node $openInputs ${node.state}", TraceEvent.NMESSAGES)
@@ -276,6 +298,7 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def reset(): Unit = {
+    aborted = false
     inputBuffer.reset()
     outputBuffer.reset()
     receivedBindings.clear()
@@ -290,7 +313,9 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def run(): Unit = {
-    parent ! NFinished(node)
+    if (!aborted) {
+      parent ! NFinished(node)
+    }
   }
 
   protected def stop(): Unit = {
@@ -302,6 +327,8 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
   }
 
   protected def abort(): Unit = {
+    aborted = true
+    trace("XXX", s"$node close outputs for abort", TraceEvent.NMESSAGES)
     closeOutputs()
     parent ! NAborted(node)
   }
@@ -381,18 +408,13 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         deliverBufferedInputs(port)
         trace("CLOSE", s"$fromNode.$fromPort -> $node.$port", TraceEvent.NMESSAGES)
         checkOutputCardinality(fromNode, fromPort, TraceEvent.CARDINALITY)
-        /*
         if (openInputs.contains(port)) {
           checkInputCardinality(node, port, TraceEvent.CARDINALITY)
-        } else {
-          checkOutputCardinality(node, port, TraceEvent.CARDINALITY)
         }
-         */
         protectedArity1(protectedClose, port)
       case NStart() =>
         runtime.noteMessageTime()
         trace("START", s"$node", TraceEvent.NMESSAGES)
-        configurePorts()
         start()
       case NStarted(node) =>
         runtime.noteMessageTime()
@@ -400,13 +422,14 @@ private[runtime] class NodeActor(private val monitor: ActorRef,
         started(node)
       case NReady(node) =>
         runtime.noteMessageTime()
-        trace("READY", s"$node", TraceEvent.NMESSAGES)
+        trace("READY", s"$node ${node.state}", TraceEvent.NMESSAGES)
         ready(node)
       case NChkReady() =>
+        trace("CHKREADY", s"$node: $openInputs: ${nodeState(node)}", TraceEvent.NMESSAGES)
         checkIfReady()
       case NRun() =>
         runtime.noteMessageTime()
-        trace("RUN", s"$node: ${nodeState(node)}", TraceEvent.NMESSAGES)
+        trace("RUN", s"${nodeState(node)}", TraceEvent.NMESSAGES)
         protectedRun()
       case NStop() =>
         runtime.noteMessageTime()

@@ -32,7 +32,6 @@ private[runtime] class LoopForCountActor(private val monitor: ActorRef,
     }
 
     if (initiallyTrue) {
-      stateChange(node, NodeState.RUNNING)
       node.iterationPosition += 1
       sendMessage("current", new ItemMessage(current, Metadata.NUMBER))
       sendClose("current")

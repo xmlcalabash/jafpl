@@ -44,6 +44,7 @@ private[runtime] class LoopForEachActor(private val monitor: ActorRef,
       sendClose("current")
       for (cnode <- node.children) {
         if (cnode.state == NodeState.READY) {
+          trace("SETRUN", s"5: ${nodeState(cnode)}", TraceEvent.NMESSAGES)
           stateChange(cnode, NodeState.RUNNING)
           actors(cnode) ! NRun()
         }

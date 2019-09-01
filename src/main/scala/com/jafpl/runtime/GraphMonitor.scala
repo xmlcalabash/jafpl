@@ -3,7 +3,7 @@ package com.jafpl.runtime
 import akka.actor.{ActorRef, PoisonPill}
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{Graph, Node, NodeState}
-import com.jafpl.runtime.NodeActor.{NAbortExecution, NException, NFinished, NInitialize, NInitialized, NNode, NReady, NRun, NStart, NStarted, NStop, NStopped, NWatchdog, NWatchdogTimeout}
+import com.jafpl.runtime.NodeActor.{NAbortExecution, NChkReady, NException, NFinished, NInitialize, NInitialized, NNode, NReady, NRun, NStart, NStarted, NStop, NStopped, NWatchdog, NWatchdogTimeout}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -113,11 +113,17 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
 
   def started(node: Node): Unit = {
     stateChange(node, NodeState.STARTED)
+    actors(node) ! NChkReady()
   }
 
   def ready(node: Node): Unit = {
-    stateChange(node, NodeState.RUNNING)
-    actors(node) ! NRun()
+    if (node.state == NodeState.STARTED) {
+      trace("SETRUN", s"4: ${nodeState(node)}", TraceEvent.NMESSAGES)
+      stateChange(node, NodeState.RUNNING)
+      actors(node) ! NRun()
+    } else {
+      trace("READY!", s"$node ${node.state} ignores READY", TraceEvent.GMESSAGES)
+    }
   }
 
   def run(): Unit = {
@@ -160,7 +166,7 @@ private[runtime] class GraphMonitor(private val graph: Graph, override protected
 
     case NReady(node: Node) =>
       runtime.noteMessageTime()
-      trace("READY", s"$node", TraceEvent.GMESSAGES)
+      trace("READY", s"$node ${node.state} / ${sender()}", TraceEvent.GMESSAGES)
       ready(node)
 
     case NStopped(node: Node) =>

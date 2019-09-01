@@ -10,6 +10,7 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
                                     override protected val runtime: GraphRuntime,
                                     override protected val node: ChooseStart) extends StartActor(monitor, runtime, node) {
   private val whenList = ListBuffer.empty[WhenStart]
+  private var nextWhen = Option.empty[WhenStart]
   private var aborting = false
 
   override protected def initialize(): Unit = {
@@ -45,19 +46,24 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
         case _ => ready = ready && (cnode.state == NodeState.READY || cnode.state == NodeState.RESET)
       }
     }
-    if (ready) {
-      parent ! NReady(node)
-    }
 
     if (node.state == NodeState.RUNNING) {
       // Choose doesn't automatically run its when children, even if they're ready
       child match {
-        case _: WhenStart => Unit
+        case when: WhenStart =>
+          if (nextWhen.isDefined && nextWhen.get == when) {
+            nextWhen = None
+            actors(when) ! NGuardCheck()
+          }
         case _ =>
           if (child.state == NodeState.READY) {
             stateChange(child, NodeState.RUNNING)
             actors(child) ! NRun()
           }
+      }
+    } else {
+      if (ready) {
+        parent ! NReady(node)
       }
     }
   }
@@ -83,7 +89,11 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
     } else {
       val when = whenList.head
       whenList -= when
-      actors(when) ! NGuardCheck()
+      if (when.state == NodeState.READY) {
+        actors(when) ! NGuardCheck()
+      } else {
+        nextWhen = Some(when)
+      }
     }
   }
 

@@ -16,10 +16,13 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
   logEvent = TraceEvent.WHEN
 
   override protected def input(port: String, message: Message): Unit = {
-    if (port == "condition") {
-      contextItem += message
-    } else {
-      super.input(port, message)
+    port match {
+      case "condition" =>
+        contextItem += message
+      case "#bindings" =>
+        Unit
+      case _ =>
+        super.input(port, message)
     }
   }
 
@@ -47,7 +50,7 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
     }
 
     val eval = runtime.runtime.expressionEvaluator.newInstance()
-    val pass = eval.booleanValue(node.testExpr, contextItem.toList, bindings.toMap, node.params)
+    val pass = eval.booleanValue(node.testExpr, contextItem.toList, receivedBindings.toMap, node.params)
     parent ! NGuardReport(node, pass)
   }
 }

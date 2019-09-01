@@ -45,24 +45,6 @@ private[runtime] class AtomicActor(private val monitor: ActorRef,
     }
   }
 
-  override protected def close(port: String): Unit = {
-    if (port == "#bindings") {
-      for (port <- inputBuffer.ports) {
-        for (message <- inputBuffer.messages(port)) {
-          node.inputCardinalities.put(port, node.inputCardinalities.getOrElse(port, 0L) + 1)
-          if (node.step.isDefined) {
-            trace("DELIVER→", s"$node $port", TraceEvent.STEPIO)
-            node.step.get.consume(port, message)
-          } else {
-            trace("DELIVER↴", s"$node $port", TraceEvent.STEPIO)
-          }
-        }
-      }
-    }
-
-    super.close(port)
-  }
-
   override protected def start(): Unit = {
     parent ! NStarted(node)
     if (openInputs.isEmpty) {
