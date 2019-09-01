@@ -2,7 +2,7 @@ dist: trusty
 install: true
 language: scala
 scala:
-  - 2.12.3
+  - 2.12.6
 script:
   - sbt ++$TRAVIS_SCALA_VERSION test doc package
   - gradle --build-file website.gradle website
