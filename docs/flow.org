@@ -1,121 +1,121 @@
 #+TITLE: Flows
 
-An atomic step is ~readyToRun~ if:
+* Initial state
 
-1. Its ~start()~ method has been called
-2. All of its inputs are closed
-3. It hasn’t thrown an exception
-4. Its ~run()~ method has not yet been called
+  The initial state of all nodes is STARTED.
 
-An atomic step is finished if:
+  Parents are responsible for keeping track of the state of their children.
 
-1. Its ~run()~ method has been called
+* Runtime.run()
 
-A compound step is ~readyToRun~ if:
+  When ~run()~ is called on ~GraphRuntime~, it sends:
 
-1. Its ~start()~ method has been called
-2. All of its inputs are closed
-3. All of its children have reset
-4. It hasn’t thrown an exception
-5. Its ~run()~ method has not yet been called
+  + ~NInit()~ to all top-level-nodes
+  + When initialization finishes:
+    + ~NStart()~ to all top-level nodes.
 
-A compound step is finished if:
+* NInit
 
-1. Its ~run()~ method has been called
-2. All of its children have finished or been stopped
+  + Send ~NInit()~ to all children
+  + When initialization finishes
+    + Do one-time initialization. Send ~NInitialized()~ or ~NException()~ to runtime.
 
-** Outputs of compound steps
+* NStart
 
-The compound-step-end node sents results back to the start node for
-delivery. This extra step is necessary in order to avoid
-out-of-sequence messaging problems. The message-order delivery
-guarantees of the framework are that they are ordered between any two
-nodes, but not across any other nodes.
+  + Initialize open inputs and outputs.
+  + Send ~NReady()~ to parent.
+  + If no inputs are open, run
 
-Consider the following possible sequence if the step-end node delivers
-documents:
+* Running an atomic step
 
-1. SENDOUT→  {p5-24}.result → {when5_end-14}.result
-2. GCLOSE    {p5-24}.result
-3. NINPUT    {when5_end-14} {p5-24}.result → result [CondEnd]
-4. GCLOSE    {p5-24}.result from _____24
-5. RECEIVE→  {when5_end-14}.result from monitor ITEM: WHEN5 [CondEnd]
-6. GFINISHED {p5-24}
-7. INPUT     {when5_end-14} / result to result [CondEnd]
-8. NCHLDFNSHD{when5-15} {p5-24} [When]
-9. CFINISH   {when5-15}: Map({p5-24} -> FINISHED) [When]
-10. FINISHED  {when5-15} [When]
-11. GCLOSE    {when5-15}.result
-12. GCLOSE    {when5-15}.result from _____15
-13. NCLOSE    {when5_end-14} result [CondEnd]
-14. GFINISHED {when5-15}
-15. NCLOSE    {Joiner-29} source_5 [Joiner]
-16. NCLOSE    {when5_end-14}.result from monitor [CondEnd]
-17. GOUTPUT   {when5-15}.result
-18. NCLOSE    {Joiner-29}.source_5 from monitor [Joiner]
-19. NCHLDFNSHD{choose-5} {when5-15} [Choose]
-20. CLOSE     {when5_end-14}.result [CondEnd]
-21. CLOSE     {Joiner-29} / source_5 [Joiner]
+  + Send ~NRunning()~ to parent
 
-   Because when5-15 was finished, it closed its output ports.
-   That closed the corresponding input to Joiner-29.
+  + Begin processing:
+    + Send ~NOutput()~ for each document produced.
 
-22. SENDOUT→  {when5-15}.result → {Joiner-29}.source_5 from _____14
+  + If an exception occurs:
+    + Send ~NClose()~ for all outputs
+    + Send ~NAborted()~ to parent.
 
-   But this happened *before* the output for Joiner-29 arrived
-   from when5-15.
+  + Otherwise:
+    + Send ~NClose()~ for all outputs
+    + Send ~NFinished()~ to parent.
 
-23. RUNIFREADY{Joiner-29} ready: true inputs: true resets: true [Joiner]
-24. MESSAGE→  {when5-15}.result → {Joiner-29}.source_5 WHEN5
-25. RUN       {Joiner-29} [Joiner]
+* Running a container
 
+  + Send ~NRunning()~ to parent
+  + Send ~NStart()~ to each child
+  + Wait until all children finish
+    + All have reported finished or aborted
+    + All output ports are closed
+  + Forward any outputs with ~NOutput()~
+  + Forward closes with ~NClose()~
 
+  + If an exception occurs:
+    + Send ~NClose()~ for all open outputs
+    + Send ~NAborted()~ to parent.
 
+  + Otherwise:
+    + Send ~NClose()~ for all outputs
+    + Send ~NFinished()~ to parent.
 
-* Actor methods
+* Running a choose
 
-|-------------------+-------------------------------------|
-| Method            | Notes                               |
-|-------------------+-------------------------------------|
-| ~initialize()~    |                                     |
-| ~input()~         |                                     |
-| ~close()~         |                                     |
-| ~start()~         |                                     |
-| ~finished()~      | Only on containers                  |
-| ~childFinished()~ | Only on containers                  |
-| ~abort()~         |                                     |
-| ~stop()~          |                                     |
-| ~childStopped()~  | Only on containers                  |
-| ~reset()~         |                                     |
-| ~resetIfReady()~  |                                     |
-| ~resetFinished()~ |                                     |
-| ~runIfReady()~    |                                     |
-| ~run()~           |                                     |
-| ~restartLoop()~   | ~Loop*Actor~                        |
-| ~guardResult()~   | ~ChooseActor~                       |
-| ~checkGuard()~    | ~WhenActor~                         |
-| ~loop()~          | ~LoopUntilActor~ & ~LoopWhileActor~ |
-| ~exception()~     | ~TryCatchActor~                     |
-| ~runFinally~      | ~TryCatchActor~                     |
-|-------------------+-------------------------------------|
+  + Send ~NRunning()~ to parent
+  + Send ~NStart()~ to each child
+  + Wait until all children have reported ready.
 
-A ~CatchActor~ is started with the cause.
-A ~FinallyActor~ is started with the cause.
+  + Iterate over the when children:
+    + Send ~NCheckGuard()~ and wait for the result
+    + If the result is pass:
+      + Send ~NRun()~ to the when
+      + Send ~NAbort()~ to all remaining whens
+    + Otherwise:
+      + Send ~NAbort()~ to the when
 
-* Step methods
+  + Send ~NOutput()~ for each document produced.
 
-|--------------------+-------|
-| Method             | Notes |
-|--------------------+-------|
-| ~location~         |       |
-| ~bindingSpec~      |       |
-| ~setConsumer()~    |       |
-|--------------------+-------|
-| ~receive()~        |       |
-| ~receiveBinding()~ |       |
-| ~initialize()~     |       |
-| ~run()~            |       |
-| ~reset()~          |       |
-| ~abort()~          |       |
-| ~stop()~           |       |
-|--------------------+-------|
+  + If an exception occurs:
+    + Send ~NClose()~ for all outputs
+    + Send ~NAborted()~ to parent.
+
+  + Otherwise:
+    + Send ~NClose()~ for all outputs
+    + Send ~NFinished()~ to parent.
+
+* NCheckGuard
+
+  + If the ~test~ input is closed:
+    + Evaluate the condition and send ~NCheckResult()~ to parent
+
+* NRun
+
+  Run the container
+
+* NAbort
+
+  + Send ~NClose()~ for all outputs
+  + Send ~NAborted()~ to parent
+
+* Running a try/catch
+
+  + Send ~NRunning()~ to parent
+  + Send ~NStart()~ to the try
+  + Wait until the try reports finished or aborted
+
+  + If the try reported finished
+    + Send ~NAbort()~ to all the catches
+  + Otherwise:
+    + Compute which catch should run:
+      + Send ~NStart()~ to that catch
+      + Send ~NAbor()~ to all the other catches
+
+  + Send ~NOutput()~ for each document produced.
+
+  + If an exception occurs:
+    + Send ~NClose()~ for all outputs
+    + Send ~NAborted()~ to parent.
+
+  + Otherwise:
+    + Send ~NClose()~ for all outputs
+    + Send ~NFinished()~ to parent.

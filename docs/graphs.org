@@ -1,0 +1,236 @@
+#+TITLE: Graphs
+
+* Graphs
+
+There are two distinct graphs in JAFPL. There is a graph of nodes,
+constructed through calls to the JAFPL ~Graph~ APIs. That graph is
+used to build a collection of actors that send messages to each other
+to implement the graph workflow.
+
+* Graph execution
+
+The actors implement the underlying graph. Each node in the graph is
+represented by an actor. Actors send messages to each other along the
+edges of the graph.
+
+There is one distinguished actor, the ~GraphMonitor~ that serves as
+overall controller for the graph. This is the actor that initializes
+all of the nodes in the graph, starts the graph running, and cleans up
+when execution ends (normally, or from an exception).
+
+There are three different perspectives in which messages occur:
+
+1. The ~GraphMonitor~ exchanges messages to the “top level” nodes in
+   the graph. A node is a “top level” node if it has no parent. Three
+   kinds of nodes can be top level nodes: pipeline inputs, pipeline
+   outputs, and the node that represents the pipeline itself. Pipeline
+   inputs and outputs are modeled as actors in the graph for
+   simplicity.
+
+2. A “compound” step, one that has a subpipeline, exchanges messages
+   with the nodes that are its immediate children.
+
+3. An step, compound or atomic, exchanges messages with its parent.
+   Top level nodes treat the ~GraphMonitor~ as their parent.
+
+** GraphMonitor messages
+
+Execution begins when the ~NRun()~ message is sent to the ~GraphMonitor~.
+The monitor initializes every actor. In this example, Node1 and Node3 are top level nodes,
+Node2 and Noden are children of Node1.
+
+#+BEGIN_SRC plantuml :file gminit.png
+participant "Graph Monitor" as GM order 10
+participant "Node1*" as Node1 order 20
+participant Node2 order 30
+participant "Node3*" as Node3 order 40
+participant "Node//n//" as Noden order 50
+GM -> Node1: NInitialize(parent1,actors,outputs1)
+GM -> Node2: NInitialize(parent2,actors,outputs2)
+GM -> Node3: NInitialize(parent3,actors,outputs3)
+GM <- Node2: NInitialized(node2)
+hnote over Node2: INITIALIZED
+GM -> Noden: NInitialize(parent//n//,actors,outputs//n//)
+GM <- Node3: NInitialized(node3)
+hnote over Node3: INITIALIZED
+GM <- Noden: NInitialized(node//n//)
+hnote over Noden: INITIALIZED
+GM <- Node1: NInitialized(node1)
+hnote over Node1: INITIALIZED
+#+END_SRC
+
+#+RESULTS:
+[[file:gminit.png]]
+
+When initialization is complete (all nodes have reported that they’re initialized),
+the top level nodes are started and then run.
+
+#+BEGIN_SRC plantuml :file gmstart.png
+participant "Graph Monitor" as GM order 10
+participant "Node1*" as Node1 order 20
+participant "Node3*" as Node3 order 30
+hnote over Node1: STARTING
+GM -> Node1: NStart()
+hnote over Node3: STARTING
+GM -> Node3: NStart()
+GM <- Node1: NStarted(node1)
+hnote over Node1: STARTED
+GM <- Node3: NStarted(node3)
+hnote over Node3: STARTED
+== Nodes started ==
+GM <- Node3: NReady()
+hnote over Node3: RUNNING
+GM -> Node3: NRun()
+GM <- Node1: NReady()
+hnote over Node1: RUNNING
+GM -> Node1: NRun()
+#+END_SRC
+
+#+RESULTS:
+[[file:gmstart.png]]
+
+When execution ends, the ~GraphMonitor~ cleans up. The ~PoisonPill~ is
+an actor system level message to terminate the actor.
+
+#+BEGIN_SRC plantuml :file gmfinish.png
+participant "Graph Monitor" as GM order 10
+participant "Node1*" as Node1 order 20
+participant Node2 order 30
+participant "Node3*" as Node3 order 40
+participant "Node//n//" as Noden order 50
+
+GM <- Node3: NFinished(node3)
+hnote over Node3: STOPPING
+GM -> Node3: NStop()
+GM <- Node3: NStopped(node3)
+hnote over Node3: STOPPED
+GM -> Node3: PoisonPill
+
+Node1 <- Node2: NFinished(node2)
+hnote over Node2: FINISHED
+Node1 <- Noden: NFinished(noden)
+hnote over Noden: FINISHED
+GM <- Node1: NFinished(node1)
+hnote over Node1: STOPPING
+GM -> Node1: NStop()
+
+hnote over Node2: STOPPING
+Node1 -> Node2: NStop()
+Node1 <- Node2: NStopped(node2)
+hnote over Node2: STOPPED
+
+hnote over Noden: STOPPING
+Node1 -> Noden: NStop()
+Node1 <- Noden: NStopped(noden)
+hnote over Noden: STOPPED
+
+GM <- Node1: NStopped(node1)
+hnote over Node1: STOPPED
+GM -> Node1: PoisonPill
+
+== All top-level nodes stopped ==
+GM -> Node2: PoisonPill
+GM -> Noden: PoisonPill
+#+END_SRC
+
+#+RESULTS:
+[[file:gmfinish.png]]
+
+If an exception occurs, it will either be caught, or it will reach the
+~GraphMonitor~. If it reaches the ~GraphMonitor~, the pipeline will be
+terminated.
+
+#+BEGIN_SRC plantuml :file gmexcept.png
+participant "Graph Monitor" as GM order 10
+participant "Node1*" as Node1 order 20
+participant Node2 order 30
+participant "Node3*" as Node3 order 40
+participant "Node//n//" as Noden order 50
+Node1 <- Node2: NException(node2,ex)
+hnote over Node2: ABORTED
+GM <- Node1: NException(node2,ex)
+
+hnote over Node1: STOPPING
+GM -> Node1: NStop()
+
+hnote over Node2: STOPPING
+Node1 -> Node2: NStop()
+Node1 <- Node2: NStopped(node2)
+hnote over Node2: STOPPED
+
+hnote over Noden: STOPPING
+Node1 -> Noden: NStop()
+Node1 <- Noden: NStopped(noden)
+hnote over Noden: STOPPED
+
+GM <- Node1: NStopped(node1)
+hnote over Node1: STOPPED
+GM -> Node1: PoisonPill
+
+hnote over Node3: STOPPING
+GM -> Node3: NStop()
+GM <- Node3: NStopped(node3)
+hnote over Node3: STOPPED
+GM -> Node3: PoisonPill
+
+== All top-level nodes stopped ==
+GM -> Node2: PoisonPill
+GM -> Noden: PoisonPill
+
+#+END_SRC
+
+#+RESULTS:
+[[file:gmexcept.png]]
+
+** Simple pipline flow
+
+Let us suppose that our example pipeline is a simple, linear flow.
+Node3 is a pipeline input; it sends source documents to Node1. Node1
+sends input to Node2, Node2 sends input to Noden, Noden discards the
+input. We’ll pick up after all of the nodes have started.
+
+#+BEGIN_SRC plantuml :file gxnormal.png
+participant "Graph Monitor" as GM order 10
+participant "Node1*" as Node1 order 20
+participant Node2 order 30
+participant "Node3*" as Node3 order 40
+participant "Node//n//" as Noden order 50
+
+GM <- Node3: NReady()
+hnote over Node3: RUNNING
+GM -> Node3: NRun()
+Node1 <- Node3: NInput(node3,result,source,msg)
+Node1 <- Node3: NClose(node3,result,source)
+GM <- Node1: NReady()
+hnote over Node1: RUNNING
+GM -> Node1: NRun()
+
+Node1 -> Node2: NInput(node1,source,source,msg)
+Node1 -> Node2: NClose(node1,source,source)
+Node1 <- Node2: NReady()
+hnote over Node2: RUNNING
+Node1 -> Node2: NRun()
+
+Node2 -> Noden: NInput(node2,result,source,msg)
+Node2 -> Noden: NClose(node2,result,source)
+Node1 <- Noden: NReady()
+hnote over Noden: RUNNING
+Node1 -> Noden: NRun()
+
+GM <- Node3: NFinished()
+hnote over Node3: FINISHED
+Node1 <- Node2: NFinished()
+hnote over Node2: FINISHED
+Node1 <- Noden: NFinished()
+hnote over Noden: FINISHED
+GM <- Node1: NFinished()
+hnote over Node1: FINISHED
+#+END_SRC
+
+#+RESULTS:
+[[file:gxnormal.png]]
+
+It’s important to note, but difficult to capture in these diagrams, that most messages are asynchronous.
+
+** The watchdog
+
