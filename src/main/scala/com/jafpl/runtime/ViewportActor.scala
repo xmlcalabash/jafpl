@@ -4,7 +4,7 @@ import akka.actor.ActorRef
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{Node, NodeState, ViewportStart}
 import com.jafpl.messages.{ItemMessage, Message, PipelineMessage}
-import com.jafpl.runtime.NodeActor.{NFinished, NReset}
+import com.jafpl.runtime.NodeActor.{NException, NFinished, NReset}
 import com.jafpl.steps.ViewportItem
 
 import scala.collection.mutable
@@ -95,7 +95,14 @@ private[runtime] class ViewportActor(private val monitor: ActorRef,
         }
       }
 
-      item.putItems(ibuffer.toList)
+      try {
+        item.putItems(ibuffer.toList)
+      } catch {
+        case e: Exception =>
+          parent !  NException(child, e)
+          return
+      }
+
       itemBuffer.clear()
 
       index += 1
