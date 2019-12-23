@@ -247,11 +247,11 @@ abstract class Node(val graph: Graph,
     }
 
     this match {
-      case start: CatchStart =>
+      case _: CatchStart =>
         inlist += xml.Text("\n")
         inlist += xml.Text(indent + "  ")
         inlist += <in-edge input-port="error"></in-edge>
-      case start: LoopStart =>
+      case _: LoopStart =>
         inlist += xml.Text("\n")
         inlist += xml.Text(indent + "  ")
         inlist += <in-edge input-port="current"></in-edge>
@@ -282,6 +282,7 @@ abstract class Node(val graph: Graph,
       nodes += <outputs>{ outlist }</outputs>
     }
 
+    /*
     this match {
       case b: Binding =>
         if (inputs.nonEmpty) {
@@ -303,6 +304,7 @@ abstract class Node(val graph: Graph,
         nodes += <outputs>{ outlist }</outputs>
       case _ => Unit
     }
+     */
 
     nodes += xml.Text("\n" + indent)
     nodes += dumpOpenChildren(depth)
@@ -368,6 +370,7 @@ abstract class Node(val graph: Graph,
     for (output <- outputs) {
       for (edge <- graph.edgesFrom(this, output)) {
         val ancestor = graph.commonAncestor(this, edge.to)
+        /*
         if (ancestor.isDefined && ancestor.get == this) {
           inlist += xml.Text("\n")
           inlist += xml.Text(indent + "  ")
@@ -377,6 +380,10 @@ abstract class Node(val graph: Graph,
           outlist += xml.Text(indent + "  ")
           outlist += <out-edge output-port={ edge.fromPort } input-port={ edge.toPort } destination={ edge.to.id }></out-edge>
         }
+         */
+        outlist += xml.Text("\n")
+        outlist += xml.Text(indent + "  ")
+        outlist += <out-edge output-port={ edge.fromPort } input-port={ edge.toPort } destination={ edge.to.id }></out-edge>
       }
     }
 
@@ -389,16 +396,6 @@ abstract class Node(val graph: Graph,
         outlist += xml.Text("\n")
         outlist += xml.Text(indent + "  ")
         outlist += <out-edge output-port="test"></out-edge>
-        /*
-      case _: CatchStart =>
-        inlist += xml.Text("\n")
-        inlist += xml.Text(indent + "  ")
-        inlist += <in-edge input-port="error"></in-edge>
-      case _: LoopStart =>
-        inlist += xml.Text("\n")
-        inlist += xml.Text(indent + "  ")
-        inlist += <in-edge input-port="current"></in-edge>
-         */
       case _ => Unit
     }
 
@@ -418,6 +415,7 @@ abstract class Node(val graph: Graph,
       nodes += <outputs>{ outlist }</outputs>
     }
 
+    /*
     this match {
       case _: Binding =>
         if (inputs.nonEmpty) {
@@ -439,6 +437,7 @@ abstract class Node(val graph: Graph,
         nodes += <outputs>{ outlist }</outputs>
       case _ => Unit
     }
+     */
 
     nodes += xml.Text("\n" + indent)
     nodes += dumpClosedChildren(depth)

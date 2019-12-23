@@ -95,7 +95,20 @@
 </xsl:template>
 
 <xsl:template match="g:in-edge">
-  <port id="{g:id(.)}" label="{@input-port}"/>
+  <!-- This is a hack. In a container, if the input and output
+       ports are the same (I think!) this is just the passthrough
+       to the container output.
+  -->
+  <xsl:choose>
+    <xsl:when test="../../self::g:node">
+      <port id="{g:id(.)}" label="{@input-port}"/>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:if test="@input-port != @output-port">
+        <port id="{g:id(.)}" label="{@input-port}"/>
+      </xsl:if>
+    </xsl:otherwise>
+  </xsl:choose>
 </xsl:template>
 
 <xsl:template match="g:outputs">

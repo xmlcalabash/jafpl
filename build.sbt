@@ -4,7 +4,7 @@ name := "jafpl"
 
 organization := "com.jafpl"
 homepage     := Some(url("https://jafpl.com/"))
-version      := "0.2.40"
+version      := "0.2.41"
 scalaVersion := "2.12.6"
 
 buildInfoUsePackageAsPath := true
