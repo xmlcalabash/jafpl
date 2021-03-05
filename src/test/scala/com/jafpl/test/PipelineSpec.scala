@@ -6,9 +6,9 @@ import com.jafpl.messages.{ItemMessage, Metadata}
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{Identity, Manifold, Producer}
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class PipelineSpec extends FlatSpec {
+class PipelineSpec extends AnyFlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
   var jafpl = Jafpl.newInstance()
 

@@ -5,9 +5,9 @@ import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.{PrimitiveItemComparator, PrimitiveRuntimeConfiguration}
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{Decrement, Manifold, Producer}
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class UntilSpec extends FlatSpec {
+class UntilSpec extends AnyFlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "An until " should " iterate until finished and return all" in {

@@ -9,6 +9,6 @@ class DeadLetterListener extends Actor {
   def receive = {
     case d: DeadLetter =>
       logger.debug(d.toString)
-    case _ => Unit
+    case _ => ()
   }
 }

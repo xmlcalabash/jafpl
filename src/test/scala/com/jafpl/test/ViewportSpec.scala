@@ -4,9 +4,9 @@ import com.jafpl.config.Jafpl
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{BufferSink, Manifold, Producer, StringComposer, Uppercase}
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class ViewportSpec extends FlatSpec {
+class ViewportSpec extends AnyFlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "A viewport " should " do what a viewport does" in {

@@ -63,7 +63,7 @@ private[runtime] class StartActor(private val monitor: ActorRef,
           actors(cnode) ! NRun()
         case NodeState.RESET =>
           actors(cnode) ! NChkReady()
-        case _ => Unit
+        case _ => ()
       }
     }
   }

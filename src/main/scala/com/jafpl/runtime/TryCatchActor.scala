@@ -25,7 +25,7 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
           catchList += ctch
         case fin: FinallyStart =>
           finallyStart = Some(fin)
-        case _ => Unit
+        case _ => ()
       }
     }
     super.initialize()
@@ -39,7 +39,7 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
       node match {
         case ctch: CatchStart =>
           catchList += ctch
-        case _ => Unit
+        case _ => ()
       }
     }
     super.reset()
@@ -63,9 +63,9 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
     if (node.state == NodeState.RUNNING) {
       // TryCatch doesn't automatically run its when children, even if they're ready
       child match {
-        case _: TryStart => Unit
-        case _: CatchStart => Unit
-        case _: FinallyStart => Unit
+        case _: TryStart => ()
+        case _: CatchStart => ()
+        case _: FinallyStart => ()
         case _ =>
           if (child.state == NodeState.READY) {
             stateChange(child, NodeState.RUNNING)
@@ -78,9 +78,9 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
   override protected def run(): Unit = {
     for (cnode <- node.children) {
       cnode match {
-        case _: TryStart => Unit
-        case _: CatchStart => Unit
-        case _: FinallyStart => Unit
+        case _: TryStart => ()
+        case _: CatchStart => ()
+        case _: FinallyStart => ()
         case _ =>
           if (cnode.state == NodeState.READY) {
             stateChange(cnode, NodeState.RUNNING)
@@ -197,7 +197,7 @@ private[runtime] class TryCatchActor(private val monitor: ActorRef,
             fin.cause = cause
             stateChange(fin, NodeState.RUNNING)
             actors(fin) ! NRun()
-          case _ => Unit
+          case _ => ()
         }
       }
     }

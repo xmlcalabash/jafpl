@@ -5,9 +5,9 @@ import com.jafpl.messages.{ItemMessage, Metadata}
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{BufferSink, Identity, Manifold, Producer}
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class IOPipelineSpec extends FlatSpec {
+class IOPipelineSpec extends AnyFlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "A pipeline with inputs and outputs " should " run" in {

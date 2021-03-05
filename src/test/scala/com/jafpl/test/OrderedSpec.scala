@@ -5,9 +5,9 @@ import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{Identity, Manifold, Producer}
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class OrderedSpec extends FlatSpec {
+class OrderedSpec extends AnyFlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "A pipeline with an ordered joiner " should " join inputs in the right order" in {

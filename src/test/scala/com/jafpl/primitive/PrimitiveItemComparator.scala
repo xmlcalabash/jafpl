@@ -9,13 +9,13 @@ class PrimitiveItemComparator extends ItemComparator {
     a match {
       case num: Long => same = same || (num == 0)
       case num: Int => same = same || (num == 0)
-      case _ => Unit
+      case _ => ()
     }
 
     b match {
       case num: Long => same = same || (num == 0)
       case num: Int => same = same || (num == 0)
-      case _ => Unit
+      case _ => ()
     }
 
     //println("Compare: " + a + "=" + b + ": " + same)

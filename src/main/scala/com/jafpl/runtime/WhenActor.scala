@@ -20,7 +20,7 @@ private[runtime] class WhenActor(private val monitor: ActorRef,
       case "condition" =>
         contextItem += message
       case "#bindings" =>
-        Unit
+        ()
       case _ =>
         super.input(port, message)
     }

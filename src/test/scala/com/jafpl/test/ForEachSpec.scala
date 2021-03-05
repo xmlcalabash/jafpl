@@ -4,9 +4,9 @@ import com.jafpl.config.Jafpl
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{BufferSink, Count, Identity, Manifold, ProduceBinding, Producer, Sink}
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class ForEachSpec extends FlatSpec {
+class ForEachSpec extends AnyFlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "A for-each " should " iterate" in {

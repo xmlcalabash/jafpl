@@ -4,9 +4,9 @@ import com.jafpl.config.Jafpl
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{BufferSink, Identity, Manifold, Producer, Sink, Sleep}
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class SimplestPipelineSpec extends FlatSpec {
+class SimplestPipelineSpec extends AnyFlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "The almost simplest possible pipeline " should " run" in {

@@ -6,9 +6,9 @@ import com.jafpl.messages.{ItemMessage, Metadata}
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{BufferSink, Empty, Identity, LiesAboutOutputBindings, Manifold, PortCardinality, Producer, Sink}
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class CardinalitySpec extends FlatSpec {
+class CardinalitySpec extends AnyFlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
   val oneOutput = new Manifold(Manifold.WILD, Manifold.singlePort("result", PortCardinality.EXACTLY_ONE))
   val oneInput = new Manifold(Manifold.singlePort("source", PortCardinality.EXACTLY_ONE), Manifold.WILD)

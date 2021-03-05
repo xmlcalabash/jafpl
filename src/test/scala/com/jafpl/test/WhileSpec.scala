@@ -5,9 +5,9 @@ import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.{PrimitiveItemTester, PrimitiveRuntimeConfiguration}
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{Decrement, Manifold, Producer}
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class WhileSpec extends FlatSpec {
+class WhileSpec extends AnyFlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "A while " should " iterate until finished and return all" in {

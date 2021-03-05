@@ -4,9 +4,9 @@ import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.JafplException
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.steps.{Identity, Manifold, Producer, Sink}
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class GraphSpec extends FlatSpec {
+class GraphSpec extends AnyFlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "A simple graph " should " compile" in {

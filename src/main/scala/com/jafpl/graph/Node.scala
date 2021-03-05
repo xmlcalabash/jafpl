@@ -255,7 +255,7 @@ abstract class Node(val graph: Graph,
         inlist += xml.Text("\n")
         inlist += xml.Text(indent + "  ")
         inlist += <in-edge input-port="current"></in-edge>
-      case _ => Unit
+      case _ => ()
     }
 
     if (inlist.nonEmpty) {
@@ -396,7 +396,7 @@ abstract class Node(val graph: Graph,
         outlist += xml.Text("\n")
         outlist += xml.Text(indent + "  ")
         outlist += <out-edge output-port="test"></out-edge>
-      case _ => Unit
+      case _ => ()
     }
 
     if (inlist.nonEmpty) {

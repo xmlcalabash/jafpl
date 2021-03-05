@@ -18,7 +18,7 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
       node match {
         case when: WhenStart =>
           whenList += when
-        case _ => Unit
+        case _ => ()
       }
     }
     super.initialize()
@@ -31,7 +31,7 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
       node match {
         case when: WhenStart =>
           whenList += when
-        case _ => Unit
+        case _ => ()
       }
     }
     super.reset()
@@ -71,7 +71,7 @@ private[runtime] class ChooseActor(private val monitor: ActorRef,
   override protected def run(): Unit = {
     for (cnode <- node.children) {
       cnode match {
-        case _: WhenStart => Unit
+        case _: WhenStart => ()
         case _ =>
           if (cnode.state == NodeState.READY) {
             stateChange(cnode, NodeState.RUNNING)

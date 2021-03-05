@@ -10,8 +10,8 @@ class JafplLoopDetected(location: Option[Location]) extends JafplException(Jafpl
   protected[jafpl] def addNode(step: Node): Unit = {
     // Don't report splitters and joiners; they're not useful to the pipeline author
     step match {
-      case join: Joiner => Unit
-      case split: Splitter => Unit
+      case join: Joiner => ()
+      case split: Splitter => ()
       case _ => _nodes += step
 
     }

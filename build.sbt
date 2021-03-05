@@ -5,7 +5,7 @@ name := "jafpl"
 organization := "com.jafpl"
 homepage     := Some(url("https://jafpl.com/"))
 version      := "0.2.41"
-scalaVersion := "2.12.6"
+scalaVersion := "2.13.5"
 
 buildInfoUsePackageAsPath := true
 
@@ -114,13 +114,13 @@ libraryDependencies ++= Seq(
   "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.12.1",
   "org.slf4j" % "jcl-over-slf4j" % "1.7.25",
   "org.slf4j" % "slf4j-api" % "1.7.25",
-  "com.typesafe.akka" %% "akka-actor" % "2.5.24",
-  "com.typesafe.akka" %% "akka-testkit" % "2.5.24" % Test,
-  "org.scalactic" %% "scalactic" % "3.0.5",
-  "org.scalatest" %% "scalatest" % "3.0.5" % "test",
-  "org.scala-lang.modules" %% "scala-xml" % "1.1.0",
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.0",
-  "org.scala-lang.modules" %% "scala-swing" % "2.0.3"
+  "com.typesafe.akka" %% "akka-actor" % "2.6.10",
+  "com.typesafe.akka" %% "akka-testkit" % "2.6.10" % Test,
+  "org.scalactic" %% "scalactic" % "3.2.3",
+  "org.scalatest" %% "scalatest" % "3.2.3" % "test",
+  "org.scala-lang.modules" %% "scala-xml" % "1.3.0",
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
+  "org.scala-lang.modules" %% "scala-swing" % "2.1.1"
 )
 
 // Yes, this is an odd place for local use, but it's where the website

@@ -19,7 +19,7 @@ class BufferConsumer extends DataConsumer {
       case item: ItemMessage =>
         _items += item.item
         _metas += item.metadata
-      case _ => Unit
+      case _ => ()
     }
   }
 }

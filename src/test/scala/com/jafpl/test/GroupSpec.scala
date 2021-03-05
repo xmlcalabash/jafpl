@@ -4,9 +4,9 @@ import com.jafpl.config.Jafpl
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{Identity, Manifold, Producer, Sink}
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class GroupSpec extends FlatSpec {
+class GroupSpec extends AnyFlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   "A group " should " run" in {

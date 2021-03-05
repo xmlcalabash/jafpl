@@ -5,9 +5,9 @@ import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{BufferSink, Count, ExceptionTranslator, Identity, Manifold, Producer, RaiseError, RaiseErrorException}
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class TryCatchSpec extends FlatSpec {
+class TryCatchSpec extends AnyFlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   behavior of "A try/catch"

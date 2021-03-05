@@ -5,9 +5,9 @@ import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{Identity, Manifold, Producer}
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class ContainerSpec extends FlatSpec {
+class ContainerSpec extends AnyFlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration(true)
   val jafpl = Jafpl.newInstance()
   jafpl.traceEventManager.traceEnabled("ALL")

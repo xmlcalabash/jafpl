@@ -6,9 +6,9 @@ import com.jafpl.messages.{ItemMessage, Metadata}
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{Identity, Manifold}
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class ProvidersSpec extends FlatSpec {
+class ProvidersSpec extends AnyFlatSpec {
   val PIPELINEDATA = "Document"
   var runtimeConfig = new PrimitiveRuntimeConfiguration(false)
 

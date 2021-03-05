@@ -4,9 +4,9 @@ import com.jafpl.config.Jafpl
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
 import com.jafpl.steps.{BufferSink, Manifold, PortCardinality, Producer, RaiseError}
-import org.scalatest.FlatSpec
+import org.scalatest.flatspec.AnyFlatSpec
 
-class ExceptionSpec extends FlatSpec {
+class ExceptionSpec extends AnyFlatSpec {
   var runtimeConfig = new PrimitiveRuntimeConfiguration()
 
   behavior of "An exception"

@@ -15,7 +15,7 @@ class BufferSink() extends DefaultStep {
     message match {
       case item: ItemMessage =>
         _items += item.item
-      case _ => Unit
+      case _ => ()
     }
   }
 

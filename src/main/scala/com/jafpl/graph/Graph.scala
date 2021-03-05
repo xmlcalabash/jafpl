@@ -584,7 +584,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
               if (bind.name == varname) {
                 return Some(bind)
               }
-            case _ => Unit
+            case _ => ()
           }
         }
       }
@@ -673,7 +673,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       if (edge.to == node) {
         edge match {
           case bedge: BindingEdge => varnames.add(bedge.from.name)
-          case _ => Unit
+          case _ => ()
         }
       }
     }
@@ -836,7 +836,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
             val empty = gparent.addEmptySource()
             addEdge(empty, "result", when, "condition")
           }
-        case _ => Unit
+        case _ => ()
       }
     }
 
@@ -868,7 +868,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
               if (start.inputs.contains(port)) {
                 container = Some(start)
               }
-            case _ => Unit
+            case _ => ()
           }
           if (container.isEmpty) {
             if (node.parent.isDefined) {
@@ -1012,10 +1012,10 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
                 addEdge(node, "current", sink, "source")
               }
               */
-            case _ => Unit
+            case _ => ()
           }
 
-        case _ => Unit
+        case _ => ()
       }
     }
 
@@ -1077,7 +1077,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
             walker match {
               case node: LoopStart =>
                 loop = Some(node)
-              case _ => Unit
+              case _ => ()
             }
             walker = walker.parent.get
           }
@@ -1201,7 +1201,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     val patchNodes = ListBuffer.empty[Node]
     for (node <- _nodes) {
       node match {
-        case end: ContainerEnd => Unit
+        case end: ContainerEnd => ()
         case _ => patchNodes += node
       }
     }
@@ -1239,7 +1239,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
         case _: Joiner =>
           node = node.parent.get
           done = false
-        case _ => Unit
+        case _ => ()
       }
     }
     node
