@@ -31,7 +31,7 @@ class UntilSpec extends AnyFlatSpec {
     val runtime = new GraphRuntime(graph, runtimeConfig)
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 7)
   }
@@ -60,7 +60,7 @@ class UntilSpec extends AnyFlatSpec {
     val runtime = new GraphRuntime(graph, runtimeConfig)
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
   }
@@ -117,7 +117,7 @@ class UntilSpec extends AnyFlatSpec {
     val runtime = new GraphRuntime(graph, runtimeConfig)
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == -1)

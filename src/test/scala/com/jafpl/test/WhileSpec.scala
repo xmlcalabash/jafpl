@@ -13,7 +13,7 @@ class WhileSpec extends AnyFlatSpec {
   "A while " should " iterate until finished and return all" in {
     val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
-    val p1       = pipeline.addAtomic(new Producer(List(7)), "p1")
+    val p1       = pipeline.addAtomic(new Producer(List(3)), "p1")
 
     val tester   = new PrimitiveItemTester(runtimeConfig, ". > 0")
     val wstep    = pipeline.addWhile(tester, true, Manifold.ALLOW_ANY)
@@ -31,22 +31,18 @@ class WhileSpec extends AnyFlatSpec {
     val runtime = new GraphRuntime(graph, runtimeConfig)
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
-    assert(bc.items.size == 7)
-    assert(bc.items(0) == 6)
-    assert(bc.items(1) == 5)
-    assert(bc.items(2) == 4)
-    assert(bc.items(3) == 3)
-    assert(bc.items(4) == 2)
-    assert(bc.items(5) == 1)
-    assert(bc.items(6) == 0)
+    assert(bc.items.size == 3)
+    assert(bc.items(0) == 2)
+    assert(bc.items(1) == 1)
+    assert(bc.items(2) == 0)
   }
 
   "A while " should " iterate until finished and return 1" in {
     val graph    = Jafpl.newInstance().newGraph()
     val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
-    val p1       = pipeline.addAtomic(new Producer(List(7)), "p1")
+    val p1       = pipeline.addAtomic(new Producer(List(3)), "p1")
 
     val tester   = new PrimitiveItemTester(runtimeConfig, ". > 0")
     val wstep    = pipeline.addWhile(tester, false, Manifold.ALLOW_ANY)
@@ -64,7 +60,7 @@ class WhileSpec extends AnyFlatSpec {
     val runtime = new GraphRuntime(graph, runtimeConfig)
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == 0)
@@ -118,9 +114,9 @@ class WhileSpec extends AnyFlatSpec {
     val runtime = new GraphRuntime(graph, runtimeConfig)
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
-    assert(bc.items.size == 0)
+    assert(bc.items.isEmpty)
   }
 
   "A while " should " be able to have multiple outputs" in {
@@ -148,7 +144,7 @@ class WhileSpec extends AnyFlatSpec {
     val runtime = new GraphRuntime(graph, runtimeConfig)
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 6)
     assert(bc.items(0) == 2)

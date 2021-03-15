@@ -30,7 +30,7 @@ class CardinalitySpec extends AnyFlatSpec {
     try {
       val runtime = new GraphRuntime(graph, runtimeConfig)
       runtime.outputs("result").setConsumer(bc)
-      runtime.run()
+      runtime.runSync()
     } catch {
       case jex: JafplException => pass = true
     }
@@ -54,7 +54,7 @@ class CardinalitySpec extends AnyFlatSpec {
     try {
       val runtime = new GraphRuntime(graph, runtimeConfig)
       runtime.outputs("result").setConsumer(bc)
-      runtime.run()
+      runtime.runSync()
     } catch {
       case jex: JafplException =>
         pass = jex.code == JafplException.INPUT_CARDINALITY_ERROR
@@ -79,7 +79,7 @@ class CardinalitySpec extends AnyFlatSpec {
     try {
       val runtime = new GraphRuntime(graph, runtimeConfig)
       runtime.outputs("result").setConsumer(bc)
-      runtime.run()
+      runtime.runSync()
     } catch {
       case _: Throwable => pass = true
     }
@@ -105,7 +105,7 @@ class CardinalitySpec extends AnyFlatSpec {
     try {
       val runtime = new GraphRuntime(graph, runtimeConfig)
       runtime.outputs("result").setConsumer(bc)
-      runtime.run()
+      runtime.runSync()
     } catch {
       case jafpl: JafplException =>
         pass = jafpl.code == JafplException.OUTPUT_CARDINALITY_ERROR
@@ -133,7 +133,7 @@ class CardinalitySpec extends AnyFlatSpec {
     try {
       val runtime = new GraphRuntime(graph, runtimeConfig)
       runtime.outputs("result").setConsumer(bc)
-      runtime.run()
+      runtime.runSync()
     } catch {
       case jafpl: JafplException =>
         pass = jafpl.code == JafplException.OUTPUT_CARDINALITY_ERROR
@@ -164,7 +164,7 @@ class CardinalitySpec extends AnyFlatSpec {
       runtime.inputs("psrc").send(new ItemMessage("P2", Metadata.BLANK))
       runtime.inputs("psrc").send(new ItemMessage("P3", Metadata.BLANK))
       runtime.outputs("result").setConsumer(bc)
-      runtime.run()
+      runtime.runSync()
     } catch {
       case jafpl: JafplException =>
         pass = jafpl.code == JafplException.INPUT_CARDINALITY_ERROR
@@ -192,7 +192,7 @@ class CardinalitySpec extends AnyFlatSpec {
     try {
       val runtime = new GraphRuntime(graph, runtimeConfig)
       runtime.outputs("result").setConsumer(bc)
-      runtime.run()
+      runtime.runSync()
     } catch {
       case jafpl: JafplException =>
         pass = jafpl.code == JafplException.OUTPUT_CARDINALITY_ERROR
@@ -221,7 +221,7 @@ class CardinalitySpec extends AnyFlatSpec {
     try {
       val runtime = new GraphRuntime(graph, runtimeConfig)
       runtime.outputs("result").setConsumer(bc)
-      runtime.run()
+      runtime.runSync()
     } catch {
       case jafpl: JafplException =>
         pass = jafpl.code == JafplException.OUTPUT_CARDINALITY_ERROR
@@ -252,7 +252,7 @@ class CardinalitySpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     var count = 1
     for (buf <- bc.items) {

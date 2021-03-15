@@ -29,7 +29,7 @@ class VariableBindingSpec extends AnyFlatSpec {
     val runtime = new GraphRuntime(graph, runtimeConfig)
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "some value")

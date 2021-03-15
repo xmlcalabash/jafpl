@@ -5,7 +5,11 @@ import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.mutable
 
 object DefaultTraceEventManager {
-  val ALL = "ALL"
+  val ALL = "all"
+  val START = "start"
+  val RUN = "run"
+  val CARDINALITY = "cardinality"
+  val RECEIVE = "receive"
 }
 
 class DefaultTraceEventManager() extends TraceEventManager {
@@ -56,12 +60,19 @@ class DefaultTraceEventManager() extends TraceEventManager {
   }
 
   override def trace(level: String, message: String, event: String): Unit = {
+    val msg = if (traceEnabled("threads")) {
+      val id = Thread.currentThread().getId
+      f"$id%4d $message%s"
+    } else {
+      message
+    }
+
     if (traceEnabled(event)) {
       level match {
-        case "debug" => logger.debug(message)
-        case "warn" => logger.warn(message)
-        case "error" => logger.error(message)
-        case _ => logger.info(message)
+        case "debug" => logger.debug(msg)
+        case "warn" => logger.warn(msg)
+        case "error" => logger.error(msg)
+        case _ => logger.info(msg)
       }
     }
   }

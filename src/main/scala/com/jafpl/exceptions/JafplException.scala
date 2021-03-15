@@ -109,7 +109,7 @@ class JafplException protected (val code: Any, val location: Option[Location], v
   override def getMessage: String = toString
 
   override def toString: String = {
-    s"JafplException $code: ${stringify(details)}: ${location.getOrElse("")}}"
+    s"JafplException $code: ${stringify(details)}: ${location.getOrElse("")}"
   }
 
   private def stringify(any: Any): String = {

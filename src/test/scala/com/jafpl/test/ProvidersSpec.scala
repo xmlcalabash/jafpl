@@ -30,7 +30,7 @@ class ProvidersSpec extends AnyFlatSpec {
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.inputs("source").send(new ItemMessage(PIPELINEDATA, Metadata.BLANK))
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == PIPELINEDATA)

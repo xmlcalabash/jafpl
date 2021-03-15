@@ -1,7 +1,6 @@
 package com.jafpl.graph
 
 import com.jafpl.exceptions.JafplException
-import com.jafpl.graph.NodeState.NodeState
 import com.jafpl.injection.{PortInjectable, StepInjectable}
 import com.jafpl.messages.Message
 import com.jafpl.steps.{ManifoldSpecification, PortCardinality, Step}
@@ -35,7 +34,6 @@ abstract class Node(val graph: Graph,
   // answers are available after the patch.
   //protected[jafpl] var openInputSet: Option[Set[String]] = None
   //protected[jafpl] var openOutputSet: Option[Set[String]] = None
-  private var _nodeState = NodeState.CREATED
 
   protected[jafpl] val inputCardinalities = mutable.HashMap.empty[String,Long]
   protected[jafpl] val outputCardinalities = mutable.HashMap.empty[String,Long]
@@ -61,11 +59,6 @@ abstract class Node(val graph: Graph,
     * Every node has a unique identifier.
     */
   val id: String = UniqueId.nextId.toString
-
-  def state: NodeState = _nodeState
-  def stateTransition(newState: NodeState): Unit = {
-    _nodeState = newState
-  }
 
   private var _loc = if (step.isDefined) {
     step.get.location
@@ -281,30 +274,6 @@ abstract class Node(val graph: Graph,
       nodes += xml.Text(indent)
       nodes += <outputs>{ outlist }</outputs>
     }
-
-    /*
-    this match {
-      case b: Binding =>
-        if (inputs.nonEmpty) {
-          nodes += xml.Text("\n")
-        }
-
-        val outlist = ListBuffer.empty[xml.Node]
-        for (edge <- graph.edgesFrom(this)) {
-          if (edge.fromPort == "result") {
-            outlist += xml.Text("\n")
-            outlist += xml.Text(indent + "  ")
-            outlist += <out-edge output-port={ edge.fromPort } input-port={ edge.toPort } destination={ edge.to.id }></out-edge>
-          } else {
-            logger.error(s"Binding has output edge named ${edge.fromPort}")
-          }
-        }
-        outlist += xml.Text("\n" + indent)
-        nodes += xml.Text(indent)
-        nodes += <outputs>{ outlist }</outputs>
-      case _ => Unit
-    }
-     */
 
     nodes += xml.Text("\n" + indent)
     nodes += dumpOpenChildren(depth)

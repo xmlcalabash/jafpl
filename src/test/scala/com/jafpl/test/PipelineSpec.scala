@@ -35,7 +35,7 @@ class PipelineSpec extends AnyFlatSpec {
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
 
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 2)
     assert(((bc.items(0) == "Hello") && (bc.items(1) == "World"))
@@ -63,7 +63,7 @@ class PipelineSpec extends AnyFlatSpec {
     val bc2 = new BufferConsumer()
     runtime.outputs("result2").setConsumer(bc2)
 
-    runtime.run()
+    runtime.runSync()
 
     assert(bc1.items.size == 1)
     assert(bc1.items.head == "ONE")
@@ -90,7 +90,7 @@ class PipelineSpec extends AnyFlatSpec {
     val runtime = new GraphRuntime(graph, runtimeConfig)
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "doc1")
@@ -115,7 +115,7 @@ class PipelineSpec extends AnyFlatSpec {
     val runtime = new GraphRuntime(graph, runtimeConfig)
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "doc1")
@@ -146,7 +146,7 @@ class PipelineSpec extends AnyFlatSpec {
       // This will throw an exception because there's no "fred" output
       val bc2 = new BufferConsumer()
       runtime.outputs("fred").setConsumer(bc2)
-      runtime.run()
+      runtime.runSync()
       pass = false
     } catch {
       case _: Throwable =>

@@ -34,7 +34,7 @@ class ContainerSpec extends AnyFlatSpec {
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
 
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "doc2")
@@ -62,7 +62,7 @@ class ContainerSpec extends AnyFlatSpec {
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
 
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "doc1")

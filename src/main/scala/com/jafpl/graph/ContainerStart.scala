@@ -1,6 +1,7 @@
 package com.jafpl.graph
 
 import com.jafpl.graph.JoinMode.JoinMode
+import com.jafpl.runtime.{ExpressionEvaluator, GraphRuntime}
 import com.jafpl.steps.{ManifoldSpecification, Step, ViewportComposer}
 import com.jafpl.util.{ItemComparator, ItemTester}
 
@@ -296,8 +297,8 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * binding in order to read its computed value at runtime.
     *
     * Option bindings consist of a name and an expression. The name and expression are
-    * arbitrary. At runtime the [[com.jafpl.runtime.ExpressionEvaluator]] provided as
-    * part of the [[com.jafpl.runtime.GraphRuntime]] must understand how to evaluate
+    * arbitrary. At runtime the [[ExpressionEvaluator]] provided as
+    * part of the [[GraphRuntime]] must understand how to evaluate
     * the expression.
     *
     * Unlike a variable, an option value can be supplied at runtime which will
@@ -335,8 +336,8 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * binding in order to read its computed value at runtime.
     *
     * Variable bindings consist of a name and an expression. The name and expression are
-    * arbitrary. At runtime the [[com.jafpl.runtime.ExpressionEvaluator]] provided as
-    * part of the [[com.jafpl.runtime.GraphRuntime]] must understand how to evaluate
+    * arbitrary. At runtime the [[ExpressionEvaluator]] provided as
+    * part of the [[GraphRuntime]] must understand how to evaluate
     * the expression.
     *
     * At runtime, the computed values are provided to steps through binding edges.

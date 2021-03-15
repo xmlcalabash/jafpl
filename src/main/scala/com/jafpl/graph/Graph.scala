@@ -1,11 +1,11 @@
 package com.jafpl.graph
 
 import java.io.{File, PrintWriter}
-
 import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.{JafplException, JafplLoopDetected}
 import com.jafpl.graph.JoinMode.JoinMode
-import com.jafpl.steps.{Manifold, ManifoldSpecification, Step, ViewportComposer}
+import com.jafpl.runtime.GraphRuntime
+import com.jafpl.steps.{Manifold, ManifoldSpecification, PortCardinality, PortSpecification, Step, ViewportComposer}
 import com.jafpl.util.{ItemComparator, ItemTester, UniqueId}
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -16,7 +16,7 @@ import scala.reflect.ClassTag
 /** A pipeline graph.
   *
   * This is the fundamental API for constructing pipeline graphs. Once constructed,
-  * graphs can be executed with the [[com.jafpl.runtime.GraphRuntime]].
+  * graphs can be executed with the [[GraphRuntime]].
   *
   * Graphs are initially open, meaning that nodes and edges can be added to them,
   * and !valid, meaning that no attempt has been made to validate them.
@@ -59,6 +59,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   }
 
   protected[jafpl] def nodes: List[Node] = _nodes.toList
+  protected[jafpl] def edges: List[Edge] = _edges.toList
 
   // protected[model] def children[T <: Artifact](implicit tag: ClassTag[T]): List[T] = {
   protected[jafpl] def tnodes[T <: Node](implicit tag: ClassTag[T]): List[T] = {
@@ -265,8 +266,19 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
     logger.debug(s"G$uid addForEach ${label.getOrElse("ANONYMOUS")}")
 
+    // The "current" port is magic, make sure it's in the output manifold
+    var stepManifold = manifold
+    if (!manifold.outputSpec.wildcard && !manifold.outputSpec.ports.contains("current")) {
+      val ospec = mutable.HashMap.empty[String, PortCardinality]
+      ospec.put("current", PortCardinality.ZERO_OR_MORE)
+      for (port <- manifold.outputSpec.ports) {
+        ospec.put(port, manifold.outputSpec.cardinality(port).get)
+      }
+      stepManifold = new Manifold(manifold.inputSpec, new PortSpecification(ospec.toMap))
+    }
+
     val end = new ContainerEnd(this)
-    val start = new LoopEachStart(this, end, label, manifold)
+    val start = new LoopEachStart(this, end, label, stepManifold)
     end.parent = start
     end.start = start
     _nodes += start
@@ -568,7 +580,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     // Find the variable
     val binding = findInScopeBinding(varname, to)
     if (binding.isEmpty) {
-      error(JafplException.variableNotInScope(varname.toString, to.toString, to.location))
+      error(JafplException.variableNotInScope(varname, to.toString, to.location))
     } else {
       addBindingEdge(binding.get, to)
     }
@@ -680,8 +692,6 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     varnames.toSet
   }
 
-  protected[graph] def edges: List[Edge] = _edges.toList
-
   protected[jafpl] def edgesFrom(node: Node): List[Edge] = {
     val outboundEdges = ListBuffer.empty[Edge]
     for (edge <- _edges) {
@@ -762,8 +772,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       if (readers.nonEmpty) {
         val catchStart = csnode.asInstanceOf[CatchStart]
         logger.debug(s"G$uid addAtomic exception translator for ${csnode.step}")
-        val node = new AtomicNode(this, catchStart.translator, None)
-        _nodes += node
+        val node = catchStart.addAtomic(catchStart.translator.get, s"${catchStart.translator.get}")
 
         for (edge <- readers) {
           // Replace this with an edge that reads from the translator
@@ -818,7 +827,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
             }
             if (map.nonEmpty) {
               val varname = map.toList.head
-              error(JafplException.requiredVariableBindingMissing(varname.toString, atomic.toString, node.location))
+              error(JafplException.requiredVariableBindingMissing(varname, atomic.toString, node.location))
             }
           }
 
@@ -1058,36 +1067,42 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     }
 
     // For every case where an edge crosses from outside a loop
-    // into a loop, add a buffer
+    // into a loop, add a buffer. This loop is a little complicated
+    // because it has to be organized to avoid mutating the _edges
+    // during the loop
     var added = true
+    var loop = Option.empty[ContainerStart]
+    var bufedge = Option.empty[Edge]
     while (added) {
       added = false
+      loop = None
       for (edge <- _edges) {
-        val ancestor = commonAncestor(edge.from, edge.to)
-        val isBuffer = edge.to match {
-          case buf: Buffer => true
-          case _ => false
-        }
-        if (isBuffer || ancestor.isEmpty || (edge.from == edge.to)) {
-          // nevermind, no buffers needed here
-        } else {
-          var walker = edge.to.parent.get
-          var loop = Option.empty[ContainerStart]
-          while (walker != ancestor.get) {
-            walker match {
-              case node: LoopStart =>
-                loop = Some(node)
-              case _ => ()
+        if (loop.isEmpty) {
+          val ancestor = commonAncestor(edge.from, edge.to)
+          val isBuffer = edge.to match {
+            case _: Buffer => true
+            case _ => false
+          }
+          if (isBuffer || ancestor.isEmpty || (edge.from == edge.to)) {
+            // nevermind, no buffers needed here
+          } else {
+            var walker = edge.to.parent.get
+            while (loop.isEmpty && walker != ancestor.get) {
+              walker match {
+                case node: LoopStart =>
+                  loop = Some(node)
+                  bufedge = Some(edge)
+                case _ => ()
+              }
+              walker = walker.parent.get
             }
-            walker = walker.parent.get
-          }
-
-          if (loop.isDefined) {
-            added = true
-            addBuffer(loop.get, edge)
-            debugDumpGraph()
           }
         }
+      }
+      if (loop.isDefined) {
+        added = true
+        addBuffer(loop.get, bufedge.get)
+        debugDumpGraph()
       }
     }
 
@@ -1164,28 +1179,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       }
     }
 
-/*
-    for (node <- _nodes) {
-      node match {
-        case start: ContainerStart =>
-          node.openInputSet = Some(node.inputs)
-          var outputs = Set.empty[String]
-          for (port <- node.outputs) {
-            if (!node.openInputSet.get.contains(port)) {
-              outputs += port
-            }
-          }
-          for (port <- start.containerEnd.inputs) {
-            outputs += port
-          }
-          node.openOutputSet = Some(outputs)
-        case _ =>
-          node.openInputSet = Some(node.inputs)
-          node.openOutputSet = Some(node.outputs)
-      }
-    }
-*/
-
+    // What in $DEITY's name was this about?
+    /*
     val patchEdges = ListBuffer.empty[Edge]
     for (edge <- _edges) {
       edge.to match {
@@ -1197,6 +1192,27 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     }
     _edges.clear()
     _edges ++= patchEdges
+    */
+
+    // Following on from the weird commented out code above; for some reason the output
+    // edges from a compound step are from the start. They should be from the end.
+    val patchEdges = ListBuffer.empty[Edge]
+    for (edge <- _edges) {
+      edge.from match {
+        case start: ContainerStart =>
+          val anc = commonAncestor(start, edge.to)
+          if (anc.isEmpty || anc.get != start) {
+            val newedge = new Edge(this, start.containerEnd, edge.fromPort, edge.to, edge.toPort)
+            patchEdges += newedge
+          } else {
+            patchEdges += edge
+          }
+        case _ => patchEdges += edge
+      }
+    }
+    _edges.clear()
+    _edges ++= patchEdges
+
 
     val patchNodes = ListBuffer.empty[Node]
     for (node <- _nodes) {
@@ -1323,7 +1339,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   def dump(): Unit = {
     for (node <- _nodes) {
       if (node.parent.isDefined) {
-        println(s"$node (${node.parent.get}")
+        println(s"$node (${node.parent.get})")
       } else {
         println(s"$node")
       }

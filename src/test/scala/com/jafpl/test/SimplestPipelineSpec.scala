@@ -18,7 +18,7 @@ class SimplestPipelineSpec extends AnyFlatSpec {
     graph.addEdge(producer, "result", sink, "source")
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
-    runtime.run()
+    runtime.runSync()
   }
 
   "The almost-identity pipeline " should " run" in {
@@ -32,13 +32,13 @@ class SimplestPipelineSpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "DOCUMENT")
   }
 
-    "A pipeline with splits and joins " should " run" in {
+  "A pipeline with splits and joins " should " run" in {
       val graph    = Jafpl.newInstance().newGraph()
       val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
       val producer = pipeline.addAtomic(new Producer(List("DOCUMENT")), "producer")
@@ -53,7 +53,7 @@ class SimplestPipelineSpec extends AnyFlatSpec {
       graph.addEdge(ident2, "result", sink, "source")
 
       val runtime = new GraphRuntime(graph, runtimeConfig)
-      runtime.run()
+      runtime.runSync()
     }
 
     "A dependency " should " determine step order" in {
@@ -72,7 +72,7 @@ class SimplestPipelineSpec extends AnyFlatSpec {
 
       val runtime = new GraphRuntime(graph, runtimeConfig)
       runtime.outputs("result").setConsumer(bc)
-      runtime.run()
+      runtime.runSync()
 
       assert(bc.items.size == 2)
       assert(bc.items(0) == "P1")
@@ -98,7 +98,7 @@ class SimplestPipelineSpec extends AnyFlatSpec {
 
       val runtime = new GraphRuntime(graph, runtimeConfig)
       runtime.outputs("result").setConsumer(bc)
-      runtime.run()
+      runtime.runSync()
 
       assert(bc.items.size == 3)
       assert(bc.items.head == "P1")

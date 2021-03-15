@@ -43,7 +43,7 @@ trait Step extends DataConsumer with ManifoldSpecification {
     *
     * @param location The location associated with this step.
     */
-  def location_=(location: Location)
+  def location_=(location: Location): Unit
 
   /** The names of the variable bindings this step requires.
     *
@@ -59,7 +59,7 @@ trait Step extends DataConsumer with ManifoldSpecification {
     *
     * @param consumer The consumer.
     */
-  def setConsumer(consumer: DataConsumer)
+  def setConsumer(consumer: DataConsumer): Unit
 
   /** Receive a binding.
     *
@@ -67,7 +67,7 @@ trait Step extends DataConsumer with ManifoldSpecification {
     *
     * @param message The binding message.
     */
-  def receiveBinding(message: BindingMessage)
+  def receiveBinding(message: BindingMessage): Unit
 
   /** One time, startup initialization.
     *
@@ -77,14 +77,14 @@ trait Step extends DataConsumer with ManifoldSpecification {
     * @param config The runtime configuration used by this pipeline
     *
     */
-  def initialize(config: RuntimeConfiguration)
+  def initialize(config: RuntimeConfiguration): Unit
 
   /** Run!
     *
     * All inputs have been recieved, so your deal.
     *
     */
-  def run()
+  def run(): Unit
 
   /** Reset to starting conditions.
     *
@@ -92,7 +92,7 @@ trait Step extends DataConsumer with ManifoldSpecification {
     * get yourself ready!
     *
     */
-  def reset()
+  def reset(): Unit
 
   /** Abort processing.
     *
@@ -103,12 +103,12 @@ trait Step extends DataConsumer with ManifoldSpecification {
     * is in a loop.
     *
     */
-  def abort()
+  def abort(): Unit
 
   /** Stop processing.
     *
     * This method will be called when all processing has finished and the pipeline
     * is about to end.
     */
-  def stop()
+  def stop(): Unit
 }

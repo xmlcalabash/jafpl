@@ -26,7 +26,7 @@ class IOPipelineSpec extends AnyFlatSpec {
     runtime.inputs("source").send(new ItemMessage("P1", Metadata.BLANK))
     runtime.inputs("source").send(new ItemMessage("P2", Metadata.BLANK))
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 2)
     assert(bc.items(0) == "P1")

@@ -21,8 +21,7 @@ class GroupSpec extends AnyFlatSpec {
     graph.addEdge(ident, "result", group, "result")
     graph.addEdge(group, "result", sink, "source")
 
-    //println(graph.asXML)
     val runtime = new GraphRuntime(graph, runtimeConfig)
-    runtime.run()
+    runtime.runSync()
   }
 }

@@ -68,7 +68,7 @@ class ChooseSpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "WHEN1")
@@ -102,7 +102,7 @@ class ChooseSpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "WHEN2")
@@ -136,7 +136,7 @@ class ChooseSpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "WHEN1")
@@ -170,7 +170,7 @@ class ChooseSpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.isEmpty)
   }
@@ -228,7 +228,7 @@ class ChooseSpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "WHEN5")
@@ -257,7 +257,7 @@ class ChooseSpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "WHEN1")
@@ -296,7 +296,7 @@ class ChooseSpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "WHEN2")
@@ -334,7 +334,7 @@ class ChooseSpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "WHEN1")
@@ -389,7 +389,7 @@ class ChooseSpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 5)
     assert(bc.items(0) == "WHEN1")
@@ -430,7 +430,7 @@ class ChooseSpec extends AnyFlatSpec {
     var pass = false
     try {
       runtime.outputs("result").setConsumer(bc)
-      runtime.run()
+      runtime.runSync()
     } catch {
       case _: Exception =>
         pass = true

@@ -24,7 +24,7 @@ class JoinerSpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 4)
   }
@@ -43,7 +43,7 @@ class JoinerSpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 4)
     assert(bc.items(0) == "A1")
@@ -86,7 +86,7 @@ class JoinerSpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 2)
     assert(bc.items(0) == "A1")
@@ -107,7 +107,7 @@ class JoinerSpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 2)
     assert(bc.items(0) == "B1")
@@ -130,7 +130,7 @@ class JoinerSpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 2)
     assert(bc.items(0) == "A1")
@@ -153,7 +153,7 @@ class JoinerSpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 4)
     assert(bc.items(0) == "B1")

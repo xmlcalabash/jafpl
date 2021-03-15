@@ -4,7 +4,7 @@ import com.jafpl.graph.Location
 import com.jafpl.messages.{BindingMessage, Message}
 import com.jafpl.runtime.RuntimeConfiguration
 
-class DefaultStep  extends Step {
+class DefaultStep extends Step {
   protected var _location = Option.empty[Location]
 
   override def inputSpec: PortSpecification = PortSpecification.ANY

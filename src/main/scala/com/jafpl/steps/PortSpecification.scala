@@ -48,6 +48,14 @@ class PortSpecification(spec: immutable.Map[String,PortCardinality]) {
     spec.keySet.filter(_ != PortSpecification.WILDCARD)
   }
 
+  /** A port specification that includes a wildcard allows any ports without constraints.
+   *
+   * @return true iff a wildcard is allowed
+   */
+  def wildcard: Boolean = {
+    spec.keySet.contains(PortSpecification.WILDCARD)
+  }
+
   def cardinality(port: String): Option[PortCardinality] = {
     if (spec.contains(port)) {
       Some(spec(port))

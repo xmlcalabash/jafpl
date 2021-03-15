@@ -13,15 +13,15 @@ class PortCardinality(private val minimumCardinality: Long, private val maximumC
     || maximumCardinality.get == PortCardinality.UNBOUNDED
     || maximumCardinality.get >= minimumCardinality)
 
-  def this() {
+  def this() = {
     this(0, None)
   }
 
-  def this(min: Long) {
+  def this(min: Long) = {
     this(min, None)
   }
 
-  def this(min: Long, max: Long) {
+  def this(min: Long, max: Long) = {
     this(min, Some(max))
   }
 

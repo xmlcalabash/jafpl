@@ -1,5 +1,7 @@
 package com.jafpl.graph
 
+import com.jafpl.steps.{ManifoldSpecification, PortSpecification}
+
 /** A variable binding.
   *
   * When pipelines are constructed, variable bindings associate expressions with variable names.
@@ -13,7 +15,7 @@ package com.jafpl.graph
 class Binding protected[jafpl] (override val graph: Graph,
                                 val name: String,
                                 val expression: Any,
-                                val params: Option[BindingParams]) extends AtomicNode(graph, None, None) {
+                                val params: Option[BindingParams]) extends AtomicNode(graph, None, None) with ManifoldSpecification {
 
   protected var _start: Option[ContainerStart] = None
   protected val _label = s"$name-$id"
@@ -66,4 +68,8 @@ class Binding protected[jafpl] (override val graph: Graph,
     }
     valid
   }
+
+  def inputSpec: PortSpecification = PortSpecification.ANY
+  def outputSpec: PortSpecification = PortSpecification.RESULT
+  override def manifold: Option[ManifoldSpecification] = Some(this)
 }

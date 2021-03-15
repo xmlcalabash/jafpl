@@ -78,7 +78,7 @@
       </pg:outputs>
    </pg:node>
    <pg:node name="loop_end_6"
-            step="com.jafpl.runtime.DefaultEnd@793be5ca"
+            step="com.jafpl.akka.DefaultEnd@793be5ca"
             uid="7">
       <pg:inputs>
          <pg:in-edge source="5" input-port="I_result" output-port="result"/>
@@ -88,7 +88,7 @@
       </pg:outputs>
    </pg:node>
    <pg:node name="loop_start_8"
-            step="com.jafpl.runtime.ForEachIterator@625732"
+            step="com.jafpl.akka.ForEachIterator@625732"
             uid="9">
       <pg:inputs>
          <pg:in-edge source="12" input-port="source" output-port="result_2"/>

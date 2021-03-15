@@ -18,17 +18,17 @@ class ViewportSpec extends AnyFlatSpec {
     val prod     = pipeline.addAtomic(new Producer(List("Now is the time; just do it.")), "prod")
     val viewport = pipeline.addViewport(new StringComposer(), "viewport")
     val uc       = viewport.addAtomic(new Uppercase(), "uc")
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(prod, "result", viewport, "source")
     graph.addEdge(viewport, "current", uc, "source")
     graph.addEdge(uc, "result", viewport, "result")
     graph.addEdge(viewport, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     graph.close()
     val runtime = new GraphRuntime(graph, runtimeConfig)
-    runtime.run()
+    runtime.outputs("result").setConsumer(bc)
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "NOW IS THE TIME; JUST DO IT.")
@@ -43,17 +43,17 @@ class ViewportSpec extends AnyFlatSpec {
     val prod     = pipeline.addAtomic(new Producer(List("Now is the time; just do it.")), "prod")
     val viewport = pipeline.addViewport(new StringComposer(), "viewport")
     val uc       = viewport.addAtomic(new Uppercase(), "uc")
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(prod, "result", viewport, "source")
     graph.addEdge(viewport, "current", uc, "source")
     graph.addEdge(uc, "result", viewport, "fribble")
     graph.addEdge(viewport, "fribble", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     graph.close()
     val runtime = new GraphRuntime(graph, runtimeConfig)
-    runtime.run()
+    runtime.outputs("result").setConsumer(bc)
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "NOW IS THE TIME; JUST DO IT.")
@@ -68,17 +68,17 @@ class ViewportSpec extends AnyFlatSpec {
     val prod     = pipeline.addAtomic(new Producer(List()), "prod")
     val viewport = pipeline.addViewport(new StringComposer(), "viewport")
     val uc       = viewport.addAtomic(new Uppercase(), "uc")
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addEdge(prod, "result", viewport, "source")
     graph.addEdge(viewport, "current", uc, "source")
     graph.addEdge(uc, "result", viewport, "result")
     graph.addEdge(viewport, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     graph.close()
     val runtime = new GraphRuntime(graph, runtimeConfig)
-    runtime.run()
+    runtime.outputs("result").setConsumer(bc)
+    runtime.runSync()
 
     assert(bc.items.isEmpty)
   }
@@ -93,7 +93,6 @@ class ViewportSpec extends AnyFlatSpec {
     val prod     = pipeline.addAtomic(new Producer(List("one two")), "prod")
     val viewport = pipeline.addViewport(new StringComposer(), "viewport")
     val uc       = viewport.addAtomic(new Uppercase(), "uc")
-    val consumer = pipeline.addAtomic(bc, "consumer")
 
     graph.addBindingEdge(bind, viewport)
 
@@ -101,11 +100,12 @@ class ViewportSpec extends AnyFlatSpec {
     graph.addEdge(viewport, "current", uc, "source")
     graph.addEdge(uc, "result", viewport, "result")
     graph.addEdge(viewport, "result", pipeline, "result")
-    graph.addEdge(pipeline, "result", consumer, "source")
+    graph.addOutput(pipeline, "result")
 
     graph.close()
     val runtime = new GraphRuntime(graph, runtimeConfig)
-    runtime.run()
+    runtime.outputs("result").setConsumer(bc)
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "ONE TWO")

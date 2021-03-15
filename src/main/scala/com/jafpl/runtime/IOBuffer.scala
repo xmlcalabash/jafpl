@@ -6,7 +6,7 @@ import com.jafpl.steps.DataConsumer
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-private[runtime] class IOBuffer extends DataConsumer {
+private[jafpl] class IOBuffer extends DataConsumer {
   private val buffer = mutable.HashMap.empty[String, ListBuffer[Message]]
 
   /** Send output from a step.

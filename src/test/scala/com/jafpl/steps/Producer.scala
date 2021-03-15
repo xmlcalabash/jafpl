@@ -3,7 +3,7 @@ package com.jafpl.steps
 import com.jafpl.messages.{ItemMessage, Metadata}
 
 class Producer(val items: List[Any]) extends DefaultStep {
-  def this(str: Any) {
+  def this(str: Any) = {
     this(List(str))
   }
 

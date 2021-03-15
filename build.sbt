@@ -4,7 +4,7 @@ name := "jafpl"
 
 organization := "com.jafpl"
 homepage     := Some(url("https://jafpl.com/"))
-version      := "0.2.41"
+version      := "0.3.1"
 scalaVersion := "2.13.5"
 
 buildInfoUsePackageAsPath := true
@@ -114,8 +114,6 @@ libraryDependencies ++= Seq(
   "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.12.1",
   "org.slf4j" % "jcl-over-slf4j" % "1.7.25",
   "org.slf4j" % "slf4j-api" % "1.7.25",
-  "com.typesafe.akka" %% "akka-actor" % "2.6.10",
-  "com.typesafe.akka" %% "akka-testkit" % "2.6.10" % Test,
   "org.scalactic" %% "scalactic" % "3.2.3",
   "org.scalatest" %% "scalatest" % "3.2.3" % "test",
   "org.scala-lang.modules" %% "scala-xml" % "1.3.0",
@@ -126,7 +124,9 @@ libraryDependencies ++= Seq(
 // Yes, this is an odd place for local use, but it's where the website
 // needs them. I should figure out how to parameterize the location...
 target in Compile in doc := baseDirectory.value / "build/pages/apidocs"
-scalacOptions in (Compile, doc) ++= Seq(
-  "-doc-root-content", baseDirectory.value+"/docs/apidocs/root.md",
-  "-no-link-warnings", "-deprecation"
-)
+//scalacOptions in (Compile, doc) ++= Seq(
+//  "-doc-root-content", baseDirectory.value+"/docs/apidocs/root.md",
+//  "-no-link-warnings", "-deprecation"
+//)
+
+scalacOptions := Seq("-unchecked", "-deprecation")

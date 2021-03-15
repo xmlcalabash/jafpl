@@ -11,6 +11,6 @@ private[jafpl] class Edge(val graph: Graph,
   }
 
   override def toString: String = {
-    from + "." + fromPort + " -> " + to + "." + toPort + " (" + mode + ")"
+    s"${from}.${fromPort} -> ${to}.${toPort} (${mode})"
   }
 }

@@ -27,7 +27,7 @@ class BindingSpec extends AnyFlatSpec {
 
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "Hello, World")
@@ -51,7 +51,7 @@ class BindingSpec extends AnyFlatSpec {
 
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.isEmpty)
   }
@@ -74,7 +74,7 @@ class BindingSpec extends AnyFlatSpec {
     graph.close()
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == "twelve")

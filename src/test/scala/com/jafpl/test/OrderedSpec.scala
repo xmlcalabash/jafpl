@@ -39,7 +39,7 @@ class OrderedSpec extends AnyFlatSpec {
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
 
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.length == 4)
     assert(bc.items.head == "One")
@@ -72,7 +72,7 @@ class OrderedSpec extends AnyFlatSpec {
     val bc = new BufferConsumer()
     runtime.outputs("result").setConsumer(bc)
 
-    runtime.run()
+    runtime.runSync()
     assert(bc.items.length == 4)
     assert(bc.items.head == "One")
     assert(bc.items(1) == "Two")

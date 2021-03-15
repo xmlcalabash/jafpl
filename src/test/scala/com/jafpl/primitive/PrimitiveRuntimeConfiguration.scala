@@ -1,7 +1,6 @@
 package com.jafpl.primitive
 
 import com.jafpl.runtime.{ExpressionEvaluator, RuntimeConfiguration}
-import com.jafpl.runtime.RuntimeConfiguration
 
 import scala.collection.mutable
 
@@ -10,7 +9,7 @@ class PrimitiveRuntimeConfiguration(val traceAll: Boolean) extends RuntimeConfig
   private val enabledTraces = mutable.HashSet.empty[String]
   private val disabledTraces = mutable.HashSet.empty[String]
 
-  def this() {
+  def this() = {
     this(false)
   }
 
@@ -47,12 +46,5 @@ class PrimitiveRuntimeConfiguration(val traceAll: Boolean) extends RuntimeConfig
     }
   }
 
-  override def watchdogTimeout: Long = {
-    var timeout: Long = 1000
-    val prop = Option(System.getProperty("com.xmlcalabash.watchdogTimeout"))
-    if (prop.isDefined) {
-      timeout = prop.get.toLong
-    }
-    timeout
-  }
+  override def threadPoolSize: Int = 5
 }

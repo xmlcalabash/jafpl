@@ -27,7 +27,7 @@ class ExceptionSpec extends AnyFlatSpec {
     try {
       val runtime = new GraphRuntime(graph, runtimeConfig)
       runtime.outputs("result").setConsumer(bc)
-      runtime.run()
+      runtime.runSync()
     } catch {
       case _: Exception =>
         pass = true

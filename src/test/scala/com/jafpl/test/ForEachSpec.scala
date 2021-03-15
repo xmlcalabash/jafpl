@@ -27,7 +27,7 @@ class ForEachSpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     var count = 1
     for (buf <- bc.items) {
@@ -58,7 +58,7 @@ class ForEachSpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 1)
     assert(bc.items.head == 3)
@@ -88,7 +88,7 @@ class ForEachSpec extends AnyFlatSpec {
 
     val runtime = new GraphRuntime(graph, runtimeConfig)
     runtime.outputs("result").setConsumer(bc)
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 3)
     for (item <- bc.items) {
@@ -121,7 +121,7 @@ class ForEachSpec extends AnyFlatSpec {
 
     runtime.outputs("result").setConsumer(bc)
 
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.size == 3)
     for (item <- bc.items) {
@@ -149,7 +149,7 @@ class ForEachSpec extends AnyFlatSpec {
 
     runtime.outputs("result").setConsumer(bc)
 
-    runtime.run()
+    runtime.runSync()
 
     assert(bc.items.isEmpty)
   }

@@ -1,6 +1,6 @@
 package com.jafpl.graph
 
-import com.jafpl.steps.ViewportComposer
+import com.jafpl.steps.{Manifold, ManifoldSpecification, PortSpecification, ViewportComposer}
 
 private[jafpl] class ViewportStart(override val graph: Graph,
                                    override protected val end: ContainerEnd,
@@ -10,6 +10,9 @@ private[jafpl] class ViewportStart(override val graph: Graph,
   private var _outputPort = ""
 
   def outputPort: String = _outputPort
+
+  // FIXME: don't allow a sequence on source!
+  override def manifold: Option[ManifoldSpecification] = Some(Manifold.ALLOW_ANY)
 
   override def inputsOk(): Boolean = {
     var hasSource = false

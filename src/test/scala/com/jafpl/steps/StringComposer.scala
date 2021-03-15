@@ -11,7 +11,7 @@ class StringComposer(location: Option[Location]) extends ViewportComposer {
   private val items = ListBuffer.empty[StringViewportItem]
   private var suffix = ""
 
-  def this() {
+  def this() = {
     this(None)
   }
 

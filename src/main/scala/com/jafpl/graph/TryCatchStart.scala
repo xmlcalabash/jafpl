@@ -1,12 +1,15 @@
 package com.jafpl.graph
 
 import com.jafpl.exceptions.JafplException
-import com.jafpl.steps.{ManifoldSpecification, Step, ViewportComposer}
+import com.jafpl.steps.{Manifold, ManifoldSpecification, Step, ViewportComposer}
 
 class TryCatchStart private[jafpl] (override val graph: Graph,
                                     override protected val end: ContainerEnd,
                                     override val userLabel: Option[String])
   extends ContainerStart(graph, end, userLabel) {
+
+  // FIXME: Is this right?
+  override def manifold: Option[ManifoldSpecification] = Some(Manifold.ALLOW_ANY)
 
   def addTry(label: String): TryStart = addTry(Some(label))
 

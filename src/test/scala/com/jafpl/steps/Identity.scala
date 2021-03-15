@@ -8,11 +8,11 @@ class Identity(allowSeq: Boolean, label: String) extends DefaultStep {
   var ready = false
   val buf = ListBuffer.empty[Message]
 
-  def this() {
+  def this() = {
     this(true, "")
   }
 
-  def this(allowSeq: Boolean) {
+  def this(allowSeq: Boolean) = {
     this(allowSeq, "")
   }
 
