@@ -29,14 +29,6 @@ abstract class Node(val graph: Graph,
   protected[jafpl] val outputInjectables: ListBuffer[PortInjectable] = ListBuffer.empty[PortInjectable]
   protected[jafpl] val stepInjectables: ListBuffer[StepInjectable] = ListBuffer.empty[StepInjectable]
 
-  // After the graph is patched to remove the "end" nodes; inputs and outputs become muddled.
-  // Before doing that patch, we store the final sets in these variables so that the correct
-  // answers are available after the patch.
-  //protected[jafpl] var openInputSet: Option[Set[String]] = None
-  //protected[jafpl] var openOutputSet: Option[Set[String]] = None
-
-  protected[jafpl] val inputCardinalities = mutable.HashMap.empty[String,Long]
-  protected[jafpl] val outputCardinalities = mutable.HashMap.empty[String,Long]
   protected[jafpl] val _staticBindings = mutable.HashMap.empty[Binding,Message]
   private var _manifold: Option[ManifoldSpecification] = if (step.isDefined) {
     step

@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import com.jafpl.exceptions.JafplException
-import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, EmptySource, FinallyStart, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopForStart, LoopStart, LoopUntilStart, LoopWhileStart, Node, PipelineStart, Sink, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
+import com.jafpl.graph.{AtomicNode, Binding, Buffer, CatchStart, ChooseStart, ContainerEnd, ContainerStart, Edge, EmptySource, FinallyStart, GraphInput, GraphOutput, GroupStart, Joiner, LoopEachStart, LoopForStart, LoopStart, LoopUntilStart, LoopWhileStart, Node, PipelineStart, Sink, Splitter, TryCatchStart, TryStart, ViewportStart, WhenStart}
 import com.jafpl.messages.Message
 import com.jafpl.runtime.NodeState.NodeState
 import com.jafpl.util.TraceEventManager
@@ -128,6 +128,51 @@ class GraphStatus(val scheduler: Scheduler) {
       }
     }
     tracer.trace("debug", s"MUTEX UNLOCK for finished($node)", TraceEventManager.MUTEX)
+  }
+
+  def checkCardinalities(edge: Edge): Option[Throwable] = {
+    var ex = Option.empty[Throwable]
+
+    tracer.trace("debug", s"MUTEX LOCK for cardinalities on $edge", TraceEventManager.MUTEX)
+    nodeStatus.synchronized {
+      tracer.trace("debug", s"MUTEX LOCKED for cardinalities on $edge", TraceEventManager.MUTEX)
+      ex = nodeStatus(edge.from).sentFrom(edge.fromPort)
+      if (ex.isEmpty && edge.toPort != "#bindings") {
+        ex = nodeStatus(edge.to).receivedOn(edge.toPort)
+      }
+    }
+    tracer.trace("debug", s"MUTEX UNLOCK for cardinalities on $edge", TraceEventManager.MUTEX)
+    ex
+  }
+
+  def checkInputCardinalities(node: Node): Option[Throwable] = {
+    var ex = Option.empty[Throwable]
+    tracer.trace("debug", s"MUTEX LOCK for checkInputCardinalities for $node", TraceEventManager.MUTEX)
+    nodeStatus.synchronized {
+      tracer.trace("debug", s"MUTEX LOCKED for checkInputCardinalities for $node", TraceEventManager.MUTEX)
+      for (port <- node.inputs) {
+        if (ex.isEmpty) {
+          ex = nodeStatus(node).checkInputCardinality(port)
+        }
+      }
+    }
+    tracer.trace("debug", s"MUTEX UNLOCKED for checkInputCardinalities for $node", TraceEventManager.MUTEX)
+    ex
+  }
+
+  def checkOutputCardinalities(node: Node): Option[Throwable] = {
+    var ex = Option.empty[Throwable]
+    tracer.trace("debug", s"MUTEX LOCK for checkOutputCardinalities for $node", TraceEventManager.MUTEX)
+    nodeStatus.synchronized {
+      tracer.trace("debug", s"MUTEX LOCKED for checkOutputCardinalities for $node", TraceEventManager.MUTEX)
+      for (port <- node.outputs) {
+        if (ex.isEmpty) {
+          ex = nodeStatus(node).checkOutputCardinality(port)
+        }
+      }
+    }
+    tracer.trace("debug", s"MUTEX UNLOCKED for checkOutputCardinalities for $node", TraceEventManager.MUTEX)
+    ex
   }
 
   def receive(fromNode: Node, fromPort: String, toNode: Node, toPort: String, message: Message): Unit = {

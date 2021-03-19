@@ -1,8 +1,10 @@
 package com.jafpl.runtime
 
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{Buffer, CatchStart, ChooseStart, ContainerEnd, Node, WhenStart}
 import com.jafpl.messages.Message
 import com.jafpl.runtime.NodeState.NodeState
+import com.jafpl.steps.PortSpecification
 import com.jafpl.util.TraceEventManager
 
 import scala.collection.immutable.HashSet
@@ -15,6 +17,10 @@ class NodeStatus(val node: Node, val action: Action, tracer: TraceEventManager) 
   private val _openBindings = mutable.HashSet.empty[String]
   private val _buffers = mutable.HashMap.empty[String, ListBuffer[Message]]
   private val _dependsOn = mutable.HashSet.empty[Node]
+  private var inputSpecification = Option.empty[PortSpecification]
+  private var outputSpecification = Option.empty[PortSpecification]
+  private val inputCardinalities = mutable.HashMap.empty[String,Long]
+  private val outputCardinalities = mutable.HashMap.empty[String,Long]
 
   init()
 
@@ -25,6 +31,22 @@ class NodeStatus(val node: Node, val action: Action, tracer: TraceEventManager) 
   }
 
   private def init(): Unit = {
+    node match {
+      case end: ContainerEnd =>
+        val start = end.start.get
+        if (start.manifold.isDefined) {
+          // Container ends are just passthroughs; whatever the start can write to,
+          // is the input. And the output is exactly what's written in.
+          inputSpecification = Some(start.manifold.get.outputSpec)
+          outputSpecification = inputSpecification
+        }
+      case _ =>
+        if (node.manifold.isDefined) {
+          inputSpecification = Some(node.manifold.get.inputSpec)
+          outputSpecification = Some(node.manifold.get.outputSpec)
+        }
+    }
+
     doReset(NodeState.RUNNABLE, false)
   }
 
@@ -71,8 +93,8 @@ class NodeStatus(val node: Node, val action: Action, tracer: TraceEventManager) 
           _state = newState
       }
       action.reset(newState)
-      node.inputCardinalities.clear()
-      node.outputCardinalities.clear()
+      inputCardinalities.clear()
+      outputCardinalities.clear()
     }
   }
 
@@ -138,6 +160,60 @@ class NodeStatus(val node: Node, val action: Action, tracer: TraceEventManager) 
   }
 
   /* ================================================================================ */
+
+  protected[runtime] def receivedOn(port: String): Option[Throwable] = {
+    val count = inputCardinalities.getOrElse(port, 0L) + 1
+    inputCardinalities.put(port, count)
+    tracer.trace(s"CARD  INCR I:${node}.${port}: ${count}", TraceEventManager.CARDINALITY)
+    checkInputCardinality(port)
+  }
+
+  protected[runtime] def checkInputCardinality(port: String): Option[Throwable] = {
+    if (_state != NodeState.STOPPED && !node.isInstanceOf[ContainerEnd]) {
+      val count = inputCardinalities.getOrElse(port, 0L)
+      if (inputSpecification.isDefined) {
+        val card = inputSpecification.get.cardinality(port)
+        if (card.isDefined) {
+          if (!card.get.withinBounds(count)) {
+            return Some(JafplException.inputCardinalityError(port, count.toString, card.get))
+          }
+        } else {
+          tracer.trace(s"CARD? No cardinality for input $port on $node", TraceEventManager.CARDINALITY)
+        }
+      } else {
+        tracer.trace(s"CARD? No input specification on $node", TraceEventManager.CARDINALITY)
+      }
+    }
+
+    None
+  }
+
+  protected[runtime] def sentFrom(port: String): Option[Throwable] = {
+    val count = outputCardinalities.getOrElse(port, 0L) + 1
+    outputCardinalities.put(port, count)
+    tracer.trace(s"CARD  INCR O:${node}.${port}: ${count}", TraceEventManager.CARDINALITY)
+    checkOutputCardinality(port)
+  }
+
+  protected[runtime] def checkOutputCardinality(port: String): Option[Throwable] = {
+    if (_state != NodeState.STOPPED) {
+      val count = outputCardinalities.getOrElse(port, 0L)
+      if (outputSpecification.isDefined) {
+        val card = outputSpecification.get.cardinality(port)
+        if (card.isDefined) {
+          if (!card.get.withinBounds(count)) {
+            return Some(JafplException.outputCardinalityError(port, count.toString, card.get))
+          }
+        } else {
+          tracer.trace(s"CARD? No cardinality for output $port on $node", TraceEventManager.CARDINALITY)
+        }
+      } else {
+        tracer.trace(s"CARD? No output specification on $node", TraceEventManager.CARDINALITY)
+      }
+    }
+
+    None
+  }
 
   def receive(port: String, message: Message): Unit = {
     action.receive(port, message)

@@ -95,9 +95,11 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
 
   private def start(node: Node): Unit = {
     try {
-      for (port <- node.inputs) {
-        val edge = node.inputEdge(port)
-        checkCardinalities(edge)
+      if (_exception.isEmpty) {
+        _exception = graphStatus.checkInputCardinalities(node)
+      }
+      if (_exception.isDefined) {
+        return
       }
 
       node match {
@@ -140,6 +142,13 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
 
   def finish(node: Node): Unit = {
     synchronized {
+      if (_exception.isEmpty) {
+        _exception = graphStatus.checkOutputCardinalities(node)
+      }
+      if (_exception.isDefined) {
+        return
+      }
+
       tracer.trace("FINSH " + node, TraceEventManager.RUN)
       var loopStart = Option.empty[LoopStart]
       node match {
@@ -269,81 +278,17 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
   }
 
   def receive(node: Node, port: String, message: Message): Unit = {
-    try {
-      if (node.hasOutputEdge(port)) {
-        val edge = node.outputEdge(port)
-
-        try {
-          val ocount = edge.from.outputCardinalities.getOrElse(edge.fromPort, 0L)
-          edge.from.outputCardinalities.put(edge.fromPort, ocount + 1)
-          tracer.trace(s"CARD  INCR O:${edge.from}.${edge.fromPort}: ${ocount+1}", TraceEventManager.CARDINALITY)
-
-          val icount = edge.to.inputCardinalities.getOrElse(edge.toPort, 0L)
-          edge.to.inputCardinalities.put(edge.toPort, icount + 1)
-          tracer.trace(s"CARD  INCR I:${edge.to}.${edge.toPort}: ${icount+1}", TraceEventManager.CARDINALITY)
-
-          checkCardinalities(edge)
-        } catch {
-          case t: Throwable =>
-            _exception = Some(t)
-            return
+    if (node.hasOutputEdge(port)) {
+      val edge = node.outputEdge(port)
+      if (_exception.isEmpty) {
+        _exception = graphStatus.checkCardinalities(edge)
+        if (_exception.isEmpty) {
+          graphStatus.receive(edge.from, edge.fromPort, edge.to, edge.toPort, message)
         }
-
-        graphStatus.receive(edge.from, edge.fromPort, edge.to, edge.toPort, message)
-      } else {
-        // Ignore this
-        tracer.trace("debug", s"$node attempted to write to non-existant port $port", TraceEventManager.IO)
       }
-    } catch {
-      case t: Throwable =>
-        _exception = Some(t)
-    }
-  }
-
-  private def checkCardinalities(edge: Edge): Unit = {
-    // The cardinalities of stopped steps (and the steps they connect to) are irrelevant
-    if (graphStatus.state(edge.from) == NodeState.STOPPED) {
-      return
-    }
-
-    val icount = edge.from.outputCardinalities.getOrElse(edge.fromPort, 0L)
-    var manifold = edge.from match {
-      case end: ContainerEnd => end.start.get.manifold
-      case _ => edge.from.manifold
-    }
-
-    try {
-      manifold.get.outputSpec.checkOutputCardinality(edge.fromPort, icount)
-      tracer.trace("CARD  FR " + edge.from + "." + edge.fromPort + ": " + icount, TraceEventManager.CARDINALITY)
-    } catch {
-      case err: Throwable =>
-        if (manifold.isEmpty) {
-          tracer.trace("XCARD FR NO MANIFOLD " + edge.from + "." + edge.fromPort + ": " + icount, TraceEventManager.CARDINALITY)
-        } else {
-          tracer.trace("XCARD FR " + edge.from + "." + edge.fromPort + ": " + icount, TraceEventManager.CARDINALITY)
-        }
-        throw err
-    }
-
-    if (edge.toPort != "#bindings") {
-      val ocount = edge.to.inputCardinalities.getOrElse(edge.toPort, 0L)
-      manifold = edge.to match {
-        case end: ContainerEnd => end.start.get.manifold
-        case _ => edge.to.manifold
-      }
-
-      try {
-        manifold.get.inputSpec.checkInputCardinality(edge.toPort, ocount)
-        tracer.trace("CARD  TO " + edge.to + ": " + edge.toPort + ": " + ocount, TraceEventManager.CARDINALITY)
-      } catch {
-        case err: Throwable =>
-          if (manifold.isEmpty) {
-            tracer.trace("XCARD TO NO MANIFOLD " + edge.to + "." + edge.toPort + ": " + icount, TraceEventManager.CARDINALITY)
-          } else {
-            tracer.trace("XCARD TO " + edge.to + "." + edge.toPort + ": " + icount, TraceEventManager.CARDINALITY)
-          }
-          throw err
-      }
+    } else {
+      // Ignore this
+      tracer.trace("debug", s"$node attempted to write to non-existant port $port", TraceEventManager.IO)
     }
   }
 
