@@ -3,20 +3,20 @@
 * Graphs
 
 There are two distinct graphs in JAFPL. There is a graph of nodes,
-constructed through calls to the JAFPL ~Graph~ APIs. That graph is
-used to build a collection of actors that send messages to each other
-to implement the graph workflow.
+constructed through calls to the JAFPL ~Graph~ APIs. That graph is used
+to build a collection of actions that implement the graph workflow.
+(Early versions of this library were built on top of Akka, but that
+work was abandoned and now there’s just a simple thread pool.)
+
+FIXME: this documentation is out-of-date.
 
 * Graph execution
 
-The actors implement the underlying graph. Each node in the graph is
-represented by an actor. Actors send messages to each other along the
+The actions implement the underlying graph. Each node in the graph is
+represented by an action. Actors send messages to each other along the
 edges of the graph.
 
-There is one distinguished actor, the ~GraphMonitor~ that serves as
-overall controller for the graph. This is the actor that initializes
-all of the nodes in the graph, starts the graph running, and cleans up
-when execution ends (normally, or from an exception).
+The ~Scheduler~ orchestrates actions.
 
 There are three different perspectives in which messages occur:
 

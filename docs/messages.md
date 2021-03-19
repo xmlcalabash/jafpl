@@ -1,5 +1,7 @@
 # Messages
 
+FIXME: this documentation is out-of-date.
+
 Everything in JAFPL is coordinated with messages. There is a central
 `GraphMonitor` that sends messages to individual steps. All steps send
 messages through the `GraphMonitor`.

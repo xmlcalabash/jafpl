@@ -2,10 +2,11 @@
 
 Just Another /Fine/ Pipeline Language.
 
-This is a pipeline framework. It’s built on top of Akka actors to support
-arbitrary data flow pipelines. It is wholly agnostic to the kinds of data
+This is a pipeline framework. It is wholly agnostic to the kinds of data
 that flow through the pipelines and the implementations of the steps that
 process them.
 
 See http://jafpl.com/
 
+(Early versions of this library were built on top of Akka, but that
+work was abandoned and now there’s just a simple thread pool.)
