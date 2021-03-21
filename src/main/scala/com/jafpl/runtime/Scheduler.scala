@@ -9,7 +9,7 @@ import com.jafpl.util.TraceEventManager
 import scala.collection.mutable.ListBuffer
 
 class Scheduler(val runtime: GraphRuntime) extends Runnable {
-  private val CYCLETIME = 10
+  private val CYCLETIME = 1
   private val WATCHDOGLIMIT = 5
   private val graphStatus = new GraphStatus(this)
   private val pool = new ThreadPool(this,runtime.runtime.threadPoolSize)

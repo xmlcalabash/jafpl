@@ -391,9 +391,11 @@ class ChooseSpec extends AnyFlatSpec {
     runtime.outputs("result").setConsumer(bc)
     runtime.runSync()
 
+    print(bc.items)
+
     assert(bc.items.size == 5)
-    assert(bc.items(0) == "WHEN1")
-    assert(bc.items(1) == 1)
+    assert(bc.items(0) == 1)
+    assert(bc.items(1) == "WHEN1")
     assert(bc.items(2) == 2)
     assert(bc.items(3) == 3)
     assert(bc.items(4) == "WHEN3")

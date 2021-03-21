@@ -18,8 +18,8 @@ deploy:
   api_key:
     secure: KmdmZ1rM9sc3/+CimuP4KOPQbdROJnNcbuWom4rnUsskzF0gHCgC0zjSHwoanu+t43XN25Ll5+u7VtX2db/YKfusqv3m0Wfh12NJjP8prarDAB3WbTaocfo76bBy6yzjhmxeQzKXQbEtmMYiO0jThFOagNdb6QUy6YYZ8Rv1ZPC2/SSKEUHhzoh8gh74FECLBOJgnf4c0fqeqEkZkezlPDlVtwGeQNYeAqEFOWccWuFdMC34kAUpU+Kx/pEWtek5emtlj25fq4cqKEAUPWo9W41/rjp2johJ3brAPDSRjFofnxU9jx6ULhAS1dkYyxI1KSsUbFEWvlVMZSZgg+JmkDqFq3qxHRShbxhFqjEXBqLq3lZFKi+tSWC+8ZT6mxvOh9V3pv9RyKfm/UL8FGkbkE0XHF0oM3ZQO28T9jjFIOiRYdlz1iz3ngxIySwq7Gn0nGuIL79IdEb4Tb+s9aF/9Z8EzAtIAI22uJjXios/lPHkpyglyGforhcMiG8+iuXXbMQJXfFHewj+vhmY7FxwjIieSv5IQrGh5bAORrWV/zF7uemXeaknlvmERBHtmwEbmkWxhMgZ0u1TC7IFhLG6ugHSVM33+Effj9+MBK80WEd8ohHqT6fJozKDJpMQJhszrU/6vUpLhlRf1IudtkIfFGIgYDD+CeRmkJHpLK6g+nU=
   file:
-    - target/scala-2.12/jafpl_2.12-$TRAVIS_TAG.jar
-    - target/scala-2.12/jafpl_2.12-$TRAVIS_TAG-javadoc.jar
+    - target/scala-2.13/jafpl_2.13-$TRAVIS_TAG.jar
+    - target/scala-2.13/jafpl_2.13-$TRAVIS_TAG-javadoc.jar
   skip_cleanup: true
   on:
     tags: true

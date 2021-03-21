@@ -196,12 +196,9 @@ class GraphStatus(val scheduler: Scheduler) {
     nodeStatus.synchronized {
       tracer.trace("debug", s"MUTEX LOCKED for unbuffer($node)", TraceEventManager.MUTEX)
       val status = nodeStatus(node)
-      for (port <- node.inputs) {
-        tracer.trace(s"SCHED UBUF ${node}.${port} (${status.buffered(port)})", TraceEventManager.MESSAGES)
-        for (message <- status.unbuffer(port)) {
-          tracer.trace(s"SCHED UBUF ${message} → ${node}.${port}", TraceEventManager.MESSAGES)
-          status.receive(port, message)
-        }
+      for (buf <- status.unbuffer()) {
+        tracer.trace(s"SCHED UBUF ${buf._2} → ${node}.${buf._1}", TraceEventManager.MESSAGES)
+        status.receive(buf._1, buf._2)
       }
     }
     tracer.trace("debug", s"MUTEX UNLOCK for unbuffer($node)", TraceEventManager.MUTEX)

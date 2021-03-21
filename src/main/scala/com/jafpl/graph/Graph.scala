@@ -1044,8 +1044,20 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
             }
           }
 
-          val joiner = if (node.parent.isDefined) {
-            node.parent.get.addJoiner(mode)
+          var container = node.parent
+          if (container.isDefined) {
+            node match {
+              case _: WhenStart =>
+                // If we're adding a joiner for the input of a when (the condition),
+                // make sure we put it outside the choose, otherwise the choose will
+                // depend on one of its children and that's a deadlock condition.
+                container = container.get.parent
+              case _ => ()
+            }
+          }
+
+          val joiner = if (container.isDefined) {
+            container.get.addJoiner(mode)
           } else {
             addJoiner(mode)
           }

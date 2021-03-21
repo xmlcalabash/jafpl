@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import com.jafpl.exceptions.JafplException
-import com.jafpl.graph.{Buffer, CatchStart, ChooseStart, ContainerEnd, Node, WhenStart}
+import com.jafpl.graph.{Buffer, CatchStart, ChooseStart, ContainerEnd, GraphInput, Node, WhenStart}
 import com.jafpl.messages.Message
 import com.jafpl.runtime.NodeState.NodeState
 import com.jafpl.steps.PortSpecification
@@ -15,7 +15,7 @@ class NodeStatus(val node: Node, val action: Action, tracer: TraceEventManager) 
   private var __state = NodeState.LIMBO
   private val _openInputs = mutable.HashSet.empty[String]
   private val _openBindings = mutable.HashSet.empty[String]
-  private val _buffers = mutable.HashMap.empty[String, ListBuffer[Message]]
+  private val _buffer = ListBuffer.empty[Tuple2[String,Message]]
   private val _dependsOn = mutable.HashSet.empty[Node]
   private var inputSpecification = Option.empty[PortSpecification]
   private var outputSpecification = Option.empty[PortSpecification]
@@ -40,6 +40,12 @@ class NodeStatus(val node: Node, val action: Action, tracer: TraceEventManager) 
           inputSpecification = Some(start.manifold.get.outputSpec)
           outputSpecification = inputSpecification
         }
+      case io: GraphInput =>
+        if (node.manifold.isDefined) {
+          inputSpecification = Some(node.manifold.get.inputSpec)
+          // Graph inputs can have an arbitrary number of outputs
+          outputSpecification = Some(PortSpecification.ANY)
+        }
       case _ =>
         if (node.manifold.isDefined) {
           inputSpecification = Some(node.manifold.get.inputSpec)
@@ -47,11 +53,11 @@ class NodeStatus(val node: Node, val action: Action, tracer: TraceEventManager) 
         }
     }
 
-    doReset(NodeState.RUNNABLE, false)
+    doReset(NodeState.RUNNABLE, resetAction=false)
   }
 
   def reset(state: NodeState): Unit = {
-    doReset(state, true)
+    doReset(state, resetAction=true)
   }
 
   private def doReset(newState: NodeState, resetAction: Boolean): Unit = {
@@ -61,7 +67,7 @@ class NodeStatus(val node: Node, val action: Action, tracer: TraceEventManager) 
       _openInputs.add(port)
     }
 
-    _buffers.clear()
+    _buffer.clear()
 
     _dependsOn.clear()
     node match {
@@ -139,7 +145,7 @@ class NodeStatus(val node: Node, val action: Action, tracer: TraceEventManager) 
   def looping(): Unit = {
     node match {
       case _: ContainerEnd =>
-        doReset(NodeState.RUNNABLE, false)
+        doReset(NodeState.RUNNABLE, resetAction=false)
       case _ =>
         _state = if (node.isInstanceOf[Buffer]) {
           // Buffers are weird. They don't need anything in a loop to run, but
@@ -240,34 +246,35 @@ class NodeStatus(val node: Node, val action: Action, tracer: TraceEventManager) 
     _dependsOn.remove(node)
   }
 
+  def buffered(): Int = {
+    _buffer.synchronized {
+      _buffer.size
+    }
+  }
+
   def buffered(port: String): Int = {
-    _buffers.synchronized {
-      if (_buffers.contains(port)) {
-        _buffers(port).length
-      } else {
-        0
+    _buffer.synchronized {
+      var count = 0
+      for (buf <- _buffer) {
+        if (buf._1 == port) {
+          count += 1
+        }
       }
+      count
     }
   }
 
   def buffer(port: String, message: Message): Unit = {
-    _buffers.synchronized {
-      if (!_buffers.contains(port)) {
-        _buffers.put(port, ListBuffer.empty[Message])
-      }
-      _buffers(port) += message
+    _buffer.synchronized {
+      _buffer += Tuple2(port, message)
     }
   }
 
-  def unbuffer(port: String): ListBuffer[Message] = {
-    _buffers.synchronized {
-      if (_buffers.contains(port)) {
-        val lb = _buffers(port)
-        _buffers.remove(port)
-        lb
-      } else {
-        ListBuffer.empty[Message]
-      }
+  def unbuffer(): List[Tuple2[String,Message]] = {
+    _buffer.synchronized {
+      val list = _buffer.toList
+      _buffer.clear()
+      list
     }
   }
 

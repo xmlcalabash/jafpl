@@ -4,40 +4,73 @@ import com.jafpl.graph.{JoinMode, Joiner}
 import com.jafpl.messages.Message
 import com.jafpl.runtime.NodeState.NodeState
 
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
+
 class JoinerAction(override val node: Joiner) extends AbstractAction(node) {
-  private val joinBuffer = new IOBuffer()
+  private val ports = mutable.HashSet.empty[String]
+  private val messages = ListBuffer.empty[Tuple2[String,Message]]
 
   override def receive(port: String, message: Message): Unit = {
     super.receive(port, message)
-    joinBuffer.consume(port, message)
+    messages += Tuple2(port, message)
+    ports.add(port)
   }
 
   override def run(): Unit = {
     super.run()
 
-    if (node.mode == JoinMode.PRIORITY && joinBuffer.ports.contains("source_1")) {
-      for (item <- joinBuffer.messages("source_1")) {
-        scheduler.receive(node, "result", item)
-      }
-    } else {
-      var portNum = 0
-      while (joinBuffer.ports.nonEmpty) {
-        portNum += 1
-        val port = s"source_$portNum"
-        if (joinBuffer.ports.contains(port)) {
-          for (item <- joinBuffer.messages(port)) {
-            scheduler.receive(node, "result", item)
-          }
-          joinBuffer.clear(port)
-        }
-      }
+    var mode = node.mode
+    if (mode == JoinMode.PRIORITY && !ports.contains("source_1")) {
+      // I've forgottene exactly what "priority" was for. When I reworked
+      // this code to preserver order, I determined that if the mode was
+      // "priority" and there were documents on the "source_1" port, that's
+      // what was returned. Otherwise, it worked just like mixed.
+      mode = JoinMode.ORDERED
     }
 
+    mode match {
+      case JoinMode.PRIORITY =>
+        for (buf <- messages) {
+          if (buf._1 == "source_1") {
+            scheduler.receive(node, "result", buf._2)
+          }
+        }
+      case JoinMode.ORDERED =>
+        // This strikes me as not necessarily the most efficient thing...
+        for (port <- ports.toList.sorted) {
+          for (buf <- messages) {
+            if (buf._1 == port) {
+              scheduler.receive(node, "result", buf._2)
+            }
+          }
+        }
+      case JoinMode.MIXED =>
+        for (buf <- messages) {
+          scheduler.receive(node, "result", buf._2)
+        }
+    }
+
+    messages.clear()
+    ports.clear()
     scheduler.finish(node)
   }
 
   override def reset(state: NodeState): Unit = {
-    joinBuffer.reset()
     super.reset(state)
+    messages.clear()
+    ports.clear()
+  }
+
+  override def abort(): Unit = {
+    super.abort()
+    messages.clear()
+    ports.clear()
+  }
+
+  override def stop(): Unit = {
+    super.stop()
+    messages.clear()
+    ports.clear()
   }
 }
