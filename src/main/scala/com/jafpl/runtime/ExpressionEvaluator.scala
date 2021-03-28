@@ -23,20 +23,17 @@ trait ExpressionEvaluator {
    */
   def newInstance(): ExpressionEvaluator
 
-  def setContextItem(message: Message): Unit
-  def setContextItem(messages: List[Message]): Unit
-  def setContextCollection(message: List[Message]): Unit
-
   /** Evaluate an expression. The expression may return any number of results, including none.
    *
    * The `expr` is evaluated according to whatever grammar the evaluator supports. The context is
    * an item from the pipeline. The bindings are variable bindings from the pipeline.
    *
    * @param expr     The expression to evaluate.
+   * @param context  The expression context.
    * @param bindings Any variable bindings that are provided for the expression.
    * @return The computed value of the expression.
    */
-  def value(expr: Any, bindings: Map[String, Message], params: Option[BindingParams]): Message
+  def value(expr: Any, context: List[Message], bindings: Map[String, Message], params: Option[BindingParams]): Message
 
   /** Evaluate an expression that is expected to return a single value.
    *
@@ -44,17 +41,19 @@ trait ExpressionEvaluator {
    * an item from the pipeline. The bindings are variable bindings from the pipeline.
    *
    * @param expr     The expression to evaluate.
+   * @param context  The expression context.
    * @param bindings Any variable bindings that are provided for the expression.
    * @return The computed value of the expression.
    */
-  def singletonValue(expr: Any, bindings: Map[String, Message], params: Option[BindingParams]): Message
+  def singletonValue(expr: Any, context: List[Message], bindings: Map[String, Message], params: Option[BindingParams]): Message
 
   /**
    * Evaluate an expression and cast the result to a boolean.
    *
    * @param expr     The expression to evaluate.
+   * @param context  The expression context.
    * @param bindings Any variable bindings that are provided for the expression.
    * @return The boolean value of the computed expression.
    */
-  def booleanValue(expr: Any, bindings: Map[String, Message], params: Option[BindingParams]): Boolean
+  def booleanValue(expr: Any, context: List[Message], bindings: Map[String, Message], params: Option[BindingParams]): Boolean
 }

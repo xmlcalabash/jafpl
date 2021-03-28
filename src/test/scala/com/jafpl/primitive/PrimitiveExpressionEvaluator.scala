@@ -8,30 +8,16 @@ import org.slf4j.{Logger, LoggerFactory}
 
 class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends ExpressionEvaluator() {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
-  private var contextCollection = List[Message]()
-  private var context = List[Message]()
 
   override def newInstance(): PrimitiveExpressionEvaluator = {
     new PrimitiveExpressionEvaluator(config)
   }
 
-  override def setContextItem(message: Message): Unit = {
-    context = List(message)
+  override def value(expr: Any, context: List[Message], bindings: Map[String,Message], params: Option[BindingParams]): Message = {
+    singletonValue(expr, context, bindings, params)
   }
 
-  override def setContextItem(messages: List[Message]): Unit = {
-    context = messages
-  }
-
-  override def setContextCollection(messages: List[Message]): Unit = {
-    contextCollection = messages
-  }
-
-  override def value(expr: Any, bindings: Map[String,Message], params: Option[BindingParams]): Message = {
-    singletonValue(expr, bindings, params)
-  }
-
-  override def singletonValue(expr: Any, bindings: Map[String,Message], params: Option[BindingParams]): Message = {
+  override def singletonValue(expr: Any, context: List[Message], bindings: Map[String,Message], params: Option[BindingParams]): Message = {
     if (context.size > 1) {
       throw JafplException.singletonContextExpected()
     }
@@ -97,7 +83,7 @@ class PrimitiveExpressionEvaluator(config: RuntimeConfiguration) extends Express
     }
   }
 
-  override def booleanValue(expr: Any, bindings: Map[String,Message], params: Option[BindingParams]): Boolean = {
+  override def booleanValue(expr: Any, context: List[Message], bindings: Map[String,Message], params: Option[BindingParams]): Boolean = {
     if (context.size > 1) {
       throw JafplException.singletonContextExpected()
     }

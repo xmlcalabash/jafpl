@@ -19,11 +19,11 @@ class ChooseStart private[jafpl] (override val graph: Graph,
 
   manifold = manspec
 
-  def addWhen(expression: Any, collection: Any, label: String, manifold: ManifoldSpecification): WhenStart = {
-    addWhen(expression, collection, Some(label), manifold)
+  def addWhen(expression: Any, label: String, manifold: ManifoldSpecification): WhenStart = {
+    addWhen(expression, Some(label), manifold)
   }
-  def addWhen(expression: Any, collection: Any, label: Option[String], manifold: ManifoldSpecification): WhenStart = {
-    val node = graph.addWhen(expression, collection, label, manifold)
+  def addWhen(expression: Any, label: Option[String], manifold: ManifoldSpecification): WhenStart = {
+    val node = graph.addWhen(expression, label, manifold)
     addChild(node)
     node
   }
