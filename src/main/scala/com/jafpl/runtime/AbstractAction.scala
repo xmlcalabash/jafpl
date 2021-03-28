@@ -12,7 +12,7 @@ import scala.collection.mutable.ListBuffer
 abstract class AbstractAction(val node: Node) extends Action with DataConsumer {
   protected var scheduler: Scheduler = _
   protected var tracer: TraceEventManager = _
-  protected var receivedBindings = mutable.HashMap.empty[String, BindingMessage]
+  protected var receivedBindings = mutable.HashMap.empty[String, Message]
   private val _received = mutable.HashMap.empty[String, ListBuffer[Message]]
 
   def receivedPorts: List[String] = _received.keys.toList
@@ -42,7 +42,7 @@ abstract class AbstractAction(val node: Node) extends Action with DataConsumer {
     message match {
       case msg: BindingMessage =>
         tracer.trace(s"RECVB $this for ${msg.name}", TraceEventManager.BINDING)
-        receivedBindings.put(msg.name, msg)
+        receivedBindings.put(msg.name, msg.message)
       case _ =>
         tracer.trace(s"RECV  $this for $port: $message", TraceEventManager.RECEIVE)
         if (node.inputs.contains(port) || port.startsWith("#")) {

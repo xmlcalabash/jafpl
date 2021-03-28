@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{AtomicNode, Node}
-import com.jafpl.messages.{BindingMessage, Message}
+import com.jafpl.messages.BindingMessage
 
 class AtomicAction(override val node: AtomicNode) extends AbstractAction(node) {
   override def initialize(scheduler: Scheduler, node: Node): Unit = {
@@ -16,8 +16,8 @@ class AtomicAction(override val node: AtomicNode) extends AbstractAction(node) {
     super.run()
 
     if (node.step.isDefined) {
-      for (message <- receivedBindings.values) {
-        node.step.get.receiveBinding(message)
+      for (key <- receivedBindings.keys) {
+        node.step.get.receiveBinding(new BindingMessage(key, receivedBindings(key)))
       }
       for (port <- receivedPorts) {
         for (message <- received(port)) {
