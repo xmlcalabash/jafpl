@@ -441,4 +441,40 @@ class ChooseSpec extends AnyFlatSpec {
     assert(pass)
   }
 
+  "A when with a collection " should " operate on the collection" in {
+    val graph    = Jafpl.newInstance().newGraph()
+
+    val pipeline = graph.addPipeline(None, Manifold.ALLOW_ANY)
+    val producer = pipeline.addAtomic(new Producer(List("SomeDocument")), "doc_producer")
+    val cprod    = pipeline.addAtomic(new Producer(List("1", "2", "3", "4")), "seq_producer")
+
+    val choose = pipeline.addChoose("choose")
+    val when1 = choose.addWhen("true", "true", "when1", Manifold.ALLOW_ANY)
+    val when2 = choose.addWhen("false", "false", "when2", Manifold.ALLOW_ANY)
+
+    val p1 = when1.addAtomic(new Producer(List("WHEN1")), "p1")
+    val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")
+
+    val bc = new BufferSink()
+
+    graph.addEdge(cprod, "result", when1, "condition")
+    graph.addEdge(producer, "result", when2, "condition")
+
+    graph.addEdge(p1, "result", when1, "result")
+    graph.addEdge(p2, "result", when2, "result")
+
+    graph.addEdge(when1, "result", choose, "result")
+    graph.addEdge(when2, "result", choose, "result")
+
+    graph.addEdge(choose, "result", pipeline, "result")
+    graph.addOutput(pipeline, "result")
+
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+    runtime.outputs("result").setConsumer(bc)
+    runtime.runSync()
+
+    assert(bc.items.size == 1)
+    assert(bc.items.head == "WHEN1")
+  }
+
 }

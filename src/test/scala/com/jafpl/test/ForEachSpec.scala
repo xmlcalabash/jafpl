@@ -130,7 +130,7 @@ class ForEachSpec extends AnyFlatSpec {
     runtime.outputs("result").setConsumer(bc)
     runtime.runSync()
 
-    assert(bc.items.size == 12)
+    assert(bc.items.size == 9)
     for (item <- bc.items) {
       assert(item == 4)
     }

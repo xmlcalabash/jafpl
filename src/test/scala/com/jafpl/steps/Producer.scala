@@ -13,9 +13,9 @@ class Producer(val items: List[Any]) extends DefaultStep {
   override def run(): Unit = {
     for (item <- items) {
       item match {
-        case str: String => consumer.get.consume("result", new ItemMessage(item, Metadata.STRING))
-        case num: Int => consumer.get.consume("result", new ItemMessage(item, Metadata.NUMBER))
-        case num: Long => consumer.get.consume("result", new ItemMessage(item, Metadata.NUMBER))
+        case _: String => consumer.get.consume("result", new ItemMessage(item, Metadata.STRING))
+        case _: Int => consumer.get.consume("result", new ItemMessage(item, Metadata.NUMBER))
+        case _: Long => consumer.get.consume("result", new ItemMessage(item, Metadata.NUMBER))
         case _ => consumer.get.consume("result", new ItemMessage(item, Metadata.BLANK))
       }
     }
