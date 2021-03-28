@@ -307,7 +307,7 @@ class GraphStatus(val scheduler: Scheduler) {
           case _: Buffer =>
             nodeStatus(child).looping()
           case _ =>
-            nodeStatus(child).reset(NodeState.RUNNABLE)
+            nodeStatus(child).reset(NodeState.LIMBO)
         }
       }
       nodeStatus(node.containerEnd).looping()
