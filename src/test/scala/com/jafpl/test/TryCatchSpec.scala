@@ -366,8 +366,8 @@ class TryCatchSpec extends AnyFlatSpec {
     val caught   = catchx.addAtomic(new Producer(List("Caught")), "caught")
 
     val choose = try1.addChoose("choose")
-    val when1 = choose.addWhen("ERROR", "when1", Manifold.ALLOW_ANY)
-    val when2 = choose.addWhen("true", "when2", Manifold.ALLOW_ANY)
+    val when1 = choose.addWhen("ERROR", "false", "when1", Manifold.ALLOW_ANY)
+    val when2 = choose.addWhen("true", "false", "when2", Manifold.ALLOW_ANY)
 
     val p1 = when1.addAtomic(new Producer(List("WHEN1")), "p1")
     val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")

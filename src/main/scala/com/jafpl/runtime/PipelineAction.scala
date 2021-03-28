@@ -7,10 +7,13 @@ class PipelineAction(override val node: PipelineStart) extends ContainerAction(n
   override def run(): Unit = {
     super.run()
     startChildren()
-    scheduler.finish(node)
-  }
 
-  override def receive(port: String, message: Message): Unit = {
-    scheduler.receive(node, port, message)
+    for (port <- receivedPorts) {
+      for (message <- received(port)) {
+        scheduler.receive(node, port, message)
+      }
+    }
+
+    scheduler.finish(node)
   }
 }

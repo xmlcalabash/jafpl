@@ -16,4 +16,9 @@ class Count extends DefaultStep {
   override def run(): Unit = {
     consumer.get.consume("result", new ItemMessage(count, Metadata.BLANK))
   }
+
+  override def reset(): Unit = {
+    super.reset()
+    count = 0
+  }
 }

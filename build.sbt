@@ -4,7 +4,7 @@ name := "jafpl"
 
 organization := "com.jafpl"
 homepage     := Some(url("https://jafpl.com/"))
-version      := "0.3.5"
+version      := "0.3.9"
 scalaVersion := "2.13.5"
 
 buildInfoUsePackageAsPath := true
@@ -22,7 +22,7 @@ buildInfoKeys ++= Seq[BuildInfoKey](
         )
         new BufferedReader(extracted).readLine
       } catch {
-        case ex: Exception => "FAILED"
+        case _: Exception => "FAILED"
       }
     }}.toString()
 )
@@ -58,7 +58,7 @@ publish := Def.taskDyn {
       reader.close()
       diff
     } catch {
-      case ex: Exception => "FAILED"
+      case _: Exception => "FAILED"
     }
   }
 
@@ -79,7 +79,7 @@ publish := Def.taskDyn {
       reader.close()
       newFile
     } catch {
-      case ex: Exception => "FAILED"
+      case _: Exception => "FAILED"
     }
   }
 
@@ -114,11 +114,11 @@ libraryDependencies ++= Seq(
   "org.apache.logging.log4j" % "log4j-slf4j-impl" % "2.12.1",
   "org.slf4j" % "jcl-over-slf4j" % "1.7.25",
   "org.slf4j" % "slf4j-api" % "1.7.25",
-  "org.scalactic" %% "scalactic" % "3.2.3",
+  //"org.scalactic" %% "scalactic" % "3.2.3",
   "org.scalatest" %% "scalatest" % "3.2.3" % "test",
   "org.scala-lang.modules" %% "scala-xml" % "1.3.0",
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
-  "org.scala-lang.modules" %% "scala-swing" % "2.1.1"
+  //"org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
+  //"org.scala-lang.modules" %% "scala-swing" % "2.1.1"
 )
 
 // Yes, this is an odd place for local use, but it's where the website

@@ -14,7 +14,6 @@ class LoopWhileAction(override val node: LoopWhileStart) extends LoopAction(node
   def done: Boolean = _done
 
   override def receive(port: String, message: Message): Unit = {
-    super.receive(port, message)
     message match {
       case item: ItemMessage =>
         port match {

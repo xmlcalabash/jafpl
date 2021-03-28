@@ -33,17 +33,26 @@ class LoopWhileEndAction(override val node: ContainerEnd) extends EndAction(node
 
   override def run(): Unit = {
     tracer.trace(s"RUN   $this ************************************************************", TraceEventManager.RUN)
-    if (startAction.done && !loopStart.returnAll) {
-      for (port <- buffer.keys) {
-        super.receive(port, buffer(port))
+    if (loopStart.returnAll) {
+      for (port <- receivedPorts) {
+        for (message <- received(port)) {
+          scheduler.receive(this, port, message)
+        }
       }
-      buffer.clear()
+    } else {
+      if (startAction.done) {
+        for (port <- buffer.keys) {
+          scheduler.receive(this, port, buffer(port))
+        }
+        buffer.clear()
+      }
     }
+
     scheduler.finish(node)
   }
 
-  override def reset(state: NodeState): Unit = {
-    super.reset(state)
+  override def cleanup(): Unit = {
+    super.cleanup()
     buffer.clear()
   }
 }

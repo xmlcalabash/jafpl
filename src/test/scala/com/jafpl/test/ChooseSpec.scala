@@ -46,8 +46,8 @@ class ChooseSpec extends AnyFlatSpec {
     val pipeline = graph.addPipeline(None, Manifold.ALLOW_ANY)
     val producer = pipeline.addAtomic(new Producer(List("SomeDocument")), "producer")
     val choose = pipeline.addChoose("choose")
-    val when1 = choose.addWhen("true", "when1", Manifold.ALLOW_ANY)
-    val when2 = choose.addWhen("false", "when2", Manifold.ALLOW_ANY)
+    val when1 = choose.addWhen("true", "false", "when1", Manifold.ALLOW_ANY)
+    val when2 = choose.addWhen("false", "false", "when2", Manifold.ALLOW_ANY)
 
     val p1 = when1.addAtomic(new Producer(List("WHEN1")), "p1")
     val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")
@@ -80,8 +80,8 @@ class ChooseSpec extends AnyFlatSpec {
     val pipeline = graph.addPipeline(None, Manifold.ALLOW_ANY)
     val producer = pipeline.addAtomic(new Producer(List("SomeDocument")), "producer")
     val choose = pipeline.addChoose("choose")
-    val when1 = choose.addWhen("false", "when1", Manifold.ALLOW_ANY)
-    val when2 = choose.addWhen("true", "when2", Manifold.ALLOW_ANY)
+    val when1 = choose.addWhen("false", "false", "when1", Manifold.ALLOW_ANY)
+    val when2 = choose.addWhen("true", "false", "when2", Manifold.ALLOW_ANY)
 
     val p1 = when1.addAtomic(new Producer(List("WHEN1")), "p1")
     val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")
@@ -114,8 +114,8 @@ class ChooseSpec extends AnyFlatSpec {
     val pipeline = graph.addPipeline(None,Manifold.ALLOW_ANY)
     val producer = pipeline.addAtomic(new Producer(List("SomeDocument")), "producer")
     val choose = pipeline.addChoose("choose")
-    val when1 = choose.addWhen("true", "when1", Manifold.ALLOW_ANY)
-    val when2 = choose.addWhen("true", "when2", Manifold.ALLOW_ANY)
+    val when1 = choose.addWhen("true", "false", "when1", Manifold.ALLOW_ANY)
+    val when2 = choose.addWhen("true", "false", "when2", Manifold.ALLOW_ANY)
 
     val p1 = when1.addAtomic(new Producer(List("WHEN1")), "p1")
     val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")
@@ -148,8 +148,8 @@ class ChooseSpec extends AnyFlatSpec {
     val pipeline = graph.addPipeline(None, Manifold.ALLOW_ANY)
     val producer = pipeline.addAtomic(new Producer(List("SomeDocument")), "producer")
     val choose = pipeline.addChoose("choose")
-    val when1 = choose.addWhen("false", "when1", Manifold.ALLOW_ANY)
-    val when2 = choose.addWhen("false", "when2", Manifold.ALLOW_ANY)
+    val when1 = choose.addWhen("false", "false", "when1", Manifold.ALLOW_ANY)
+    val when2 = choose.addWhen("false", "false", "when2", Manifold.ALLOW_ANY)
 
     val p1 = when1.addAtomic(new Producer(List("WHEN1")), "p1")
     val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")
@@ -181,13 +181,13 @@ class ChooseSpec extends AnyFlatSpec {
     val pipeline = graph.addPipeline(None, Manifold.ALLOW_ANY)
     val producer = pipeline.addAtomic(new Producer(List("SomeDocument")), "producer")
     val choose = pipeline.addChoose("choose")
-    val when1 = choose.addWhen("false", "when1", Manifold.ALLOW_ANY)
-    val when2 = choose.addWhen("false", "when2", Manifold.ALLOW_ANY)
-    val when3 = choose.addWhen("false", "when3", Manifold.ALLOW_ANY)
-    val when4 = choose.addWhen("false", "when4", Manifold.ALLOW_ANY)
-    val when5 = choose.addWhen("true", "when5", Manifold.ALLOW_ANY)
-    val when6 = choose.addWhen("true", "when6", Manifold.ALLOW_ANY)
-    val when7 = choose.addWhen("true", "when7", Manifold.ALLOW_ANY)
+    val when1 = choose.addWhen("false", "false", "when1", Manifold.ALLOW_ANY)
+    val when2 = choose.addWhen("false", "false", "when2", Manifold.ALLOW_ANY)
+    val when3 = choose.addWhen("false", "false", "when3", Manifold.ALLOW_ANY)
+    val when4 = choose.addWhen("false", "false", "when4", Manifold.ALLOW_ANY)
+    val when5 = choose.addWhen("true", "false", "when5", Manifold.ALLOW_ANY)
+    val when6 = choose.addWhen("true", "false", "when6", Manifold.ALLOW_ANY)
+    val when7 = choose.addWhen("true", "false", "when7", Manifold.ALLOW_ANY)
 
     val p1 = when1.addAtomic(new Producer(List("WHEN1")), "p1")
     val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")
@@ -240,7 +240,7 @@ class ChooseSpec extends AnyFlatSpec {
     val pipeline = graph.addPipeline(None, Manifold.ALLOW_ANY)
     val producer = pipeline.addAtomic(new Producer(List(17)), "producer")
     val choose = pipeline.addChoose("choose")
-    val when1 = choose.addWhen(". != ", "when1", Manifold.ALLOW_ANY)
+    val when1 = choose.addWhen(". != ", "false", "when1", Manifold.ALLOW_ANY)
 
     val p1 = when1.addAtomic(new Producer(List("WHEN1")), "p1")
 
@@ -269,9 +269,9 @@ class ChooseSpec extends AnyFlatSpec {
     val pipeline = graph.addPipeline(None, Manifold.ALLOW_ANY)
     val producer = pipeline.addAtomic(new Producer(List(1)), "producer")
     val choose = pipeline.addChoose("choose")
-    val when1 = choose.addWhen(". > 2", "when1", Manifold.ALLOW_ANY)
-    val when2 = choose.addWhen(". > 0", "when2", Manifold.ALLOW_ANY)
-    val when3 = choose.addWhen("true", "when3", Manifold.ALLOW_ANY)
+    val when1 = choose.addWhen(". > 2", "false", "when1", Manifold.ALLOW_ANY)
+    val when2 = choose.addWhen(". > 0", "false", "when2", Manifold.ALLOW_ANY)
+    val when3 = choose.addWhen("true", "false", "when3", Manifold.ALLOW_ANY)
 
     val p1 = when1.addAtomic(new Producer(List("WHEN1")), "p1")
     val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")
@@ -310,7 +310,7 @@ class ChooseSpec extends AnyFlatSpec {
     val forEach  = pipeline.addForEach("for-each", Manifold.ALLOW_ANY)
 
     val choose = forEach.addChoose("choose")
-    val when3 = choose.addWhen("true", "when3", Manifold.ALLOW_ANY)
+    val when3 = choose.addWhen("true", "false", "when3", Manifold.ALLOW_ANY)
 
     val p3 = when3.addAtomic(new Producer(List("WHEN1")), "p3")
 
@@ -348,9 +348,9 @@ class ChooseSpec extends AnyFlatSpec {
     val forEach  = pipeline.addForEach("for-each", Manifold.ALLOW_ANY)
 
     val choose = forEach.addChoose("choose")
-    val when1 = choose.addWhen(". > 2", "when1", Manifold.ALLOW_ANY)
-    val when2 = choose.addWhen(". > 1", "when2", Manifold.ALLOW_ANY)
-    val when3 = choose.addWhen("true", "when3", Manifold.ALLOW_ANY)
+    val when1 = choose.addWhen(". > 2", "false", "when1", Manifold.ALLOW_ANY)
+    val when2 = choose.addWhen(". > 1", "false", "when2", Manifold.ALLOW_ANY)
+    val when3 = choose.addWhen("true", "false", "when3", Manifold.ALLOW_ANY)
 
     val p1 = when1.addAtomic(new Producer(List("WHEN3")), "p1")
     val p3 = when3.addAtomic(new Producer(List("WHEN1")), "p3")
@@ -407,8 +407,8 @@ class ChooseSpec extends AnyFlatSpec {
     val pipeline = graph.addPipeline(None, Manifold.ALLOW_ANY)
     val producer = pipeline.addAtomic(new Producer(List("SomeDocument")), "producer")
     val choose = pipeline.addChoose("choose")
-    val when1 = choose.addWhen("ERROR", "when1", Manifold.ALLOW_ANY)
-    val when2 = choose.addWhen("true", "when2", Manifold.ALLOW_ANY)
+    val when1 = choose.addWhen("ERROR", "false", "when1", Manifold.ALLOW_ANY)
+    val when2 = choose.addWhen("true", "false", "when2", Manifold.ALLOW_ANY)
 
     val p1 = when1.addAtomic(new Producer(List("WHEN1")), "p1")
     val p2 = when2.addAtomic(new Producer(List("WHEN2")), "p2")

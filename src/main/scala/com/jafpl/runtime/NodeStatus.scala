@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{Buffer, CatchStart, ChooseStart, ContainerEnd, GraphInput, Node, WhenStart}
-import com.jafpl.messages.Message
+import com.jafpl.messages.{BindingMessage, Message}
 import com.jafpl.runtime.NodeState.NodeState
 import com.jafpl.steps.PortSpecification
 import com.jafpl.util.TraceEventManager

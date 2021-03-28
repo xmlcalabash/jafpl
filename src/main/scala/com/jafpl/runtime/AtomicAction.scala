@@ -1,31 +1,43 @@
 package com.jafpl.runtime
 
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.{AtomicNode, Node}
 import com.jafpl.messages.{BindingMessage, Message}
 
 class AtomicAction(override val node: AtomicNode) extends AbstractAction(node) {
   override def initialize(scheduler: Scheduler, node: Node): Unit = {
     super.initialize(scheduler, node)
-    node.step.get.setConsumer(this)
-  }
-
-  override def receive(port: String, message: Message): Unit = {
-    super.receive(port, message)
-    message match {
-      case b: BindingMessage => node.step.get.receiveBinding(b)
-      case _ => node.step.get.consume(port, message)
+    if (node.step.isDefined) {
+      node.step.get.setConsumer(this)
     }
   }
 
   override def run(): Unit = {
     super.run()
-    try {
-      node.step.get.run()
-    } catch {
-      case t: Throwable =>
-        scheduler.reportException(node, t)
-        return
+
+    if (node.step.isDefined) {
+      for (message <- receivedBindings.values) {
+        node.step.get.receiveBinding(message)
+      }
+      for (port <- receivedPorts) {
+        for (message <- received(port)) {
+          node.step.get.consume(port, message)
+        }
+      }
+
+      try {
+        node.step.get.run()
+      } catch {
+        case t: Throwable =>
+          scheduler.reportException(node, t)
+          return
+      }
+    } else {
+      scheduler.reportException(node, JafplException.noStepFor(node.toString, node.location))
+      return
     }
+
     scheduler.finish(node)
+    cleanup()
   }
 }

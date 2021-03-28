@@ -15,8 +15,6 @@ trait Action extends Runnable {
 
   def close(port: String): Unit
 
-  def receiveBinding(message: Message): Unit
-
   def run(): Unit
 
   def reset(state: NodeState): Unit

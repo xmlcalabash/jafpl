@@ -2,7 +2,7 @@ package com.jafpl.runtime
 
 import com.jafpl.graph.{JoinMode, Joiner}
 import com.jafpl.messages.Message
-import com.jafpl.runtime.NodeState.NodeState
+import com.jafpl.util.TraceEventManager
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -12,7 +12,7 @@ class JoinerAction(override val node: Joiner) extends AbstractAction(node) {
   private val messages = ListBuffer.empty[Tuple2[String,Message]]
 
   override def receive(port: String, message: Message): Unit = {
-    super.receive(port, message)
+    tracer.trace(s"RECV  $this for $port: $message", TraceEventManager.RECEIVE)
     messages += Tuple2(port, message)
     ports.add(port)
   }
@@ -56,20 +56,8 @@ class JoinerAction(override val node: Joiner) extends AbstractAction(node) {
     scheduler.finish(node)
   }
 
-  override def reset(state: NodeState): Unit = {
-    super.reset(state)
-    messages.clear()
-    ports.clear()
-  }
-
-  override def abort(): Unit = {
-    super.abort()
-    messages.clear()
-    ports.clear()
-  }
-
-  override def stop(): Unit = {
-    super.stop()
+  override def cleanup(): Unit = {
+    super.cleanup()
     messages.clear()
     ports.clear()
   }

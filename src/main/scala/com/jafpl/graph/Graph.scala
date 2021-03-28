@@ -242,13 +242,13 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     start
   }
 
-  protected[graph] def addWhen(expression: Any, label: Option[String], manifold: ManifoldSpecification): WhenStart = {
+  protected[graph] def addWhen(expression: Any, collection: Any, label: Option[String], manifold: ManifoldSpecification): WhenStart = {
     checkOpen()
 
     logger.debug(s"G$uid addWhen ${label.getOrElse("ANONYMOUS")} $expression")
 
     val end = new ContainerEnd(this)
-    val start = new WhenStart(this, end, label, manifold, expression)
+    val start = new WhenStart(this, end, label, manifold, expression, collection)
     end.parent = start
     end.start = start
     _nodes += start
