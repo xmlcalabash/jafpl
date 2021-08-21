@@ -35,7 +35,7 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     if (inputs.nonEmpty) {
       var valid = true
       for (port <- inputs) {
-        if (port != "#bindings") {
+        if (port != "#bindings" && !port.startsWith("#depends_")) {
           println("Invalid binding on " + this + ": " + port)
           valid = false
         }
