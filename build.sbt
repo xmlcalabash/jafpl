@@ -4,8 +4,11 @@ name := "jafpl"
 
 organization := "com.jafpl"
 homepage     := Some(url("https://jafpl.com/"))
-version      := "0.3.12"
+version      := "0.3.13"
 scalaVersion := "2.13.5"
+
+Global / excludeLintKeys += homepage
+Global / excludeLintKeys += organization
 
 buildInfoUsePackageAsPath := true
 
@@ -123,7 +126,7 @@ libraryDependencies ++= Seq(
 
 // Yes, this is an odd place for local use, but it's where the website
 // needs them. I should figure out how to parameterize the location...
-target in Compile in doc := baseDirectory.value / "build/pages/apidocs"
+Compile / target / doc := baseDirectory.value / "build/pages/apidocs"
 //scalacOptions in (Compile, doc) ++= Seq(
 //  "-doc-root-content", baseDirectory.value+"/docs/apidocs/root.md",
 //  "-no-link-warnings", "-deprecation"
