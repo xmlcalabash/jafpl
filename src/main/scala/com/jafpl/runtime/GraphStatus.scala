@@ -424,7 +424,7 @@ class GraphStatus(val scheduler: Scheduler) {
   }
 
   private def createNodeStatus(node: Node): Unit = {
-    tracer.trace("CREAT " + node, TraceEventManager.CREATE)
+    tracer.trace(TraceEventManager.CREATE, node.toString, TraceEventManager.CREATE)
     val action = node match {
       case n: PipelineStart => new PipelineAction(n)
       case n: LoopEachStart => new LoopEachAction(n)
