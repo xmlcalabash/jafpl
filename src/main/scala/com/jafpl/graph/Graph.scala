@@ -932,8 +932,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
             val skipWhenCondition = start.isInstanceOf[WhenStart] && (port == "condition")
             val skipWhenBindings = start.isInstanceOf[WhenStart] && (port == "#bindings")
             val skipViewportBindings = start.isInstanceOf[ViewportStart] && (port == "#bindings")
+            val skipDepends = port.startsWith("#depends_")
             val edges = edgesFrom(node, port)
-            if (edges.isEmpty && !skipLoopSource && !skipWhenCondition && ! skipWhenBindings && !skipViewportBindings) {
+            if (edges.isEmpty && !skipLoopSource && !skipWhenCondition && ! skipWhenBindings && !skipViewportBindings && !skipDepends) {
               logger.debug(s"G$uid Input $port on $start unread, adding sink")
               val sink = start.addSink()
               addEdge(node, port, sink, "source")
@@ -1128,10 +1129,10 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
         error(JafplException.invalidOutputs(node.toString, node.location))
       }
 
-      // FIXME: this redundantly checks the same paths more than once
-      // Note, however, that checking only nodes without parents (as used to be done here)
-      // isn't sufficient. Does starting with nodes with no inbound (binding or port) edges work?
-      checkLoops(node, ListBuffer.empty[Node])
+      // Note: this redundantly checks the same paths more than once.
+      // However, checking only nodes without parents (as used to be done)
+      // isn't sufficient. Would starting with nodes with no inbound (binding or port) edges work?
+      //checkLoops(node, ListBuffer.empty[Node])
     }
 
     for (edge <- _edges) {
@@ -1191,21 +1192,6 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       }
     }
 
-    // What in $DEITY's name was this about?
-    /*
-    val patchEdges = ListBuffer.empty[Edge]
-    for (edge <- _edges) {
-      edge.to match {
-        case end: ContainerEnd =>
-          val newedge = new Edge(this, edge.from, edge.fromPort, end.start.get, edge.toPort)
-          patchEdges += newedge
-        case _ => patchEdges += edge
-      }
-    }
-    _edges.clear()
-    _edges ++= patchEdges
-    */
-
     // Following on from the weird commented out code above; for some reason the output
     // edges from a compound step are from the start. They should be from the end.
     val patchEdges = ListBuffer.empty[Edge]
@@ -1235,6 +1221,13 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     }
     _nodes.clear()
     _nodes ++= patchNodes
+
+    for (node <- nodes) {
+      // Note: this redundantly checks the same paths more than once.
+      // However, checking only nodes without parents (as used to be done)
+      // isn't sufficient. Would starting with nodes with no inbound (binding or port) edges work?
+      checkLoops(node, ListBuffer.empty[Node])
+    }
 
     open = false
 
@@ -1308,6 +1301,16 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       return
     }
 
+    /*
+    val sb = new StringBuffer()
+    for (p <- path) {
+      sb.append(p)
+      sb.append("→")
+    }
+    sb.append(node)
+    System.err.println("Path:" + sb.toString);
+    */
+
     if (path.contains(node)) {
       _valid = false
       val loopException = new JafplLoopDetected(node.location)
@@ -1331,8 +1334,17 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       val newpath = path.clone()
       newpath += node
 
-      for (port <- node.outputs) {
-        val edges = edgesFrom(node, port)
+      // checkLoops is called after graph fixup; the outputs of starts are actually
+      // associated with the ends.
+      val outnode = node match {
+        case start: ContainerStart =>
+          start.containerEnd
+        case _ =>
+          node
+      }
+
+      for (port <- outnode.outputs) {
+        val edges = edgesFrom(outnode, port)
         for (edge <- edges) {
           checkLoops(edge.to, newpath)
         }
