@@ -23,11 +23,15 @@ class BindingAction(override val node: Binding) extends AbstractAction(node) {
     }
 
     val expreval = scheduler.runtime.runtime.expressionEvaluator.newInstance()
-    val answer = expreval.value(node.expression, received("source"), bindings.toMap, node.params)
 
-    val msg = new BindingMessage(node.name, answer)
-    scheduler.receive(node, "result", msg)
-
-    scheduler.finish(node)
+    try {
+      val answer = expreval.value(node.expression, received("source"), bindings.toMap, node.params)
+      val msg = new BindingMessage(node.name, answer)
+      scheduler.receive(node, "result", msg)
+      scheduler.finish(node)
+    } catch {
+      case t: Throwable =>
+        scheduler.reportException(node, t)
+    }
   }
 }

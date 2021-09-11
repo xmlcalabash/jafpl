@@ -9,15 +9,25 @@ import com.jafpl.util.TraceEventManager
 import scala.collection.mutable.ListBuffer
 
 class Scheduler(val runtime: GraphRuntime) extends Runnable {
-  private val CYCLETIME = 1
-  private val WATCHDOGLIMIT = 5
+  private val CYCLETIME = 100
+  private val WATCHDOGLIMIT = 10
+  private object Locker;
+
   private val graphStatus = new GraphStatus(this)
   private val pool = new ThreadPool(this,runtime.runtime.threadPoolSize)
   private val tracer = runtime.traceEventManager
-  private var _exception = Option.empty[Throwable]
+  private var __exception = Option.empty[Throwable]
   private var done = false
 
-  def exception: Option[Throwable] = _exception
+  def exception: Option[Throwable] = __exception
+
+  def exception_=(except: Throwable): Unit = {
+    Locker.synchronized {
+      if (__exception.isEmpty) {
+        __exception = Some(except)
+      }
+    }
+  }
 
   def startNode(node: Node): Unit = {
     graphStatus.startNode(node)
@@ -42,8 +52,8 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
     done = false
     var watchdog = 0
     while (!done) {
-      if (_exception.isDefined) {
-        tracer.trace("ABORT SCHEDULER: " + _exception.get, TraceEventManager.SCHEDULER)
+      if (exception.isDefined) {
+        tracer.trace("ABORT SCHEDULER: " + exception.get, TraceEventManager.SCHEDULER)
         graphStatus.abort()
         done = true
       } else {
@@ -60,7 +70,7 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
             watchdog += 1
 
             if (watchdog > WATCHDOGLIMIT) {
-              _exception = Some(new RuntimeException("Looping without runnable actions"))
+              exception = new RuntimeException("Looping without runnable actions")
             }
 
             tracer.trace("debug", "Scheduler has no runnable actions", TraceEventManager.SCHEDULER)
@@ -77,8 +87,8 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
     pool.joinAll()
     graphStatus.stop()
     tracer.trace("DONE  SCHEDULER", TraceEventManager.SCHEDULER)
-    if (_exception.isDefined) {
-      runtime.finish(_exception.get)
+    if (exception.isDefined) {
+      runtime.finish(exception.get)
     } else {
       runtime.finish()
     }
@@ -95,10 +105,13 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
 
   private def start(node: Node): Unit = {
     try {
-      if (_exception.isEmpty) {
-        _exception = graphStatus.checkInputCardinalities(node)
+      if (exception.isEmpty) {
+        val cardfail = graphStatus.checkInputCardinalities(node)
+        if (cardfail.isDefined) {
+          exception = cardfail.get
+        }
       }
-      if (_exception.isDefined) {
+      if (exception.isDefined) {
         return
       }
 
@@ -142,10 +155,13 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
 
   def finish(node: Node): Unit = {
     synchronized {
-      if (_exception.isEmpty) {
-        _exception = graphStatus.checkOutputCardinalities(node)
+      if (exception.isEmpty) {
+        val cardfail = graphStatus.checkOutputCardinalities(node)
+        if (cardfail.isDefined) {
+          exception = cardfail.get
+        }
       }
-      if (_exception.isDefined) {
+      if (exception.isDefined) {
         return
       }
 
@@ -197,6 +213,7 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
   }
 
   def reportException(node: Node, cause: Throwable): Unit = {
+    tracer.trace(s"Exception reported: ${cause}", TraceEventManager.EXCEPTIONS)
     node match {
       case atry: TryStart =>
         abort(atry)
@@ -215,7 +232,7 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
         if (node.parent.isDefined) {
           reportException(node.parent.get, cause)
         } else {
-          _exception = Some(cause)
+          exception = cause
         }
     }
   }
@@ -280,9 +297,12 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
   def receive(node: Node, port: String, message: Message): Unit = {
     if (node.hasOutputEdge(port)) {
       val edge = node.outputEdge(port)
-      if (_exception.isEmpty) {
-        _exception = graphStatus.checkCardinalities(edge)
-        if (_exception.isEmpty) {
+      if (exception.isEmpty) {
+        val cardfail = graphStatus.checkCardinalities(edge)
+        if (cardfail.isDefined) {
+          exception = cardfail.get
+        }
+        if (exception.isEmpty) {
           graphStatus.receive(edge.from, edge.fromPort, edge.to, edge.toPort, message)
         }
       }
@@ -295,7 +315,12 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
   def receiveOutput(port: String, message: Message): Unit = {
     val proxy = runtime.outputs.get(port)
     if (proxy.isDefined) {
-      proxy.get.consume(proxy.get.outputPort, message)
+      try {
+        proxy.get.consume(proxy.get.outputPort, message)
+      } catch {
+        case t: Throwable =>
+          exception = t
+      }
     }
   }
 

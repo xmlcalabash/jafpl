@@ -1,7 +1,7 @@
 package com.jafpl.runtime
 
 import com.jafpl.exceptions.JafplException
-import com.jafpl.graph.{Buffer, CatchStart, ChooseStart, ContainerEnd, GraphInput, Node, WhenStart}
+import com.jafpl.graph.{Buffer, CatchStart, ChooseStart, ContainerEnd, GraphInput, GraphOutput, Node, WhenStart}
 import com.jafpl.messages.{BindingMessage, Message}
 import com.jafpl.runtime.NodeState.NodeState
 import com.jafpl.steps.PortSpecification
@@ -40,11 +40,17 @@ class NodeStatus(val node: Node, val action: Action, tracer: TraceEventManager) 
           inputSpecification = Some(start.manifold.get.outputSpec)
           outputSpecification = inputSpecification
         }
-      case io: GraphInput =>
+      case _: GraphInput =>
         if (node.manifold.isDefined) {
           inputSpecification = Some(node.manifold.get.inputSpec)
           // Graph inputs can have an arbitrary number of outputs
           outputSpecification = Some(PortSpecification.ANY)
+        }
+      case _: GraphOutput =>
+        if (node.manifold.isDefined) {
+          // Graph outputs can have an arbitrary number of inputs
+          inputSpecification = Some(PortSpecification.ANY)
+          outputSpecification = Some(node.manifold.get.outputSpec)
         }
       case _ =>
         if (node.manifold.isDefined) {
