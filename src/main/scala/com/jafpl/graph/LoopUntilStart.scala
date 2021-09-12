@@ -20,7 +20,7 @@ private[jafpl] class LoopUntilStart(override val graph: Graph,
     if (inputs.nonEmpty) {
       var valid = true
       for (port <- inputs) {
-        if (port != "#bindings" && port != "source") {
+        if (!validPortName(port, "source")) {
           println("Invalid binding on " + this + ": " + port)
           valid = false
         }

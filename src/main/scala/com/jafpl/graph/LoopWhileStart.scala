@@ -24,7 +24,7 @@ private[jafpl] class LoopWhileStart(override val graph: Graph,
     if (inputs.nonEmpty) {
       var valid = true
       for (port <- inputs) {
-        if (port != "#bindings" && port != "source") {
+        if (!validPortName(port, "source")) {
           graph.error(JafplException.invalidInputPort(port, this.toString, location))
           valid = false
         }

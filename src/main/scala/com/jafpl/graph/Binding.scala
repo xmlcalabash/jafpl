@@ -50,7 +50,7 @@ class Binding protected[jafpl] (override val graph: Graph,
   private[graph] override def inputsOk(): Boolean = {
     var valid = true
     for (port <- inputs) {
-      if ((port != "#bindings") && (port != "source")) {
+      if (!validPortName(port, "source")) {
         valid = false
         logger.error(s"Invalid input binding on variable: $port")
       }

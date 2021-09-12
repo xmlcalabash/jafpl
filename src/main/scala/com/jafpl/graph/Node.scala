@@ -430,6 +430,18 @@ abstract class Node(val graph: Graph,
     new xml.Elem(null, nodeName, attrs, xml.TopScope, false, nodes:_*)
   }
 
+  private[graph] def validPortName(port: String): Boolean = {
+    port == "#bindings" || port.startsWith("#depends")
+  }
+
+  private[graph] def validPortName(port: String, name: String): Boolean = {
+    port == "#bindings" || port.startsWith("#depends") || port == name
+  }
+
+  private[graph] def validPortName(port: String, names: List[String]): Boolean = {
+    port == "#bindings" || port.startsWith("#depends") || names.contains(port)
+  }
+
   private[graph] def inputsOk(): Boolean
   private[graph] def outputsOk(): Boolean
 }

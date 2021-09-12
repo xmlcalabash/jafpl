@@ -20,7 +20,7 @@ private[jafpl] class WhenStart(override val graph: Graph,
     if (inputs.nonEmpty) {
       var valid = true
       for (port <- inputs) {
-        if (port != "#bindings" && port != "condition") {
+        if (!validPortName(port, "condition")) {
           println("Invalid binding on " + this + ": " + port)
           valid = false
         }
