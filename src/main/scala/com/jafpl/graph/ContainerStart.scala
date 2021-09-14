@@ -323,7 +323,7 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
   }
 
   private def addOption(name: String, expression: Any, params: Option[BindingParams]): OptionBinding = {
-    val binding = graph.addOption(name, expression, params)
+    val binding = graph.addOption(name, expression, params, topLevel = false)
     addChild(binding)
     binding
   }

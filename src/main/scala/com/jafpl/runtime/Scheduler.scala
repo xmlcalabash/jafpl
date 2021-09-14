@@ -6,6 +6,7 @@ import com.jafpl.messages.Message
 import com.jafpl.runtime.NodeState.NodeState
 import com.jafpl.util.TraceEventManager
 
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 class Scheduler(val runtime: GraphRuntime) extends Runnable {
@@ -14,6 +15,7 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
   private object Locker;
 
   private val graphStatus = new GraphStatus(this)
+  private val optionBindings = mutable.HashMap.empty[Node, Message]
   private val pool = new ThreadPool(this,runtime.runtime.threadPoolSize)
   private val tracer = runtime.traceEventManager
   private var __exception = Option.empty[Throwable]
@@ -86,6 +88,7 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
 
     pool.joinAll()
     graphStatus.stop()
+    optionBindings.clear()
     tracer.trace("DONE  SCHEDULER", TraceEventManager.SCHEDULER)
     if (exception.isDefined) {
       runtime.finish(exception.get)
@@ -310,6 +313,14 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
       // Ignore this
       tracer.trace("debug", s"$node attempted to write to non-existant port $port", TraceEventManager.IO)
     }
+  }
+
+  protected[runtime] def receiveBinding(node: Node, message: Message): Unit = {
+    optionBindings.put(node, message)
+  }
+
+  protected[runtime] def getBinding(node: Node): Option[Message] = {
+    optionBindings.get(node)
   }
 
   def receiveOutput(port: String, message: Message): Unit = {

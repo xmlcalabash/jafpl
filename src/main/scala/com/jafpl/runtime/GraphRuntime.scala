@@ -30,7 +30,7 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
   private var _finished = false
   private val _graphInputs = mutable.HashMap.empty[String, InputProxy]
   private val _graphOutputs = mutable.HashMap.empty[String, OutputProxy]
-  private val _graphOptions = mutable.HashMap.empty[String, OptionBinding]
+  private val _graphOptions = mutable.HashMap.empty[String, OptionProxy]
   private var _traceEventManager: TraceEventManager = new DefaultTraceEventManager()
   private var _exception = Option.empty[Throwable]
 
@@ -56,6 +56,14 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
         }
         val op = new OutputProxy(req.name, node)
         _graphOutputs.put(req.name, op)
+      case req: OptionBinding =>
+        if (req.topLevel) {
+          if (_graphOptions.contains(req.name)) {
+            throw JafplException.dupOptionName(req.name, req.location)
+          }
+          val op = new OptionProxy(node, req.name, scheduler)
+          _graphOptions.put(req.name, op)
+        }
       case _ => ()
     }
   }
@@ -99,11 +107,11 @@ class GraphRuntime(val graph: Graph, val runtime: RuntimeConfiguration) {
     *
     * @return A map of the expected variable bindings.
     */
-  //def bindings: Map[String, BindingProvider] =  Map() ++ _graphBindings
+  def bindings: Map[String, OptionProxy] =  Map() ++ _graphOptions
 
   /** A map of the outputs that the pipeline produces.
     *
-    * This mapping from names (strings) to [[com.jafpl.steps.DataConsumerProxy]]s is the set of outputs that
+    * This mapping from names (strings) to [[OutputProxy]]s is the set of outputs that
     * the pipeline. If you do not call the `setProvider` method, the output will be
     * discarded.
     *

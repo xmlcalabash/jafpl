@@ -173,14 +173,18 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     * @return The binding
     */
   def addOption(name: String, expression: Any, params: BindingParams): OptionBinding = {
-    addOption(name, expression, Some(params))
+    addOption(name, expression, Some(params), topLevel = true)
   }
 
   def addOption(name: String, expression: Any, params: Option[BindingParams]): OptionBinding = {
+    addOption(name, expression, params, topLevel = true)
+  }
+
+  protected[graph] def addOption(name: String, expression: Any, params: Option[BindingParams], topLevel: Boolean): OptionBinding = {
     checkOpen()
     logger.debug(s"G$uid addOption $name $expression")
 
-    val binding = new OptionBinding(this, name, expression, params)
+    val binding = new OptionBinding(this, name, expression, params, topLevel)
     _nodes += binding
 
     binding
