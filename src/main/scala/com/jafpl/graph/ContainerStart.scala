@@ -246,22 +246,23 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     *
     * @return The node added.
     */
-  def addViewport(composer: ViewportComposer): ViewportStart = addViewport(composer, None)
+  def addViewport(composer: ViewportComposer, manifold: ManifoldSpecification): ViewportStart = addViewport(composer, None, manifold)
 
   /** Add a new viewport container to this container.
     *
     * @param label A user-defined label.
     * @return The node added.
     */
-  def addViewport(composer: ViewportComposer, label: String): ViewportStart = addViewport(composer, Some(label))
+  def addViewport(composer: ViewportComposer, label: String, manifold: ManifoldSpecification): ViewportStart
+    = addViewport(composer, Some(label), manifold)
 
   /** Add a new viewport container to this container.
     *
     * @param label An optional, user-defined label.
     * @return The node added.
     */
-  def addViewport(composer: ViewportComposer, label: Option[String]): ViewportStart = {
-    val node = graph.addViewport(composer, label)
+  def addViewport(composer: ViewportComposer, label: Option[String], manifold: ManifoldSpecification): ViewportStart = {
+    val node = graph.addViewport(composer, label, manifold)
     addChild(node)
     node
   }
@@ -270,22 +271,22 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     *
     * @return The node added.
     */
-  def addTryCatch(): TryCatchStart = addTryCatch(None)
+  def addTryCatch(manifold: ManifoldSpecification): TryCatchStart = addTryCatch(None, manifold)
 
   /** Add a new try/catch container to this container.
     *
     * @param label A user-defined label.
     * @return The node added.
     */
-  def addTryCatch(label: String): TryCatchStart = addTryCatch(Some(label))
+  def addTryCatch(label: String, manifold: ManifoldSpecification): TryCatchStart = addTryCatch(Some(label), manifold)
 
   /** Add a new try/catch container to this container.
     *
     * @param label An optional, user-defined label.
     * @return The node added.
     */
-  def addTryCatch(label: Option[String]): TryCatchStart = {
-    val node = graph.addTryCatch(label)
+  def addTryCatch(label: Option[String], manifold: ManifoldSpecification): TryCatchStart = {
+    val node = graph.addTryCatch(label, manifold)
     addChild(node)
     node
   }

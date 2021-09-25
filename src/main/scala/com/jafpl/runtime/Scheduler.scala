@@ -159,7 +159,12 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
   def finish(node: Node): Unit = {
     synchronized {
       if (exception.isEmpty) {
-        val cardfail = graphStatus.checkOutputCardinalities(node)
+        val cardfail = node match {
+          case cont: ContainerStart =>
+            graphStatus.checkOutputCardinalities(cont.containerEnd)
+          case _ =>
+            graphStatus.checkOutputCardinalities(node)
+        }
         if (cardfail.isDefined) {
           exception = cardfail.get
         }

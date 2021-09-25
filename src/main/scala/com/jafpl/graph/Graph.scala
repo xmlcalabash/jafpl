@@ -1,14 +1,14 @@
 package com.jafpl.graph
 
-import java.io.{File, PrintWriter}
 import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.{JafplException, JafplLoopDetected}
 import com.jafpl.graph.JoinMode.JoinMode
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{Manifold, ManifoldSpecification, PortCardinality, PortSpecification, Step, ViewportComposer}
+import com.jafpl.steps._
 import com.jafpl.util.{ItemComparator, ItemTester, UniqueId}
 import org.slf4j.{Logger, LoggerFactory}
 
+import java.io.{File, PrintWriter}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.reflect.ClassTag
@@ -356,13 +356,13 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     * @param label An optional, user-defined label.
     * @return The constructed viewport.
     */
-  protected[graph] def addViewport(composer: ViewportComposer, label: Option[String]): ViewportStart = {
+  protected[graph] def addViewport(composer: ViewportComposer, label: Option[String], manifold: ManifoldSpecification): ViewportStart = {
     checkOpen()
 
     logger.debug(s"G$uid addViewport ${label.getOrElse("ANONYMOUS")}")
 
     val end = new ContainerEnd(this)
-    val start = new ViewportStart(this, end, label, composer)
+    val start = new ViewportStart(this, end, label, composer, manifold)
     end.parent = start
     end.start = start
     _nodes += start
@@ -375,13 +375,13 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     * @param label An optional, user-defined label.
     * @return The constructed try/catch.
     */
-  protected[graph] def addTryCatch(label: Option[String]): TryCatchStart = {
+  protected[graph] def addTryCatch(label: Option[String], manifold: ManifoldSpecification): TryCatchStart = {
     checkOpen()
 
     logger.debug(s"G$uid addTryCatch ${label.getOrElse("ANONYMOUS")}")
 
     val end = new ContainerEnd(this)
-    val start = new TryCatchStart(this, end, label)
+    val start = new TryCatchStart(this, end, label, manifold)
     end.parent = start
     end.start = start
     _nodes += start
@@ -389,13 +389,13 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     start
   }
 
-  protected[graph] def addTry(label: Option[String]): TryStart = {
+  protected[graph] def addTry(label: Option[String], manifold: ManifoldSpecification): TryStart = {
     checkOpen()
 
     logger.debug(s"G$uid addTry ${label.getOrElse("ANONYMOUS")}")
 
     val end = new ContainerEnd(this)
-    val start = new TryStart(this, end, label)
+    val start = new TryStart(this, end, label, manifold)
     end.parent = start
     end.start = start
     _nodes += start
@@ -403,14 +403,14 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     start
   }
 
-  protected[graph] def addCatch(label: Option[String], codes: List[Any]): CatchStart = {
+  protected[graph] def addCatch(label: Option[String], codes: List[Any], manifold: ManifoldSpecification): CatchStart = {
     checkOpen()
 
     val dlabel = label.getOrElse("ANONYMOUS")
     logger.debug(s"G$uid addCatch $dlabel $codes")
 
     val end = new ContainerEnd(this)
-    val start = new CatchStart(this, end, label, codes)
+    val start = new CatchStart(this, end, label, codes, manifold)
     end.parent = start
     end.start = start
     _nodes += start
@@ -418,13 +418,13 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     start
   }
 
-  protected[graph] def addFinally(label: Option[String]): FinallyStart = {
+  protected[graph] def addFinally(label: Option[String], manifold: ManifoldSpecification): FinallyStart = {
     checkOpen()
 
     logger.debug(s"G$uid addFinally ${label.getOrElse("ANONYMOUS")}")
 
     val end = new ContainerEnd(this)
-    val start = new FinallyStart(this, end, label)
+    val start = new FinallyStart(this, end, label, manifold)
     end.parent = start
     end.start = start
     _nodes += start

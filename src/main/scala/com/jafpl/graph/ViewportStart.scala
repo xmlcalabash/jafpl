@@ -5,14 +5,13 @@ import com.jafpl.steps.{Manifold, ManifoldSpecification, PortSpecification, View
 private[jafpl] class ViewportStart(override val graph: Graph,
                                    override protected val end: ContainerEnd,
                                    override val userLabel: Option[String],
-                                   val composer: ViewportComposer)
+                                   val composer: ViewportComposer,
+                                   private val manspec: ManifoldSpecification)
   extends LoopStart(graph, end, userLabel) {
   private var _outputPort = ""
+  manifold = manspec
 
   def outputPort: String = _outputPort
-
-  // FIXME: don't allow a sequence on source!
-  override def manifold: Option[ManifoldSpecification] = Some(Manifold.ALLOW_ANY)
 
   override def inputsOk(): Boolean = {
     var hasSource = false

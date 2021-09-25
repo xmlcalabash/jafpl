@@ -104,7 +104,7 @@ class DependsSpec extends AnyFlatSpec {
       fail()
     } catch {
       case _: JafplLoopDetected => assert(true)
-      case _ => fail("Expected JafplLoopDetected")
+      case _: Throwable => fail("Expected JafplLoopDetected")
     }
   }
 
@@ -129,10 +129,10 @@ class DependsSpec extends AnyFlatSpec {
     val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
     val prodA = pipeline.addAtomic(new Producer(List("A")), "docA")
 
-    val p_try = pipeline.addTryCatch("try")
-    val p_group = p_try.addTry("group")
+    val p_try = pipeline.addTryCatch("try", Manifold.ALLOW_ANY)
+    val p_group = p_try.addTry("group", Manifold.ALLOW_ANY)
     val p_gid = p_group.addAtomic(new Identity(), "group_ident")
-    val p_catch = p_try.addCatch("catch")
+    val p_catch = p_try.addCatch("catch", Manifold.ALLOW_ANY)
     val p_cid = p_catch.addAtomic(new Identity(), "catch_ident")
     val p_final = pipeline.addAtomic(new Identity(), label="final_ident")
 

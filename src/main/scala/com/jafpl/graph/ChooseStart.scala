@@ -44,11 +44,11 @@ class ChooseStart private[jafpl] (override val graph: Graph,
     throw JafplException.childForbidden(this.label, label.getOrElse("for-each"), location)
   }
 
-  override def addViewport(composer: ViewportComposer, label: Option[String]): ViewportStart = {
+  override def addViewport(composer: ViewportComposer, label: Option[String], manifold: ManifoldSpecification): ViewportStart = {
     throw JafplException.childForbidden(this.label, label.getOrElse("viewport"), location)
   }
 
-  override def addTryCatch(label: Option[String]): TryCatchStart = {
+  override def addTryCatch(label: Option[String], manifold: ManifoldSpecification): TryCatchStart = {
     throw JafplException.childForbidden(this.label, label.getOrElse("try"), location)
   }
 }

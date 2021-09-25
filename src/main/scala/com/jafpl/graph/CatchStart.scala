@@ -14,8 +14,10 @@ import com.jafpl.steps.{Manifold, ManifoldSpecification, Step}
 class CatchStart private[jafpl] (override val graph: Graph,
                                  override protected val end: ContainerEnd,
                                  override val userLabel: Option[String],
-                                 val codes: List[Any]) extends ContainerStart(graph, end, userLabel) {
+                                 val codes: List[Any],
+                                 private val manspec: ManifoldSpecification) extends ContainerStart(graph, end, userLabel) {
   protected[jafpl] var cause = Option.empty[Throwable]
+  manifold = manspec
 
   private var _translator = Option.empty[Step]
   def translator: Option[Step] = _translator
@@ -25,7 +27,4 @@ class CatchStart private[jafpl] (override val graph: Graph,
     }
     _translator = Some(xlate)
   }
-
-  // FIXME: Is this right?
-  override def manifold: Option[ManifoldSpecification] = Some(Manifold.ALLOW_ANY)
 }

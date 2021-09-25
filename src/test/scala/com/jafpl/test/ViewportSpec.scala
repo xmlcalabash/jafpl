@@ -16,7 +16,7 @@ class ViewportSpec extends AnyFlatSpec {
     val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
 
     val prod     = pipeline.addAtomic(new Producer(List("Now is the time; just do it.")), "prod")
-    val viewport = pipeline.addViewport(new StringComposer(), "viewport")
+    val viewport = pipeline.addViewport(new StringComposer(), "viewport", Manifold.ALLOW_ANY)
     val uc       = viewport.addAtomic(new Uppercase(), "uc")
 
     graph.addEdge(prod, "result", viewport, "source")
@@ -41,7 +41,7 @@ class ViewportSpec extends AnyFlatSpec {
     val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
 
     val prod     = pipeline.addAtomic(new Producer(List("Now is the time; just do it.")), "prod")
-    val viewport = pipeline.addViewport(new StringComposer(), "viewport")
+    val viewport = pipeline.addViewport(new StringComposer(), "viewport", Manifold.ALLOW_ANY)
     val uc       = viewport.addAtomic(new Uppercase(), "uc")
 
     graph.addEdge(prod, "result", viewport, "source")
@@ -66,7 +66,7 @@ class ViewportSpec extends AnyFlatSpec {
     val pipeline = graph.addPipeline(Manifold.ALLOW_ANY)
 
     val prod     = pipeline.addAtomic(new Producer(List()), "prod")
-    val viewport = pipeline.addViewport(new StringComposer(), "viewport")
+    val viewport = pipeline.addViewport(new StringComposer(), "viewport", Manifold.ALLOW_ANY)
     val uc       = viewport.addAtomic(new Uppercase(), "uc")
 
     graph.addEdge(prod, "result", viewport, "source")
@@ -91,7 +91,7 @@ class ViewportSpec extends AnyFlatSpec {
 
     val bind     = pipeline.addVariable("fred", "some value")
     val prod     = pipeline.addAtomic(new Producer(List("one two")), "prod")
-    val viewport = pipeline.addViewport(new StringComposer(), "viewport")
+    val viewport = pipeline.addViewport(new StringComposer(), "viewport", Manifold.ALLOW_ANY)
     val uc       = viewport.addAtomic(new Uppercase(), "uc")
 
     graph.addBindingEdge(bind, viewport)
