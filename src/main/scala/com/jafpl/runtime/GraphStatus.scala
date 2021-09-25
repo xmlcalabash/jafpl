@@ -82,6 +82,16 @@ class GraphStatus(val scheduler: Scheduler) {
     state
   }
 
+  def openInputs(node: Node): Set[String] = {
+    tracer.trace("debug", s"MUTEX LOCK for openInputs($node)", TraceEventManager.MUTEX)
+    val inputs = nodeStatus.synchronized {
+      tracer.trace("debug", s"MUTEX LOCKED for openInputs($node)", TraceEventManager.MUTEX)
+      nodeStatus(node).openInputs
+    }
+    tracer.trace("debug", s"MUTEX UNLOCK for opneInputs($node)", TraceEventManager.MUTEX)
+    inputs
+  }
+
   def run(node: Node): Unit = {
     tracer.trace("debug", s"MUTEX LOCK for run($node)", TraceEventManager.MUTEX)
     val status = nodeStatus.synchronized {
@@ -471,7 +481,7 @@ class GraphStatus(val scheduler: Scheduler) {
       case _ =>
         throw JafplException.unexpecteStepType(node.toString, node.location)
     }
-    val status = new NodeStatus(node, action, tracer)
+    val status = new NodeStatus(node, action, this, tracer)
 
     for (dep <- status.dependsOn) {
       if (!dependentOn.contains(dep)) {

@@ -11,7 +11,7 @@ import scala.collection.immutable.HashSet
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-class NodeStatus(val node: Node, val action: Action, tracer: TraceEventManager) extends Runnable {
+class NodeStatus(val node: Node, val action: Action, graphStatus: GraphStatus, tracer: TraceEventManager) extends Runnable {
   private var __state = NodeState.LIMBO
   private val _openInputs = mutable.HashSet.empty[String]
   private val _openBindings = mutable.HashSet.empty[String]
@@ -234,7 +234,27 @@ class NodeStatus(val node: Node, val action: Action, tracer: TraceEventManager) 
   def state(): NodeState.Value = {
     if (_state == NodeState.RUNNABLE) {
       if (_openInputs.isEmpty && _openBindings.isEmpty && _dependsOn.isEmpty) {
-        _state = NodeState.READY;
+        node match {
+          case choose: ChooseStart =>
+            // Choose is special; we can't let it be READY until all of the
+            // when branches are able to run their tests.
+            var limbo = false
+            for (child <- choose.children) {
+              child match {
+                case _: WhenStart =>
+                  limbo = limbo || graphStatus.openInputs(child).nonEmpty
+                case _ => ()
+              }
+            }
+            if (limbo) {
+              tracer.trace("debug", "Choose in limbo because when/otherwise waiting for inputs", TraceEventManager.SCHEDULER)
+              // leave it in the RUNNABLE state
+            } else {
+              _state = NodeState.READY
+            }
+          case _ =>
+            _state = NodeState.READY;
+        }
       }
     }
     _state
