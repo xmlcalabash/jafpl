@@ -309,7 +309,7 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * @return The node added.
     */
   def addOption(name: String, expression: Any): Binding = {
-    addOption(name, expression, None)
+    addOption(name, expression, None, false)
   }
 
   /**
@@ -319,11 +319,21 @@ class ContainerStart protected[jafpl] (override val graph: Graph,
     * @return The binding
     */
   def addOption(name: String, expression: Any, params: BindingParams): OptionBinding = {
-    addOption(name, expression, Some(params))
+    addOption(name, expression, Some(params), false)
   }
 
-  private def addOption(name: String, expression: Any, params: Option[BindingParams]): OptionBinding = {
-    val binding = graph.addOption(name, expression, params, topLevel = false)
+  /**
+   * FIXME: WRITE THIS
+   * @param name The option name
+   * @param expression The default initializer for the option
+   * @return The binding
+   */
+  def addOption(name: String, expression: Any, params: BindingParams, topLevel: Boolean): OptionBinding = {
+    addOption(name, expression, Some(params), topLevel)
+  }
+
+  private def addOption(name: String, expression: Any, params: Option[BindingParams], topLevel: Boolean): OptionBinding = {
+    val binding = graph.addOption(name, expression, params, topLevel)
     addChild(binding)
     binding
   }
