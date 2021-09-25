@@ -4,7 +4,7 @@ name := "jafpl"
 
 organization := "com.jafpl"
 homepage     := Some(url("https://jafpl.com/"))
-version      := "0.3.34"
+version      := "0.3.39"
 scalaVersion := "2.13.5"
 
 Global / excludeLintKeys += homepage
