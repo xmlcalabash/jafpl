@@ -37,7 +37,7 @@ private[jafpl] class ViewportStart(override val graph: Graph,
     // A viewport can have only two outputs: current and result
     var count = 0
     for (output <- outputs) {
-      if (output != "current") {
+      if (output != "current" && !output.startsWith("#depends_")) {
         count += 1
         _outputPort = output
       }
