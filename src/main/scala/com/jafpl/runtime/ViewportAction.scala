@@ -34,9 +34,15 @@ class ViewportAction(override val node: ViewportStart) extends LoopAction(node) 
 
     if (node.iterationPosition == 0) {
       if (sourceItem.isDefined) {
-        node.composer.runtimeBindings(receivedBindings.toMap)
-        for (item <- node.composer.decompose(sourceItem.get)) {
-          itemQueue += item
+        try {
+          node.composer.runtimeBindings(receivedBindings.toMap)
+          for (item <- node.composer.decompose(sourceItem.get)) {
+            itemQueue += item
+          }
+        } catch {
+          case t: Throwable =>
+            scheduler.reportException(node, t)
+            return
         }
       }
       _index = 0

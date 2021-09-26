@@ -164,8 +164,12 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
             None
           case end: ContainerEnd =>
             end.start.get match {
-              case _: ViewportStart =>
-                None // No documents are written to the end for most iterations
+              case vstart: ViewportStart =>
+                if (vstart.iterationPosition == vstart.iterationSize) {
+                  graphStatus.checkOutputCardinalities(node)
+                } else {
+                  None // We're still looping through the pieces
+                }
               case _ =>
                 graphStatus.checkOutputCardinalities(node)
             }
