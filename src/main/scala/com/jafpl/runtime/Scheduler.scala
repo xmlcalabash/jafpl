@@ -160,8 +160,15 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
     synchronized {
       if (exception.isEmpty) {
         val cardfail = node match {
-          case cont: ContainerStart =>
-            graphStatus.checkOutputCardinalities(cont.containerEnd)
+          case _: ContainerStart =>
+            None
+          case end: ContainerEnd =>
+            end.start.get match {
+              case _: ViewportStart =>
+                None // No documents are written to the end for most iterations
+              case _ =>
+                graphStatus.checkOutputCardinalities(node)
+            }
           case _ =>
             graphStatus.checkOutputCardinalities(node)
         }
