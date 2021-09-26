@@ -443,7 +443,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   }
 
   protected[graph] def addJoiner(): Joiner = {
-    addJoiner(JoinMode.MIXED)
+    addJoiner(JoinMode.ORDERED)
   }
 
   protected[graph] def addJoiner(mode: JoinMode): Joiner = {
