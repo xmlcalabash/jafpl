@@ -767,7 +767,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
     _valid = true
 
-    debugDumpGraph()
+    // debugDumpGraph()
 
     // Insert exception translators into each catch if the catch reads from the
     // error port and a translator has been provided.
