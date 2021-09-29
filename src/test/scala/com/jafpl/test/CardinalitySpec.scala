@@ -201,12 +201,12 @@ class CardinalitySpec extends AnyFlatSpec {
     assert(pass)
   }
 
-  "Cardinalities" should " be enforced on a for-each" in {
+  "Cardinalities" should " be enforced outside a for-each" in {
     val graph    = Jafpl.newInstance().newGraph()
 
-    val pipeline      = graph.addPipeline(Manifold.ALLOW_ANY)
+    val pipeline      = graph.addPipeline(new Manifold(Manifold.WILD, Manifold.singlePort("result", 0, 2)))
     val producer      = pipeline.addAtomic(new Producer(List("1", "2", "3")), "producer")
-    val outerForEach  = pipeline.addForEach("o-for-each", new Manifold(Manifold.WILD, Manifold.singlePort("result", 0, 2)))
+    val outerForEach  = pipeline.addForEach("o-for-each", Manifold.ALLOW_ANY)
     val ident         = outerForEach.addAtomic(new Identity(), "ident")
 
     val bc = new BufferSink()
@@ -214,6 +214,39 @@ class CardinalitySpec extends AnyFlatSpec {
     graph.addEdge(producer, "result", outerForEach, "source")
     graph.addEdge(outerForEach, "current", ident, "source")
     graph.addEdge(ident, "result", outerForEach, "result")
+    graph.addEdge(outerForEach, "result", pipeline, "result")
+    graph.addOutput(pipeline, "result")
+
+    var pass = false
+    try {
+      val runtime = new GraphRuntime(graph, runtimeConfig)
+      runtime.outputs("result").setConsumer(bc)
+      runtime.runSync()
+    } catch {
+      case jafpl: JafplException =>
+        pass = jafpl.code == JafplException.OUTPUT_CARDINALITY_ERROR
+        jafpl.printStackTrace()
+    }
+
+    assert(pass)
+  }
+
+  "Cardinalities" should " be enforced inside a for-each" in {
+    val graph    = Jafpl.newInstance().newGraph()
+
+    val pipeline      = graph.addPipeline(Manifold.ALLOW_ANY)
+    val producer      = pipeline.addAtomic(new Producer(List("1", "2", "3")), "producer")
+    val outerForEach  = pipeline.addForEach("o-for-each",new Manifold(Manifold.WILD, Manifold.singlePort("result", 0, 1)))
+    val ident1        = outerForEach.addAtomic(new Identity(), "ident1")
+    val ident2        = outerForEach.addAtomic(new Identity(), "ident2")
+
+    val bc = new BufferSink()
+
+    graph.addEdge(producer, "result", outerForEach, "source")
+    graph.addEdge(outerForEach, "current", ident1, "source")
+    graph.addEdge(outerForEach, "current", ident2, "source")
+    graph.addEdge(ident1, "result", outerForEach, "result")
+    graph.addEdge(ident2, "result", outerForEach, "result")
     graph.addEdge(outerForEach, "result", pipeline, "result")
     graph.addOutput(pipeline, "result")
 
