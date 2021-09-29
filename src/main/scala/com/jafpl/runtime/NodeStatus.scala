@@ -66,6 +66,11 @@ class NodeStatus(val node: Node, val action: Action, graphStatus: GraphStatus, t
     doReset(state, resetAction=true)
   }
 
+  protected[jafpl] def resetCardinalities(): Unit = {
+    inputCardinalities.clear()
+    outputCardinalities.clear()
+  }
+
   private def doReset(newState: NodeState, resetAction: Boolean): Unit = {
     // On containers, the inputs are determined by the kind of container
     _openInputs.clear()
@@ -105,8 +110,7 @@ class NodeStatus(val node: Node, val action: Action, graphStatus: GraphStatus, t
           _state = newState
       }
       action.reset(newState)
-      inputCardinalities.clear()
-      outputCardinalities.clear()
+      resetCardinalities()
     }
   }
 
@@ -210,6 +214,26 @@ class NodeStatus(val node: Node, val action: Action, graphStatus: GraphStatus, t
   protected[runtime] def checkOutputCardinality(port: String): Option[Throwable] = {
     if (_state != NodeState.STOPPED) {
       val count = outputCardinalities.getOrElse(port, 0L)
+      if (outputSpecification.isDefined) {
+        val card = outputSpecification.get.cardinality(port)
+        if (card.isDefined) {
+          if (!card.get.withinBounds(count)) {
+            return Some(JafplException.outputCardinalityError(port, count.toString, card.get))
+          }
+        } else {
+          tracer.trace(s"CARD? No cardinality for output $port on $node", TraceEventManager.CARDINALITY)
+        }
+      } else {
+        tracer.trace(s"CARD? No output specification on $node", TraceEventManager.CARDINALITY)
+      }
+    }
+
+    None
+  }
+
+  protected[runtime] def checkContainerOutputCardinality(port: String): Option[Throwable] = {
+    if (_state != NodeState.STOPPED) {
+      val count = inputCardinalities.getOrElse(port, 0L)
       if (outputSpecification.isDefined) {
         val card = outputSpecification.get.cardinality(port)
         if (card.isDefined) {

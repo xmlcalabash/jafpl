@@ -162,17 +162,13 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
         val cardfail = node match {
           case _: ContainerStart =>
             None
-          case end: ContainerEnd =>
-            end.start.get match {
-              case vstart: ViewportStart =>
-                if (vstart.iterationPosition == vstart.iterationSize) {
-                  graphStatus.checkOutputCardinalities(node)
-                } else {
-                  None // We're still looping through the pieces
-                }
-              case _ =>
-                graphStatus.checkOutputCardinalities(node)
-            }
+          case _: ContainerEnd =>
+            // For containers, the declared cardinality of an output port
+            // should be compared against the number of inputs that the container
+            // end received.
+            val status = graphStatus.checkContainerOutputCardinalities(node)
+            graphStatus.resetCardinalities(node)
+            status
           case _ =>
             graphStatus.checkOutputCardinalities(node)
         }

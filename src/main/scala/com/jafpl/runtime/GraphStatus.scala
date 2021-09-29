@@ -185,6 +185,21 @@ class GraphStatus(val scheduler: Scheduler) {
     ex
   }
 
+  def checkContainerOutputCardinalities(node: Node): Option[Throwable] = {
+    var ex = Option.empty[Throwable]
+    tracer.trace("debug", s"MUTEX LOCK for checkOutputCardinalities for $node", TraceEventManager.MUTEX)
+    nodeStatus.synchronized {
+      tracer.trace("debug", s"MUTEX LOCKED for checkOutputCardinalities for $node", TraceEventManager.MUTEX)
+      for (port <- node.outputs) {
+        if (ex.isEmpty) {
+          ex = nodeStatus(node).checkContainerOutputCardinality(port)
+        }
+      }
+    }
+    tracer.trace("debug", s"MUTEX UNLOCKED for checkOutputCardinalities for $node", TraceEventManager.MUTEX)
+    ex
+  }
+
   def receive(fromNode: Node, fromPort: String, toNode: Node, toPort: String, message: Message): Unit = {
     tracer.trace("debug", s"MUTEX LOCK for receive from $fromNode", TraceEventManager.MUTEX)
     nodeStatus.synchronized {
@@ -305,6 +320,15 @@ class GraphStatus(val scheduler: Scheduler) {
       nodeStatus(node).reset(state)
     }
     tracer.trace("debug", s"MUTEX UNLOCK for reset($node)", TraceEventManager.MUTEX)
+  }
+
+  protected[jafpl] def resetCardinalities(node: Node): Unit = {
+    tracer.trace("debug", s"MUTEX LOCK for resetCardinalities($node)", TraceEventManager.MUTEX)
+    nodeStatus.synchronized {
+      tracer.trace("debug", s"MUTEX LOCKED for resetCardinalities($node)", TraceEventManager.MUTEX)
+      nodeStatus(node).resetCardinalities()
+    }
+    tracer.trace("debug", s"MUTEX UNLOCK for resetCardinalities($node)", TraceEventManager.MUTEX)
   }
 
   def loop(node: LoopStart): Unit = {
