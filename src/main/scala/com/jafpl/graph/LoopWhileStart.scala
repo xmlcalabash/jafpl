@@ -16,7 +16,13 @@ private[jafpl] class LoopWhileStart(override val graph: Graph,
                                     val returnAll: Boolean)
   extends LoopStart(graph, end, userLabel) {
 
+  private var _done = false
   manifold = manspec
+
+  protected[jafpl] def done: Boolean = _done
+  protected[jafpl] def done_=(state: Boolean): Unit = {
+    _done = state
+  }
 
   override def inputsOk(): Boolean = {
     var hasSource = false

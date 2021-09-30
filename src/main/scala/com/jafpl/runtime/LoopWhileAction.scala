@@ -9,35 +9,41 @@ class LoopWhileAction(override val node: LoopWhileStart) extends LoopAction(node
   private var currentItem = Option.empty[ItemMessage]
   private var looping = false
   private var firstItem = true
-  private var _done = false
+  private var inputPort = Option.empty[String]
+  private var endAction: LoopWhileEndAction = _
 
-  def done: Boolean = _done
+  def loopEndAction: LoopWhileEndAction = endAction
+  def loopEndAction_=(end: LoopWhileEndAction): Unit = {
+    endAction = end
+  }
 
   override def receive(port: String, message: Message): Unit = {
     message match {
       case item: ItemMessage =>
-        port match {
-          case "source" =>
+        if (port == "test") {
+          currentItem = Some(item)
+        } else {
+          if (inputPort.isEmpty || inputPort.get == port) {
             if (currentItem.isDefined) {
-              throw new RuntimeException("Sequence on loop while source")
+              throw JafplException.unexpectedSequence(node.userLabel.getOrElse("cx:until"), port, node.location)
             }
             currentItem = Some(item)
-          case "test" =>
-            currentItem = Some(item)
-          case _ =>
-            throw new RuntimeException(s"Unexpected input port on until: ${port}")
+            inputPort = Some(port)
+          } else {
+            throw JafplException.invalidUntilPort(port, inputPort.get, node.location)
+          }
         }
       case _ =>
         throw JafplException.unexpectedMessage(message.toString, port, node.location)
     }
   }
 
-  override def finished(): Boolean = _done
+  override def finished(): Boolean = node.done
 
   override def run(): Unit = {
     super.run()
 
-    _done = currentItem.isEmpty || !node.tester.test(List(currentItem.get), receivedBindings.toMap)
+    node.done = currentItem.isEmpty || !node.tester.test(List(currentItem.get), receivedBindings.toMap)
 
     if (!looping) {
       looping = true
@@ -45,7 +51,7 @@ class LoopWhileAction(override val node: LoopWhileStart) extends LoopAction(node
       node.iterationSize = 0
     }
 
-    if (_done) {
+    if (node.done) {
       skipChildren()
     } else {
       node.iterationPosition += 1
@@ -65,6 +71,6 @@ class LoopWhileAction(override val node: LoopWhileStart) extends LoopAction(node
     currentItem = None
     looping = false
     firstItem = true
-    _done = false
+    node.done = false
   }
 }

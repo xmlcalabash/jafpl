@@ -55,6 +55,8 @@ object JafplException {
   val UNDEFINED_STATIC = 49
   val USER_ABORT = 50
   val NO_STEP_FOR = 59
+  val INVALID_LOOP_BOUNDS = 60
+  val INVALID_UNTIL_PORT = 61
 
   protected[jafpl] def childForbidden(parent: String, child: String, location: Option[Location]): JafplException = new JafplException(CHILD_FORBIDDEN, location, List(parent, child))
   protected[jafpl] def badContainerEnd(expectedEnd: String, actualEnd: String, location: Option[Location]): JafplException = new JafplException(BAD_CONTAINER_END, location, List(expectedEnd, actualEnd))
@@ -105,8 +107,9 @@ object JafplException {
   protected[jafpl] def undefinedStatic(item: String, location: Option[Location]): JafplException = new JafplException(UNDEFINED_STATIC, location, List(item))
   protected[jafpl] def userAbort(): JafplException = new JafplException(USER_ABORT, None, List())
   protected[jafpl] def noStepFor(node: String, location: Option[Location]): JafplException = new JafplException(NO_STEP_FOR, location, List(node))
+  protected[jafpl] def invalidLoopBounds(from: Long, to: Long, by: Long): JafplException = new JafplException(INVALID_LOOP_BOUNDS, None, List(from,to,by))
+  protected[jafpl] def invalidUntilPort(port: String, expected: String, location: Option[Location]): JafplException = new JafplException(INVALID_UNTIL_PORT, location, List(port, expected))
 }
-
 class JafplException protected (val code: Any, val location: Option[Location], val details: List[Any]) extends RuntimeException {
   override def getMessage: String = toString
 

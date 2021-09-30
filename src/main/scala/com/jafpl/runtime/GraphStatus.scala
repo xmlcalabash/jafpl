@@ -486,16 +486,21 @@ class GraphStatus(val scheduler: Scheduler) {
         if (n.start.isDefined) {
           n.start.get match {
             case s: LoopUntilStart =>
+              val start = nodeStatus(s).action.asInstanceOf[LoopUntilAction]
               val end = new LoopUntilEndAction(n)
-              end.loopStartAction = nodeStatus(s).action.asInstanceOf[LoopUntilAction]
+              start.loopEndAction = end
+              end.loopStartAction = start
               end
             case s: LoopWhileStart =>
+              val start = nodeStatus(s).action.asInstanceOf[LoopWhileAction]
               val end = new LoopWhileEndAction(n)
-              end.loopStartAction = nodeStatus(s).action.asInstanceOf[LoopWhileAction]
+              start.loopEndAction = end
+              end.loopStartAction = start
               end
             case s: ViewportStart =>
+              val start = nodeStatus(s).action.asInstanceOf[ViewportAction]
               val end = new ViewportEndAction(n)
-              end.loopStartAction = nodeStatus(s).action.asInstanceOf[ViewportAction]
+              end.loopStartAction = start
               end
             case _ => new EndAction(n)
           }

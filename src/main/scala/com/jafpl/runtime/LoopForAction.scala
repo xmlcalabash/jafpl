@@ -1,5 +1,6 @@
 package com.jafpl.runtime
 
+import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.LoopForStart
 import com.jafpl.messages.{ItemMessage, Metadata}
 import com.jafpl.runtime.NodeState.NodeState
@@ -21,15 +22,14 @@ class LoopForAction(override val node: LoopForStart) extends LoopAction(node) {
       current = node.countFrom
       node.iterationPosition = 0
       node.iterationSize = (diff + node.countBy.abs - 1) / node.countBy.abs
+
+      if ((node.countFrom <= node.countTo && node.countBy <= 0)
+        || (node.countFrom >= node.countTo && node.countBy >= 0)) {
+        throw JafplException.invalidLoopBounds(node.countFrom, node.countTo, node.countBy)
+      }
     }
 
-    val initiallyTrue = if (node.countBy > 0) {
-      current <= node.countTo
-    } else {
-      current >= node.countTo
-    }
-
-    if (initiallyTrue) {
+    if (!finished()) {
       scheduler.receive(node, "current", new ItemMessage(current, Metadata.NUMBER))
       node.iterationPosition += 1
       current += node.countBy
@@ -37,6 +37,14 @@ class LoopForAction(override val node: LoopForStart) extends LoopAction(node) {
 
     startChildren()
     scheduler.finish(node)
+  }
+
+  override def finished(): Boolean = {
+    if (node.countBy > 0) {
+      current > node.countTo
+    } else {
+      current < node.countTo
+    }
   }
 
   override def reset(state: NodeState): Unit = {

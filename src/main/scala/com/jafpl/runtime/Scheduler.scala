@@ -162,11 +162,22 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
         val cardfail = node match {
           case _: ContainerStart =>
             None
-          case _: ContainerEnd =>
+          case cend: ContainerEnd =>
             // For containers, the declared cardinality of an output port
             // should be compared against the number of inputs that the container
             // end received.
-            val status = graphStatus.checkContainerOutputCardinalities(node)
+            // ...except...
+            // The while step is a special case, it will always receive 0 items
+            // on the last iteration after the loop decides it's finished.
+            var status = Option.empty[Throwable]
+            cend.start.get match {
+              case cwhile: LoopWhileStart =>
+                if (!cwhile.done) {
+                  status = graphStatus.checkContainerOutputCardinalities(node)
+                }
+              case _ =>
+                status = graphStatus.checkContainerOutputCardinalities(node)
+            }
             graphStatus.resetCardinalities(node)
             status
           case _ =>
@@ -349,7 +360,12 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
 
   class ActionProxy(graphStatus: GraphStatus, node: Node) extends Runnable {
     def run(): Unit = {
-      graphStatus.run(node)
+      try {
+        graphStatus.run(node)
+      } catch {
+        case t: Throwable =>
+          exception = t
+      }
     }
 
     override def toString: String = {

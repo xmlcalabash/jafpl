@@ -1,10 +1,11 @@
 package com.jafpl.test
 
 import com.jafpl.config.Jafpl
+import com.jafpl.exceptions.JafplException
 import com.jafpl.io.BufferConsumer
 import com.jafpl.primitive.PrimitiveRuntimeConfiguration
 import com.jafpl.runtime.GraphRuntime
-import com.jafpl.steps.{Identity, Manifold}
+import com.jafpl.steps.{Identity, Manifold, RaiseError}
 import org.scalatest.flatspec.AnyFlatSpec
 
 class ForLoopSpec extends AnyFlatSpec {
@@ -63,5 +64,34 @@ class ForLoopSpec extends AnyFlatSpec {
       assert(buf.toString == count.toString)
       count -= 2
     }
+  }
+
+  it should "not iterate" in {
+    val graph    = Jafpl.newInstance().newGraph()
+    val pipeline = graph.addPipeline("mypipe", Manifold.ALLOW_ANY)
+    val forloop  = pipeline.addFor("loop", 1, 10, -1, Manifold.ALLOW_ANY)
+    val error = forloop.addAtomic(new RaiseError("bang"), "ident")
+
+    graph.addEdge(forloop, "current", error, "source")
+    graph.addEdge(error, "result", forloop, "result")
+    graph.addEdge(forloop, "result", pipeline, "result")
+    graph.addOutput(pipeline, "result")
+
+    graph.close()
+
+    var pass = false
+    val runtime = new GraphRuntime(graph, runtimeConfig)
+    val bc = new BufferConsumer()
+    runtime.outputs("result").setConsumer(bc)
+    try {
+      runtime.runSync()
+    } catch {
+      case ex: JafplException =>
+        assert(ex.code == JafplException.INVALID_LOOP_BOUNDS)
+        pass = true
+      case ex: Throwable =>
+        fail()
+    }
+    assert(pass)
   }
 }

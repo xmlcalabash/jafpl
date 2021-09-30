@@ -40,7 +40,7 @@ class LoopWhileEndAction(override val node: ContainerEnd) extends EndAction(node
         }
       }
     } else {
-      if (startAction.done) {
+      if (startAction.finished()) {
         for (port <- buffer.keys) {
           scheduler.receive(this, port, buffer(port))
         }
