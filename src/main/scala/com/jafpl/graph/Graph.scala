@@ -853,7 +853,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       }
     }
 
-    debugDumpGraph()
+    //debugDumpGraph()
 
     // For every case where an outbound edge has more than one connection,
     // insert a splitter so that it has only one outbound edge.
