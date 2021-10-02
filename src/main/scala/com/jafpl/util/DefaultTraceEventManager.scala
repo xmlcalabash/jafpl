@@ -4,14 +4,6 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable
 
-object DefaultTraceEventManager {
-  val ALL = "all"
-  val START = "start"
-  val RUN = "run"
-  val CARDINALITY = "cardinality"
-  val RECEIVE = "receive"
-}
-
 class DefaultTraceEventManager() extends TraceEventManager {
   protected[jafpl] val logger: Logger = LoggerFactory.getLogger(this.getClass)
   protected val enabledTraces = mutable.HashSet.empty[String]
@@ -53,6 +45,11 @@ class DefaultTraceEventManager() extends TraceEventManager {
   override def traceEnabled(event: String): Boolean = {
     val lcevent = event.toLowerCase()
     enabledTraces.contains(lcevent) || (enabledTraces.contains("all") && !disabledTraces.contains(lcevent))
+  }
+
+  override def traceExplicitlyEnabled(event: String): Boolean = {
+    val lcevent = event.toLowerCase()
+    enabledTraces.contains(lcevent)
   }
 
   override def trace(message: String, event: String): Unit = {

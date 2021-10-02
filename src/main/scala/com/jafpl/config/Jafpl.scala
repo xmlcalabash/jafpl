@@ -26,7 +26,7 @@ object Jafpl {
     * @return Your new, configured pipeline instance.
     */
   def newInstance(): Jafpl = {
-    val configurer = Class.forName(configClass).newInstance()
+    val configurer = Class.forName(configClass).getDeclaredConstructor().newInstance()
     val config = new Jafpl()
     configurer.asInstanceOf[JafplConfigurer].configure(config)
     config.close()

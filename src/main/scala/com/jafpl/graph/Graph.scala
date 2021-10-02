@@ -41,9 +41,8 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   private var open = true
   private var _valid = false
   private var exception = Option.empty[Throwable]
-  private var _dumpGraphTransitions = false
-  private var _dumpCount = 0
   private val _uid = UniqueId.nextId
+  private var _dumpCount = 0
 
   protected[graph] def error(cause: Throwable): Unit = {
     if (exception.isEmpty) {
@@ -72,11 +71,6 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   /** True if the graph is known to be valid. */
   def valid: Boolean = _valid
   def uid: Long = _uid
-
-  def dumpGraphTransitions: Boolean = _dumpGraphTransitions
-  def dumpGraphTransitions_=(dump: Boolean): Unit = {
-    _dumpGraphTransitions = dump
-  }
 
   /** Adds a pipeline to the graph.
     *
@@ -562,6 +556,10 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     } else {
       edge = Some(new Edge(this, from, fromName, to, toName, mode))
       _edges += edge.get
+    }
+
+    if (jafpl.traceEventManager.traceExplicitlyEnabled("edge-transitions")) {
+      debugDumpGraph()
     }
 
     if (mode == JoinMode.PRIORITY) {
@@ -1243,13 +1241,11 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     }
   }
 
-  private def debugDumpGraph(): Unit = {
-    if (dumpGraphTransitions) {
-      _dumpCount += 1
-      val pw = new PrintWriter(new File(s"dump_${_dumpCount}.xml"))
-      pw.write(asXML.toString())
-      pw.close()
-    }
+  def debugDumpGraph(): Unit = {
+    _dumpCount += 1
+    val pw = new PrintWriter(new File(f"dump_${_dumpCount}%04d.xml"))
+    pw.write(asXML.toString())
+    pw.close()
   }
 
   private def usefulAncestor(start: Node): Node = {

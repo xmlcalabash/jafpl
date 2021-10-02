@@ -18,6 +18,7 @@ class ViewportEndAction(override val node: ContainerEnd) extends EndAction(node)
   def loopStartAction: ViewportAction = startAction
   def loopStartAction_=(start: ViewportAction): Unit = {
     startAction = start
+    outputPort = start.node.outputPort
   }
 
   override def receive(port: String, message: Message): Unit = {
@@ -49,11 +50,11 @@ class ViewportEndAction(override val node: ContainerEnd) extends EndAction(node)
           println(s"BANG! $t")
           throw t
       }
+    }
 
-      if (startAction.finished()) {
-        val recomposition = viewportStart.composer.recompose()
-        scheduler.receive(node, outputPort, recomposition)
-      }
+    if (startAction.finished()) {
+      val recomposition = viewportStart.composer.recompose()
+      scheduler.receive(node, outputPort, recomposition)
     }
 
     scheduler.finish(node)
