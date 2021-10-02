@@ -52,7 +52,7 @@ class ViewportEndAction(override val node: ContainerEnd) extends EndAction(node)
       }
     }
 
-    if (startAction.finished()) {
+    if (startAction.receivedInput && startAction.finished()) {
       val recomposition = viewportStart.composer.recompose()
       scheduler.receive(node, outputPort, recomposition)
     }

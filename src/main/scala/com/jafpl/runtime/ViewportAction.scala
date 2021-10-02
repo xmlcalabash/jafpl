@@ -29,6 +29,10 @@ class ViewportAction(override val node: ViewportStart) extends LoopAction(node) 
     }
   }
 
+  // We have to be able to distinguish between we never received any input
+  // and we consumed all of our input.
+  def receivedInput: Boolean = sourceItem.isDefined
+
   override def run(): Unit = {
     super.run()
 
