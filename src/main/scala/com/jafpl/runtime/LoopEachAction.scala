@@ -30,9 +30,11 @@ class LoopEachAction(override val node: LoopEachStart) extends LoopAction(node) 
       ipos += 1
 
       scheduler.receive(node, "current", source.remove(0))
+      startChildren()
+    } else {
+      skipChildren()
     }
 
-    startChildren()
     scheduler.finish(node)
   }
 
