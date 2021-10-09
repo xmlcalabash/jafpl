@@ -32,8 +32,19 @@ import scala.reflect.ClassTag
   * digits, hyphens, and underscores.
   *
   * @constructor A pipeline graph.
-  *
   */
+
+private object Graph {
+  private var graphId: Long = 1
+  def nextId: Long = {
+    this.synchronized {
+      val id = graphId
+      graphId = graphId + 1
+      id
+    }
+  }
+}
+
 class Graph protected[jafpl] (jafpl: Jafpl) {
   protected[jafpl] val logger: Logger = LoggerFactory.getLogger(this.getClass)
   private val _nodes = ListBuffer.empty[Node]
@@ -42,7 +53,17 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
   private var _valid = false
   private var exception = Option.empty[Throwable]
   private val _uid = UniqueId.nextId
+  private val _graphid = Graph.nextId
   private var _dumpCount = 0
+  private var _label = Option.empty[String]
+
+  def label: String = _label.getOrElse(s"graph")
+  def label_=(label: String): Unit = {
+    if (_label.isDefined) {
+      logger.info(s"Graph label changed from ${_label.get} to ${label}")
+    }
+    _label = Some(label)
+  }
 
   protected[graph] def error(cause: Throwable): Unit = {
     if (exception.isEmpty) {
@@ -559,7 +580,7 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     }
 
     if (jafpl.traceEventManager.traceExplicitlyEnabled("edge-transitions")) {
-      debugDumpGraph()
+      debugDumpGraph("edge-transitions")
     }
 
     if (mode == JoinMode.PRIORITY) {
@@ -765,7 +786,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
 
     _valid = true
 
-    // debugDumpGraph()
+    if (jafpl.traceEventManager.traceExplicitlyEnabled("open-graph")) {
+      debugDumpGraph("open-graph")
+    }
 
     // Insert exception translators into each catch if the catch reads from the
     // error port and a translator has been provided.
@@ -788,7 +811,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
         val newEdge = new Edge(this, catchStart, "error", node, "source")
         _edges += newEdge
 
-        debugDumpGraph()
+        if (jafpl.traceEventManager.traceExplicitlyEnabled("exception-translators")) {
+          debugDumpGraph("exception-translators")
+        }
       }
     }
 
@@ -851,7 +876,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       }
     }
 
-    //debugDumpGraph()
+    if (jafpl.traceEventManager.traceExplicitlyEnabled("edge-construction")) {
+      debugDumpGraph("edge-construction")
+    }
 
     // For every case where an outbound edge has more than one connection,
     // insert a splitter so that it has only one outbound edge.
@@ -920,7 +947,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
             count += 1
           }
 
-          debugDumpGraph()
+          if (jafpl.traceEventManager.traceExplicitlyEnabled("adding-splitters")) {
+            debugDumpGraph("adding-splitters")
+          }
         }
       }
     }
@@ -940,7 +969,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
               logger.debug(s"G$uid Input $port on $start unread, adding sink")
               val sink = start.addSink()
               addEdge(node, port, sink, "source")
-              debugDumpGraph()
+              if (jafpl.traceEventManager.traceExplicitlyEnabled("adding-sinks")) {
+                debugDumpGraph("adding-sinks")
+              }
             }
           }
         case end: ContainerEnd =>
@@ -955,7 +986,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
                 start.addSink()
               }
               addEdge(start, port, sink, "source")
-              debugDumpGraph()
+              if (jafpl.traceEventManager.traceExplicitlyEnabled("adding-sinks")) {
+                debugDumpGraph("adding-sinks")
+              }
             }
           }
         case atomic: AtomicNode =>
@@ -967,7 +1000,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
                 val start = atomic.parent.get
                 val sink = start.addSink()
                 addEdge(node, port, sink, "source")
-                debugDumpGraph()
+                if (jafpl.traceEventManager.traceExplicitlyEnabled("adding-sinks")) {
+                  debugDumpGraph("adding-sinks")
+                }
               }
             }
           }
@@ -993,7 +1028,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
                 logger.debug(s"G$uid Adding empty source to feed output $start.$port")
                 val source = start.addEmptySource()
                 addEdge(source, "result", end, port)
-                debugDumpGraph()
+                if (jafpl.traceEventManager.traceExplicitlyEnabled("empty-sources")) {
+                  debugDumpGraph("empty-sources")
+                }
               }
             }
           }
@@ -1006,7 +1043,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
                 logger.debug(s"G$uid Adding sink to consume $start.current")
                 val sink = start.addSink()
                 addEdge(node, "current", sink, "source")
-                debugDumpGraph()
+                if (jafpl.traceEventManager.traceExplicitlyEnabled("adding-sinks")) {
+                  debugDumpGraph("adding-sinks")
+                }
               }
               /* I'm not convinced that reading from the error port is implemented correclty yet
             case start: CatchStart =>
@@ -1076,7 +1115,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
             _edges -= edge
           }
 
-          debugDumpGraph()
+          if (jafpl.traceEventManager.traceExplicitlyEnabled("adding-joiners")) {
+            debugDumpGraph("adding-joiners")
+          }
         }
       }
     }
@@ -1117,7 +1158,9 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
       if (loop.isDefined) {
         added = true
         addBuffer(loop.get, bufedge.get)
-        debugDumpGraph()
+        if (jafpl.traceEventManager.traceExplicitlyEnabled("adding-loop-buffers")) {
+          debugDumpGraph("adding-loop-buffers")
+        }
       }
     }
 
@@ -1241,9 +1284,11 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
     }
   }
 
-  def debugDumpGraph(): Unit = {
+  private def debugDumpGraph(trace: String): Unit = {
     _dumpCount += 1
-    val pw = new PrintWriter(new File(f"dump_${_dumpCount}%04d.xml"))
+    val filename = f"${label}_${_graphid}%02d_${_dumpCount}%04d.xml"
+    val pw = new PrintWriter(new File(filename))
+    pw.println(s"<!-- trace: ${trace} -->")
     pw.write(asXML.toString())
     pw.close()
   }
