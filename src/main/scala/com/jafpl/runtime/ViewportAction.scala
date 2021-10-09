@@ -3,6 +3,7 @@ package com.jafpl.runtime
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.ViewportStart
 import com.jafpl.messages.{ItemMessage, Message, PipelineMessage}
+import com.jafpl.runtime.AbstractAction.showRunningMessage
 import com.jafpl.runtime.NodeState.NodeState
 import com.jafpl.steps.ViewportItem
 
@@ -35,8 +36,9 @@ class ViewportAction(override val node: ViewportStart) extends LoopAction(node) 
 
   override def run(): Unit = {
     super.run()
-
-    logger.info(s"Running viewport")
+    if (showRunningMessage) {
+      logger.info("Running viewport")
+    }
 
     if (node.iterationPosition == 0) {
       if (sourceItem.isDefined) {

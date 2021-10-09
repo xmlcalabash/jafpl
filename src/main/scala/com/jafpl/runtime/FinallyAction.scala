@@ -2,12 +2,14 @@ package com.jafpl.runtime
 
 import com.jafpl.graph.FinallyStart
 import com.jafpl.messages.ExceptionMessage
+import com.jafpl.runtime.AbstractAction.showRunningMessage
 
 class FinallyAction(override val node: FinallyStart) extends ContainerAction(node) {
   override def run(): Unit = {
     super.run()
-
-    logger.info(s"Running finally ${node.userLabel.getOrElse("")}")
+    if (showRunningMessage) {
+      logger.info("Running finally {}", node.userLabel.getOrElse(""))
+    }
 
     startChildren()
 

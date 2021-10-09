@@ -2,18 +2,28 @@ package com.jafpl.runtime
 
 import com.jafpl.graph.Node
 import com.jafpl.messages.{BindingMessage, Message}
+import com.jafpl.runtime.AbstractAction.showRunningMessage
 import com.jafpl.runtime.NodeState.NodeState
 import com.jafpl.steps.DataConsumer
 import com.jafpl.util.TraceEventManager
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+
+object AbstractAction {
+  protected[jafpl] def showRunningMessage: Boolean = {
+    val prop = System.getProperty("com.jafpl.show-running-messages")
+    Option(prop).isDefined && (prop == "true" || prop == "1" || prop == "yes")
+  }
+}
 
 abstract class AbstractAction(val node: Node) extends Action with DataConsumer {
   protected var scheduler: Scheduler = _
   protected var tracer: TraceEventManager = _
   protected var receivedBindings = mutable.HashMap.empty[String, Message]
   private val _received = mutable.HashMap.empty[String, ListBuffer[Message]]
+  protected[runtime] val logger = LoggerFactory.getLogger(this.getClass)
 
   def receivedPorts: List[String] = _received.keys.toList
   def received(port: String): List[Message] = {

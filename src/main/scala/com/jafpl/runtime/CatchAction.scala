@@ -2,12 +2,14 @@ package com.jafpl.runtime
 
 import com.jafpl.graph.CatchStart
 import com.jafpl.messages.ExceptionMessage
+import com.jafpl.runtime.AbstractAction.showRunningMessage
 
 class CatchAction(override val node: CatchStart) extends ContainerAction(node) {
   override def run(): Unit = {
     super.run()
-
-    logger.info(s"Running catch ${node.userLabel.getOrElse("")}")
+    if (showRunningMessage) {
+      logger.info("Running catch {}", node.userLabel.getOrElse(""))
+    }
 
     startChildren()
 

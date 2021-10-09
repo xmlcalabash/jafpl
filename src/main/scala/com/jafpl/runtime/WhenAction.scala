@@ -2,6 +2,7 @@ package com.jafpl.runtime
 
 import com.jafpl.graph.WhenStart
 import com.jafpl.messages.Message
+import com.jafpl.runtime.AbstractAction.showRunningMessage
 import com.jafpl.runtime.NodeState.NodeState
 import com.jafpl.util.TraceEventManager
 
@@ -29,8 +30,9 @@ class WhenAction(override val node: WhenStart) extends ContainerAction(node) {
 
   override def run(): Unit = {
     super.run()
-
-    logger.info(s"Running when ${node.userLabel.getOrElse("")}")
+    if (showRunningMessage) {
+      logger.info("Running when {}", node.userLabel.getOrElse(""))
+    }
 
     startChildren()
     scheduler.finish(node)

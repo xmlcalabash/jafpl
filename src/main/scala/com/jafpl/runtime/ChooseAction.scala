@@ -1,12 +1,14 @@
 package com.jafpl.runtime
 
 import com.jafpl.graph.{ChooseStart, WhenStart}
+import com.jafpl.runtime.AbstractAction.showRunningMessage
 
 class ChooseAction(override val node: ChooseStart) extends ContainerAction(node) {
   override def run(): Unit = {
     super.run()
-
-    logger.info(s"Running choose ${node.userLabel.getOrElse("")}")
+    if (showRunningMessage) {
+      logger.info("Running choose {}", node.userLabel.getOrElse(""))
+    }
 
     for (child <- node.children) {
       child match {

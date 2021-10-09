@@ -3,6 +3,7 @@ package com.jafpl.runtime
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.LoopForStart
 import com.jafpl.messages.{ItemMessage, Metadata}
+import com.jafpl.runtime.AbstractAction.showRunningMessage
 import com.jafpl.runtime.NodeState.NodeState
 
 class LoopForAction(override val node: LoopForStart) extends LoopAction(node) {
@@ -11,11 +12,12 @@ class LoopForAction(override val node: LoopForStart) extends LoopAction(node) {
 
   override def run(): Unit = {
     super.run()
-
-    if (node.userLabel.isDefined) {
-      logger.info(s"Running for loop ${node.userLabel.get}: ${node.countFrom} to ${node.countTo} by ${node.countBy}")
-    } else {
-      logger.info(s"Running for loop: ${node.countFrom} to ${node.countTo} by ${node.countBy}")
+    if (showRunningMessage) {
+      if (node.userLabel.isDefined) {
+        logger.info("Running for loop {}: {} to {} by {}", node.userLabel.get, node.countFrom, node.countTo, node.countBy)
+      } else {
+        logger.info("Running for loop: {} to {} by {}", node.countFrom, node.countTo, node.countBy)
+      }
     }
 
     if (!looping) {

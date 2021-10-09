@@ -2,11 +2,8 @@ package com.jafpl.runtime
 
 import com.jafpl.graph.ContainerStart
 import com.jafpl.runtime.NodeState.NodeState
-import org.slf4j.LoggerFactory
 
 abstract class ContainerAction(override val node: ContainerStart) extends AbstractAction(node) {
-  protected val logger = LoggerFactory.getLogger(this.getClass)
-
   def startChildren(): Unit = {
     for (child <- node.children) {
       scheduler.startNode(child)

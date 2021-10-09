@@ -3,6 +3,7 @@ package com.jafpl.runtime
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.LoopUntilStart
 import com.jafpl.messages.{ItemMessage, Message}
+import com.jafpl.runtime.AbstractAction.showRunningMessage
 import com.jafpl.runtime.NodeState.NodeState
 import com.jafpl.util.TraceEventManager
 
@@ -56,8 +57,9 @@ class LoopUntilAction(override val node: LoopUntilStart) extends LoopAction(node
 
   override def run(): Unit = {
     super.run()
-
-    logger.info(s"Running for/until ${node.userLabel.getOrElse("")}")
+    if (showRunningMessage) {
+      logger.info("Running for/until ", node.userLabel.getOrElse(""))
+    }
 
     if (!looping) {
       looping = true

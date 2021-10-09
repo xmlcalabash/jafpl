@@ -3,6 +3,7 @@ package com.jafpl.runtime
 import com.jafpl.exceptions.JafplException
 import com.jafpl.graph.LoopWhileStart
 import com.jafpl.messages.{ItemMessage, Message}
+import com.jafpl.runtime.AbstractAction.showRunningMessage
 import com.jafpl.runtime.NodeState.NodeState
 
 class LoopWhileAction(override val node: LoopWhileStart) extends LoopAction(node) {
@@ -42,8 +43,9 @@ class LoopWhileAction(override val node: LoopWhileStart) extends LoopAction(node
 
   override def run(): Unit = {
     super.run()
-
-    logger.info(s"Running while loop")
+    if (showRunningMessage) {
+      logger.info("Running while loop")
+    }
 
     node.done = currentItem.isEmpty || !node.tester.test(List(currentItem.get), receivedBindings.toMap)
 

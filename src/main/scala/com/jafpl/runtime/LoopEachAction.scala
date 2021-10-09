@@ -2,6 +2,7 @@ package com.jafpl.runtime
 
 import com.jafpl.graph.LoopEachStart
 import com.jafpl.messages.Message
+import com.jafpl.runtime.AbstractAction.showRunningMessage
 import com.jafpl.runtime.NodeState.NodeState
 
 import scala.collection.mutable.ListBuffer
@@ -21,8 +22,9 @@ class LoopEachAction(override val node: LoopEachStart) extends LoopAction(node) 
 
   override def run(): Unit = {
     super.run()
-
-    logger.info(s"Running for-each ${node.userLabel.getOrElse("")}")
+    if (showRunningMessage) {
+      logger.info("Running for-each {}", node.userLabel.getOrElse(""))
+    }
 
     if (source.nonEmpty) {
       if (ipos == 0) {
