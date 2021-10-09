@@ -29,6 +29,9 @@ class WhenAction(override val node: WhenStart) extends ContainerAction(node) {
 
   override def run(): Unit = {
     super.run()
+
+    logger.info(s"Running when ${node.userLabel.getOrElse("")}")
+
     startChildren()
     scheduler.finish(node)
   }

@@ -57,6 +57,8 @@ class LoopUntilAction(override val node: LoopUntilStart) extends LoopAction(node
   override def run(): Unit = {
     super.run()
 
+    logger.info(s"Running for/until ${node.userLabel.getOrElse("")}")
+
     if (!looping) {
       looping = true
       node.iterationPosition = 0

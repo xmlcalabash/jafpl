@@ -22,6 +22,8 @@ class LoopEachAction(override val node: LoopEachStart) extends LoopAction(node) 
   override def run(): Unit = {
     super.run()
 
+    logger.info(s"Running for-each ${node.userLabel.getOrElse("")}")
+
     if (source.nonEmpty) {
       if (ipos == 0) {
         node.iterationSize = source.length

@@ -36,6 +36,8 @@ class ViewportAction(override val node: ViewportStart) extends LoopAction(node) 
   override def run(): Unit = {
     super.run()
 
+    logger.info(s"Running viewport")
+
     if (node.iterationPosition == 0) {
       if (sourceItem.isDefined) {
         try {

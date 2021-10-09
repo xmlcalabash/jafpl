@@ -5,6 +5,9 @@ import com.jafpl.graph.{CatchStart, FinallyStart, TryCatchStart}
 class TryCatchAction(override val node: TryCatchStart) extends ContainerAction(node) {
   override def run(): Unit = {
     super.run()
+
+    logger.info(s"Running try ${node.userLabel.getOrElse("")}")
+
     for (child <- node.children) {
       child match {
         case _: CatchStart => () // Don't run these

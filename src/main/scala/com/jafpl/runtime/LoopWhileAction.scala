@@ -43,6 +43,8 @@ class LoopWhileAction(override val node: LoopWhileStart) extends LoopAction(node
   override def run(): Unit = {
     super.run()
 
+    logger.info(s"Running while loop")
+
     node.done = currentItem.isEmpty || !node.tester.test(List(currentItem.get), receivedBindings.toMap)
 
     if (!looping) {

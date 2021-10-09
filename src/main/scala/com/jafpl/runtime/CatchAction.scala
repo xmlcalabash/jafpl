@@ -6,6 +6,9 @@ import com.jafpl.messages.ExceptionMessage
 class CatchAction(override val node: CatchStart) extends ContainerAction(node) {
   override def run(): Unit = {
     super.run()
+
+    logger.info(s"Running catch ${node.userLabel.getOrElse("")}")
+
     startChildren()
 
     if (node.cause.isDefined) {

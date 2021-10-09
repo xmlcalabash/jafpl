@@ -6,6 +6,9 @@ import com.jafpl.messages.ExceptionMessage
 class FinallyAction(override val node: FinallyStart) extends ContainerAction(node) {
   override def run(): Unit = {
     super.run()
+
+    logger.info(s"Running finally ${node.userLabel.getOrElse("")}")
+
     startChildren()
 
     if (node.cause.isDefined) {

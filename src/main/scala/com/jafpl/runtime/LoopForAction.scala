@@ -12,6 +12,12 @@ class LoopForAction(override val node: LoopForStart) extends LoopAction(node) {
   override def run(): Unit = {
     super.run()
 
+    if (node.userLabel.isDefined) {
+      logger.info(s"Running for loop ${node.userLabel.get}: ${node.countFrom} to ${node.countTo} by ${node.countBy}")
+    } else {
+      logger.info(s"Running for loop: ${node.countFrom} to ${node.countTo} by ${node.countBy}")
+    }
+
     if (!looping) {
       looping = true
       val diff = if (node.countFrom > node.countTo) {

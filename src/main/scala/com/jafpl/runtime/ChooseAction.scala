@@ -5,6 +5,9 @@ import com.jafpl.graph.{ChooseStart, WhenStart}
 class ChooseAction(override val node: ChooseStart) extends ContainerAction(node) {
   override def run(): Unit = {
     super.run()
+
+    logger.info(s"Running choose ${node.userLabel.getOrElse("")}")
+
     for (child <- node.children) {
       child match {
         case _: WhenStart => () // At most one already marked runnable by scheduler
