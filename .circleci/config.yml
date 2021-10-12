@@ -42,7 +42,7 @@ jobs:
                 value: << pipeline.git.tag >>
           steps:
             - run: echo This is a tagged commit
-            - run: sbt test publish
+            - run: sbt test publishSigned
             - run: cp target/scala-2.13/*.jar build/distributions
 
       - run: rm ~/.sbt/.credentials
