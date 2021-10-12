@@ -102,7 +102,7 @@ publish := Def.taskDyn {
     println(message.get)
   }
 
-  if (false && message.isDefined) {
+  if (message.isDefined) {
     Def.taskDyn {
       failTask
     }
