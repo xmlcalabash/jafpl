@@ -15,6 +15,8 @@ jobs:
             - v1-dependencies-{{ checksum "build.sbt" }}
             - v1-depdencies-
 
+      - run: gpg --keyserver keyserver.ubuntu.com --recv-keys 4C5F68D09D42BA7FAC888DF9A929EA2321FDBF8F
+
       - run: |
           echo "realm=Sonatype Nexus Repository Manager" > ~/.sbt/.credentials
           echo "host=oss.sonatype.org" >> ~/.sbt/.credentials
@@ -85,11 +87,11 @@ workflows:
             tags:
               only: /.+/
 
-      - publish-github-release:
-          requires:
-            - build
-          filters:
-            branches:
-              ignore: /.*/
-            tags:
-              only: /.+/
+#      - publish-github-release:
+#          requires:
+#            - build
+#          filters:
+#            branches:
+#              ignore: /.*/
+#            tags:
+#              only: /.+/
