@@ -1,7 +1,7 @@
 package com.jafpl.steps
 
 import com.jafpl.exceptions.JafplException
-import com.jafpl.messages.Metadata
+import com.jafpl.messages.{ItemMessage, Message, Metadata}
 
 import scala.collection.mutable.ListBuffer
 
@@ -14,10 +14,11 @@ class StringViewportItem(val prefix: String, val item: String) extends ViewportI
 
   override def getMetadata: Metadata = Metadata.STRING
 
-  override def putItems(xformed: List[Any]): Unit = {
+  override def putItems(xformed: List[Message]): Unit = {
     for (item <- xformed) {
       item match {
-        case s: String => items += s
+        case msg: ItemMessage =>
+          items += msg.item.toString
         case _ => throw JafplException.unexpectedItemType(item.toString, "source", None)
       }
     }

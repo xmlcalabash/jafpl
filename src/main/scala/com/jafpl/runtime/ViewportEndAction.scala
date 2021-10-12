@@ -31,23 +31,11 @@ class ViewportEndAction(override val node: ContainerEnd) extends EndAction(node)
 
     if (startAction.itemQueue.nonEmpty) {
       val item = startAction.itemQueue(startAction.index)
-      val ibuffer = mutable.ListBuffer.empty[Any]
-      for (item <- itemBuffer) {
-        item match {
-          case msg: ItemMessage =>
-            ibuffer += msg.item
-          case _: Message =>
-            throw JafplException.internalError("Unexpected message $msg on returnItems in viewport", node.location)
-          case _ =>
-            ibuffer += item
-        }
-      }
 
       try {
-        item.putItems(ibuffer.toList)
+        item.putItems(itemBuffer.toList)
       } catch {
         case t: Throwable =>
-          println(s"BANG! $t")
           throw t
       }
     }

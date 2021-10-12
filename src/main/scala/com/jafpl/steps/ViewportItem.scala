@@ -1,6 +1,6 @@
 package com.jafpl.steps
 
-import com.jafpl.messages.Metadata
+import com.jafpl.messages.{Message, Metadata}
 
 /** A representation of a sub-portion of a resource for viewport processing.
   *
@@ -34,5 +34,5 @@ trait ViewportItem {
     *
     * @param items The item(s) that the original item was transformed into.
     */
-  def putItems(items: List[Any]): Unit
+  def putItems(items: List[Message]): Unit
 }
