@@ -42,7 +42,9 @@ jobs:
                 value: << pipeline.git.tag >>
           steps:
             - run: echo This is a tagged commit
+            - run: openssl enc -d -aes-256-cbc -a -salt -in .circleci/publish.data -out ~/.gnupg/sonatype-secring.gpg -k $PUBLISH_DATA
             - run: sbt test publishSigned
+            - run: rm ~/.gnupg/sonatype-secring.gpg
             - run: cp target/scala-2.13/*.jar build/distributions
 
       - run: rm ~/.sbt/.credentials
