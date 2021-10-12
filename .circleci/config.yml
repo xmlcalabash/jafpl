@@ -1,0 +1,75 @@
+version: 2.1
+
+executors:
+  docker-default:
+    docker:
+      - image: cimg/openjdk:11.0
+
+jobs:
+  build:
+    executor: docker-default
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.sbt" }}
+            - v1-depdencies-
+
+      - run: |
+          echo "realm=Sonatype Nexus Repository Manager" > ~/.sbt/.credentials
+          echo "host=oss.sonatype.org" >> ~/.sbt/.credentials
+          echo "user=$SONATYPE_USER" >> ~/.sbt/.credentials
+          echo "password=$SONATYPE_PASSWORD" >> ~/.sbt/.credentials
+
+      - when:
+          condition:
+            matches:
+              pattern: "^$"
+              value: << pipeline.git.tag >>
+          steps:
+            - run: echo This is an untagged commit
+            - run: sbt test
+
+      - when:
+          condition:
+            not:
+              matches:
+                pattern: "^$"
+                value: << pipeline.git.tag >>
+          steps:
+            - run: echo This is an tagged commit
+            - run: sbt test publish
+            - run: mkdir -p build/distributions
+            - run: cp target/scala-2.13/*.jar build/distributions
+            - run: ls -l build/distributions
+
+      - run: rm ~/.sbt/.credentials
+
+      - save_cache:
+          paths:
+            - "~/.iv2/cache"
+            - "~/.sbt"
+            - "~/.m2"
+            - "target/resolution-cache"
+            - "target/streams"
+            - "project/target/resolution-cache"
+            - "project/target/streams"
+          key: v1-dependencies-{{ checksum "build.sbt" }}
+
+#workflows:
+#  version: 2
+#  check:
+#    jobs:
+#      - build:
+#          filters:
+#            branches:
+#              ignore: gh-pages
+#  deploy:
+#    jobs:
+#      - build:
+#          filters:
+#            branches:
+#              ignore: /.*/
+#            tags:
+#              only: /.+/
+#
