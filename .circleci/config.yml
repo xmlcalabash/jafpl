@@ -21,6 +21,8 @@ jobs:
           echo "user=$SONATYPE_USER" >> ~/.sbt/.credentials
           echo "password=$SONATYPE_PASSWORD" >> ~/.sbt/.credentials
 
+      - run: mkdir -p build/distributions
+
       - when:
           condition:
             matches:
@@ -37,11 +39,9 @@ jobs:
                 pattern: "^$"
                 value: << pipeline.git.tag >>
           steps:
-            - run: echo This is an tagged commit
+            - run: echo This is a tagged commit
             - run: sbt test publish
-            - run: mkdir -p build/distributions
             - run: cp target/scala-2.13/*.jar build/distributions
-            - run: ls -l build/distributions
 
       - run: rm ~/.sbt/.credentials
 
@@ -56,6 +56,24 @@ jobs:
             - "project/target/streams"
           key: v1-dependencies-{{ checksum "build.sbt" }}
 
+      - persist_to_workspace:
+          root: build
+          paths:
+            - distributions
+
+  publish-github-release:
+    docker:
+      - image: cibuilds/github:0.10
+    steps:
+      - attach_workspace:
+          at: ./artifacts
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            VERSION=${CIRCLE_TAG}
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} ${VERSION} ./artifacts/distributions/
+
+
 workflows:
   version: 2
   build:
@@ -67,3 +85,11 @@ workflows:
             tags:
               only: /.+/
 
+      - publish-github-release:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.+/
