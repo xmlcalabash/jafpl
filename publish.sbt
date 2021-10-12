@@ -37,7 +37,7 @@ credentials += Credentials(
             "GnuPG Key ID",
             "gpg",
             "4C5F68D09D42BA7FAC888DF9A929EA2321FDBF8F",
-            System.getenv("SONATYPE_GPG_PASSPHRASE"))
+            System.getenv("PGP_PASSPHRASE"))
 
 publishTo := {
   val nexus = "https://oss.sonatype.org/"
