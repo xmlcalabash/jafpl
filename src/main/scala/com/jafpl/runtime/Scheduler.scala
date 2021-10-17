@@ -169,14 +169,26 @@ class Scheduler(val runtime: GraphRuntime) extends Runnable {
             // ...except...
             // The while step is a special case, it will always receive 0 items
             // on the last iteration after the loop decides it's finished.
+            // ...and except...
+            // If it's a loop that never ran
             var status = Option.empty[Throwable]
-            cend.start.get match {
-              case cwhile: LoopWhileStart =>
-                if (!cwhile.done) {
-                  status = graphStatus.checkContainerOutputCardinalities(node)
-                }
+
+            val ranAtLeastOnce = cend.start.get match {
+              case loop: LoopStart =>
+                loop.ranAtLeastOnce
               case _ =>
-                status = graphStatus.checkContainerOutputCardinalities(node)
+                true
+            }
+
+            if (ranAtLeastOnce) {
+              cend.start.get match {
+                case cwhile: LoopWhileStart =>
+                  if (!cwhile.done) {
+                    status = graphStatus.checkContainerOutputCardinalities(node)
+                  }
+                case _ =>
+                  status = graphStatus.checkContainerOutputCardinalities(node)
+              }
             }
             graphStatus.resetCardinalities(node)
             status

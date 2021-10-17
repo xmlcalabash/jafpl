@@ -20,6 +20,7 @@ abstract class LoopStart(override val graph: Graph,
                          override val userLabel: Option[String]) extends ContainerStart(graph, end, userLabel) {
   private var _iterationSize = 0L
   private var _iterationPosition = 0L
+  private var _ranAtLeastOnce = false
 
   def iterationSize: Long = _iterationSize
   protected[jafpl] def iterationSize_=(size: Long): Unit = {
@@ -29,5 +30,10 @@ abstract class LoopStart(override val graph: Graph,
   def iterationPosition: Long = _iterationPosition
   protected[jafpl] def iterationPosition_=(pos: Long): Unit = {
     _iterationPosition = pos
+  }
+
+  def ranAtLeastOnce: Boolean = _ranAtLeastOnce
+  protected[jafpl] def ranAtLeastOnce_=(ran: Boolean): Unit = {
+    _ranAtLeastOnce = ran
   }
 }
