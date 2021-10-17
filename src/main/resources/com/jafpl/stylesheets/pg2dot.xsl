@@ -194,7 +194,7 @@
   <xsl:choose>
     <xsl:when test="$in-edge">
       <xsl:for-each select="$in-edge">
-        <xsl:variable name="in" select="$in-edge"/>
+        <xsl:variable name="in" select="."/>
         <xsl:for-each select="$to-edge">
           <edge from="{g:id($in)}" to="{g:id(.)}"/>
         </xsl:for-each>
