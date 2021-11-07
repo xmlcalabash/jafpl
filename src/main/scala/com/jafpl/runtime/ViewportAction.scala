@@ -18,15 +18,15 @@ class ViewportAction(override val node: ViewportStart) extends LoopAction(node) 
 
   override def receive(port: String, message: Message): Unit = {
     super.receive(port, message)
-    if (port == "source") {
+    if (port.startsWith("#depends") || port == "#bindings") {
+      scheduler.receive(node, port, message)
+    } else {
       message match {
         case item: ItemMessage =>
           sourceItem = Some(item)
         case _ =>
           throw JafplException.unexpectedMessage(message.toString, port, node.location)
       }
-    } else {
-      scheduler.receive(node, port, message)
     }
   }
 

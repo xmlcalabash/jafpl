@@ -14,18 +14,17 @@ private[jafpl] class ViewportStart(override val graph: Graph,
   def outputPort: String = _outputPort
 
   override def inputsOk(): Boolean = {
-    var hasSource = false
-
     if (inputs.nonEmpty) {
-      var valid = true
+      val valid = true
+      var count = 0
       for (port <- inputs) {
-        if (!validPortName(port, "source")) {
-          println("Invalid binding on " + this + ": " + port)
-          valid = false
+        if (port.startsWith("#depends") || port == "#bindings") {
+          // these don't count
+        } else {
+          count += 1
         }
-        hasSource = hasSource || (port == "source")
       }
-      valid && hasSource
+      valid && (count == 1)
     } else {
       true
     }
