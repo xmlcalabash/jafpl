@@ -4,7 +4,7 @@
                 xmlns:g="http://jafpl.com/ns/graph"
                 xmlns:dot="http://jafpl.com/ns/dot"
                 xmlns="http://jafpl.com/ns/dot"
-                version="2.0">
+                version="3.0">
 
 <!-- JAFPL version 0.0.104 -->
 
@@ -95,7 +95,8 @@
 </xsl:template>
 
 <xsl:template match="g:in-edge">
-  <port id="{g:id(.)}" label="{@input-port}"/>
+  <port id="{g:id(.)}"
+        label="{if (@input-port = '#anon') then '' else @input-port}"/>
 </xsl:template>
 
 <xsl:template match="g:outputs">
@@ -108,7 +109,8 @@
 <xsl:template match="g:container/g:outputs" priority="100"/>
 
 <xsl:template match="g:out-edge">
-  <port id="{g:id(.)}" label="{@output-port}"/>
+  <port id="{g:id(.)}"
+        label="{if (@output-port = '#anon') then '' else @output-port}"/>
 </xsl:template>
 
 <xsl:template match="element()">
@@ -168,7 +170,7 @@
         <xsl:variable name="from" select="."/>
         <xsl:for-each select="$to-edge">
           <xsl:variable name="to" select="."/>
-          <edge from="{g:id($from)}" to="{g:id($to)}"/>
+          <edge x="1" from="{g:id($from)}" to="{g:id($to)}"/>
         </xsl:for-each>
       </xsl:for-each>
     </xsl:when>
@@ -189,21 +191,21 @@
        edge is in a container -->
   <xsl:variable name="in-edge"
                 select="../../g:inputs[parent::g:container]
-                        /g:in-edge[@input-port=$iport]"/>
+                        /g:in-edge[@input-port=$oport]"/>
 
   <xsl:choose>
     <xsl:when test="$in-edge">
       <xsl:for-each select="$in-edge">
         <xsl:variable name="in" select="."/>
         <xsl:for-each select="$to-edge">
-          <edge from="{g:id($in)}" to="{g:id(.)}"/>
+          <edge x="2" from="{g:id($in)}" to="{g:id(.)}"/>
         </xsl:for-each>
       </xsl:for-each>
     </xsl:when>
     <xsl:otherwise>
       <xsl:variable name="here" select="."/>
       <xsl:for-each select="$to-edge">
-        <edge from="{g:id($here)}" to="{g:id(.)}"/>
+        <edge x="3" from="{g:id($here)}" to="{g:id(.)}"/>
       </xsl:for-each>
     </xsl:otherwise>
   </xsl:choose>
