@@ -19,21 +19,16 @@ class LoopEachStart private[jafpl](override val graph: Graph,
   manifold = manspec
 
   override def inputsOk(): Boolean = {
-    var hasSource = false
-
-    if (inputs.nonEmpty) {
-      var valid = true
-      for (port <- inputs) {
-        if (!validPortName(port, "source")) {
-          println("Invalid binding on " + this + ": " + port)
-          valid = false
-        }
-        hasSource = hasSource || (port == "source")
+    val valid = true
+    var count = 0
+    for (port <- inputs) {
+      if (port.startsWith("#depends") || port == "#bindings") {
+        // these don't count
+      } else {
+        count += 1
       }
-      valid && hasSource
-    } else {
-      true
     }
+    valid && (count == 1)
   }
 
 }

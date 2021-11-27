@@ -859,11 +859,20 @@ class Graph protected[jafpl] (jafpl: Jafpl) {
           }
 
         case loop: LoopEachStart =>
+          var count = 0
+          var port = ""
           for (in <- loop.inputs) {
-            if (in != "source") {
-              error(JafplException.badLoopInputPort(in, loop.toString, node.location))
+            if (in == "#bindings" || in.startsWith("#depends")) {
+              // doesn't count
+            } else {
+              port = in
+              count += 1
             }
           }
+          if (count != 1) {
+            error(JafplException.badLoopInputPort(port, loop.toString, node.location))
+          }
+
 
         case when: WhenStart =>
           if (edgesTo(when, "condition").isEmpty) {

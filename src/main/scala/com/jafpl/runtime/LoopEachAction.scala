@@ -13,10 +13,11 @@ class LoopEachAction(override val node: LoopEachStart) extends LoopAction(node) 
 
   override def receive(port: String, message: Message): Unit = {
     super.receive(port, message)
-    if (port == "source") {
-      source += message
-    } else {
+    if (port == "#bindings" || port.startsWith("#depends")) {
       scheduler.receive(node, port, message)
+    } else {
+      // Must be ours
+      source += message
     }
   }
 
