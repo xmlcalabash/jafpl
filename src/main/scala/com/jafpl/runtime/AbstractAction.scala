@@ -54,7 +54,8 @@ abstract class AbstractAction(val node: Node) extends Action with DataConsumer {
         tracer.trace(s"RECVB $this for ${msg.name}", TraceEventManager.BINDING)
         receivedBindings.put(msg.name, msg.message)
       case _ =>
-        tracer.trace(s"RECV  $this for $port: $message", TraceEventManager.RECEIVE)
+        tracer.trace(s"RECV  $this for $port", TraceEventManager.RECEIVE)
+        tracer.trace(s"MESSAGE $message", TraceEventManager.MESSAGES)
         if (node.inputs.contains(port) || port.startsWith("#")) {
           if (_received.contains(port)) {
             _received(port) += message
@@ -75,7 +76,7 @@ abstract class AbstractAction(val node: Node) extends Action with DataConsumer {
   }
 
   override def close(port: String): Unit = {
-    tracer.trace("CLOS? " + this + " for " + port, TraceEventManager.RECEIVE)
+    tracer.trace(s"CLOS? $this for $port", TraceEventManager.RECEIVE)
   }
 
   override def run(): Unit = {

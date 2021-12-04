@@ -15,7 +15,8 @@ class BufferAction(override val node: Buffer) extends AbstractAction(node) {
 
   override def receive(port: String, message: Message): Unit = {
     // Buffer all messages, even bindings
-    tracer.trace(s"RECV  $this for $port: $message", TraceEventManager.RECEIVE)
+    tracer.trace(s"RECV  $this for $port", TraceEventManager.RECEIVE)
+    tracer.trace(s"MESSAGE $message", TraceEventManager.MESSAGES)
     if (buffer.contains(port)) {
       buffer(port) += message
     } else {
