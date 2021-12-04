@@ -62,7 +62,8 @@ abstract class AbstractAction(val node: Node) extends Action with DataConsumer {
             _received.put(port, ListBuffer(message))
           }
         } else {
-          tracer.trace("error", s"INTERNAL ERROR: Ignoring input for unexpected port $this: $port ($message)", TraceEventManager.MESSAGES)
+          tracer.trace("error", s"INTERNAL ERROR: Ignoring input for unexpected port $this: $port", TraceEventManager.LISTEN)
+          tracer.trace("error", s"MESSAGE $message", TraceEventManager.MESSAGES)
         }
     }
   }

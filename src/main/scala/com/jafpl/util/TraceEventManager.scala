@@ -16,6 +16,7 @@ object TraceEventManager {
   val ABORT = "abort"
   val STOP = "stop"
   val LOOP = "loop"
+  val LISTEN = "listen"
   val MESSAGES = "messages"
   val CHOOSE = "choose"
   val UNTIL = "until"
