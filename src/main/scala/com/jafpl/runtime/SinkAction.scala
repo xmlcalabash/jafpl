@@ -12,9 +12,10 @@ class SinkAction(override val node: Sink) extends AbstractAction(node) {
       case msg: BindingMessage =>
         tracer.trace(s"RECVB $this for ${msg.name}", TraceEventManager.BINDING)
       case _ =>
-        tracer.trace(s"RECV  $this for $port: $message", TraceEventManager.RECEIVE)
+        tracer.trace(s"RECV  $this for $port", TraceEventManager.RECEIVE)
+        tracer.trace(s"MESSAGE $message", TraceEventManager.MESSAGES)
         if (!node.inputs.contains(port) && !port.startsWith("#")) {
-          tracer.trace("error", s"INTERNAL ERROR: Ignoring input for unexpected port $this: $port ($message)", TraceEventManager.MESSAGES)
+          tracer.trace("error", s"INTERNAL ERROR: Ignoring input for unexpected port $this: $port", TraceEventManager.LISTEN)
         }
     }
   }

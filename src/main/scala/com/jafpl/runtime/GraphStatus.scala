@@ -206,11 +206,13 @@ class GraphStatus(val scheduler: Scheduler) {
       tracer.trace("debug", s"MUTEX LOCKED for receive from $fromNode", TraceEventManager.MUTEX)
       val status = nodeStatus(toNode)
       if (status.state() == NodeState.RUNNING || toNode.isInstanceOf[WhenStart]) {
-        tracer.trace(s"SCHED FORW ${fromNode}.${fromPort} → ${toNode}.${toPort}: ${message}", TraceEventManager.MESSAGES)
+        tracer.trace(s"SCHED FORW ${fromNode}.${fromPort} → ${toNode}.${toPort}", TraceEventManager.LISTEN)
+        tracer.trace(s"MESSAGE ${message}", TraceEventManager.MESSAGES)
         status.receive(toPort, message)
       } else {
         status.buffer(toPort, message)
-        tracer.trace(s"SCHED BUFR ${fromNode}.${fromPort} → ${toNode}.${toPort}: ${message} (${status.buffered(toPort)})", TraceEventManager.MESSAGES)
+        tracer.trace(s"SCHED BUFR ${fromNode}.${fromPort} → ${toNode}.${toPort}: ${status.buffered(toPort)}", TraceEventManager.LISTEN)
+        tracer.trace(s"MESSAGE ${message}", TraceEventManager.MESSAGES)
       }
     }
     tracer.trace("debug", s"MUTEX UNLOCK for receive from $fromNode", TraceEventManager.MUTEX)
@@ -222,7 +224,8 @@ class GraphStatus(val scheduler: Scheduler) {
       tracer.trace("debug", s"MUTEX LOCKED for unbuffer($node)", TraceEventManager.MUTEX)
       val status = nodeStatus(node)
       for (buf <- status.unbuffer()) {
-        tracer.trace(s"SCHED UBUF ${buf._2} → ${node}.${buf._1}", TraceEventManager.MESSAGES)
+        tracer.trace(s"SCHED UBUF → ${node}.${buf._1}", TraceEventManager.LISTEN)
+        tracer.trace(s"MESSAGE ${buf._2}", TraceEventManager.MESSAGES)
         status.receive(buf._1, buf._2)
       }
     }

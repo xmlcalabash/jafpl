@@ -12,7 +12,8 @@ class JoinerAction(override val node: Joiner) extends AbstractAction(node) {
   private val messages = ListBuffer.empty[Tuple2[String,Message]]
 
   override def receive(port: String, message: Message): Unit = {
-    tracer.trace(s"RECV  $this for $port: $message", TraceEventManager.RECEIVE)
+    tracer.trace(s"RECV  $this for $port", TraceEventManager.RECEIVE)
+    tracer.trace(s"MESSAGE $message", TraceEventManager.MESSAGES)
     messages += Tuple2(port, message)
     ports.add(port)
   }
